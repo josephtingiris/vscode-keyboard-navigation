@@ -1,0 +1,13 @@
+*.vsix
+.DS_Store
+.cache/
+.venv/
+/.env
+/.vscode/**/workspaceStorage
+dist/
+node_modules/
+out/
+tmp/
+
+# Ignore compiled python caches in bin
+bin/__pycache__/
