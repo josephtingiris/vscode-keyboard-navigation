@@ -88,13 +88,13 @@ vsce package --allow-missing-repository --out dist/
 3. Install the produced VSIX:
 
 ```bash
-code --install-extension dist/key-nav-<version>.vsix
+code --install-extension dist/keyboard-navigation-<version>.vsix
 ```
 
 To force an overwrite during testing:
 
 ```bash
-code --install-extension --force dist/key-nav-<version>.vsix
+code --install-extension --force dist/keyboard-navigation-<version>.vsix
 ```
 
 Make sure to bump `extension/package.json` `version` before packaging when creating upgrades.
