@@ -1,0 +1,22 @@
+# normalize line endings for text files
+* text=auto
+
+# force LF for repository JSON/Markdown and node/shell/python scripts
+*.json text eol=lf
+*.md text eol=lf
+*.js text eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+
+# binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.vsix binary
+*.zip binary
+*.tar.gz binary
+
+# do not attempt to merge lockfiles
+package-lock.json merge=union
