@@ -26,7 +26,7 @@ Basic usage
 	the visible workbench surfaces.
 
 Configuration (selected)
-- `keyNav.enabled` (boolean): enable/disable the extension (default: `true`).
+- `keyboardNavigation.enabled` (boolean): enable/disable the extension (default: `true`).
 
 Support & development
 - Report issues, feature requests, or contribute on the GitHub repository root.

@@ -1,0 +1,5 @@
+# Exclude the following from the packaged VSIX
+*.vsix
+assets/
+dist/
+node_modules/
