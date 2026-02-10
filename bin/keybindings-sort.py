@@ -1,0 +1,808 @@
+#!/usr/bin/env python3
+"""
+Sort VS Code `keybindings.json` (JSONC) while preserving comments.
+
+Usage:
+    python3 bin/keybindings-sort.py [--primary {key,when}] < keybindings.json
+
+Examples:
+    python3 bin/keybindings-sort.py < keybindings.json > keybindings.sorted.json
+    python3 bin/keybindings-sort.py --primary when < keybindings.json > keybindings.sorted.by_when.json
+
+Options:
+    --primary, -p {key,when}   Primary sort field (default: key)
+    --secondary, -s {key,when} Secondary sort field (optional)
+    -h, --help                 Show this help and exit
+
+Behavior:
+    - Preserves comments and surrounding formatting before/after the top-level
+      array and inside each object.
+    - Sorts by `key` (natural order) and `when` specificity (broad to specific)
+      by default; `--primary when` makes `when` the primary sort key.
+    - Attempts to preserve trailing commas and annotates exact duplicates
+      with a trailing `// DUPLICATE` comment.
+
+Inputs / Outputs:
+    stdin:  JSONC text (keybindings array)
+    stdout: Sorted JSONC text encoded as UTF-8
+
+Exit codes:
+    0   Success
+    1   Usage / bad args
+    2   File read/write or other runtime error
+"""
+
+# (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
+import sys
+import re
+import json
+import argparse
+from typing import List, Tuple
+
+
+def extract_preamble_postamble(text):
+    """
+    Find the top-level JSON array brackets, skipping any brackets that appear
+    inside comments or strings in the preamble/postamble.
+    """
+    i = 0
+    n = len(text)
+    in_string = False
+    string_char = ''
+    esc = False
+    in_line_comment = False
+    in_block_comment = False
+    start = -1
+    
+    # Find opening bracket, skipping comments and strings
+    while i < n:
+        ch = text[i]
+        next2 = text[i:i+2] if i+2 <= n else ''
+        
+        if in_line_comment:
+            if ch == '\n':
+                in_line_comment = False
+            i += 1
+            continue
+        if in_block_comment:
+            if next2 == '*/':
+                in_block_comment = False
+                i += 2
+            else:
+                i += 1
+            continue
+        if in_string:
+            if esc:
+                esc = False
+            elif ch == '\\':
+                esc = True
+            elif ch == string_char:
+                in_string = False
+            i += 1
+            continue
+        
+        # Not in string/comment
+        if next2 == '//':
+            in_line_comment = True
+            i += 2
+            continue
+        if next2 == '/*':
+            in_block_comment = True
+            i += 2
+            continue
+        if ch == '"' or ch == "'":
+            in_string = True
+            string_char = ch
+            i += 1
+            continue
+        if ch == '[':
+            start = i
+            break
+        i += 1
+    
+    if start == -1:
+        return '', '', text
+    
+    # Find matching closing bracket
+    depth = 1
+    i = start + 1
+    in_string = False
+    string_char = ''
+    esc = False
+    in_line_comment = False
+    in_block_comment = False
+    end = -1
+    
+    while i < n:
+        ch = text[i]
+        next2 = text[i:i+2] if i+2 <= n else ''
+        
+        if in_line_comment:
+            if ch == '\n':
+                in_line_comment = False
+            i += 1
+            continue
+        if in_block_comment:
+            if next2 == '*/':
+                in_block_comment = False
+                i += 2
+            else:
+                i += 1
+            continue
+        if in_string:
+            if esc:
+                esc = False
+            elif ch == '\\':
+                esc = True
+            elif ch == string_char:
+                in_string = False
+            i += 1
+            continue
+        
+        # Not in string/comment
+        if next2 == '//':
+            in_line_comment = True
+            i += 2
+            continue
+        if next2 == '/*':
+            in_block_comment = True
+            i += 2
+            continue
+        if ch == '"' or ch == "'":
+            in_string = True
+            string_char = ch
+            i += 1
+            continue
+        if ch == '[':
+            depth += 1
+        elif ch == ']':
+            depth -= 1
+            if depth == 0:
+                end = i
+                break
+        i += 1
+    
+    if end == -1:
+        return '', '', text
+    
+    preamble = text[:start]
+    postamble = text[end+1:]
+    array_text = text[start+1:end]  # exclude [ and ]
+    return preamble, array_text, postamble
+
+
+def group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]], str]:
+    groups = []
+    comments = ''
+    buf = ''
+    depth = 0
+    in_obj = False
+    for line in array_text.splitlines(keepends=True):
+        stripped = line.strip()
+        if not in_obj:
+            if '{' in stripped:
+                in_obj = True
+                depth = stripped.count('{') - stripped.count('}')
+                buf = line
+            else:
+                comments += line
+        else:
+            buf += line
+            depth += line.count('{') - line.count('}')
+            if depth == 0:
+                groups.append((comments, buf))
+                comments = ''
+                buf = ''
+                in_obj = False
+    trailing_comments = comments
+    return groups, trailing_comments
+
+
+def strip_json_comments(text):
+    def replacer(match):
+        s = match.group(0)
+        if s.startswith('/'):
+            return ''
+        return s
+    pattern = r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)'  # string or comment
+    return re.sub(pattern, replacer, text, flags=re.DOTALL | re.MULTILINE)
+
+
+def strip_trailing_commas(text):
+    text = re.sub(r',\s*([}\]])', r'\1', text)
+    return text
+
+
+def natural_key(s):
+    import re
+    return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s)]
+
+
+def natural_key_case_sensitive(s):
+    import re
+    return [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', s)]
+
+
+def when_specificity(when_val: str) -> Tuple[int]:
+    """
+    Heuristic specificity score for a when clause. Lower is broader.
+        Returns a tuple so we can sort stably by:
+            1) number of condition terms (split on && / ||)
+    """
+    if not when_val:
+        return (0,)
+    # Count top-level terms via simple operator splitting
+    term_count = len(re.split(r'\s*&&\s*|\s*\|\|\s*', when_val.strip()))
+    return (term_count,)
+
+
+class WhenNode:
+    def __init__(self, parens: bool = False):
+        self.parens = parens
+
+
+class WhenLeaf(WhenNode):
+    def __init__(self, text: str, parens: bool = False):
+        super().__init__(parens=parens)
+        self.text = text
+
+    def to_str(self) -> str:
+        return self.text
+
+
+class WhenNot(WhenNode):
+    def __init__(self, child: WhenNode, parens: bool = False):
+        super().__init__(parens=parens)
+        self.child = child
+
+    def to_str(self) -> str:
+        child_str = self.child.to_str()
+        if isinstance(self.child, (WhenAnd, WhenOr)) and not self.child.parens:
+            child_str = f'({child_str})'
+        return f'!{child_str}'
+
+
+class WhenAnd(WhenNode):
+    def __init__(self, children, parens: bool = False):
+        super().__init__(parens=parens)
+        self.children = children
+
+    def to_str(self) -> str:
+        return ' && '.join([render_when_node(c) for c in self.children])
+
+
+class WhenOr(WhenNode):
+    def __init__(self, children, parens: bool = False):
+        super().__init__(parens=parens)
+        self.children = children
+
+    def to_str(self) -> str:
+        return ' || '.join([render_when_node(c) for c in self.children])
+
+
+def render_when_node(node: WhenNode) -> str:
+    inner = node.to_str()
+    if node.parens:
+        return f'({inner})'
+    return inner
+
+
+def normalize_operand(text: str) -> str:
+    collapsed = re.sub(r'\s+', ' ', text).strip()
+    return collapsed
+
+
+def tokenize_when(expr: str):
+    tokens = []
+    buf = ''
+    i = 0
+    n = len(expr)
+    in_single = False
+    in_double = False
+    in_regex = False
+    regex_escape = False
+    prev_nonspace = ''
+
+    def flush_buf():
+        nonlocal buf
+        if buf.strip():
+            tokens.append(('OPERAND', normalize_operand(buf)))
+        buf = ''
+
+    while i < n:
+        ch = expr[i]
+
+        if in_single:
+            buf += ch
+            if ch == '\\':
+                if i + 1 < n:
+                    buf += expr[i + 1]
+                    i += 1
+            elif ch == "'":
+                in_single = False
+            i += 1
+            continue
+
+        if in_double:
+            buf += ch
+            if ch == '\\':
+                if i + 1 < n:
+                    buf += expr[i + 1]
+                    i += 1
+            elif ch == '"':
+                in_double = False
+            i += 1
+            continue
+
+        if in_regex:
+            buf += ch
+            if regex_escape:
+                regex_escape = False
+            elif ch == '\\':
+                regex_escape = True
+            elif ch == '/':
+                in_regex = False
+            i += 1
+            continue
+
+        if ch.isspace():
+            buf += ch
+            i += 1
+            continue
+
+        if ch == "'":
+            in_single = True
+            buf += ch
+            i += 1
+            continue
+
+        if ch == '"':
+            in_double = True
+            buf += ch
+            i += 1
+            continue
+
+        if ch == '/' and prev_nonspace == '~':
+            in_regex = True
+            buf += ch
+            i += 1
+            continue
+
+        if expr.startswith('&&', i) or expr.startswith('||', i):
+            flush_buf()
+            tokens.append(('OP', expr[i:i+2]))
+            i += 2
+            prev_nonspace = ''
+            continue
+
+        if ch in '()':
+            flush_buf()
+            tokens.append(('OP', ch))
+            i += 1
+            prev_nonspace = ch
+            continue
+
+        if ch == '!':
+            nxt = expr[i+1] if i + 1 < n else ''
+            if nxt == '=':
+                buf += ch
+                i += 1
+                prev_nonspace = ch
+                continue
+            if not buf.strip():
+                flush_buf()
+                tokens.append(('OP', '!'))
+                i += 1
+                prev_nonspace = '!'
+                continue
+
+        buf += ch
+        if not ch.isspace():
+            prev_nonspace = ch
+        i += 1
+
+    flush_buf()
+    return tokens
+
+
+def parse_when(expr: str) -> WhenNode:
+    tokens = tokenize_when(expr)
+    idx = 0
+
+    def peek():
+        return tokens[idx] if idx < len(tokens) else None
+
+    def consume():
+        nonlocal idx
+        t = tokens[idx] if idx < len(tokens) else None
+        idx += 1
+        return t
+
+    def parse_primary():
+        t = peek()
+        if not t:
+            return WhenLeaf('')
+        if t[0] == 'OP' and t[1] == '(':
+            consume()  # (
+            node = parse_or()
+            if peek() and peek()[0] == 'OP' and peek()[1] == ')':
+                consume()
+                node.parens = True
+            return node
+        if t[0] == 'OPERAND':
+            consume()
+            return WhenLeaf(t[1])
+        return WhenLeaf('')
+
+    def parse_unary():
+        t = peek()
+        if t and t[0] == 'OP' and t[1] == '!':
+            consume()
+            return WhenNot(parse_unary())
+        return parse_primary()
+
+    def parse_and():
+        node = parse_unary()
+        children = [node]
+        while True:
+            t = peek()
+            if t and t[0] == 'OP' and t[1] == '&&':
+                consume()
+                children.append(parse_unary())
+            else:
+                break
+        if len(children) == 1:
+            return children[0]
+        return WhenAnd(children)
+
+    def parse_or():
+        node = parse_and()
+        children = [node]
+        while True:
+            t = peek()
+            if t and t[0] == 'OP' and t[1] == '||':
+                consume()
+                children.append(parse_and())
+            else:
+                break
+        if len(children) == 1:
+            return children[0]
+        return WhenOr(children)
+
+    return parse_or()
+
+
+def canonicalize_when(when_val: str) -> str:
+    """
+    Produce a canonical string for a `when` clause by sorting operands inside
+    every AND node according to project conventions. Preserves OR groupings and
+    existing parentheses; does not reorder OR-level operands.
+    """
+    if not when_val:
+        return ''
+
+    positional_prefixes = [
+        'panel.location',
+        'panelPosition',
+    ]
+    focus_keys = {
+        'activeEditor',
+        'auxiliaryBarFocus',
+        'editorFocus',
+        'editorTextFocus',
+        'focusedView',
+        'inputFocus',
+        'listFocus',
+        'notificationFocus',
+        'panelFocus',
+        'sideBarFocus',
+        'terminalFocus',
+        'textInputFocus',
+        'view.',
+        'view.<viewId>.visible',
+        'view.container.',
+        'viewContainer.',
+        'webviewFindWidgetVisible',
+        'workbench.panel.',
+        'workbench.view.',
+    }
+    visibility_keys = {
+        'auxiliaryBarVisible',
+        'editorVisible',
+        'notificationCenterVisible',
+        'notificationToastsVisible',
+        'outline.visible',
+        'panelVisible',
+        'searchViewletVisible',
+        'sideBarVisible',
+        'terminalVisible',
+        'timeline.visible',
+        'view.<viewId>.visible',
+    }
+
+    def left_identifier(text: str) -> str:
+        t = text.strip()
+        while t.startswith('(') and t.endswith(')'):
+            t = t[1:-1].strip()
+        if t.startswith('!'):
+            t = t[1:].lstrip()
+        if not t:
+            return t
+        return t.split()[0]
+
+    def _matches_entry(left: str, entry: str) -> bool:
+        if entry.endswith('.'):
+            return left.startswith(entry)
+        if '<viewId>' in entry:
+            prefix, suffix = entry.split('<viewId>', 1)
+            return left.startswith(prefix) and left.endswith(suffix)
+        return left == entry
+
+    def _is_focus(left: str) -> bool:
+        return any(_matches_entry(left, entry) for entry in focus_keys)
+
+    def _is_visibility(left: str) -> bool:
+        return any(_matches_entry(left, entry) for entry in visibility_keys)
+
+    def group_rank(text: str) -> int:
+        left = left_identifier(text)
+        # Group order: config.* -> positional prefixes -> focus -> visibility -> other
+        if left.startswith('config.'):
+            return 1
+        if any(left.startswith(p) for p in positional_prefixes):
+            return 2
+        if _is_focus(left):
+            return 3
+        if _is_visibility(left):
+            return 4
+        return 5
+
+    def sort_key(idx_and_node):
+        idx, node = idx_and_node
+        token = render_when_node(node)
+        order_token = token[1:] if token.startswith('!') else token
+        return (group_rank(token), natural_key_case_sensitive(order_token), idx)
+
+    def sort_and_nodes(node: WhenNode):
+        if isinstance(node, WhenAnd):
+            for child in node.children:
+                sort_and_nodes(child)
+            items = list(enumerate(node.children))
+            items.sort(key=sort_key)
+            # Assign sorted children and remove duplicates while preserving order
+            sorted_children = [it[1] for it in items]
+            unique: list[WhenNode] = []
+            seen = set()
+            for c in sorted_children:
+                tok = render_when_node(c)
+                if tok in seen:
+                    continue
+                seen.add(tok)
+                unique.append(c)
+            node.children = unique
+        elif isinstance(node, WhenOr):
+            for child in node.children:
+                sort_and_nodes(child)
+            # Remove duplicate OR operands while preserving order
+            unique: list[WhenNode] = []
+            seen = set()
+            for c in node.children:
+                tok = render_when_node(c)
+                if tok in seen:
+                    continue
+                seen.add(tok)
+                unique.append(c)
+            node.children = unique
+        elif isinstance(node, WhenNot):
+            sort_and_nodes(node.child)
+
+    ast = parse_when(when_val)
+    sort_and_nodes(ast)
+    return render_when_node(ast)
+
+
+def sortable_when_key(when_val: str) -> str:
+    if not when_val:
+        return ''
+    # Preserve negation for sorting to avoid unstable ordering when
+    # otherwise-identical clauses differ only by '!'.
+    return canonicalize_when(when_val)
+
+
+def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str = None) -> Tuple:
+    obj_match = re.search(r'\{.*\}', obj_text, re.DOTALL)
+    if not obj_match:
+        return ([], '', '')
+    obj_str = obj_match.group(0)
+    try:
+        clean = strip_json_comments(obj_str)
+        clean = strip_trailing_commas(clean)
+        obj = json.loads(clean)
+        key_val = str(obj.get('key', ''))
+        when_val = str(obj.get('when', ''))
+        canonical_when = canonicalize_when(when_val)
+        sortable_when = sortable_when_key(when_val)
+
+        # Build a flexible sort tuple based on primary/secondary preferences.
+        keys = []
+
+        def append_when():
+            # Use canonicalized when for ordering but ignore leading '!'
+            # so negation does not affect sort position. Case-sensitive.
+            keys.append(when_specificity(when_val))
+            keys.append(natural_key_case_sensitive(sortable_when))
+
+        def append_key():
+            keys.append(natural_key(key_val))
+
+        # Primary
+        if primary == 'when':
+            append_when()
+        else:
+            append_key()
+
+        # Secondary (if provided and different)
+        if secondary and secondary != primary:
+            if secondary == 'when':
+                append_when()
+            else:
+                append_key()
+
+        # Append any remaining fields not yet included
+        if 'when' not in (primary, secondary):
+            append_when()
+        if 'key' not in (primary, secondary):
+            append_key()
+
+        return tuple(keys)
+    except Exception:
+        return ([], '', '')
+
+
+def normalize_when_in_object(obj_text: str) -> Tuple[str, bool]:
+    pattern = re.compile(r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")')
+    match = pattern.search(obj_text)
+    if not match:
+        return obj_text, False
+    original_when = match.group(2)
+    normalized = canonicalize_when(original_when)
+    if normalized == original_when:
+        return obj_text, False
+    new_obj = obj_text[:match.start(2)] + normalized + obj_text[match.end(2):]
+    return new_obj, True
+
+
+def extract_key_when(obj_text: str) -> Tuple[str, str]:
+    obj_match = re.search(r'\{.*\}', obj_text, re.DOTALL)
+    if not obj_match:
+        return ('', '')
+    obj_str = obj_match.group(0)
+    try:
+        clean = strip_json_comments(obj_str)
+        clean = strip_trailing_commas(clean)
+        obj = json.loads(clean)
+        key_val = str(obj.get('key', ''))
+        when_val = str(obj.get('when', ''))
+        return (key_val, when_val)
+    except Exception:
+        return ('', '')
+
+
+def object_has_trailing_comma(obj_text: str) -> bool:
+    lines = obj_text.rstrip().splitlines()
+    found_closing = False
+    for line in reversed(lines):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if not found_closing and stripped.endswith('}'):  # first closing brace
+            found_closing = True
+            continue
+        if found_closing:
+            # Only allow whitespace or comments after closing brace
+            if stripped.startswith(','):
+                return True
+            elif stripped and not stripped.startswith('//') and not stripped.startswith('/*'):
+                return False
+    return False
+
+
+def usage(prog: str | None = None) -> None:
+    if prog is None:
+        prog = sys.argv[0].split('/')[-1]
+    msg = (
+        f"Usage: {prog} [--primary {{key,when}}] [--secondary {{key,when}}] < keybindings.json\n\n"
+        "Options:\n  --primary, -p {key,when}   Primary sort field (default: key)\n"
+        "  --secondary, -s {key,when} Secondary sort field (optional)\n"
+        "  -h, --help                Show this usage message and exit\n"
+    )
+    print(msg, file=sys.stderr)
+    sys.exit(1)
+
+
+def main():
+    raw_argv = sys.argv[1:]
+    if any(a in ('-h', '--help') for a in raw_argv):
+        usage()
+    parser = argparse.ArgumentParser(
+        description='Sort VS Code keybindings.json by key/when')
+    parser.add_argument('--primary', '-p', choices=['key', 'when'], default='key',
+                        help="Primary sort field: 'key' (default) or 'when')")
+    parser.add_argument('--secondary', '-s', choices=['key', 'when'], default=None,
+                        help="Secondary sort field: 'key' or 'when' (optional)")
+    args = parser.parse_args()
+
+    primary_order = args.primary
+    secondary_order = args.secondary
+    # Always normalize `when` clauses so sub-clauses are deduped and grouped
+    # consistently before any sorting.
+    normalize_when = True
+
+    raw = sys.stdin.read()
+    preamble, array_text, postamble = extract_preamble_postamble(raw)
+    groups, trailing_comments = group_objects_with_comments(array_text)
+
+    normalized_groups = []
+    for comments, obj in groups:
+        obj_out = obj.rstrip()
+        when_changed = False
+        if normalize_when:
+            obj_out, when_changed = normalize_when_in_object(obj_out)
+            if when_changed:
+                comments = re.sub(r'^\s*//\s*when-sorted:.*\n',
+                                  '', comments, flags=re.MULTILINE)
+        normalized_groups.append((comments, obj_out))
+
+    # Sort by chosen primary (natural), then the other field (natural), then by _comment
+    sorted_groups = sorted(normalized_groups, key=lambda pair: extract_sort_keys(
+        pair[1], primary=primary_order, secondary=secondary_order))
+    seen = set()
+    sys.stdout.write(preamble)
+    # Ensure the opening bracket is on its own line
+    sys.stdout.write('[\n')
+    for i, (comments, obj) in enumerate(sorted_groups):
+        is_last = (i == len(sorted_groups) - 1)
+        obj_out = obj.rstrip()
+        key_val, when_val = extract_key_when(obj_out)
+        canonical_when = canonicalize_when(when_val)
+        pair_id = (key_val, canonical_when)
+        # Annotate if duplicate
+        if pair_id in seen:
+            comments += f'// DUPLICATE key: {key_val!r} when: {canonical_when!r}\n'
+        seen.add(pair_id)
+        # Strip blank-only lines from comment blocks so sorting does not
+        # introduce spurious empty lines between objects.
+        if comments:
+            comments = re.sub(r'(?m)^[ \t]*\n+', '', comments)
+        sys.stdout.write(comments)
+        idx = obj_out.rfind('}')
+        if idx != -1:
+            after = obj_out[idx+1:]
+            after_clean = re.sub(r'^\s*,+', '', after)
+            obj_out = obj_out[:idx+1] + after_clean
+        sys.stdout.write(obj_out)
+        if not is_last and not object_has_trailing_comma(obj_out):
+            sys.stdout.write(',')
+        sys.stdout.write('\n')
+
+    # Write any trailing comments that followed the array contents
+    sys.stdout.write(trailing_comments)
+    # If trailing_comments is present, ensure it ends with a newline so the
+    # closing bracket appears on its own line. If no trailing_comments were
+    # object so the bracket will still be on its own line.
+    # written, the previous loop already emitted a newline after the last
+    if trailing_comments and not trailing_comments.endswith('\n'):
+        sys.stdout.write('\n')
+    # Trim leading/trailing blanks (spaces and blank lines) from the
+    # postamble and append it. This prevents accidental blank lines being
+    # introduced while preserving the postamble content.
+    postamble_trimmed = re.sub(r'^[ \t\r\n]+|[ \t\r\n]+$', '', postamble)
+    if postamble_trimmed:
+        sys.stdout.write(']\n' + postamble_trimmed + '\n')
+    else:
+        sys.stdout.write(']\n')
+
+
+if __name__ == "__main__":
+    main()
