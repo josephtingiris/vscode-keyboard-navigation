@@ -11,6 +11,7 @@ and working with the VS Code Keyboard Navigation extension and repository tools.
    - [Window-channel format notes](#window-channel-format-notes)
 - [Active development](#active-development)
    - [Auto-install & testing references](#auto-install-references)
+   - [Project Bash Helpers](#project-bash-helpers)
 - [Packaging & local install (VSIX)](#packaging-local-install-vsix)
 
 ---
@@ -63,6 +64,57 @@ chmod +x bin/watch-runner.sh bin/keybindings-install-references.sh
 The watcher runs quietly and executes the installer script on file changes. Stop it with Ctrl+C or `pkill -f watch-runner.sh`.
 
 Notes on the installer: the script attempts to detect WSL vs native Windows and copy the file into the proper user keybindings location.
+
+---
+
+<a id="project-bash-helpers"></a>
+### Project Bash Helpers
+
+This repository includes a small `etc/bash.d` directory with shell helper
+scripts intended to be sourced by tools such as the `bd` (Bash Directory)
+autoloader. These helpers provide convenient environment wiring for local
+development tasks and can be loaded automatically by `bd`.
+
+Install `bd` (automatic):
+
+```bash
+cd
+curl -Ls https://raw.githubusercontent.com/bash-d/bd/main/bd-install.sh | /usr/bin/env bash -s _ replace
+. "$HOME/.bash_profile"
+bd env
+```
+
+Manual install:
+
+1. Download a release into `~/.bd`.
+2. Add the following to your shell profile:
+   ```bash
+   [ -r "$HOME/.bd/bd.sh" ] && source "$HOME/.bd/bd.sh"
+   bd env
+   ```
+
+Use with this repo:
+
+1. From the repository root, export this directory into the autoloader search path:
+
+```bash
+export BD_AUTOLOADER_DIRS="$PWD/etc/bash.d:${BD_AUTOLOADER_DIRS:-}"
+```
+
+2. Source `bd.sh` (or start a shell where your profile does it) so `bd` discovers the directory:
+
+```bash
+[ -r "$HOME/.bd/bd.sh" ] && source "$HOME/.bd/bd.sh"
+bd env
+```
+
+3. Drop `*.sh` or `*.bash` helpers in this folder; `bd` will source them in lexical order. Prefer numbered prefixes (for example `10-path.sh`) for explicit ordering.
+
+Recommended practices:
+
+- Keep functions idempotent and safe when sourced multiple times.
+- Group related helpers into separate files to aid discoverability.
+- Use comments at the top of each script to explain purpose and any prerequisites.
 
 ---
 
