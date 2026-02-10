@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "asvetliakov.vscode-neovim",
+    "esbenp.prettier-vscode",
+    "github.copilot-chat",
+    "github.vscode-pull-request-github",
+    "mkhl.shfmt",
+    "ms-vscode.makefile-tools",
+    "ms-vscode-remote.remote-containers"
+  ],
+  "unwantedRecommendations": []
+}

@@ -1,0 +1,19 @@
+{
+  "folders": [
+    {
+      "path": ".",
+    },
+  ],
+  "settings": {
+    // settings that should be here (or in user settings), not in directory .vscode/settings.json
+    "makefile.configureOnOpen": false,
+    "shfmt.executablePath": "shfmt",
+    "shfmt.executableArgs": [
+      "--indent",
+      "4",
+      "--space-redirects",
+      "--case-indent",
+      "--simplify",
+    ],
+  },
+}
