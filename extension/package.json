@@ -12,7 +12,7 @@
   "engines": {
     "vscode": "^1.60.0"
   },
-  "description": "An opinionated keyboard grammar that focuses on speedrunning the Workbench UI",
+  "description": "An opinionated keyboard grammar extension that focuses on speedrunning the Workbench UI",
   "categories": [
     "Keymaps",
     "Themes",
@@ -27,18 +27,18 @@
       {
         "command": "keyboardNavigation.resetLayout",
         "title": "Reset Workbench Layout",
-        "category": "keyboardNavigation"
+        "category": "Keyboard Navigation"
       }
       ,
       {
         "command": "keyboardNavigation.applyVisualHighlights",
         "title": "Apply Visual Highlights",
-        "category": "keyboardNavigation"
+        "category": "Keyboard Navigation"
       },
       {
         "command": "keyboardNavigation.toggleVisualHighlights",
         "title": "Toggle Visual Highlights",
-        "category": "keyboardNavigation"
+        "category": "Keyboard Navigation"
       }
     ],
     "keybindings": [
