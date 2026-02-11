@@ -26,7 +26,7 @@ Scope:
 
 Conventions:
   * treat 'up' or 'k' or 'right' or 'l' as 'next'
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !panelFocus && editorFocus && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !panelFocus && editorFocus && activeEditorGroupIndex > 0 && activeeEditorGroupIndex < 2 && activeEditorIsFirstInGroup"
   * if there is a commented command in an object:
     - if it is ABOVE the active command:, then it is a potential future command that i have not yet implemented
     - if it is BELOW the active command:, then it is an old command that has been replaced but left for reference (lower is older)
@@ -39,10 +39,10 @@ Constraints:
   * vscode integrated terminals only split one way, depending on the orientation of the panel. see: https://github.com/microsoft/vscode/issues/160501
 
 Notes:
-  * my primary editor is [neo]vim, so these keybindings are designed to augment and blend in with the traditional vi keyboard grammar (and subsequent muscle memory).
-  * i try to avoid conflicts with default bindings and common extensions, however some conflicts are unavoidable and can be noted
-  * i still need to test compatibility with other extensions, particularly vim emulation extensions
-  * i'm aware of numerous conflicts with the vs code multiple cursor feature, and will circle back to resolve them later (once I learn to use it better)
+  * My primary editor is [neo]vim, so these keybindings are designed to augment and blend in with the traditional vi keyboard grammar (and subsequent muscle memory).
+  * I try to avoid conflicts with default bindings and common extensions, however some conflicts are unavoidable.
+  * I test daily with vscode-neovim but still need to test compatibility with other extensions, particularly vim emulation extensions.
+  * I'm aware of numerous conflicts with the vs code multiple cursor feature, and will circle back to resolve them later (once I learn to use it better).
 */
 [
   {
@@ -72,20 +72,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (split) (horizontal)
-    "key": "alt+-",
-    "command": "workbench.action.splitEditorDown",
-    // "command": "alt+- 301f",
-    "when": "config.keyboardNavigation.enabled && editorFocus"
-  },
-  {
-    // (split) (horizontal)
-    "key": "alt+-",
-    "command": "workbench.action.terminal.split",
-    "when": "config.keyboardNavigation.enabled && panelFocus && terminalFocus"
-  },
-  {
-    // (split) (horizontal) - Settings editor, Keyboard Shortcuts, et al
+    // (down) (split) (horizontal) - Settings editor, Keyboard Shortcuts, et al
     "key": "alt+-",
     "command": "workbench.action.splitEditorDown",
     // "command": "alt+- 83bb",
@@ -120,27 +107,6 @@ Notes:
     "key": "alt+=",
     "command": "(model) alt+= b752",
     "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // (split) (vertical)
-    "key": "alt+=",
-    "command": "workbench.action.splitEditor",
-    // "command": "alt+= 54b0",
-    "when": "config.keyboardNavigation.enabled && editorFocus"
-  },
-  {
-    // (split) (vertical)
-    "key": "alt+=",
-    "command": "workbench.action.terminal.split",
-    // "command": "alt+= 9e54",
-    "when": "config.keyboardNavigation.enabled && panelFocus && terminalFocus"
-  },
-  {
-    // (split) (vertical) - Settings editor, Keyboard Shortcuts, et al
-    "key": "alt+=",
-    "command": "workbench.action.splitEditor",
-    // "command": "alt+= 83ba",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
   },
   {
     // (left)
@@ -208,6 +174,31 @@ Notes:
     "when": "config.keyboardNavigation.enabled && panelPosition == 'top'"
   },
   {
+    // (zoom) (editor) - alternative zen mode toggle chord
+    "key": "alt+a alt+z",
+    "command": "workbench.action.toggleZenMode",
+    // "command": "alt+a alt+p 4242",
+    "when": "config.keyboardNavigation.enabled && editorFocus"
+  },
+  {
+    // (panel) - open (file) explorer
+    "key": "alt+a e",
+    "command": "workbench.view.explorer",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (panel) - open find in files
+    "key": "alt+a f",
+    "command": "workbench.action.findInFiles",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (panel) - open scm (git) changes
+    "key": "alt+a g",
+    "command": "workbench.view.scm",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
     "key": "alt+a v",
     "command": "alt+a v 69f8",
     // "command": "workbench.action.toggleActivityBarVisibility",
@@ -238,7 +229,6 @@ Notes:
     // (zoom) - maximize editor group
     "key": "alt+a z",
     "command": "workbench.action.toggleMaximizeEditorGroup",
-    // "command": "workbench.action.toggleZenMode",
     // "command": "alt+a z fe32",
     "when": "config.keyboardNavigation.enabled && editorFocus && !panelFocus"
   },
@@ -348,6 +338,13 @@ Notes:
     "command": "workbench.action.focusActiveEditorGroup",
     // "command": "alt+h 6318",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left' && auxiliaryBarFocus && !panelVisible && editorIsOpen"
+  },
+  {
+    // (left) (vi)
+    "key": "alt+h",
+    "command": "workbench.action.focusActiveEditorGroup",
+    // "command": "alt+h 6319",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left' && auxiliaryBarFocus && panelVisible && editorIsOpen"
   },
   {
     // (left) (vi) (edge) (wrap)
@@ -1294,7 +1291,7 @@ Notes:
     "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
   },
   {
-    // (left) (vi)
+    // (left) (vi) - this is a candidate keybinding to move editors within groups
     "key": "ctrl+shift+alt+h",
     "command": "(model) ctrl+shift+alt+h f90f",
     // "command": "cursorWordPartLeftSelect",
@@ -1558,25 +1555,68 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // (left) (editor) (juke) (sidestep)
+    "key": "shift+alt+,",
+    "command": "workbench.action.previousEditor",
+    // "command": "shift+alt+, de62",
+    "when": "config.keyboardNavigation.enabled && editorFocus"
+  },
+  {
+    // (left) (panel) (juke) (sidestep)
+    "key": "shift+alt+,",
+    "command": "workbench.action.previousPanelView",
+    // "command": "shift+alt+, f057",
+    "when": "config.keyboardNavigation.enabled && panelFocus"
+  },
+  {
+    // (left) (panel) (juke) (sidestep)
+    "key": "shift+alt+,",
+    "command": "workbench.action.previousPanelView",
+    // "command": "shift+alt+, c899",
+    "when": "config.keyboardNavigation.enabled && !editorFocus && panelFocus"
+  },
+  {
+    // (left) (editor) (juke) (sidestep)
+    "key": "shift+alt+,",
+    "command": "workbench.action.previousEditor",
+    // "command": "(model) shift+alt+, a60e",
+    "when": "config.keyboardNavigation.enabled && editorFocus && !panelFocus"
+  },
+  {
+    // (left) (panel) (juke) (sidestep) - is this necessary? (i think it is, otherwise there would be no way to navigate to the previous panel view when both an editor and panel are focused)
+    "key": "shift+alt+,",
+    "command": "shift+alt+, 70d8",
+    // "command": "workbench.action.previousPanelView",
+    "when": "config.keyboardNavigation.enabled && editorFocus && focusedView != '' && panelFocus"
+  },
+  {
+    // (left) (editor) (juke) (sidestep) - Settings editor, Keyboard Shortcuts, et al
+    "key": "shift+alt+,",
+    "command": "workbench.action.previousEditor",
+    // "command": "shift+alt+, 4823",
+    "when": "config.keyboardNavigation.enabled && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
     "key": "shift+alt+-",
     "command": "(model) shift+alt+- 8490",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (split) (horizontal)
+    // (down) (split) (horizontal)
     "key": "shift+alt+-",
     "command": "workbench.action.splitEditorDown",
     // "command": "(model) shift+alt+- 8491",
     "when": "config.keyboardNavigation.enabled && editorFocus"
   },
   {
-    // (split) (horizontal)
+    // (split) (horizontal) - terminal only splits one way, depending on where it's docked
     "key": "shift+alt+-",
-    "command": "workbench.action.terminal.split",
+    "command": "workbench.action.terminal.new",
+    //"command": "workbench.action.terminal.split",
     "when": "config.keyboardNavigation.enabled && panelFocus && terminalFocus"
   },
   {
-    // (split) (horizontal) - Settings editor, Keyboard Shortcuts, et al
+    // (down) (split) (horizontal) - Settings editor, Keyboard Shortcuts, et al
     "key": "shift+alt+-",
     "command": "workbench.action.splitEditorDown",
     // "command": "shift+alt+- 83be",
@@ -1587,6 +1627,34 @@ Notes:
     "key": "shift+alt+.",
     "command": "(model) shift+alt+. 7bf5",
     "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (right) (editor) (juke) (sidestep)
+    "key": "shift+alt+.",
+    "command": "workbench.action.nextEditor",
+    // "command": "shift+alt+. cc62",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus"
+  },
+  {
+    // (right) (panel) (juke) (sidestep)
+    "key": "shift+alt+.",
+    "command": "workbench.action.nextPanelView",
+    // "command": "shift+alt+. e857",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && panelFocus"
+  },
+  {
+    // (right) (editor) (panel) (juke) (sidestep)
+    "key": "shift+alt+.",
+    "command": "workbench.action.nextPanelView",
+    // "command": "shift+alt+. 90d8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus && focusedView != '' && panelFocus"
+  },
+  {
+    // (right) (editor) (juke) (sidestep) - Settings editor, Keyboard Shortcuts, et al
+    "key": "shift+alt+.",
+    "command": "workbench.action.nextEditor",
+    // "command": "shift+alt+. 403a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
   },
   {
     // (left)
@@ -1606,6 +1674,13 @@ Notes:
     "command": "workbench.action.splitEditor",
     // "command": "(model) shift+alt+= 9043",
     "when": "config.keyboardNavigation.enabled && editorFocus"
+  },
+  {
+    // (split) (vertical) - terminal only splits one way, depending on where it's docked (terminal splits down when docked to the right, and splits right when docked to the bottom), so this keybinding is necessary to allow splitting in both directions regardless of where the terminal is docked
+    "key": "shift+alt+=",
+    "command": "workbench.action.terminal.split",
+    // "command": "shift+alt+= 9e54",
+    "when": "config.keyboardNavigation.enabled && panelFocus && terminalFocus"
   },
   {
     // (split) (vertical) - Settings editor, Keyboard Shortcuts, et al
@@ -1671,38 +1746,23 @@ Notes:
     "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
   },
   {
-    // (arrow)
-    "key": "shift+alt+end",
-    "command": "workbench.action.moveEditorToEnd",
-    // "command": "(model) shift+alt+home 23d9",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && editorFocus"
-  },
-  {
-    // (arrows) - Settings editor, Keyboard Shortcuts, et al
-    "key": "shift+alt+end",
-    "command": "workbench.action.moveEditorToEnd",
-    // "command": "shift+alt+end f107",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
-  },
-  {
     // (left) (vi)
     "key": "shift+alt+h",
     "command": "(model) shift+alt+h a60d",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
-    // (left) (vi) (panel)
+    // (left) (vi)
     "key": "shift+alt+h",
-    "command": "workbench.action.previousPanelView",
-    // "command": "shift+alt+h c899",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !editorFocus && panelFocus"
+    "command": "(model) shift+alt+h a66d",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus"
   },
   {
     // (left) (vi)
     "key": "shift+alt+h",
-    "command": "workbench.action.previousEditor",
-    // "command": "(model) shift+alt+h a60e",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus && !panelFocus"
+    "command": "workbench.action.focusLeftGroup",
+    // "command": "(model) shift+alt+h adec",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus && multipleEditorGroups"
   },
   {
     // (left) (vi) (panel) (terminal)
@@ -1710,13 +1770,6 @@ Notes:
     "command": "workbench.action.terminal.focusPreviousPane",
     // "command": "shift+alt+h a330",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && panelFocus && terminalFocus && terminalCount > 1 && terminalSplitPaneActive"
-  },
-  {
-    // (left) (vi) - Settings editor, Keyboard Shortcuts, et al
-    "key": "shift+alt+h",
-    "command": "workbench.action.previousEditor",
-    // "command": "shift+alt+h 4823",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
   },
   {
     "key": "shift+alt+home",
@@ -1729,20 +1782,6 @@ Notes:
     "key": "shift+alt+home",
     "command": "(model) shift+alt+home 23d7",
     "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "shift+alt+home",
-    "command": "workbench.action.moveEditorToStart",
-    // "command": "(model) shift+alt+home 23d8",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && editorFocus"
-  },
-  {
-    // (arrows) - Settings editor, Keyboard Shortcuts, et al
-    "key": "shift+alt+home",
-    "command": "workbench.action.moveEditorToStart",
-    // "command": "shift+alt+home f109",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
   },
   {
     // (down) (vi) (inside)
@@ -1777,13 +1816,6 @@ Notes:
     "command": "shift+alt+j b422",
     // "command": "workbench.action.focusPreviousPart",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus && activeEditorGroupIndex == 1 && !multipleEditorGroups"
-  },
-  {
-    // (down)
-    "key": "shift+alt+j",
-    "command": "workbench.action.nextEditor",
-    // "command": "shift+alt+j 55e1",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus && activeEditorGroupIndex > 1 && activeEditorIsLastInGroup && multipleEditorGroups"
   },
   {
     // (down) (vi) (inside) (terminal)
@@ -1828,11 +1860,11 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus"
   },
   {
-    // (up) (vi) (inside) (editor)
+    // (up) (vi) (inside) (editor) (edge)
     "key": "shift+alt+k",
     "command": "shift+alt+j a481",
-    // "command": "workbench.action.focusAboveGroup",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus && multipleEditorGroups"
+    // "command": "noop"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && editorFocus && multipleEditorGroups"
   },
   {
     // (up) (vi) (inside) (terminal)
@@ -1842,11 +1874,21 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && panelPosition == 'bottom' && terminalFocus && terminalCount > 1"
   },
   {
-    // (up) (vi) (inside) (editor) (edge) (wrap) - if on first editor group, wrap to last editor group
+    // (up) (vi) (inside) (editor) (edge) (wrap)
     "key": "shift+alt+k",
+    // "command": "workbench.action.focusAboveGroup",
     "command": "shift+alt+k a400",
     // "command": "workbench.action.focusLastEditorGroup",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi config.keyboardNavigation.wrap && editorFocus && activeEditorGroupIndex == 1 && multipleEditorGroups"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && editorFocus && activeEditorGroupIndex == 1 && multipleEditorGroups"
+    // "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && editorFocus && activeEditorGroupIndex <= 1 && multipleEditorGroups"
+    // "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && editorFocus && activeEditorGroupIndex < 2 && activeEditorGroupIndex > 0 && multipleEditorGroups"
+  },
+  {
+    // (up) (vi) (inside) (editor) (edge)
+    "key": "shift+alt+k",
+    "command": "workbench.action.focusAboveGroup",
+    // "command": "shift+alt+j a482",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && editorFocus && activeEditorGroupIndex > 1 && multipleEditorGroups"
   },
   {
     // (up) (vi) (inside)
@@ -1854,6 +1896,13 @@ Notes:
     "command": "workbench.action.terminal.focusPrevious",
     // "command": "shift+alt+k a2d4",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && panelPosition == 'bottom' && panelFocus && terminalFocus && terminalCount > 1"
+  },
+  {
+    // (up) (vi) (inside) (editor) - Settings editor, Keyboard Shortcuts, et al
+    "key": "shift+alt+k",
+    "command": "workbench.action.focusAboveGroup",
+    // "command": "shift+alt+k 229f",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
   },
   {
     // (up) (vi) (inside) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - if on first editor group, wrap to last editor group
@@ -1870,19 +1919,6 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
-    "key": "shift+alt+l",
-    "command": "workbench.action.nextEditor",
-    // "command": "shift+alt+l cc62",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus"
-  },
-  {
-    // (right) (vi)
-    "key": "shift+alt+l",
-    "command": "workbench.action.nextPanelView",
-    // "command": "shift+alt+l e857",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && panelFocus"
-  },
-  {
     // (right) (vi)
     "key": "shift+alt+l",
     "command": "shift+alt+l 8c60",
@@ -1890,11 +1926,11 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor == 'workbench.editor.keybindings' && editorFocus"
   },
   {
-    // (right)
+    // (right) (vi)
     "key": "shift+alt+l",
-    "command": "workbench.action.nextPanelView",
-    // "command": "shift+alt+l 90d8",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus && focusedView != '' && panelFocus"
+    "command": "workbench.action.focusRightGroup",
+    // "command": "(model) shift+alt+l cd4c",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus && multipleEditorGroups"
   },
   {
     // (split) (right) (vi) (panel) (terminal) - focused terminal is split pane
@@ -1903,13 +1939,6 @@ Notes:
     // "command": "shift+alt+l ca60",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && panelFocus && terminalFocus && terminalCount > 1 && terminalSplitPaneActive"
     // "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && panelFocus && terminalFocus && terminalCount > 1 && terminalSplitPaneActive"
-  },
-  {
-    // (right) (vi) - Settings editor, Keyboard Shortcuts, et al
-    "key": "shift+alt+l",
-    "command": "workbench.action.nextEditor",
-    // "command": "shift+alt+l 32e7",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
   },
   {
     // (left) (arrow)
@@ -1930,6 +1959,13 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // (left)
+    "key": "shift+alt+meta+,",
+    "command": "workbench.action.moveEditorLeftInGroup",
+    // "command": "(model) shift+alt+meta+, 9940",
+    "when": "config.keyboardNavigation.enabled && editorFocus"
+  },
+  {
     "key": "shift+alt+meta+-",
     "command": "(model) shift+alt+meta+- 9b4b",
     "when": "config.keyboardNavigation.enabled"
@@ -1939,6 +1975,13 @@ Notes:
     "key": "shift+alt+meta+.",
     "command": "(model) shift+alt+meta+. 60f7",
     "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (right)
+    "key": "shift+alt+meta+.",
+    "command": "workbench.action.moveEditorRightInGroup",
+    // "command": "(model) shift+alt+meta+. 60f8",
+    "when": "config.keyboardNavigation.enabled && editorFocus"
   },
   {
     // (left)
@@ -1986,10 +2029,31 @@ Notes:
     "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
   },
   {
+    // (arrow)
+    "key": "shift+alt+meta+end",
+    "command": "workbench.action.moveEditorToEnd",
+    // "command": "(model) shift+alt+meta+home 23e9",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && editorFocus"
+  },
+  {
+    // (arrows) - Settings editor, Keyboard Shortcuts, et al
+    "key": "shift+alt+meta+end",
+    "command": "workbench.action.moveEditorToEnd",
+    // "command": "shift+alt+meta+end e107",
+    "when": "config.keyboardNavigation.enabled && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
     // (left) (vi)
     "key": "shift+alt+meta+h",
     "command": "(model) shift+alt+meta+h aba8",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
+  },
+  {
+    // (left) (vi)
+    "key": "shift+alt+meta+h",
+    "command": "workbench.action.moveEditorToLeftGroup",
+    // "command": "(model) shift+alt+meta+h 25e4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus"
   },
   {
     // (left) (vi) - Settings editor, Keyboard Shortcuts, et al
@@ -2004,6 +2068,20 @@ Notes:
     "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
   },
   {
+    // (arrow)
+    "key": "shift+alt+meta+home",
+    "command": "workbench.action.moveEditorToStart",
+    // "command": "(model) shift+alt+meta+home 129d",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && editorFocus"
+  },
+  {
+    // (arrows) - Settings editor, Keyboard Shortcuts, et al
+    "key": "shift+alt+meta+home",
+    "command": "workbench.action.moveEditorToStart",
+    // "command": "shift+alt+meta+home ee07",
+    "when": "config.keyboardNavigation.enabled && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
     // (down) (vi)
     "key": "shift+alt+meta+j",
     "command": "(model) shift+alt+meta+j 5749",
@@ -2013,13 +2091,14 @@ Notes:
     // (down) (vi)
     "key": "shift+alt+meta+j",
     "command": "workbench.action.moveEditorToBelowGroup",
-    // "command": "(model) shift+alt+meta+j 5750",
+    // "command": "(model) shift+alt+meta+j 5349",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus"
   },
   {
-    // (down) (vi) - Settings editor, Keyboard Shortcuts, et al
+    // (down) (vi) - Settings editor, Keyboard Shortcuts, et al - move to right
     "key": "shift+alt+meta+j",
-    "command": "shift+alt+meta+h f833",
+    "command": "workbench.action.moveEditorToBelowGroup",
+    // "command": "(model) shift+alt+meta+j 5350",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
   },
   {
@@ -2036,9 +2115,11 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus"
   },
   {
-    // (up) (vi) - Settings editor, Keyboard Shortcuts, et al
+    // (up) (vi)
     "key": "shift+alt+meta+k",
-    "command": "shift+alt+meta+h ff00",
+    "command": "workbench.action.moveEditorToAboveGroup",
+    // "command": "(model) shift+alt+meta+j 5360",
+    // "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus"
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
   },
   {
@@ -2046,6 +2127,13 @@ Notes:
     "key": "shift+alt+meta+l",
     "command": "(model) shift+alt+meta+l 3b6a",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
+  },
+  {
+    // (right) (vi)
+    "key": "shift+alt+meta+l",
+    "command": "workbench.action.moveEditorToRightGroup",
+    // "command": "(model) shift+alt+meta+k 25e3",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus"
   },
   {
     // (right) (vi) - Settings editor, Keyboard Shortcuts, et al
