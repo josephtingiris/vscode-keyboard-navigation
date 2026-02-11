@@ -1562,6 +1562,13 @@ Notes:
     "when": "config.keyboardNavigation.enabled && editorFocus"
   },
   {
+    // (left)
+    "key": "shift+alt+,",
+    "command": "(model) shift+alt+, 3fe8",
+    "when": "config.keyboardNavigation.enabled && panelFocus"
+  },
+// DUPLICATE key: 'shift+alt+,' when: 'config.keyboardNavigation.enabled && panelFocus'
+  {
     // (left) (panel) (juke) (sidestep)
     "key": "shift+alt+,",
     "command": "workbench.action.previousPanelView",
@@ -1588,6 +1595,13 @@ Notes:
     "command": "shift+alt+, 70d8",
     // "command": "workbench.action.previousPanelView",
     "when": "config.keyboardNavigation.enabled && editorFocus && focusedView != '' && panelFocus"
+  },
+  {
+    // (left) (panel) (juke) (sidestep) - is this necessary?
+    "key": "shift+alt+,",
+    "command": "shift+alt+, 70ee",
+    // "command": "workbench.action.previousPanelView",
+    "when": "config.keyboardNavigation.enabled && editorFocus && focusedView == '' && panelFocus"
   },
   {
     // (left) (editor) (juke) (sidestep) - Settings editor, Keyboard Shortcuts, et al
