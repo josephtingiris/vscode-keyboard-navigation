@@ -4,10 +4,9 @@
 .venv/
 /.env
 /.vscode/**/workspaceStorage
+bin/__pycache__/
 dist/
 node_modules/
 out/
+personal*
 tmp/
-
-# Ignore compiled python caches in bin
-bin/__pycache__/
