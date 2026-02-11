@@ -131,13 +131,23 @@ all_mods = MODIFIERS_SINGLE + MODIFIERS_MULTI
 
 for key in KEYS:
     for mod in all_mods:
-        key_str = f"{mod}+{key}"
-        cmd = f"(model) {key_str} {hex4()}"
-        when = when_for(key)
-        tags = tags_for(key)
-        # only include comment if key belongs to at least one mapping group
-        comment_tags = tags if tags else []
-        records.append((key_str, cmd, when, comment_tags))
+            key_str = f"{mod}+{key}"
+            base_when = when_for(key)
+            tags = tags_for(key)
+            # only include comment if key belongs to at least one mapping group
+            comment_tags = tags if tags else []
+
+            # include the base when condition with its own unique id
+            cmd_base = f"(model) {key_str} {hex4()}"
+            records.append((key_str, cmd_base, base_when, comment_tags))
+
+            # additional when-context variants to generate separate objects for
+            EXTRA_WHENS = ["config.keyboardNavigation.wrap", "!config.keyboardNavigation.wrap"]
+            for extra in EXTRA_WHENS:
+                combined_when = f"{base_when} && {extra}"
+                # generate a unique id for each extra variant
+                cmd_extra = f"(model) {key_str} {hex4()}"
+                records.append((key_str, cmd_extra, combined_when, comment_tags))
 
 # Ouput JSONC array
 out_lines = []
