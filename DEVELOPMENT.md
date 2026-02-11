@@ -70,10 +70,7 @@ Notes on the installer: the script attempts to detect WSL vs native Windows and 
 <a id="project-bash-helpers"></a>
 ### Project Bash Helpers
 
-This repository includes a small `etc/bash.d` directory with shell helper
-scripts intended to be sourced by tools such as the `bd` (Bash Directory)
-autoloader. These helpers provide convenient environment wiring for local
-development tasks and can be loaded automatically by `bd`.
+This repository includes a small `etc/bash.d` directory with shell helper scripts intended to be sourced by tools such as the `bd` (Bash Directory) autoloader. These helpers provide convenient environment wiring for local development tasks and can be loaded automatically by `bd`.
 
 Install `bd` (automatic):
 
