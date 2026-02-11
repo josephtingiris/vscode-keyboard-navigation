@@ -31,6 +31,7 @@ from __future__ import annotations
 import json
 import sys
 from random import Random
+from itertools import combinations
 
 # Deterministic RNG for reproducible outputs
 rng = Random(0)
@@ -142,12 +143,35 @@ for key in KEYS:
             records.append((key_str, cmd_base, base_when, comment_tags))
 
             # additional when-context variants to generate separate objects for
-            EXTRA_WHENS = ["config.keyboardNavigation.wrap", "!config.keyboardNavigation.wrap"]
-            for extra in EXTRA_WHENS:
-                combined_when = f"{base_when} && {extra}"
-                # generate a unique id for each extra variant
-                cmd_extra = f"(model) {key_str} {hex4()}"
-                records.append((key_str, cmd_extra, combined_when, comment_tags))
+            EXTRA_WHENS = [
+                "config.keyboardNavigation.terminal",
+                "!config.keyboardNavigation.terminal",
+                "config.keyboardNavigation.wrap",
+                "!config.keyboardNavigation.wrap",
+            ]
+            # emit records for every non-empty combination of EXTRA_WHENS
+            n = len(EXTRA_WHENS)
+            for r in range(1, n + 1):
+                for combo in combinations(EXTRA_WHENS, r):
+                    # skip combinations that include both a context and its negation
+                    conflict = False
+                    seen = {}
+                    for extra in combo:
+                        base = extra[1:] if extra.startswith("!") else extra
+                        neg = extra.startswith("!")
+                        if base in seen:
+                            if seen[base] != neg:
+                                conflict = True
+                                break
+                        else:
+                            seen[base] = neg
+                    if conflict:
+                        continue
+
+                    combined_when = base_when + " && " + " && ".join(combo)
+                    # generate a unique id for each combined variant
+                    cmd_extra = f"(model) {key_str} {hex4()}"
+                    records.append((key_str, cmd_extra, combined_when, comment_tags))
 
 # Ouput JSONC array
 out_lines = []
