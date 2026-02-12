@@ -13,8 +13,8 @@
 # Examples:
 #   ./bin/keybindings-install-references.sh references/keybindings.json
 #   ./bin/keybindings-install-references.sh references/keybindings.json
-#   while true; do ./bin/watch-runner.sh ./references/keybindings.json ./bin/keybindings-install-references.sh; sleep 3; done
-
+# 	while true; do KEYBINDINGS_SORT_ARGUMENTS="-p when" ./bin/watch-runner.sh ./references/keybindings.json ./bin/keybindings-install-references.sh; sleep 3; done
+# 	while true; do KEYBINDINGS_SORT_ARGUMENTS="-p key -s when" ./bin/watch-runner.sh ./references/keybindings.json ./bin/keybindings-install-references.sh; sleep 3; done
 #
 # Behavior:
 #   - Validates JSONC using `keybindings-remove-comments.py | jq` before installing.
@@ -51,7 +51,19 @@ usage() {
 validate_json() {
     local file="${1}"
     local rc=0
-	
+    local tempfile="/tmp/$(basename "${file}").nocomments.json.$$"
+
+    cat "${file}" | keybindings-remove-comments.py > "${tempfile}"
+    echo >> "${tempfile}" # ensure file ends with newline for jq
+    echo -n "Validating JSON '$(basename "${file}")' ... "
+    if ! jq . "${tempfile}" > /dev/null 2>&1; then
+        jq . "${tempfile}"
+        rm -f "${tempfile}" &> /dev/null
+        aborting "'${tempfile}' is not valid JSON"
+    fi
+    rm -f "${tempfile}" &> /dev/null
+    echo "OK."
+
     if ! cat "${file}" | keybindings-remove-comments.py | jq . > /dev/null 2>&1; then
         aborting "'${file}' is not valid JSON"
     fi
@@ -84,11 +96,24 @@ main() {
         aborting "'${user_keybindings_json}' file not found readable"
     fi
 
-	KEYBINDINGS_SORT_ARGUMENTS="${KEYBINDINGS_SORT_ARGUMENTS:--p key -s when}"
-    if type -p keybindings-sort.py > /dev/null 2>&1; then
-        keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} < "${KEYBINDINGS_JSON}" > /tmp/keybindings-sorted.json
-        mv /tmp/keybindings-sorted.json "${KEYBINDINGS_JSON}"
+    if [ "${KEYBINDINGS_SORT_ARGUMENTS}" ]; then
+        echo "Using provided KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
+    else
+        KEYBINDINGS_SORT_ARGUMENTS="-p key -s when"
+        echo "Using default KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     fi
+	export KEYBINDINGS_SORT_ARGUMENTS
+
+    echo -n "Sorting JSON '$(basename "${KEYBINDINGS_JSON}")' ... "
+    if type -p keybindings-sort.py > /dev/null 2>&1; then
+        #echo "keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} < \"${KEYBINDINGS_JSON}\" > /tmp/keybindings-sorted.json.$$"
+        keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} < "${KEYBINDINGS_JSON}" > /tmp/keybindings-sorted.json.$$
+        #cat /tmp/keybindings-sorted.json.$$
+        mv /tmp/keybindings-sorted.json.$$ "${KEYBINDINGS_JSON}"
+    fi
+    echo "OK."
+
+    validate_json "${KEYBINDINGS_JSON}"
 
     echo -n "Installing 'references/$(basename "${KEYBINDINGS_JSON}")' to '$(vscode_user_home)' ... "
     cp "${KEYBINDINGS_JSON}" "${user_keybindings_json}"
