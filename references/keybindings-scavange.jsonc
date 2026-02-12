@@ -10,14 +10,6 @@
   },
   {
     // (down) (vi)
-    // (note) vi-like extensions disabled
-    "key": "alt+j",
-    "command": "alt+j 9831",
-    // "command": "cursorDown",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus && !neovim.init"
-  },
-  {
-    // (down) (vi)
     "key": "alt+j",
     "command": "alt+j 083d",
     // "command": "workbench.action.focusActiveEditorGroup",
