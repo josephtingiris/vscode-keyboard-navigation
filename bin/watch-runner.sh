@@ -33,8 +33,6 @@
 #   (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
 # -----------------------------------------------------------------------------
 
-set -euo pipefail
-
 WATCH=""
 RUNNER=""
 
@@ -76,11 +74,14 @@ main() {
         ! command -v "${RUNNER}" > /dev/null 2>&1 && aborting "runner not found in PATH: ${RUNNER}"
     fi
 
+	local runner_pid
+
     # Watch loop: quiet while waiting, print a delimiter then execute runner
     while inotifywait -q -e close_write,modify,move,create "${WATCH_REAL}" > /dev/null 2>&1; do
         echo "---- RUN: $(date -u '+%Y-%m-%dT%H:%M:%SZ') ----"
         "${RUNNER}" "${WATCH_REAL}"
-		wait $! || aborting "runner exited with non-zero status"
+		runner_pid=$!
+		wait ${runner_pid} &> /dev/null || aborting "pid ${runner_pid} exited with non-zero status"
 		sleep 3 # debounce: wait a moment to avoid multiple rapid triggers
     done
 }
