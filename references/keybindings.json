@@ -941,9 +941,17 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus && !neovim.init"
   },
   {
+    // (left) (corner)
+    "key": "alt+h",
+    "command": "alt+h ad8d",
+    // "command": "workbench.action.focusSideBar",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorFocus && sideBarVisible && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
+  },
+  {
     // (arrow)
     "key": "alt+home",
     "command": "(model) alt+home 8160",
+    // "command": "workbench.action.focusActiveEditorGroup",
     "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
   },
   {
@@ -967,7 +975,8 @@ Notes:
   {
     // (arrow)
     "key": "alt+home",
-    "command": "(model) alt+home a7d0",
+    "command": "-noop",
+    // "command": "(model) alt+home a7d0",
     "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
   },
   {
@@ -991,7 +1000,8 @@ Notes:
   {
     // (arrow)
     "key": "alt+home",
-    "command": "(model) alt+home 9d31",
+    "command": "-noop",
+    // "command": "(model) alt+home 9d31",
     "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
@@ -7975,6 +7985,66 @@ Notes:
     "key": "shift+alt+h",
     "command": "shift+alt+h 080e",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorFocus && panelVisible && !sideBarVisible"
+  },
+  {
+    // (left) (vi) (edge) (wrap)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 8e22",
+    // "command": "workbench.action.focusActiveEditorGroup",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && panelFocus && !sideBarVisible && editorIsOpen"
+  },
+  {
+    // (left) (vi) (edge) (wrap)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 0812",
+    // "command": "workbench.action.focusPanel",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorFocus && panelVisible && !sideBarVisible"
+  },
+  {
+    // (left) (vi) (edge) (wrap)
+    "key": "shift+alt+h",
+    "command": "workbench.action.focusActiveEditorGroup",
+    // "command": "shift+alt+h 8e20",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && panelFocus && !sideBarVisible && editorIsOpen"
+  },
+  {
+    // (left) (topleft)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h cd7e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorFocus && !sideBarVisible && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
+  },
+ {
+    // (left) (corner)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h cd8d",
+    // "command": "workbench.action.focusSideBar",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorFocus && sideBarVisible && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
+  },
+  {
+    // (left) (vi) - Settings editor, Keyboard Shortcuts, et al
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 4b2a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
+    // (left) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (not first in group)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 8b41",
+    // "command": "workbench.action.focusSideBar",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && sideBarVisible && activeEditorIsReadonly"
+  },
+  {
+    // (left) (corner) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar hidden (first in group)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 4b2b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && !sideBarVisible && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly"
+  },
+  {
+    // (left) (corner) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (first in group)
+    "key": "shift+alt+h",
+    "command": "workbench.action.focusSideBar",
+    // "command": "shift+alt+h 4b2c",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && sideBarVisible && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly"
   },
   {
     // (arrow)
