@@ -944,6 +944,12 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorFocus && sideBarVisible && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
   },
   {
+    // (left) (vi) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+h",
+    "command": "alt+h 2a1a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
     // (arrow)
     "key": "alt+home",
     "command": "workbench.action.focusActiveEditorGroup",
@@ -1070,6 +1076,13 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && terminalFocus"
   },
   {
+    // (down) (vi) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+j",
+    "command": "workbench.action.focusBelowGroup",
+    // "command": "alt+j 42a6",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
     // (up) (vi)
     "key": "alt+k",
     "command": "(model) alt+k b4f9",
@@ -1163,8 +1176,8 @@ Notes:
   {
     // (right) (vi) (gold) (editor) (wrap)
     "key": "alt+l",
-    "command": "workbench.action.focusRightGroup",
-    // "command": "alt+l 3bef",
+    "command": "alt+l 3bef",
+    // "command": "workbench.action.focusRightGroup",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && editorFocus"
   },
   {
@@ -1190,6 +1203,12 @@ Notes:
     "key": "alt+l",
     "command": "(model) alt+l a8fc",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && terminalFocus"
+  },
+  {
+    // (right) (vi) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+l",
+    "command": "alt+l 2b2a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
   },
   {
     // (left) (arrow)
@@ -4634,7 +4653,7 @@ Notes:
     "key": "ctrl+k",
     "command": "-vscode-neovim.send",
     // "command": "ctrl+k 1678",
-    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.k && neovim.init && neovim.mode != 'insert'" // must be exact
+    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.k && neovim.init && neovim.mode != 'insert'"
   },
   {
     // (right) (vi)
