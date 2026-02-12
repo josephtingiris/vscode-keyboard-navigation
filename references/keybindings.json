@@ -251,6 +251,13 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
   },
   {
+    // (right) (all) (editor) (juke)
+    "key": "alt+.",
+    "command": "workbench.action.nextEditor",
+    // "command": "alt., de63",
+    "when": "config.keyboardNavigation.enabled && editorFocus"
+  },
+  {
     // (right)
     "key": "alt+.",
     "command": "(model) alt+. 42a4",
@@ -271,7 +278,8 @@ Notes:
   {
     // (right)
     "key": "alt+.",
-    "command": "(model) alt+. f411",
+    "command": "-noop",
+    // "command": "(model) alt+. f411",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
