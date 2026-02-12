@@ -80,7 +80,7 @@ main() {
     while inotifywait -q -e close_write,modify,move,create "${WATCH_REAL}" > /dev/null 2>&1; do
         echo "---- RUN: $(date -u '+%Y-%m-%dT%H:%M:%SZ') ----"
         "${RUNNER}" "${WATCH_REAL}"
-		wait $? || aborting "runner exited with non-zero status"
+		wait $! || aborting "runner exited with non-zero status"
 		sleep 3 # debounce: wait a moment to avoid multiple rapid triggers
     done
 }
