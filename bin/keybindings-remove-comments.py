@@ -51,20 +51,64 @@ def strip_comments(jsonc_string: str) -> str:
     This simple implementation preserves line breaks for most single-line
     comments and strips block comments using a non-greedy DOTALL regex.
     """
-    # Remove comments while respecting quoted strings. This avoids stripping
-    # comment-like sequences inside string literals.
-    def _replacer(match: re.Match) -> str:
-        token = match.group(0)
-        # If token starts with / it's a comment; drop it. Otherwise keep string.
-        if token.startswith('/'):
-            return ''
-        return token
+    # Robust scanner: iterate characters and remove comments while respecting
+    # double-quoted strings and escapes. Preserves newline for single-line
+    # comments so line count remains stable for diagnostics.
+    out = []
+    i = 0
+    n = len(jsonc_string)
+    in_string = False
 
-    pattern = r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)'
-    no_comments = re.sub(pattern, _replacer, jsonc_string,
-                         flags=re.DOTALL | re.MULTILINE)
+    while i < n:
+        ch = jsonc_string[i]
+
+        if in_string:
+            out.append(ch)
+            if ch == '\\':
+                # preserve escape and next char if present
+                if i + 1 < n:
+                    out.append(jsonc_string[i + 1])
+                    i += 1
+            elif ch == '"':
+                in_string = False
+            i += 1
+            continue
+
+        # not in a string
+        if ch == '"':
+            in_string = True
+            out.append(ch)
+            i += 1
+            continue
+
+        # possible comment
+        if ch == '/' and i + 1 < n:
+            nxt = jsonc_string[i + 1]
+            if nxt == '/':
+                # single-line comment: skip until end of line, preserve newline
+                i += 2
+                while i < n and jsonc_string[i] != '\n':
+                    i += 1
+                if i < n and jsonc_string[i] == '\n':
+                    out.append('\n')
+                    i += 1
+                continue
+            if nxt == '*':
+                # block comment: skip until closing '*/'
+                i += 2
+                while i + 1 < n and not (jsonc_string[i] == '*' and jsonc_string[i + 1] == '/'):
+                    i += 1
+                if i + 1 < n:
+                    i += 2
+                continue
+
+        # normal character
+        out.append(ch)
+        i += 1
+
+    res = ''.join(out)
     # Remove any now-empty lines that came from full-line comments so there are no blank lines in the output.
-    no_blank_lines = re.sub(r'(?m)^[ \t]*\n+', '', no_comments)
+    no_blank_lines = re.sub(r'(?m)^[ \t]*\n+', '', res)
     return no_blank_lines.strip()
 
 

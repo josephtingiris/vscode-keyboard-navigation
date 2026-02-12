@@ -51,11 +51,8 @@ usage() {
 validate_json() {
     local file="${1}"
     local rc=0
+	
     if ! cat "${file}" | keybindings-remove-comments.py | jq . > /dev/null 2>&1; then
-
-        cat "${file}" | keybindings-remove-comments.py #| jq .
-        echo $?
-
         aborting "'${file}' is not valid JSON"
     fi
 }
