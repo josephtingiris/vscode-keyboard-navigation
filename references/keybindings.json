@@ -54,6 +54,7 @@ Notes:
     // (right)
     "key": "alt+'",
     "command": "(model) alt+' 96b9",
+    // "command": "workbench.action.navigateForward",
     "when": "config.keyboardNavigation.enabled"
   },
   {
@@ -108,6 +109,7 @@ Notes:
     // (left)
     "key": "alt+,",
     "command": "(model) alt+, c44e",
+    // "command": "workbench.action.navigateBack",
     "when": "config.keyboardNavigation.enabled"
   },
   {
@@ -167,6 +169,14 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
+    // (left) (all) (editor) (juke) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+,",
+    "command": "workbench.action.previousEditor",
+    // "command": "alt+, 03ab",
+    "when": "config.keyboardNavigation.enabled && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
+    // (split) (horizontal)
     "key": "alt+-",
     "command": "(model) alt+- c53e",
     "when": "config.keyboardNavigation.enabled"
@@ -219,6 +229,13 @@ Notes:
     "command": "-noop",
     // "command": "(model) alt+- cf53",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (split) (horizontal) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+-",
+    "command": "workbench.action.splitEditorDown",
+    // "command": "alt+- 83bb",
+    "when": "config.keyboardNavigation.enabled && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
   },
   {
     // (right)
@@ -283,6 +300,19 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
+    // (right) (all) (editor) (juke) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+.",
+    "command": "workbench.action.nextEditor",
+    // "command": "alt+. 03ac",
+    "when": "config.keyboardNavigation.enabled && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
+    "key": "alt+/",
+    "command": "alt+/ e9b2",
+    // "command": "editor.action.previousMatchFindAction",
+    "when": "config.keyboardNavigation.enabled && editorFocus"
+  },
+  {
     // (left)
     "key": "alt+;",
     "command": "(model) alt+; f54a",
@@ -311,6 +341,12 @@ Notes:
     "key": "alt+;",
     "command": "(model) alt+; da62",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    "key": "alt+;",
+    "command": "alt+; afa2",
+    // "command": "cursorHome", // maybe for non-neovim profiles but for neovim users there are many ways to navigate to the beginning of a line ...
+    "when": "config.keyboardNavigation.enabled && editorFocus"
   },
   {
     // (left)
@@ -391,6 +427,13 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
+    // (right) (split) (vertical) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+=",
+    "command": "workbench.action.splitEditor",
+    // "command": "alt+= 83bc",
+    "when": "config.keyboardNavigation.enabled && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
     // (left)
     "key": "alt+[",
     "command": "(model) alt+[ af43",
@@ -419,6 +462,16 @@ Notes:
     "key": "alt+[",
     "command": "(model) alt+[ e276",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left)
+    "key": "alt+[",
+    "command": "alt+[ f982",
+    // "command": "cursorMove",
+    "args": {
+      "to": "prevBlankLine"
+    },
+    "when": "config.keyboardNavigation.enabled && editorFocus"
   },
   {
     // (left)
@@ -473,6 +526,16 @@ Notes:
     "key": "alt+]",
     "command": "(model) alt+] 5d4c",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (right)
+    "key": "alt+]",
+    "command": "alt+] ff82",
+    // "command": "cursorMove",
+    "args": {
+      "to": "nextBlankLine"
+    },
+    "when": "config.keyboardNavigation.enabled && editorFocus"
   },
   {
     // (right)
@@ -542,6 +605,103 @@ Notes:
     "key": "alt+a",
     "command": "(model) alt+a 48fe",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
+  },
+  {
+    // (panel) (position) - rotate clockwise
+    "key": "alt+a alt+p",
+    "command": "workbench.action.positionPanelLeft",
+    // "command": "alt+a alt+p 77a1",
+    "when": "config.keyboardNavigation.enabled && panelPosition == 'bottom'"
+  },
+  {
+    // (panel) (position) - rotate clockwise
+    "key": "alt+a alt+p",
+    "command": "workbench.action.positionPanelTop",
+    // "command": "alt+a alt+p 77a2",
+    "when": "config.keyboardNavigation.enabled && panelPosition == 'left'"
+  },
+  {
+    // (panel) (position) - rotate clockwise
+    "key": "alt+a alt+p",
+    "command": "workbench.action.positionPanelBottom",
+    // "command": "alt+a alt+p 77a3",
+    "when": "config.keyboardNavigation.enabled && panelPosition == 'right'"
+  },
+  {
+    // (panel) (position) - rotate clockwise
+    "key": "alt+a alt+p",
+    "command": "workbench.action.positionPanelRight",
+    // "command": "alt+a alt+p 77a4",
+    "when": "config.keyboardNavigation.enabled && panelPosition == 'top'"
+  },
+  {
+    // (zoom) (editor) - alternative zen mode toggle chord
+    "key": "alt+a alt+z",
+    "command": "workbench.action.toggleZenMode",
+    // "command": "alt+a alt+p 4242",
+    "when": "config.keyboardNavigation.enabled && editorFocus"
+  },
+  {
+    // (panel) - open (file) explorer
+    "key": "alt+a e",
+    "command": "workbench.view.explorer",
+    // "command": "alt+a 59a7",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (panel) - open find in files
+    "key": "alt+a f",
+    "command": "workbench.action.findInFiles",
+    // "command": "alt+a 55a7",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (panel) - open scm (git) changes
+    "key": "alt+a g",
+    "command": "workbench.view.scm",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    "key": "alt+a v",
+    "command": "alt+a v 69f8",
+    // "command": "workbench.action.toggleActivityBarVisibility",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (zoom) (copy) - toggle zen mode
+    "key": "alt+a z",
+    "command": "alt+a z b809",
+    // "command": "workbench.action.toggleZenMode",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (zoom) (copy) - toggle secondary side bar
+    "key": "alt+a z",
+    "command": "workbench.action.toggleMaximizedAuxiliaryBar",
+    // "command": "alt+a z af39",
+    "when": "config.keyboardNavigation.enabled && auxiliaryBarFocus"
+  },
+  {
+    // (zoom) (copy) - toggle maximized panel
+    "key": "alt+a z",
+    "command": "workbench.action.toggleMaximizedPanel",
+    // "command": "alt+a z cbb4",
+    "when": "config.keyboardNavigation.enabled && !editorFocus && panelFocus"
+  },
+  {
+    // (zoom) - maximize editor group
+    "key": "alt+a z",
+    "command": "workbench.action.toggleMaximizeEditorGroup",
+    // "command": "alt+a z fe32",
+    "when": "config.keyboardNavigation.enabled && editorFocus && !panelFocus"
+  },
+  {
+    // (zoom) - toggle maximize editor group
+    "key": "alt+a z",
+    "command": "workbench.action.toggleMaximizeEditorGroup",
+    // "command": "workbench.action.maximizeEditorHideSidebar",
+    // "command": "alt+a z fe33",
+    "when": "config.keyboardNavigation.enabled && editorFocus && !panelFocus && multipleEditorGroups"
   },
   {
     "key": "alt+d",
@@ -1047,6 +1207,20 @@ Notes:
     "key": "alt+left",
     "command": "(model) alt+left f65d",
     "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
+  },
+  {
+    // (neovim)
+    "key": "alt+n",
+    "command": "alt+n 318f",
+    // "command": "editor.action.nextMatchFindAction",
+    "when": "config.keyboardNavigation.enabled && neovim.init"
+  },
+  {
+    // (neovim) (only) - restart (only) the neovim extension
+    "key": "alt+n r",
+    "command": "vscode-neovim.restart",
+    // "command": "alt+n 419e",
+    "when": "config.keyboardNavigation.enabled && neovim.init"
   },
   {
     // (down) (arrow)
@@ -4354,7 +4528,8 @@ Notes:
   {
     // (up) (vi)
     "key": "ctrl+k",
-    "command": "(model) ctrl+k 0678",
+    "command": "-noop",
+    // "command": "(model) ctrl+k 0678",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
@@ -4366,7 +4541,8 @@ Notes:
   {
     // (up) (vi)
     "key": "ctrl+k",
-    "command": "(model) ctrl+k 70ad",
+    "command": "-noop",
+    // "command": "(model) ctrl+k 70ad",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi"
   },
   {
@@ -4376,9 +4552,10 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap"
   },
   {
-    // (up) (vi)
+    // (up) (vi) (wrap)
     "key": "ctrl+k",
-    "command": "(model) ctrl+k fd49",
+    "command": "-noop",
+    // "command": "(model) ctrl+k fd49",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
@@ -4402,8 +4579,25 @@ Notes:
   {
     // (up) (vi)
     "key": "ctrl+k",
-    "command": "(model) ctrl+k a0bd",
+    "command": "-noop",
+    // "command": "(model) ctrl+k a0bd",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (vi) (neovim) (user)
+    // (note) ctrl+k must be a chord for native vscode keybindings to work
+    "key": "ctrl+k",
+    "command": "ctrl+k 43f7",
+    // "command": "-vscode-neovim.send",
+    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.k && neovim.init && neovim.mode == 'insert'"
+  },
+  {
+    // (up) (vi) (neovim) (user)
+    // (note) ctrl+k must be a chord for native vscode keybindings to work
+    "key": "ctrl+k",
+    "command": "-vscode-neovim.send",
+    // "command": "ctrl+k 1678",
+    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.k && neovim.init && neovim.mode != 'insert'" // must be exact
   },
   {
     // (right) (vi)
