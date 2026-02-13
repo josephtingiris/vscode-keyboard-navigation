@@ -1,19 +1,12 @@
 {
   "folders": [
     {
-      "path": ".",
-    },
+      "path": "."
+    }
   ],
   "settings": {
-    // settings that should be here (or in user settings), not in directory .vscode/settings.json
-    "makefile.configureOnOpen": false,
-    "shfmt.executablePath": "shfmt",
-    "shfmt.executableArgs": [
-      "--indent",
-      "4",
-      "--space-redirects",
-      "--case-indent",
-      "--simplify",
-    ],
-  },
+    // settings defined here apply to ALL multi-root workspace files/folders (.vscode/settings.json do not)
+    // see DEVELOPMENT.md for rationale to determine which settings go here, or in .vscode/settings.json
+    "editor.minimap.enabled": false
+  }
 }

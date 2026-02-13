@@ -5,6 +5,7 @@
 .venv/
 /.env
 /.vscode/**/workspaceStorage
+/.vscode/*bak*
 bin/__pycache__/
 dist/
 node_modules/
