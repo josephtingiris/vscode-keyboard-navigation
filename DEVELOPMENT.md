@@ -5,6 +5,7 @@ and working with the VS Code Keyboard Navigation extension and repository tools.
 
 ### Table of Contents
 
+- [Project & Workspace configuration](#project-and-workspace-configuration)
 - [Debugging](#debugging)
    - [Live resolver](#live-resolver)
    - [Autoscroll](#autoscroll)
@@ -16,8 +17,47 @@ and working with the VS Code Keyboard Navigation extension and repository tools.
 
 ---
 
-## Debugging
+<a id="project-and-workspace-configuration"></a>
+## Project & Workspace configuration
+
+This project's recommended locations for settings and session preferences are
+documented here so contributors know where to place project-critical vs
+window/session-level configuration.
+
+### Project Configuration — .vscode/settings.json
+
+- Use this file as the canonical, project-wide configuration. Treat it as a required part of the project's system requirements.
+- Place settings that affect build, CI, linting, formatting, or any behavior that must be consistent for all contributors. Examples:
+  - Linter and formatter paths (for example, `python.linting.enabled`, `editor.defaultFormatter`).
+  - File exclusions (for example, `node_modules`, `__pycache__`).
+  - Any rule whose modification could break the build or cause a Pull Request to fail.
+
+### Workspace & UI — .code-workspace
+
+- Use the workspace file for session-specific preferences and UI configuration only. These settings customize the developer experience for a particular window or multi-folder layout.
+- Appropriate contents include:
+  - Folder aliases (sidebar naming):
+
+```
+    "folders": [
+        { "path": ".", "name": "FULL PROJECT" },
+        { "path": "src/api", "name": "BACKEND" }
+    ]
+```
+
+- Window aesthetics (for example, `workbench.colorCustomizations` to set a per-workspace title bar color).
+- Global tasks that run across all workspace folders.
+
+Guidelines
+
+- Do not place strict build or CI settings in `.code-workspace`.
+- Review and approve changes to `.vscode/settings.json` in code reviews; these settings are project policy.
+- Use the workspace file to improve ergonomics, not to override project requirements.
+
+---
+
 <a id="debugging"></a>
+## Debugging
 ### Live resolver
 
 <a id="live-resolver"></a>
@@ -45,12 +85,12 @@ Enable **Auto Scroll** in the Output panel (three-dot menu) to keep new lines vi
 
 <a id="window-channel-format-notes"></a>
 
-Some builds print keybinding logs to the `Window` channel with lines prefixed by `/`, `|`, `\`, `+` that indicate dispatch, conversion, match results, and invocation. Look for `matched <command>` and `source: user|default|extension`.
+Some builds print keybinding logs to the `Window` channel with lines prefixed by `/`, `|`, `\\`, `+` that indicate dispatch, conversion, match results, and invocation. Look for `matched <command>` and `source: user|default|extension`.
 
 ---
 
-## Active development
 <a id="active-development"></a>
+## Active development
 <a id="auto-install-references"></a>
 ### Auto-install & testing references
 
