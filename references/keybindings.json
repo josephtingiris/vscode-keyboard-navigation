@@ -1,12 +1,13 @@
 /*
-VS Code Keyboard Navigation
-Reference Configuration
+VS Code Keyboard Navigation - Reference Configuration
 
 See:
+
   * references/vscode-keybindings-resolution.md
 
 Scope:
-  * the following variant prefixes are in scope:
+
+  * The following variant prefixes are in scope:
       * Single-modifier:
         - alt+
         - ctrl+
@@ -15,16 +16,18 @@ Scope:
         - shift+alt+
       * Three-modifier:
         - ctrl+shift+alt+
-  * included modifiers: `alt+ ctrl+ ctrl+alt+ shift+alt+ ctrl+alt+meta+ ctrl+shift+alt+ shift+alt+meta+ ctrl+shift+alt+meta+`
-  * modifier order is not significant (e.g., ctrl+alt+k == alt+ctrl+k), but a canonical ordering is ctrl+shift+alt+<key>
+  * Included modifiers: `alt+ ctrl+ ctrl+alt+ shift+alt+ ctrl+alt+meta+ ctrl+shift+alt+ shift+alt+meta+ ctrl+shift+alt+meta+`
+  * Modifier order is not significant (e.g., ctrl+alt+k == alt+ctrl+k), but a canonical ordering is ctrl+shift+alt+<key>
   * left/right variants are treated as identical (leftAlt, rightAlt, leftCtrl, rightCtrl, leftShift, rightShift, leftMeta, rightMeta)
-  * support for differentiating leftAlt from rightAlt or rightShift is not supported and treated as a single key (e.g., alt instead of leftAlt/rightAlt)
-  * on mac keyboards, the 'command' key is a out of scope and the `option` key is treated as 'alt'
+  * Support for differentiating leftAlt from rightAlt or rightShift is not supported and treated as a single key (e.g., alt instead of leftAlt/rightAlt)
+  * on mac keyboards, the 'command' key is a out of scope
+  * on mac keyboards, the `option` key is treated as 'alt'
   * on pc keyboards, the 'windows' key is also known as the 'meta' key is out of scope
   * on some keyboards AltGr is reported as ctrl+alt (i.e. AltGr+k == ctrl+alt+k)
-  * chords are allowed (e.g., alt+a alt+b).
+  * Chords are allowed (e.g., alt+a alt+b).
 
 Conventions:
+
   * treat 'up' or 'k' or 'right' or 'l' as 'next'
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !panelFocus && editorFocus && !panelFocus && activeEditorGroupIndex > 0 && activeeEditorGroupIndex < 2 && activeEditorIsFirstInGroup"
   * if there is a commented command in an object:
@@ -36,18 +39,33 @@ Conventions:
   * comment convention: `(direction | omni) (key group | all) (ring group color | black) [(model)] [(terminal)] [(wrap)] [(edge)]`
 
 Constraints:
+
   * ctrl+shift+alt+arrow keys have system keybindings (mimic them?)
   * vscode integrated terminals only split one way, depending on the orientation of the panel. see: https://github.com/microsoft/vscode/issues/160501
 
+FIN Ring/Shell Assignments:
+
+  * alt+                = X/Gold
+  * shift+alt           = 1/Red
+  * ctrl+alt            = 2/Blue
+  * ctrl+alt+meta       = 3/Black
+  * ctrl+shift+alt      = Alter/Change/Shift/Move (UI components)
+  
 Notes:
-  * My primary editor is [neo]vim, so these keybindings are designed to augment and blend in with the traditional vi keyboard grammar (and subsequent muscle memory).
-  * I try to avoid conflicts with default bindings and common extensions, however some conflicts are unavoidable.
+
+  * The keybindings in this reference file use my 'Focal-Invariant Navigation' (FIN) model to determine when contexts.
+  * My primary editor is [neo]vim, so these keybindings are designed to augment and blend with the traditional vi keyboard grammar (and muscle memory).
+  * I really try to avoid conflicts with default bindings and common extensions, however some conflicts are unavoidable.
   * I test daily with vscode-neovim but still need to test compatibility with other extensions, particularly vim emulation extensions.
   * I'm aware of numerous conflicts with the vs code multiple cursor feature, and will circle back to resolve them later (once I learn to use it better).
-    "command": "workbench.action.focusLeftGroup",
-    "command": "workbench.action.focusBelowGroup",
-    "command": "workbench.action.focusAboveGroup",
-    "command": "workbench.action.focusRightGroup",
+  
+Copy/Paste:
+
+ "command": "workbench.action.focusLeftGroup",
+ "command": "workbench.action.focusBelowGroup",
+ "command": "workbench.action.focusAboveGroup",
+ "command": "workbench.action.focusRightGroup",
+
 */
 [
   {
@@ -611,6 +629,12 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap && terminalFocus"
   },
   {
+    "key": "alt+a a",
+    "command": "workbench.action.toggleActivityBarVisibility",
+   // "command": "alt+a a 39f8",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
     // (panel) (position) - rotate clockwise
     "key": "alt+a alt+p",
     "command": "workbench.action.positionPanelLeft",
@@ -646,54 +670,48 @@ Notes:
     "when": "config.keyboardNavigation.enabled && editorFocus && !panelFocus"
   },
   {
-    // (panel) - open (file) explorer
+    // (panel) - focus (file) explorer in the primary sidebar
     "key": "alt+a e",
     "command": "workbench.view.explorer",
     // "command": "alt+a 59a7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (panel) - open find in files
+    // (panel) - focus find in files in the primary sidebar
     "key": "alt+a f",
     "command": "workbench.action.findInFiles",
     // "command": "alt+a 55a7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (panel) - open scm (git) changes
+    // (panel) - focus scm (git) changes in the primary sidebar
     "key": "alt+a g",
     "command": "workbench.view.scm",
+    // "command": "alt+a 53a7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    "key": "alt+a v",
-    "command": "alt+a v 69f8",
-    // "command": "workbench.action.toggleActivityBarVisibility",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // (zoom) (copy) - toggle zen mode
+    // (zoom) (alias)
     "key": "alt+a z",
     "command": "alt+a z b809",
-    // "command": "workbench.action.toggleZenMode",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (zoom) (copy) (secondary) (gold) - toggle secondary side bar
+    // (zoom) (alias) (secondary) (gold) - toggle secondary side bar
     "key": "alt+a z",
     "command": "workbench.action.toggleMaximizedAuxiliaryBar",
     // "command": "alt+a z af39",
     "when": "config.keyboardNavigation.enabled && auxiliaryBarFocus"
   },
   {
-    // (zoom) (copy) (panel) (gold) - toggle maximized panel
+    // (zoom) (alias) (panel) (gold) - toggle maximized panel
     "key": "alt+a z",
     "command": "workbench.action.toggleMaximizedPanel",
     // "command": "alt+a z cbb4",
     "when": "config.keyboardNavigation.enabled && !editorFocus && panelFocus"
   },
   {
-    // (zoom) - maximize editor group
+    // (zoom) - maximize editor group - toggle maximized editor group
     "key": "alt+a z",
     "command": "workbench.action.toggleMaximizeEditorGroup",
     // "command": "alt+a z fe32",
@@ -708,59 +726,20 @@ Notes:
     "when": "config.keyboardNavigation.enabled && editorFocus && !panelFocus && multipleEditorGroups"
   },
   {
+    // (quad) (chord) - alt+d chords
     "key": "alt+d",
     "command": "(model) alt+d 9911",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    "key": "alt+d",
-    "command": "(model) alt+d 6f9f",
-    "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    "key": "alt+d",
-    "command": "(model) alt+d d488",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    "key": "alt+d",
-    "command": "(model) alt+d f201",
-    "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && terminalFocus"
-  },
-  {
-    "key": "alt+d",
-    "command": "(model) alt+d b547",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && terminalFocus"
-  },
-  {
-    "key": "alt+d",
-    "command": "(model) alt+d fc45",
-    "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap && terminalFocus"
-  },
-  {
-    "key": "alt+d",
-    "command": "(model) alt+d a2f0",
-    "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && config.keyboardNavigation.wrap && terminalFocus"
-  },
-  {
-    "key": "alt+d",
-    "command": "(model) alt+d fa4b",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap && terminalFocus"
-  },
-  {
-    "key": "alt+d",
-    "command": "(model) alt+d f414",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap && terminalFocus"
-  },
-  {
-    // (debug) - inspect context keys
+    // (debug) (chord) - inspect context keys
     "key": "alt+d alt+i",
     "command": "workbench.action.inspectContextKeys",
     // "command": "alt+d 9912",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (debug) - toggle keybinding logging
+    // (debug) (chord) - toggle keybinding logging
     "key": "alt+d alt+k",
     "command": "workbench.action.toggleKeybindingsLog",
     // "command": "alt+d 9913",
@@ -7954,6 +7933,12 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left'"
   },
   {
+    // (left) (vi) (primary) (gold)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h e12e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && sideBarFocus"
+  },
+  {
     // (left) (vi)
     "key": "shift+alt+h",
     "command": "(model) shift+alt+h e957",
@@ -8190,6 +8175,19 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && terminalFocus"
   },
   {
+    "key": "shift+alt+j",
+   "command": "alt+a a 67f8",
+   // "command": "workbench.action.toggleActivityBarVisibility",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.activityBar.location == 'bottom'"
+    //"when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (vi) (primary) (gold)
+    "key": "shift+alt+j",
+    "command": "shift+alt+j e42e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && sideBarFocus"
+  },
+  {
     // (down) (vi)
     "key": "shift+alt+j",
     "command": "(model) shift+alt+j db46",
@@ -8212,6 +8210,13 @@ Notes:
     "key": "shift+alt+j",
     "command": "(model) shift+alt+j 6fa6",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && terminalFocus"
+  },
+  {
+    // (panel) (gold)
+    "key": "shift+alt+j",
+   "command": "workbench.action.toggleActivityBarVisibility",
+   // "command": "alt+a a 27f3",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.activityBar.location == 'bottom' && sideBarFocus"
   },
   {
     // (down) (vi)
@@ -8276,6 +8281,12 @@ Notes:
     "key": "shift+alt+k",
     "command": "(model) shift+alt+k afb3",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && terminalFocus"
+  },
+  {
+    // (up) (vi) (primary) (gold)
+    "key": "shift+alt+k",
+    "command": "shift+alt+k e32e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && sideBarFocus"
   },
   {
     // (up) (vi)
@@ -8369,6 +8380,12 @@ Notes:
     "key": "shift+alt+l",
     "command": "(model) shift+alt+l ea8e",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && terminalFocus"
+  },
+  {
+    // (right) (vi) (primary) (gold)
+    "key": "shift+alt+l",
+    "command": "shift+alt+l e11e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && sideBarFocus"
   },
   {
     // (right) (vi)
