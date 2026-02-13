@@ -1,6 +1,7 @@
 *.vsix
 .DS_Store
 .cache/
+.code-workspace*bak*
 .venv/
 /.env
 /.vscode/**/workspaceStorage
