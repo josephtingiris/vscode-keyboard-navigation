@@ -36,7 +36,10 @@ Conventions:
   * 'command not found' pseudo command: placeholders:
     - are left in to help with debugging, sorting, and future key binding placements
     - should contain the key and a 4-character UNIQUE identifier, i.e. 'alt+l jj4e' or 'alt+l 8df3'
-  * comment convention: `(direction | omni) (key group | all) (ring group color | black) [(model)] [(terminal)] [(wrap)] [(edge)]`
+  * comment convention: `(direction | omni) (key group | all) (ring group color | black) [
+(model)
+]
+[(terminal)] [(wrap)] [(edge)]`
 
 Constraints:
 
@@ -443,10 +446,17 @@ Copy/Paste:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap && terminalFocus"
   },
   {
-    // (noop) (all) (model) (terminal) (wrap)
+    // (noop) (all) (model) (terminal)
     "key": "alt+=",
-    "command": "(model) alt+= d6be",
+    "command": "(model) alt+= d2be",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap && terminalFocus"
+  },
+  {
+    // (split) (all) (gold) (editor) (text)
+    "key": "alt+=",
+    "command": "alt+= d67f",
+    // "command": "workbench.action.splitEditor",
+    "when": "config.keyboardNavigation.enabled && editorFocus && editorTextFocus && !panelFocus && activeEditorCanSplitInGroup"
   },
   {
     // (right) (split) (vertical) - Settings editor, Keyboard Shortcuts, et al
@@ -584,54 +594,16 @@ Copy/Paste:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap && terminalFocus"
   },
   {
+    // (noop) (chord) - alt+a chords
     "key": "alt+a",
     "command": "(model) alt+a dd09",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    "key": "alt+a",
-    "command": "(model) alt+a ae47",
-    "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    "key": "alt+a",
-    "command": "(model) alt+a e82a",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    "key": "alt+a",
-    "command": "(model) alt+a 7ef4",
-    "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && terminalFocus"
-  },
-  {
-    "key": "alt+a",
-    "command": "(model) alt+a 5977",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && terminalFocus"
-  },
-  {
-    "key": "alt+a",
-    "command": "(model) alt+a 2c49",
-    "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap && terminalFocus"
-  },
-  {
-    "key": "alt+a",
-    "command": "(model) alt+a ecc4",
-    "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && config.keyboardNavigation.wrap && terminalFocus"
-  },
-  {
-    "key": "alt+a",
-    "command": "(model) alt+a b5f2",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap && terminalFocus"
-  },
-  {
-    "key": "alt+a",
-    "command": "(model) alt+a 48fe",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap && terminalFocus"
-  },
-  {
+    // (action) (chord) - alt+a chords
     "key": "alt+a a",
-    "command": "workbench.action.toggleActivityBarVisibility",
-   // "command": "alt+a a 39f8",
+    "command": "alt+a a 39f8",
+    // "command": "workbench.action.toggleActivityBarVisibility",
     "when": "config.keyboardNavigation.enabled"
   },
   {
@@ -691,6 +663,27 @@ Copy/Paste:
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // (editor) - open markdown preview editor to the side
+    "key": "alt+a p",
+    "command": "markdown.showPreview",
+    // "command": "alt+a 50a9",
+    "when": "config.keyboardNavigation.enabled && editorFocus && !panelFocus && editorLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/ && !notebookEditorFocused"
+  },
+  {
+    // (editor) - toggle line wrapping
+    "key": "alt+a w",
+    "command": "editor.action.toggleWordWrap",
+    // "command": "alt+a 59a9",
+    "when": "config.keyboardNavigation.enabled && editorFocus && !panelFocus"
+  },
+  {
+    // (panel) - focus extensions in the primary sidebar
+    "key": "alt+a x",
+    "command": "workbench.view.extensions",
+    // "command": "alt+a 59a7",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
     // (zoom) (alias)
     "key": "alt+a z",
     "command": "alt+a z b809",
@@ -726,7 +719,7 @@ Copy/Paste:
     "when": "config.keyboardNavigation.enabled && editorFocus && !panelFocus && multipleEditorGroups"
   },
   {
-    // (quad) (chord) - alt+d chords
+    // (noop) (chord) - alt+d chords
     "key": "alt+d",
     "command": "(model) alt+d 9911",
     "when": "config.keyboardNavigation.enabled"
@@ -1907,51 +1900,6 @@ Copy/Paste:
     // (right)
     "key": "ctrl+]",
     "command": "(model) ctrl+] b1b0",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap && terminalFocus"
-  },
-  {
-    "key": "ctrl+a",
-    "command": "(model) ctrl+a f771",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    "key": "ctrl+a",
-    "command": "(model) ctrl+a e5ee",
-    "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    "key": "ctrl+a",
-    "command": "(model) ctrl+a 00f1",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    "key": "ctrl+a",
-    "command": "(model) ctrl+a 96e6",
-    "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && terminalFocus"
-  },
-  {
-    "key": "ctrl+a",
-    "command": "(model) ctrl+a 6843",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && terminalFocus"
-  },
-  {
-    "key": "ctrl+a",
-    "command": "(model) ctrl+a 98dc",
-    "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap && terminalFocus"
-  },
-  {
-    "key": "ctrl+a",
-    "command": "(model) ctrl+a 6ffd",
-    "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && config.keyboardNavigation.wrap && terminalFocus"
-  },
-  {
-    "key": "ctrl+a",
-    "command": "(model) ctrl+a 03fb",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap && terminalFocus"
-  },
-  {
-    "key": "ctrl+a",
-    "command": "(model) ctrl+a ec8c",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap && terminalFocus"
   },
   {
@@ -4655,6 +4603,11 @@ Copy/Paste:
     "command": "-vscode-neovim.send",
     // "command": "ctrl+k 1678",
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.k && neovim.init && neovim.mode != 'insert'"
+  },
+  {
+    "key": "ctrl+k ctrl+shift+\\",
+    "command": "workbench.action.splitEditorInGroup",
+    "when": "activeEditorCanSplitInGroup"
   },
   {
     // (right) (vi)
@@ -8057,7 +8010,7 @@ Copy/Paste:
     "command": "shift+alt+h cd7e",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorFocus && !sideBarVisible && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
   },
- {
+  {
     // (left) (corner)
     "key": "shift+alt+h",
     "command": "shift+alt+h cd8d",
@@ -8176,16 +8129,10 @@ Copy/Paste:
   },
   {
     "key": "shift+alt+j",
-   "command": "alt+a a 67f8",
-   // "command": "workbench.action.toggleActivityBarVisibility",
+    "command": "alt+a a 67f8",
+    // "command": "workbench.action.toggleActivityBarVisibility",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.activityBar.location == 'bottom'"
     //"when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (vi) (primary) (gold)
-    "key": "shift+alt+j",
-    "command": "shift+alt+j e42e",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && sideBarFocus"
   },
   {
     // (down) (vi)
@@ -8212,11 +8159,19 @@ Copy/Paste:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && terminalFocus"
   },
   {
-    // (panel) (gold)
+    // (down) (vi) (primary) (gold)
     "key": "shift+alt+j",
-   "command": "workbench.action.toggleActivityBarVisibility",
-   // "command": "alt+a a 27f3",
+    "command": "workbench.action.focusActivityBar",
+    // "command": "workbench.action.toggleActivityBarVisibility",
+    // "command": "shift+alt+j e42a",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.activityBar.location == 'bottom' && sideBarFocus"
+  },
+  {
+    // (down) (vi) (primary) (gold)
+    "key": "shift+alt+j",
+    "command": "workbench.action.toggleActivityBarVisibility",
+    // "command": "shift+alt+j e42e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.activityBar.location == 'hidden' && sideBarFocus"
   },
   {
     // (down) (vi)
@@ -8238,9 +8193,7 @@ Copy/Paste:
     "key": "shift+alt+j",
     "command": "runCommands",
     "args": {
-      "commands": [
-          "workbench.action.focusPanel"
-      ]
+      "commands": ["workbench.action.focusPanel"]
     },
     // "command": "shift+alt+j d49a",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && editorFocus && !panelFocus && !panelVisible"

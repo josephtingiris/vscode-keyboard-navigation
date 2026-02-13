@@ -1144,13 +1144,6 @@
     "when": "config.keyboardNavigation.enabled && editorFocus"
   },
   {
-    // (split) (horizontal) - terminal only splits one way, depending on where it's docked
-    "key": "shift+alt+-",
-    "command": "workbench.action.terminal.new",
-    //"command": "workbench.action.terminal.split",
-    "when": "config.keyboardNavigation.enabled && panelFocus && terminalFocus"
-  },
-  {
     // (down) (split) (horizontal) - Settings editor, Keyboard Shortcuts, et al
     "key": "shift+alt+-",
     "command": "workbench.action.splitEditorDown",
