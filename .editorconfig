@@ -1,0 +1,16 @@
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{sh,bash}]
+
+#function_next_line = true
+#keep_padding = true
+switch_case_indent = true
+indent_size = 4
+indent_style = space
+#shell_variant = posix
+space_redirects = true
