@@ -13,8 +13,8 @@
 # Examples:
 #   ./bin/keybindings-install-references.sh references/keybindings.json
 #   ./bin/keybindings-install-references.sh references/keybindings.json
-# 	while true; do KEYBINDINGS_SORT_ARGUMENTS="-p when" ./bin/watch-runner.sh ./references/keybindings.json ./bin/keybindings-install-references.sh; sleep 3; done
-# 	while true; do KEYBINDINGS_SORT_ARGUMENTS="-p key -s when" ./bin/watch-runner.sh ./references/keybindings.json ./bin/keybindings-install-references.sh; sleep 3; done
+#   while true; do KEYBINDINGS_SORT_ARGUMENTS="-p when" ./bin/watch-runner.sh ./references/keybindings.json ./bin/keybindings-install-references.sh; sleep 3; done
+#   while true; do KEYBINDINGS_SORT_ARGUMENTS="-p key -s when" ./bin/watch-runner.sh ./references/keybindings.json ./bin/keybindings-install-references.sh; sleep 3; done
 #
 # Behavior:
 #   - Validates JSONC using `keybindings-remove-comments.py | jq` before installing.
@@ -102,7 +102,7 @@ main() {
         KEYBINDINGS_SORT_ARGUMENTS="-p key -s when"
         echo "Using default KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     fi
-	export KEYBINDINGS_SORT_ARGUMENTS
+    export KEYBINDINGS_SORT_ARGUMENTS
 
     echo -n "Sorting JSON '$(basename "${KEYBINDINGS_JSON}")' ... "
     if type -p keybindings-sort.py > /dev/null 2>&1; then
