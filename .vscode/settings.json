@@ -11,11 +11,11 @@
   "[shellscript]": {
     "editor.defaultFormatter": "mkhl.shfmt"
   },
-  "editor.minimap.enabled": false,
   "files.exclude": {
     "**/.venv": true,
     "**/node_modules": true
   },
+  "makefile.configureOnOpen": false,
   "search.exclude": {
     "**/node_modules": true
   }
