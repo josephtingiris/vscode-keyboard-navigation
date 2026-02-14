@@ -475,10 +475,6 @@ def canonicalize_when(when_val: str, mode: str = 'default') -> str:
     if not when_val:
         return ''
 
-    positional_prefixes = [
-        'panel.location',
-        'panelPosition',
-    ]
     focus_keys = {
         'activeEditor',
         'auxiliaryBarFocus',
@@ -500,6 +496,11 @@ def canonicalize_when(when_val: str, mode: str = 'default') -> str:
         'workbench.panel.',
         'workbench.view.',
     }
+    positional_prefixes = [
+        'panel.location',
+        'panelPosition',
+        'config.workbench.sideBar.location',
+    ]
     visibility_keys = {
         'auxiliaryBarVisible',
         'editorVisible',
