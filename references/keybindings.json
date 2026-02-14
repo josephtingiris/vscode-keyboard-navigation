@@ -736,6 +736,13 @@ Copy/Paste:
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // (debug) (chord) - reload window
+    "key": "alt+d alt+r",
+    "command": "workbench.action.reloadWindow",
+    // "command": "alt+d 9914",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
     // (down) (arrow)
     "key": "alt+down",
     "command": "(model) alt+down 4e51",
@@ -8404,18 +8411,24 @@ Copy/Paste:
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
-    // (right) (vi) (edge) (wrap)
+    // (right) (vi) (edge)
     "key": "shift+alt+l",
     "command": "workbench.action.focusAuxiliaryBar",
     // "command": "shift+alt+h 0811",
     "when": "editorFocus && !panelFocus && !auxiliaryBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left'"
   },
   {
-    // (right) (vi) (edge) (wrap)
+    // (right) (vi) (edge)
     "key": "shift+alt+l",
     "command": "workbench.action.focusAuxiliaryBar",
     // "command": "shift+alt+h 0711",
     "when": "editorFocus && !panelFocus && auxiliaryBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left'"
+  },
+  {
+    // (right) (vi)
+    "key": "shift+alt+l",
+    "command": "shift+alt+l cf34",
+    "when": "terminalFocus && auxiliaryBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left'"
   },
   {
     // (right) (vi)
