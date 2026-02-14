@@ -621,7 +621,7 @@ Copy/Paste:
   {
     // (action) (chord) (all) (black) - test key
     "key": "alt+a 1",
-    "command": "alt+a 1 1111",
+    // "command": "alt+a 1 1111",
     // "command": "editor.action.fontZoomReset",
     // "command": "editor.action.resetSuggestSize",
     // "command": "editor.inlayHints.Reset",
@@ -660,7 +660,8 @@ Copy/Paste:
     // "command": "workbench.debug.watchExpressionsView.resetViewLocation",
     // "command": "workbench.debug.welcome.resetViewLocation",
     // "command": "workbench.editSessions.actions.resetAuth",
-    // "command": "workbench.explorer.fileView.resetViewLocation", // this opens the (EXPLORER) FILE EXPLORER viewlet and focuses it
+    // "command": "workbench.explorer.fileView.resetViewLocation", // this opens the (EXPLORER) FILE EXPLORER viewlet and focuses it (alt+a e)
+
     // "command": "workbench.explorer.openEditorsView.resetViewLocation", // this opens the (EXPLORER) OPEN EDITORS viewlet and focuses it (alt+a .) when primary sidebar is left
     // "command": "workbench.mcp.resetCachedTools",
     // "command": "workbench.mcp.resetTrust",
@@ -734,7 +735,7 @@ Copy/Paste:
     "key": "alt+a a",
     "command": "alt+a a 39f8",
     // "command": "workbench.action.toggleActivityBarVisibility",
-    "when": "config.keyboardNavigation.enabled"
+    "when": "sideBarFocus && config.keyboardNavigation.enabled"
   },
   {
     // (panel) (position) - rotate clockwise
@@ -772,17 +773,26 @@ Copy/Paste:
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled"
   },
   {
-    // (action) (chord) (all) (black) - open and focus the (ACTIVE) EXPLORER viewlet (alt+a e)
-    "key": "alt+a e",
-    "command": "workbench.view.explorer",
-    // "command": "alt+a 59a7",
+    // (action) (chord) (all) (black) - // open and focus the CHAT viewlet in the auxiliary bar
+    "key": "alt+a c",
+    "command": "workbench.panel.chat.resetViewContainerLocation",
+    // "command": "alt+a c 1113",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (panel) - focus find in files in the primary sidebar
+    // (action) (chord) (all) (black) - open and focus the (ACTIVE) EXPLORER viewlet (alt+a e)
+    "key": "alt+a e",
+    "command": "workbench.explorer.openEditorsView.resetViewLocation", // this opens the (EXPLORER) OPEN EDITORS viewlet and focuses it (alt+a .) when primary sidebar is left
+    // "command": "workbench.view.explorer",
+    // "command": "alt+a e 59a7",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (action) (chord) (all) (black) - open and focus the (EXPLORER) FILE viewlet (alt+a f)
     "key": "alt+a f",
-    "command": "workbench.action.findInFiles",
-    // "command": "alt+a 55a7",
+    "command": "workbench.explorer.fileView.resetViewLocation", // this opens the (EXPLORER) FILE EXPLORER viewlet and focuses it (alt+a f)
+    // "command": "workbench.view.explorer",
+    // "command": "alt+a f 59a7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
@@ -793,11 +803,31 @@ Copy/Paste:
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // (action) (chord) (all) (editor) (gold) (home) -  open and focus the EDITOR
+    "key": "alt+a h",
+    "command": "workbench.action.focusActiveEditorGroup",
+    // "command": "alt+a h 1108",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (action) (chord) (all) (black) - test key
+    "key": "alt+a p",
+    "command": "alt+a p 1116",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
     // (editor) - open markdown preview editor to the side
     "key": "alt+a p",
     "command": "markdown.showPreview",
     // "command": "alt+a 50a9",
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && editorLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/ && !notebookEditorFocused"
+  },
+  {
+    // (action) (chord) (all) (black) - open and focus the (PRIMARY) SEARCH viewlet (alt+a s)
+    "key": "alt+a s",
+    "command": "workbench.action.findInFiles",
+    // "command": "alt+a s 55a7",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (action) (chord) (all) (black) - open and focus the (PANEL) TERMINAL viewlet (alt+a t)
