@@ -54,12 +54,12 @@ def extract_preamble_postamble(text):
     in_line_comment = False
     in_block_comment = False
     start = -1
-    
+
     # Find opening bracket, skipping comments and strings
     while i < n:
         ch = text[i]
         next2 = text[i:i+2] if i+2 <= n else ''
-        
+
         if in_line_comment:
             if ch == '\n':
                 in_line_comment = False
@@ -72,17 +72,6 @@ def extract_preamble_postamble(text):
             else:
                 i += 1
             continue
-        if in_string:
-            if esc:
-                esc = False
-            elif ch == '\\':
-                esc = True
-            elif ch == string_char:
-                in_string = False
-            i += 1
-            continue
-        
-        # Not in string/comment
         if next2 == '//':
             in_line_comment = True
             i += 2
@@ -100,10 +89,10 @@ def extract_preamble_postamble(text):
             start = i
             break
         i += 1
-    
+
     if start == -1:
         return '', '', text
-    
+
     # Find matching closing bracket
     depth = 1
     i = start + 1
@@ -113,11 +102,11 @@ def extract_preamble_postamble(text):
     in_line_comment = False
     in_block_comment = False
     end = -1
-    
+
     while i < n:
         ch = text[i]
         next2 = text[i:i+2] if i+2 <= n else ''
-        
+
         if in_line_comment:
             if ch == '\n':
                 in_line_comment = False
@@ -139,7 +128,7 @@ def extract_preamble_postamble(text):
                 in_string = False
             i += 1
             continue
-        
+
         # Not in string/comment
         if next2 == '//':
             in_line_comment = True
@@ -162,10 +151,10 @@ def extract_preamble_postamble(text):
                 end = i
                 break
         i += 1
-    
+
     if end == -1:
         return '', '', text
-    
+
     preamble = text[:start]
     postamble = text[end+1:]
     array_text = text[start+1:end]  # exclude [ and ]
@@ -240,6 +229,9 @@ def when_specificity(when_val: str) -> Tuple[int]:
 class WhenNode:
     def __init__(self, parens: bool = False):
         self.parens = parens
+
+    def to_str(self) -> str:
+        raise NotImplementedError
 
 
 class WhenLeaf(WhenNode):
@@ -426,7 +418,8 @@ def parse_when(expr: str) -> WhenNode:
         if t[0] == 'OP' and t[1] == '(':
             consume()  # (
             node = parse_or()
-            if peek() and peek()[0] == 'OP' and peek()[1] == ')':
+            next_token = peek()
+            if next_token and next_token[0] == 'OP' and next_token[1] == ')':
                 consume()
                 node.parens = True
             return node
@@ -473,7 +466,7 @@ def parse_when(expr: str) -> WhenNode:
     return parse_or()
 
 
-def canonicalize_when(when_val: str) -> str:
+def canonicalize_when(when_val: str, mode: str = 'default') -> str:
     """
     Produce a canonical string for a `when` clause by sorting operands inside
     every AND node according to project conventions. Preserves OR groupings and
@@ -547,7 +540,19 @@ def canonicalize_when(when_val: str) -> str:
 
     def group_rank(text: str) -> int:
         left = left_identifier(text)
-        # Group order: config.* -> positional prefixes -> focus -> visibility -> other
+        # 'default' Group order: config.* -> positional prefixes -> focus -> visibility -> other
+        # 'focal-invariant' Group order: focus -> visibility -> positional prefixes -> config.* -> other
+        if mode == 'focal-invariant':
+            if _is_focus(left):
+                return 1
+            if _is_visibility(left):
+                return 2
+            if any(left.startswith(p) for p in positional_prefixes):
+                return 3
+            if left.startswith('config.'):
+                return 4
+            return 5
+        # default: 'config' ordering
         if left.startswith('config.'):
             return 1
         if any(left.startswith(p) for p in positional_prefixes):
@@ -602,15 +607,15 @@ def canonicalize_when(when_val: str) -> str:
     return render_when_node(ast)
 
 
-def sortable_when_key(when_val: str) -> str:
+def sortable_when_key(when_val: str, mode: str = 'default') -> str:
     if not when_val:
         return ''
     # Preserve negation for sorting to avoid unstable ordering when
     # otherwise-identical clauses differ only by '!'.
-    return canonicalize_when(when_val)
+    return canonicalize_when(when_val, mode=mode)
 
 
-def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str = None) -> Tuple:
+def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None = None, tertiary: str = 'default') -> Tuple:
     obj_match = re.search(r'\{.*\}', obj_text, re.DOTALL)
     if not obj_match:
         return ([], '', '')
@@ -621,8 +626,8 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str = None
         obj = json.loads(clean)
         key_val = str(obj.get('key', ''))
         when_val = str(obj.get('when', ''))
-        canonical_when = canonicalize_when(when_val)
-        sortable_when = sortable_when_key(when_val)
+        canonical_when = canonicalize_when(when_val, mode=tertiary)
+        sortable_when = sortable_when_key(when_val, mode=tertiary)
 
         # Build a flexible sort tuple based on primary/secondary preferences.
         keys = []
@@ -660,13 +665,15 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str = None
         return ([], '', '')
 
 
-def normalize_when_in_object(obj_text: str) -> Tuple[str, bool]:
+def normalize_when_in_object(obj_text: str, mode: str = 'default') -> Tuple[str, bool]:
     pattern = re.compile(r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")')
     match = pattern.search(obj_text)
     if not match:
         return obj_text, False
     original_when = match.group(2)
-    normalized = canonicalize_when(original_when)
+    # Use caller-provided mode (defaults to 'default') so normalization
+    # can match sorting behavior when requested.
+    normalized = canonicalize_when(original_when, mode=mode)
     if normalized == original_when:
         return obj_text, False
     new_obj = obj_text[:match.start(2)] + normalized + obj_text[match.end(2):]
@@ -711,13 +718,48 @@ def object_has_trailing_comma(obj_text: str) -> bool:
 def usage(prog: str | None = None) -> None:
     if prog is None:
         prog = sys.argv[0].split('/')[-1]
-    msg = (
-        f"Usage: {prog} [--primary {{key,when}}] [--secondary {{key,when}}] < keybindings.json\n\n"
-        "Options:\n  --primary, -p {key,when}   Primary sort field (default: key)\n"
-        "  --secondary, -s {key,when} Secondary sort field (optional)\n"
-        "  -h, --help                Show this usage message and exit\n"
-    )
-    print(msg, file=sys.stderr)
+    import shutil
+    import textwrap
+
+    term_width = shutil.get_terminal_size((80, 20)).columns
+
+    usage_line = f"Usage: {prog} [--primary {{key,when}}] [--secondary {{key,when}}] [--tertiary {{default,focal-invariant}}] < keybindings.json"
+
+    opts = [
+        ("--primary, -p", "{key,when}", "Primary sort field (default: key)"),
+        ("--secondary, -s", "{key,when}", "Secondary sort field (optional)"),
+        ("--tertiary, -t", "{default,focal-invariant}",
+         "Tertiary when-grouping mode (default: default)"),
+        ("-h, --help", "", "Show this usage message and exit"),
+    ]
+
+    # Build two justified columns: (1) option + argument, (2) description.
+    left_items = [f"  {name} {arg}".rstrip() for name, arg, _ in opts]
+    max_left = max(len(it) for it in left_items) if left_items else 0
+    # Add two spaces between left and description columns
+    desc_col = max_left + 2
+    lines = [usage_line, "", "Options:"]
+
+    for (name, arg, desc), left_base in zip(opts, left_items):
+        left = left_base.ljust(max_left)
+        wrap_width = term_width - desc_col
+        if wrap_width < 20:
+            # Terminal too narrow: place description on next indented line
+            lines.append(left)
+            indent = ' ' * desc_col
+            wrapped = textwrap.fill(desc, width=max(
+                20, term_width - desc_col), initial_indent=indent, subsequent_indent=indent)
+            lines.append(wrapped)
+        else:
+            wrapped_lines = textwrap.wrap(desc, width=wrap_width)
+            if wrapped_lines:
+                lines.append(f"{left}{'  '}{wrapped_lines[0]}")
+                for rem in wrapped_lines[1:]:
+                    lines.append(' ' * desc_col + rem)
+            else:
+                lines.append(left)
+
+    print("\n".join(lines), file=sys.stderr)
     sys.exit(1)
 
 
@@ -731,10 +773,13 @@ def main():
                         help="Primary sort field: 'key' (default) or 'when')")
     parser.add_argument('--secondary', '-s', choices=['key', 'when'], default=None,
                         help="Secondary sort field: 'key' or 'when' (optional)")
+    parser.add_argument('--tertiary', '-t', choices=['default', 'focal-invariant'], default='default',
+                        help="Tertiary when-grouping mode: 'default' (default) or 'focal-invariant'")
     args = parser.parse_args()
 
     primary_order = args.primary
     secondary_order = args.secondary
+    tertiary_mode = args.tertiary
     # Always normalize `when` clauses so sub-clauses are deduped and grouped
     # consistently before any sorting.
     normalize_when = True
@@ -748,7 +793,8 @@ def main():
         obj_out = obj.rstrip()
         when_changed = False
         if normalize_when:
-            obj_out, when_changed = normalize_when_in_object(obj_out)
+            obj_out, when_changed = normalize_when_in_object(
+                obj_out, mode=tertiary_mode)
             if when_changed:
                 comments = re.sub(r'^\s*//\s*when-sorted:.*\n',
                                   '', comments, flags=re.MULTILINE)
@@ -756,7 +802,7 @@ def main():
 
     # Sort by chosen primary (natural), then the other field (natural), then by _comment
     sorted_groups = sorted(normalized_groups, key=lambda pair: extract_sort_keys(
-        pair[1], primary=primary_order, secondary=secondary_order))
+        pair[1], primary=primary_order, secondary=secondary_order, tertiary=tertiary_mode))
     seen = set()
     sys.stdout.write(preamble)
     # Ensure the opening bracket is on its own line
@@ -765,7 +811,7 @@ def main():
         is_last = (i == len(sorted_groups) - 1)
         obj_out = obj.rstrip()
         key_val, when_val = extract_key_when(obj_out)
-        canonical_when = canonicalize_when(when_val)
+        canonical_when = canonicalize_when(when_val, mode=tertiary_mode)
         pair_id = (key_val, canonical_when)
         # Annotate if duplicate
         if pair_id in seen:

@@ -36,10 +36,7 @@ Conventions:
   * 'command not found' pseudo command: placeholders:
     - are left in to help with debugging, sorting, and future key binding placements
     - should contain the key and a 4-character UNIQUE identifier, i.e. 'alt+l jj4e' or 'alt+l 8df3'
-  * comment convention: `(direction | omni) (key group | all) (ring group color | black) [
-(model)
-]
-[(terminal)] [(wrap)] [(edge)]`
+  * comment convention: `(direction | omni) (key group | all) (ring group color | black) [(model)] [(terminal)] [(wrap)] [(edge)]`
 
 Constraints:
 
@@ -4597,7 +4594,7 @@ Copy/Paste:
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.k && neovim.init && neovim.mode == 'insert'"
   },
   {
-    // (up) (vi) (neovim) (user)
+    // (up) (vi) (neovim) (user) - unbind ctrl+k in normal mode to allow native vscode keybindings to work
     // (note) ctrl+k must be a chord for native vscode keybindings to work
     "key": "ctrl+k",
     "command": "-vscode-neovim.send",
@@ -7232,10 +7229,24 @@ Copy/Paste:
     "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap && terminalFocus"
   },
   {
-    // (up) (arrow)
-    "key": "ctrl+up",
-    "command": "(model) ctrl+up e9f1",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap && terminalFocus"
+    "key": "ctrl+y",
+    "command": "vscode-neovim.send",
+    //"command": "ctrl+y 1279",
+    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.y && neovim.init && neovim.mode != 'insert'"
+  },
+  {
+    "key": "ctrl+y",
+    "command": "ctrl+y 1277",
+    // "command": "vscode-neovim.send",
+    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.y && neovim.init && neovim.mode == 'insert'"
+  },
+  {
+    // (up) (vi) (neovim) (user) - unbind ctrl+y in normal mode to allow native vscode keybindings to work
+    // (note) ctrl+y must be a chord for native vscode keybindings to work
+    "key": "ctrl+y",
+    "command": "-vscode-neovim.send",
+    //"command": "ctrl+y 1278",
+    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.y && neovim.init && neovim.mode != 'insert'"
   },
   {
     // (right)
@@ -8370,6 +8381,13 @@ Copy/Paste:
     "command": "workbench.action.toggleAuxiliaryBar",
     // "command": "shift+alt+h 0712",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left' && auxiliaryBarFocus && auxiliaryBarVisible"
+  },
+  {
+    // (right) (vi) (terminal) (gold)
+    "key": "shift+alt+l",
+    "command": "workbench.action.focusAuxiliaryBar",
+    // "command": "shift+alt+h 8711",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left' && terminalFocus && auxiliaryBarVisible"
   },
   {
     // (right) (vi) (edge) (wrap)
