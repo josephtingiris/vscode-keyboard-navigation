@@ -20,6 +20,19 @@ Scope:
         - ctrl+shift+alt+
         - shift+alt+meta+
 
+  * Key groups:
+    * Included groups: `arrow juke vi`
+      * (action) `alt+a ...`
+      * (arrow) `left down up right home end pageUp pageDown`
+      * (debug) `alt+d ...`
+      * (chord) `alt+a ...` `alt+d ...`
+      * (direction) `w a s d h j k l left right up down horizontal vertical`
+      * (juke) `q e , . ; ' [ ] pageUp pageDown home end horizontal vertical`
+      * (kbm) `w a s d`
+      * (neovim) `alt+n ...`
+      * (split) `- _ = + \ |`
+      * (vi) `h j k l
+  
   * Modifier order is not significant (e.g., ctrl+alt+k == alt+ctrl+k), but a canonical ordering is ctrl+shift+alt+<key>
   * left/right variants are treated as identical (leftAlt, rightAlt, leftCtrl, rightCtrl, leftShift, rightShift, leftMeta, rightMeta)
   * Support for differentiating leftAlt from rightAlt or rightShift is not supported and treated as a single key (e.g., alt instead of leftAlt/rightAlt)
@@ -28,6 +41,7 @@ Scope:
   * on pc keyboards, the 'windows' key is also known as the 'meta' key is out of scope
   * on some keyboards AltGr is reported as ctrl+alt (i.e. AltGr+k == ctrl+alt+k)
   * Chords are allowed (e.g., alt+a alt+b).
+  * Groups should (eventually) become customizable and (sooner) have settings to enable/disable them (e.g., config.keyboardNavigation.juke, config.keyboardNavigation.vi, etc.)
 
 Conventions:
 
@@ -49,7 +63,7 @@ Constraints:
   * ctrl+shift+alt+arrow keys have system keybindings (mimic them?)
   * vscode integrated terminals only split one way, depending on the orientation of the panel. see: https://github.com/microsoft/vscode/issues/160501
 
-FIN Ring/Shell Assignments:
+FIN Ring/Shell Focus & Move Assignments:
 
   * alt+                = X/Gold
   * shift+alt           = 1/Red
@@ -60,17 +74,10 @@ FIN Ring/Shell Assignments:
 Notes:
 
   * The keybindings in this reference file use my 'Focal-Invariant Navigation' (FIN) model to determine when contexts.
-  * My primary editor is [neo]vim, so these keybindings are designed to augment and blend with the traditional vi keyboard grammar (and muscle memory).
+  * My main editor is [neo]vim, so these keybindings are designed to augment and blend with the traditional vi keyboard grammar (and muscle memory).
   * I really try to avoid conflicts with default bindings and common extensions, however some conflicts are unavoidable.
   * I test daily with vscode-neovim but still need to test compatibility with other extensions, particularly vim emulation extensions.
   * I'm aware of numerous conflicts with the vs code multiple cursor feature, and will circle back to resolve them later (once I learn to use it better).
-  
-Copy/Paste:
-
- "command": "workbench.action.focusLeftGroup",
- "command": "workbench.action.focusBelowGroup",
- "command": "workbench.action.focusAboveGroup",
- "command": "workbench.action.focusRightGroup",
 
 */
 [
@@ -80,14 +87,14 @@ Copy/Paste:
     "when": "activeEditorCanSplitInGroup"
   },
   {
-    // (right)
+    // (right) (juke) (all) (gold)
     "key": "alt+'",
     "command": "(model) alt+' 96b9",
     // "command": "workbench.action.navigateForward",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (left)
+    // (left) (juke) (all) (gold)
     "key": "alt+,",
     "command": "(model) alt+, c44e",
     // "command": "workbench.action.navigateBack",
@@ -118,25 +125,25 @@ Copy/Paste:
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (left)
+    // (left) (juke) (all) (gold)
     "key": "alt+[",
     "command": "(model) alt+[ af43",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (right)
+    // (right) (juke) (all) (gold)
     "key": "alt+]",
     "command": "(model) alt+] 65a3",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (noop) (chord) - alt+a chords
+    // (action) (chord) (all) (gold) (noop) - alt+a chords
     "key": "alt+a",
     "command": "(model) alt+a dd09",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (action) (chord) (all) (black) - test key
+    // (action) (chord) (all) (gold) - test key
     "key": "alt+a 1",
     // "command": "alt+a 1 1111",
     // "command": "editor.action.fontZoomReset",
@@ -178,11 +185,10 @@ Copy/Paste:
     // "command": "workbench.debug.welcome.resetViewLocation",
     // "command": "workbench.editSessions.actions.resetAuth",
     // "command": "workbench.explorer.fileView.resetViewLocation", // this opens the (EXPLORER) FILE EXPLORER viewlet and focuses it (alt+a e)
-
     // "command": "workbench.explorer.openEditorsView.resetViewLocation", // this opens the (EXPLORER) OPEN EDITORS viewlet and focuses it (alt+a .) when primary sidebar is left
     // "command": "workbench.mcp.resetCachedTools",
     // "command": "workbench.mcp.resetTrust",
-    // "command": "workbench.notebook.layout.webview.reset",
+    // "command": "workbench.notebook.layout.webview.reset", // i need to learn notebooks better ...
     // "command": "workbench.panel.chat.resetViewContainerLocation", // this (also) opens the CHAT viewlet in the auxiliary bar and focuses it
     // "command": "workbench.panel.chat.view.copilot.resetViewLocation", // this (also) opens the CHAT viewlet in the primary sidebar and focuses it
     // "command": "workbench.panel.markers.resetViewContainerLocation", // this opens the PROBLEMS viewlet in the panel and focuses it
@@ -194,8 +200,8 @@ Copy/Paste:
     // "command": "workbench.panel.testResults.resetViewContainerLocation", // this (also) opens the TERMINAL viewlet in the panel and focuses it
     // "command": "workbench.panel.testResults.view.resetViewLocation", // this (also) opents the TERMINAL viewlet in the panel and focuses it
     // "command": "workbench.profiles.actions.resetWorkspaces",
-    // "command": "workbench.scm.history.resetViewLocation", // this opens the (SCM) GRAPH viewlet in the primary sidebar and focuses it
-    // "command": "workbench.scm.repositories.resetViewLocation",
+    // "command": "workbench.scm.history.resetViewLocation", // open and focus the (PRIMARY) SCM GRAPH viewlet
+    // "command": "workbench.scm.repositories.resetViewLocation", // open and focus the (PRIMARY) SCM REPOISITORIES viewlet
     // "command": "workbench.scm.resetViewLocation",
     // "command": "workbench.view.debug.resetViewContainerLocation",
     // "command": "workbench.view.editSessions.resetViewContainerLocation",
@@ -204,6 +210,7 @@ Copy/Paste:
     // "command": "workbench.view.extension.test.resetViewContainerLocation",
     // "command": "workbench.view.extensions.resetViewContainerLocation",
     // "command": "workbench.view.remote.resetViewContainerLocation",
+
     // "command": "workbench.view.scm.resetViewContainerLocation",
     // "command": "workbench.view.search.resetViewContainerLocation",
     // "command": "workbench.view.search.resetViewLocation",
@@ -248,64 +255,86 @@ Copy/Paste:
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (action) (chord) (all) (black) - // open and focus the CHAT viewlet in the auxiliary bar
+    // (action) (chord) (secondary) (gold) - open and focus the (SECONDARY) CHAT viewlet
     "key": "alt+a c",
     "command": "workbench.panel.chat.resetViewContainerLocation",
     // "command": "alt+a c 1113",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (action) (chord) (all) (black) - open and focus the (ACTIVE) EXPLORER viewlet (alt+a e)
+    // (action) (chord) (panel) (gold) - opens and focus the (PANEL) DEBUG viewlet
+    "key": "alt+a d",
+    "command": "workbench.panel.repl.resetViewContainerLocation",
+    // "command": "alt+a d 1104",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (action) (chord) (primary) (gold) - open and focus the (EXPLORER) OPEN EDITORS viewlet
     "key": "alt+a e",
-    "command": "workbench.explorer.openEditorsView.resetViewLocation", // this opens the (EXPLORER) OPEN EDITORS viewlet and focuses it (alt+a .) when primary sidebar is left
-    // "command": "workbench.view.explorer",
+    "command": "workbench.explorer.openEditorsView.resetViewLocation", 
+    // "command": "workbench.view.explorer", // open and focus the (PRIMARY) ACTIVE EXPLORER viewlet
     // "command": "alt+a e 59a7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (action) (chord) (all) (black) - open and focus the (EXPLORER) FILE viewlet (alt+a f)
+    // (action) (chord) (primary) (gold) - open and focus the (EXPLORER) FILE viewlet
     "key": "alt+a f",
-    "command": "workbench.explorer.fileView.resetViewLocation", // this opens the (EXPLORER) FILE EXPLORER viewlet and focuses it (alt+a f)
+    "command": "workbench.explorer.fileView.resetViewLocation",
     // "command": "workbench.view.explorer",
     // "command": "alt+a f 59a7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (panel) - focus scm (git) changes in the primary sidebar
+    // (action) (chord) (primary) (gold) - open and focus the (EXPLORER) SCM (git) viewlet
     "key": "alt+a g",
     "command": "workbench.view.scm",
     // "command": "alt+a 53a7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (action) (chord) (all) (editor) (gold) (home) -  open and focus the EDITOR
+    // (action) (chord) (editor) (gold) (home) - open and focus the (EDITOR) ACTIVE GROUP
     "key": "alt+a h",
     "command": "workbench.action.focusActiveEditorGroup",
     // "command": "alt+a h 1108",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (action) (chord) (all) (black) - test key
-    "key": "alt+a p",
-    "command": "alt+a p 1116",
+    // (action) (chord) (panel) (gold) - opens and focus the (PANEL) OUTPUT viewlet
+    "key": "alt+a o",
+    "command": "workbench.panel.output.resetViewContainerLocation",
+    // "command": "alt+a o 1115",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (action) (chord) (all) (black) - open and focus the (PRIMARY) SEARCH viewlet (alt+a s)
+    // (action) (chord) (panel) (gold) - open and focus the (PANEL) PROBLEMS viewlet
+    "key": "alt+a p",
+    "command": "workbench.panel.markers.resetViewContainerLocation",
+    // "command": "alt+a p 1116",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (action) (chord) (primary) (gold) - open and focus the (PRIMARY) REMOTE EXPLORER viewlet
+    "key": "alt+a r",
+    "command": "workbench.view.remote.resetViewContainerLocation",
+    // "command": "alt+a r 55a5",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (action) (chord) (primary) (gold) - open and focus the (PRIMARY) SEARCH viewlet
     "key": "alt+a s",
     "command": "workbench.action.findInFiles",
     // "command": "alt+a s 55a7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (action) (chord) (all) (black) - open and focus the (PANEL) TERMINAL viewlet (alt+a t)
+    // (action) (chord) (all) (black) - open and focus the (PANEL) TERMINAL viewlet
     "key": "alt+a t",
     "command": "terminal.resetViewLocation",
     // "command": "alt+a 1 1120",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (panel) - focus extensions in the primary sidebar
+    // (action) (chord) (primary) (gold) - open and focus the (PRIMARY) EXTENSIONS viewlet
     "key": "alt+a x",
     "command": "workbench.view.extensions",
     // "command": "alt+a 59a7",
@@ -3446,7 +3475,7 @@ Copy/Paste:
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled"
   },
   {
-    // (left)
+    // (left) (juke) (editor) (gold)
     "key": "alt+[",
     "command": "alt+[ f982",
     // "command": "cursorMove",
@@ -3456,7 +3485,7 @@ Copy/Paste:
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled"
   },
   {
-    // (right)
+    // (right) (juke) (editor) (gold)
     "key": "alt+]",
     "command": "alt+] ff82",
     // "command": "cursorMove",
@@ -3487,20 +3516,34 @@ Copy/Paste:
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled"
   },
   {
-    // (close)
+    // (close) (all) (editor) (gold)
     "key": "ctrl+d",
     "command": "workbench.action.closeActiveEditor",
     // "command": "ctrl+d 26cb",
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled"
   },
   {
-    // (right)
+    // (end) (arrow) (editor) (gold)
+    "key": "ctrl+shift+alt+end",
+    "command": "workbench.action.moveEditorToEnd",
+    // "command": "ctrl+shift+alt+end 23e9",
+    "when": "editorFocus && config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (home) (arrow) (editor) (gold)
+    "key": "ctrl+shift+alt+home",
+    "command": "workbench.action.moveEditorToStart",
+    // "command": "ctrl+shift+alt+home 23e8",
+    "when": "editorFocus && config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (right) (juke) (terminal) (gold)
     "key": "alt+'",
     "command": "(model) alt+' 21f9",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal"
   },
   {
-    // (left)
+    // (left) (juke) (terminal) (gold)
     "key": "alt+,",
     "command": "(model) alt+, 38d4",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal"
@@ -4364,17 +4407,17 @@ Copy/Paste:
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal"
   },
   {
-    // (left) (vi) (nowrap)
-    "key": "shift+alt+h",
-    "command": "alt+h 9e22",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left'"
-  },
-  {
     "key": "shift+alt+j",
     "command": "alt+a a 67f8",
     // "command": "workbench.action.toggleActivityBarVisibility",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.activityBar.location == 'bottom'"
     //"when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (vi) (nowrap)
+    "key": "shift+alt+h",
+    "command": "alt+h 9e22",
+    "when": "config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap"
   },
   {
     // (zoom) - toggle maximize editor group
@@ -7318,14 +7361,14 @@ Copy/Paste:
     "key": "shift+alt+l",
     "command": "workbench.action.toggleAuxiliaryBar",
     // "command": "shift+alt+h 0712",
-    "when": "auxiliaryBarFocus && auxiliaryBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left'"
+    "when": "auxiliaryBarFocus && auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
     // (left) (vi) (secondary) (gold)
     "key": "shift+alt+h",
     "command": "workbench.action.focusActiveEditorGroup",
     // "command": "shift+alt+h 6318",
-    "when": "auxiliaryBarFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left' && editorIsOpen"
+    "when": "auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorIsOpen"
   },
   {
     // (left) (vi) (gold) (editor) (wrap)
@@ -7445,7 +7488,7 @@ Copy/Paste:
     "key": "shift+alt+l",
     "command": "workbench.action.focusAuxiliaryBar",
     // "command": "shift+alt+h 8711",
-    "when": "terminalFocus && auxiliaryBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left'"
+    "when": "terminalFocus && auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
     // (down) (arrow)
@@ -9752,35 +9795,35 @@ Copy/Paste:
     "key": "shift+alt+h",
     "command": "workbench.action.focusSideBar",
     // "command": "shift+alt+h 8d95",
-    "when": "!editorFocus && panelFocus && sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left'"
+    "when": "!editorFocus && panelFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
     // (left) (vi)
     "key": "shift+alt+h",
     "command": "shift+alt+h 43ad",
     // "command": "workbench.action.focusPanel",
-    "when": "auxiliaryBarFocus && panelVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left'"
+    "when": "auxiliaryBarFocus && panelVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
     // (left) (vi) (secondary) (gold)
     "key": "shift+alt+h",
     "command": "workbench.action.focusActiveEditorGroup",
     // "command": "shift+alt+h 6319",
-    "when": "auxiliaryBarFocus && panelVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left' && editorIsOpen"
+    "when": "auxiliaryBarFocus && panelVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorIsOpen"
   },
   {
     // (left) (all) (secondary) (gold)
     "key": "shift+alt+,",
     "command": "workbench.action.focusPanel",
     // "command": "shift+alt+h 1319",
-    "when": "auxiliaryBarFocus && panelVisible && panelPosition == 'bottom' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left'"
+    "when": "auxiliaryBarFocus && panelVisible && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
     // (right) (vi) (edge)
     "key": "shift+alt+l",
     "command": "workbench.action.focusAuxiliaryBar",
     // "command": "shift+alt+h 0811",
-    "when": "editorFocus && !panelFocus && !auxiliaryBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left'"
+    "when": "editorFocus && !panelFocus && !auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
     // (down) (vi)
@@ -9797,7 +9840,7 @@ Copy/Paste:
     "key": "shift+alt+l",
     "command": "workbench.action.focusAuxiliaryBar",
     // "command": "shift+alt+h 0711",
-    "when": "editorFocus && !panelFocus && auxiliaryBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left'"
+    "when": "editorFocus && !panelFocus && auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
     // (up) (vi)
@@ -9825,13 +9868,13 @@ Copy/Paste:
     "key": "shift+alt+h",
     "command": "shift+alt+h add5",
     // "command": "workbench.action.toggleSidebarVisibility",
-    "when": "editorFocus && !sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left'"
+    "when": "editorFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
     // (left) (vi) (panel) (gold) (edge) (nowrap)
     "key": "shift+alt+h",
     "command": "shift+alt+h 8d96",
-    "when": "panelFocus && !sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left'"
+    "when": "panelFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap"
   },
   {
     // (down) (vi) (panel) (gold) (terminal)
@@ -9852,27 +9895,27 @@ Copy/Paste:
     "key": "shift+alt+h",
     "command": "shift+alt+h 6317",
     // "command": "workbench.action.focusAuxiliaryBar",
-    "when": "sideBarFocus && auxiliaryBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left'"
+    "when": "sideBarFocus && auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
     // (left) (vi)
     "key": "shift+alt+h",
     "command": "workbench.action.toggleSidebarVisibility",
     // "command": "shift+alt+h acd4",
-    "when": "sideBarFocus && sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left'"
+    "when": "sideBarFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
     // (right) (vi)
     "key": "shift+alt+l",
     "command": "shift+alt+l cf34",
-    "when": "terminalFocus && auxiliaryBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left'"
+    "when": "terminalFocus && auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi"
   },
   {
     // (right) (all) (secondary) (gold)
     "key": "shift+alt+.",
     "command": "workbench.action.focusAuxiliaryBar",
     // "command": "shift+alt+. 1219",
-    "when": "terminalFocus && auxiliaryBarVisible && panelPosition == 'bottom' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left'"
+    "when": "terminalFocus && auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
     // (up) (vi)
@@ -9901,7 +9944,7 @@ Copy/Paste:
     "key": "shift+alt+h",
     "command": "workbench.action.focusSideBar",
     // "command": "shift+alt+h 0812",
-    "when": "editorFocus && !panelFocus && !sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left'"
+    "when": "editorFocus && !panelFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
     // (up) (vi)
@@ -9914,54 +9957,54 @@ Copy/Paste:
     "key": "shift+alt+h",
     "command": "workbench.action.focusSideBar",
     // "command": "shift+alt+h 33ad",
-    "when": "editorFocus && !panelFocus && sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left'"
+    "when": "editorFocus && !panelFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
     // (left) (vi) (edge) (wrap)
     "key": "shift+alt+h",
     "command": "shift+alt+h 080e",
-    "when": "editorFocus && panelVisible && !sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left'"
+    "when": "editorFocus && panelVisible && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap"
   },
   {
     // (left) (vi) (panel) (gold) (edge) (wrap)
     "key": "shift+alt+h",
     "command": "shift+alt+h 8e22",
     // "command": "workbench.action.focusActiveEditorGroup",
-    "when": "panelFocus && !sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorIsOpen"
+    "when": "panelFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && editorIsOpen"
   },
   {
     // (left) (vi) (panel) (gold) (edge) (wrap)
     "key": "shift+alt+h",
     "command": "shift+alt+h 8e20",
     // "command": "workbench.action.focusActiveEditorGroup",
-    "when": "panelFocus && !sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorIsOpen"
+    "when": "panelFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && editorIsOpen"
   },
   {
     // (right) (vi)
     "key": "shift+alt+l",
     "command": "workbench.action.focusActiveEditorGroup",
     // "command": "(model) shift+alt+l b62d",
-    "when": "sideBarFocus && sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorIsOpen"
+    "when": "sideBarFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && editorIsOpen"
   },
   {
     // (left) (corner) (editor) (gold)
     "key": "shift+alt+h",
     "command": "shift+alt+h cd7e",
-    "when": "editorFocus && !sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
+    "when": "editorFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
   },
   {
     // (left) (corner)
     "key": "alt+h",
     "command": "alt+h ad8d",
     // "command": "workbench.action.focusSideBar",
-    "when": "editorFocus && !panelFocus && sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
+    "when": "editorFocus && !panelFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
   },
   {
     // (left) (corner) (editor) (gold)
     "key": "shift+alt+h",
     "command": "shift+alt+h cd8d",
     // "command": "workbench.action.focusSideBar",
-    "when": "editorFocus && !panelFocus && sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
+    "when": "editorFocus && !panelFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
   },
   {
     // (left) (juke) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
@@ -10021,19 +10064,19 @@ Copy/Paste:
     "key": "shift+alt+h",
     "command": "shift+alt+h 8b41",
     // "command": "workbench.action.focusSideBar",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditorIsReadonly"
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorIsReadonly"
   },
   {
     // (left) (corner) (editor) (gold) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar hidden (first in group)
     "key": "shift+alt+h",
     "command": "shift+alt+h 4b2b",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && !sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly"
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly"
   },
   {
     // (left) (corner) (editor) (gold) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (first in group)
     "key": "shift+alt+h",
     "command": "shift+alt+h 4b2c",
     // "command": "workbench.action.focusSideBar",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly"
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly"
   }
 ]
