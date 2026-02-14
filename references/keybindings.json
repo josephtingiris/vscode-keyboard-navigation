@@ -83,9 +83,1285 @@ Notes:
 */
 [
   {
+    // (left) (juke) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+,",
+    "command": "workbench.action.previousEditor",
+    // "command": "alt+, 03ab",
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
+    // (horizontal) (split) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+-",
+    "command": "workbench.action.splitEditorDown",
+    // "command": "alt+- 83bb",
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
+    // (right) (juke) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+.",
+    "command": "workbench.action.nextEditor",
+    // "command": "alt+. 03ac",
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
+    // (vertical) (split) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+=",
+    "command": "workbench.action.splitEditor",
+    // "command": "alt+= 83bc",
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
+    // (left) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+h",
+    "command": "alt+h 2a1a",
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
+    // (down) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+j",
+    "command": "workbench.action.focusBelowGroup",
+    // "command": "alt+j 42a6",
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
+    // (down) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+k",
+    "command": "workbench.action.focusAboveGroup",
+    // "command": "alt+k 42a5",
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
+    // (right) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
+    "key": "alt+l",
+    "command": "alt+l 2b2a",
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
+    // (left) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 4b2a",
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditorIsReadonly && editorIsOpen"
+  },
+  {
+    // (left) (vi) (editor) (gold) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (not first in group)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 8b41",
+    // "command": "workbench.action.focusSideBar",
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorIsReadonly"
+  },
+  {
+    // (left) (corner) (editor) (gold) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar hidden (first in group)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 4b2b",
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly"
+  },
+  {
+    // (left) (corner) (editor) (gold) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (first in group)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 4b2c",
+    // "command": "workbench.action.focusSideBar",
+    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly"
+  },
+  {
     "key": "ctrl+k ctrl+shift+\\",
     "command": "workbench.action.splitEditorInGroup",
     "when": "activeEditorCanSplitInGroup"
+  },
+  {
+    // (zoom) (alias) (secondary) (gold) - toggle secondary side bar
+    "key": "alt+a z",
+    "command": "workbench.action.toggleMaximizedAuxiliaryBar",
+    // "command": "alt+a z af39",
+    "when": "auxiliaryBarFocus && config.keyboardNavigation.enabled"
+  },
+  {
+    // (right) (vi) (secondary) (gold) (edge) (wrap)
+    "key": "shift+alt+l",
+    "command": "workbench.action.toggleAuxiliaryBar",
+    // "command": "shift+alt+h 0712",
+    "when": "auxiliaryBarFocus && auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
+  },
+  {
+    // (left) (vi) (secondary) (gold)
+    "key": "shift+alt+h",
+    "command": "workbench.action.focusActiveEditorGroup",
+    // "command": "shift+alt+h 6318",
+    "when": "auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorIsOpen"
+  },
+  {
+    // (left) (vi)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 43ad",
+    // "command": "workbench.action.focusPanel",
+    "when": "auxiliaryBarFocus && panelVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (vi) (secondary) (gold)
+    "key": "shift+alt+h",
+    "command": "workbench.action.focusActiveEditorGroup",
+    // "command": "shift+alt+h 6319",
+    "when": "auxiliaryBarFocus && panelVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorIsOpen"
+  },
+  {
+    // (left) (all) (secondary) (gold)
+    "key": "shift+alt+,",
+    "command": "workbench.action.focusPanel",
+    // "command": "shift+alt+h 1319",
+    "when": "auxiliaryBarFocus && panelVisible && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
+  },
+  {
+    // (down) (arrow)
+    "key": "alt+down",
+    "command": "(model) alt+down 4e51",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow) (end)
+    "key": "alt+end",
+    "command": "(model) alt+end b9f4",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "alt+home",
+    "command": "workbench.action.focusActiveEditorGroup",
+    // "command": "(model) alt+home 8160",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (left) (arrow)
+    "key": "alt+left",
+    "command": "(model) alt+left f138",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "alt+pagedown",
+    "command": "(model) alt+pagedown 0e3b",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "alt+pageup",
+    "command": "(model) alt+pageup a1d5",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (right) (arrow)
+    "key": "alt+right",
+    "command": "(model) alt+right f122",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "alt+up",
+    "command": "(model) alt+up 1405",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+alt+down",
+    "command": "(model) ctrl+alt+down 9c48",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+alt+end",
+    "command": "(model) ctrl+alt+end 23f7",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+alt+home",
+    "command": "(model) ctrl+alt+home 40ed",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+alt+left",
+    "command": "(model) ctrl+alt+left 369c",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+alt+meta+down",
+    "command": "(model) ctrl+alt+meta+down c070",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+alt+meta+end",
+    "command": "(model) ctrl+alt+meta+end af3d",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+alt+meta+home",
+    "command": "(model) ctrl+alt+meta+home 0cff",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+alt+meta+left",
+    "command": "(model) ctrl+alt+meta+left 399b",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+alt+meta+pagedown",
+    "command": "(model) ctrl+alt+meta+pagedown ba00",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+alt+meta+pageup",
+    "command": "(model) ctrl+alt+meta+pageup 1abe",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+alt+meta+right",
+    "command": "(model) ctrl+alt+meta+right c9dd",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+alt+meta+up",
+    "command": "(model) ctrl+alt+meta+up fb0e",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+alt+pagedown",
+    "command": "(model) ctrl+alt+pagedown 5165",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+alt+pageup",
+    "command": "(model) ctrl+alt+pageup e735",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+alt+right",
+    "command": "(model) ctrl+alt+right ad1a",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+alt+up",
+    "command": "(model) ctrl+alt+up c957",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+down",
+    "command": "(model) ctrl+down ab9b",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+end",
+    "command": "(model) ctrl+end 4811",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+home",
+    "command": "(model) ctrl+home 8049",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+left",
+    "command": "(model) ctrl+left 8d3f",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+pagedown",
+    "command": "(model) ctrl+pagedown 92fc",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+pageup",
+    "command": "(model) ctrl+pageup f3f5",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+right",
+    "command": "(model) ctrl+right 35e8",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+shift+alt+down",
+    "command": "(model) ctrl+shift+alt+down e7be",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+shift+alt+end",
+    "command": "(model) ctrl+shift+alt+end 129e",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+shift+alt+home",
+    "command": "(model) ctrl+shift+alt+home 9cb8",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+shift+alt+left",
+    "command": "(model) ctrl+shift+alt+left 5a92",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+shift+alt+meta+down",
+    "command": "(model) ctrl+shift+alt+meta+down 57b9",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+shift+alt+meta+end",
+    "command": "(model) ctrl+shift+alt+meta+end e639",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+shift+alt+meta+home",
+    "command": "(model) ctrl+shift+alt+meta+home 81fc",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+shift+alt+meta+left",
+    "command": "(model) ctrl+shift+alt+meta+left 0ffc",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+shift+alt+meta+pagedown",
+    "command": "(model) ctrl+shift+alt+meta+pagedown ccff",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+shift+alt+meta+pageup",
+    "command": "(model) ctrl+shift+alt+meta+pageup 06fc",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+shift+alt+meta+right",
+    "command": "(model) ctrl+shift+alt+meta+right d495",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+shift+alt+meta+up",
+    "command": "(model) ctrl+shift+alt+meta+up 660c",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+shift+alt+pagedown",
+    "command": "(model) ctrl+shift+alt+pagedown 09fd",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+shift+alt+pageup",
+    "command": "(model) ctrl+shift+alt+pageup 9e96",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+shift+alt+right",
+    "command": "(model) ctrl+shift+alt+right a753",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+shift+alt+up",
+    "command": "(model) ctrl+shift+alt+up fed7",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+up",
+    "command": "(model) ctrl+up 75a4",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "shift+alt+down",
+    "command": "(model) shift+alt+down 3207",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "shift+alt+end",
+    "command": "(model) shift+alt+end de88",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "shift+alt+home",
+    "command": "(model) shift+alt+home b1e2",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (left) (arrow)
+    "key": "shift+alt+left",
+    "command": "(model) shift+alt+left ebdf",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "shift+alt+meta+down",
+    "command": "(model) shift+alt+meta+down 5568",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "shift+alt+meta+end",
+    "command": "(model) shift+alt+meta+end 09cc",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (arrow)
+    "key": "shift+alt+meta+home",
+    "command": "(model) shift+alt+meta+home 5c45",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (left) (arrow)
+    "key": "shift+alt+meta+left",
+    "command": "(model) shift+alt+meta+left 89c3",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "shift+alt+meta+pagedown",
+    "command": "(model) shift+alt+meta+pagedown c27e",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "shift+alt+meta+pageup",
+    "command": "(model) shift+alt+meta+pageup 20d0",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (right) (arrow)
+    "key": "shift+alt+meta+right",
+    "command": "(model) shift+alt+meta+right c3ed",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "shift+alt+meta+up",
+    "command": "(model) shift+alt+meta+up 27ae",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "shift+alt+pagedown",
+    "command": "(model) shift+alt+pagedown 902a",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "shift+alt+pageup",
+    "command": "(model) shift+alt+pageup 400d",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (right) (arrow)
+    "key": "shift+alt+right",
+    "command": "(model) shift+alt+right cc6f",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (up) (arrow)
+    "key": "shift+alt+up",
+    "command": "(model) shift+alt+up b80b",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (down) (arrow)
+    "key": "alt+down",
+    "command": "(model) alt+down 0f37",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow) (end)
+    "key": "alt+end",
+    "command": "(model) alt+end fd5e",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "alt+home",
+    "command": "(model) alt+home 2e66",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "alt+left",
+    "command": "(model) alt+left 7ae8",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "alt+pagedown",
+    "command": "(model) alt+pagedown b793",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "alt+pageup",
+    "command": "(model) alt+pageup 7a39",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "alt+right",
+    "command": "(model) alt+right dd24",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "alt+up",
+    "command": "(model) alt+up fb05",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+alt+down",
+    "command": "(model) ctrl+alt+down c7d0",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+alt+end",
+    "command": "(model) ctrl+alt+end 56f7",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+alt+home",
+    "command": "(model) ctrl+alt+home cbd2",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+alt+left",
+    "command": "(model) ctrl+alt+left 0db8",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+alt+meta+down",
+    "command": "(model) ctrl+alt+meta+down 3b15",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+alt+meta+end",
+    "command": "(model) ctrl+alt+meta+end 0308",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+alt+meta+home",
+    "command": "(model) ctrl+alt+meta+home 8cd7",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+alt+meta+left",
+    "command": "(model) ctrl+alt+meta+left b71a",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+alt+meta+pagedown",
+    "command": "(model) ctrl+alt+meta+pagedown 5304",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+alt+meta+pageup",
+    "command": "(model) ctrl+alt+meta+pageup d103",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+alt+meta+right",
+    "command": "(model) ctrl+alt+meta+right 14b4",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+alt+meta+up",
+    "command": "(model) ctrl+alt+meta+up afa3",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+alt+pagedown",
+    "command": "(model) ctrl+alt+pagedown f740",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+alt+pageup",
+    "command": "(model) ctrl+alt+pageup 3cd9",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+alt+right",
+    "command": "(model) ctrl+alt+right c48f",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+alt+up",
+    "command": "(model) ctrl+alt+up f6ee",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+down",
+    "command": "(model) ctrl+down 510f",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+end",
+    "command": "(model) ctrl+end aec4",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+home",
+    "command": "(model) ctrl+home df08",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+left",
+    "command": "(model) ctrl+left 795a",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+pagedown",
+    "command": "(model) ctrl+pagedown ace5",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+pageup",
+    "command": "(model) ctrl+pageup 0142",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+right",
+    "command": "(model) ctrl+right e458",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+shift+alt+down",
+    "command": "(model) ctrl+shift+alt+down 751a",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+shift+alt+end",
+    "command": "(model) ctrl+shift+alt+end b975",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+shift+alt+home",
+    "command": "(model) ctrl+shift+alt+home 4495",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+shift+alt+left",
+    "command": "(model) ctrl+shift+alt+left 153a",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+shift+alt+meta+down",
+    "command": "(model) ctrl+shift+alt+meta+down 2c70",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+shift+alt+meta+end",
+    "command": "(model) ctrl+shift+alt+meta+end e188",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+shift+alt+meta+home",
+    "command": "(model) ctrl+shift+alt+meta+home e5cc",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+shift+alt+meta+left",
+    "command": "(model) ctrl+shift+alt+meta+left 26ff",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+shift+alt+meta+pagedown",
+    "command": "(model) ctrl+shift+alt+meta+pagedown b380",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+shift+alt+meta+pageup",
+    "command": "(model) ctrl+shift+alt+meta+pageup f3fc",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+shift+alt+meta+right",
+    "command": "(model) ctrl+shift+alt+meta+right 7432",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+shift+alt+meta+up",
+    "command": "(model) ctrl+shift+alt+meta+up c4c8",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+shift+alt+pagedown",
+    "command": "(model) ctrl+shift+alt+pagedown 138c",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+shift+alt+pageup",
+    "command": "(model) ctrl+shift+alt+pageup 0fb6",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+shift+alt+right",
+    "command": "(model) ctrl+shift+alt+right ba72",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+shift+alt+up",
+    "command": "(model) ctrl+shift+alt+up 0497",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+up",
+    "command": "(model) ctrl+up 498b",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "shift+alt+down",
+    "command": "(model) shift+alt+down 36b0",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "shift+alt+end",
+    "command": "(model) shift+alt+end 06fb",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "shift+alt+home",
+    "command": "(model) shift+alt+home 61ad",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "shift+alt+left",
+    "command": "(model) shift+alt+left ae55",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "shift+alt+meta+down",
+    "command": "(model) shift+alt+meta+down cf5e",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "shift+alt+meta+end",
+    "command": "(model) shift+alt+meta+end 5eca",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "shift+alt+meta+home",
+    "command": "(model) shift+alt+meta+home 594e",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "shift+alt+meta+left",
+    "command": "(model) shift+alt+meta+left 44b0",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "shift+alt+meta+pagedown",
+    "command": "(model) shift+alt+meta+pagedown aa74",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "shift+alt+meta+pageup",
+    "command": "(model) shift+alt+meta+pageup 0d68",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "shift+alt+meta+right",
+    "command": "(model) shift+alt+meta+right 6613",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "shift+alt+meta+up",
+    "command": "(model) shift+alt+meta+up bc28",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "shift+alt+pagedown",
+    "command": "(model) shift+alt+pagedown b444",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "shift+alt+pageup",
+    "command": "(model) shift+alt+pageup 1699",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "shift+alt+right",
+    "command": "(model) shift+alt+right a109",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "shift+alt+up",
+    "command": "(model) shift+alt+up 460b",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "alt+down",
+    "command": "(model) alt+down 74dd",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow) (end)
+    "key": "alt+end",
+    "command": "(model) alt+end a560",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "alt+home",
+    "command": "-noop",
+    // "command": "(model) alt+home a7d0",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "alt+left",
+    "command": "(model) alt+left ca28",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "alt+pagedown",
+    "command": "(model) alt+pagedown aacf",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "alt+pageup",
+    "command": "(model) alt+pageup e9c0",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "alt+right",
+    "command": "(model) alt+right b7ae",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "alt+up",
+    "command": "(model) alt+up 8991",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+alt+down",
+    "command": "(model) ctrl+alt+down b16b",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+alt+end",
+    "command": "(model) ctrl+alt+end 5900",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+alt+home",
+    "command": "(model) ctrl+alt+home 0c71",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+alt+left",
+    "command": "(model) ctrl+alt+left c8ec",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+alt+meta+down",
+    "command": "(model) ctrl+alt+meta+down 055e",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+alt+meta+end",
+    "command": "(model) ctrl+alt+meta+end 488d",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+alt+meta+home",
+    "command": "(model) ctrl+alt+meta+home 4023",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+alt+meta+left",
+    "command": "(model) ctrl+alt+meta+left 490f",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+alt+meta+pagedown",
+    "command": "(model) ctrl+alt+meta+pagedown 06e5",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+alt+meta+pageup",
+    "command": "(model) ctrl+alt+meta+pageup 27a3",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+alt+meta+right",
+    "command": "(model) ctrl+alt+meta+right 18e5",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+alt+meta+up",
+    "command": "(model) ctrl+alt+meta+up b1ce",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+alt+pagedown",
+    "command": "(model) ctrl+alt+pagedown 0c35",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+alt+pageup",
+    "command": "(model) ctrl+alt+pageup b95f",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+alt+right",
+    "command": "(model) ctrl+alt+right 384e",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+alt+up",
+    "command": "(model) ctrl+alt+up 87f3",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+down",
+    "command": "(model) ctrl+down 8606",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+end",
+    "command": "(model) ctrl+end 406f",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+home",
+    "command": "(model) ctrl+home c5f3",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+left",
+    "command": "(model) ctrl+left f2f8",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+pagedown",
+    "command": "(model) ctrl+pagedown c0dd",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+pageup",
+    "command": "(model) ctrl+pageup afcf",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+right",
+    "command": "(model) ctrl+right 3dc2",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+shift+alt+down",
+    "command": "(model) ctrl+shift+alt+down f91a",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+shift+alt+end",
+    "command": "(model) ctrl+shift+alt+end 0808",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+shift+alt+home",
+    "command": "(model) ctrl+shift+alt+home 4032",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+shift+alt+left",
+    "command": "(model) ctrl+shift+alt+left c29e",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+shift+alt+meta+down",
+    "command": "(model) ctrl+shift+alt+meta+down c006",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+shift+alt+meta+end",
+    "command": "(model) ctrl+shift+alt+meta+end 5437",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "ctrl+shift+alt+meta+home",
+    "command": "(model) ctrl+shift+alt+meta+home 4f76",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "ctrl+shift+alt+meta+left",
+    "command": "(model) ctrl+shift+alt+meta+left ed52",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+shift+alt+meta+pagedown",
+    "command": "(model) ctrl+shift+alt+meta+pagedown d0c5",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+shift+alt+meta+pageup",
+    "command": "(model) ctrl+shift+alt+meta+pageup fdf7",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+shift+alt+meta+right",
+    "command": "(model) ctrl+shift+alt+meta+right 77f6",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+shift+alt+meta+up",
+    "command": "(model) ctrl+shift+alt+meta+up 90d8",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "ctrl+shift+alt+pagedown",
+    "command": "(model) ctrl+shift+alt+pagedown 01e4",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+shift+alt+pageup",
+    "command": "(model) ctrl+shift+alt+pageup 5c80",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "ctrl+shift+alt+right",
+    "command": "(model) ctrl+shift+alt+right 5c94",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+shift+alt+up",
+    "command": "(model) ctrl+shift+alt+up 7300",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "ctrl+up",
+    "command": "(model) ctrl+up 9adb",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "shift+alt+down",
+    "command": "(model) shift+alt+down 0284",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "shift+alt+end",
+    "command": "(model) shift+alt+end 91e6",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "shift+alt+home",
+    "command": "(model) shift+alt+home 2384",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "shift+alt+left",
+    "command": "(model) shift+alt+left 56d6",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "shift+alt+meta+down",
+    "command": "(model) shift+alt+meta+down e059",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "shift+alt+meta+end",
+    "command": "(model) shift+alt+meta+end 8c87",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (arrow)
+    "key": "shift+alt+meta+home",
+    "command": "(model) shift+alt+meta+home 2955",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (arrow)
+    "key": "shift+alt+meta+left",
+    "command": "(model) shift+alt+meta+left b199",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "shift+alt+meta+pagedown",
+    "command": "(model) shift+alt+meta+pagedown df5d",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "shift+alt+meta+pageup",
+    "command": "(model) shift+alt+meta+pageup 3f29",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "shift+alt+meta+right",
+    "command": "(model) shift+alt+meta+right 3ba4",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "shift+alt+meta+up",
+    "command": "(model) shift+alt+meta+up 73d7",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (arrow)
+    "key": "shift+alt+pagedown",
+    "command": "(model) shift+alt+pagedown 79f3",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "shift+alt+pageup",
+    "command": "(model) shift+alt+pageup 62fd",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (arrow)
+    "key": "shift+alt+right",
+    "command": "(model) shift+alt+right 771e",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (arrow)
+    "key": "shift+alt+up",
+    "command": "(model) shift+alt+up 1d08",
+    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
   },
   {
     // (right) (juke) (all) (gold)
@@ -767,404 +2043,6 @@ Notes:
     "key": "shift+alt+meta+d",
     "command": "(model) shift+alt+meta+d dac5",
     "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    "key": "alt+.",
-    "command": "shift+alt+up 65a0",
-    // "command": "workbench.action.focusOtherSide",
-    "when": "editorTextFocus"
-  },
-  {
-    // (zoom) (alias) (secondary) (gold) - toggle secondary side bar
-    "key": "alt+a z",
-    "command": "workbench.action.toggleMaximizedAuxiliaryBar",
-    // "command": "alt+a z af39",
-    "when": "auxiliaryBarFocus && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "alt+down",
-    "command": "(model) alt+down 4e51",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow) (end)
-    "key": "alt+end",
-    "command": "(model) alt+end b9f4",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "alt+home",
-    "command": "workbench.action.focusActiveEditorGroup",
-    // "command": "(model) alt+home 8160",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (left) (arrow)
-    "key": "alt+left",
-    "command": "(model) alt+left f138",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "alt+pagedown",
-    "command": "(model) alt+pagedown 0e3b",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "alt+pageup",
-    "command": "(model) alt+pageup a1d5",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (right) (arrow)
-    "key": "alt+right",
-    "command": "(model) alt+right f122",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "alt+up",
-    "command": "(model) alt+up 1405",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+alt+down",
-    "command": "(model) ctrl+alt+down 9c48",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+alt+end",
-    "command": "(model) ctrl+alt+end 23f7",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+alt+home",
-    "command": "(model) ctrl+alt+home 40ed",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+alt+left",
-    "command": "(model) ctrl+alt+left 369c",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+alt+meta+down",
-    "command": "(model) ctrl+alt+meta+down c070",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+alt+meta+end",
-    "command": "(model) ctrl+alt+meta+end af3d",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+alt+meta+home",
-    "command": "(model) ctrl+alt+meta+home 0cff",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+alt+meta+left",
-    "command": "(model) ctrl+alt+meta+left 399b",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+alt+meta+pagedown",
-    "command": "(model) ctrl+alt+meta+pagedown ba00",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+alt+meta+pageup",
-    "command": "(model) ctrl+alt+meta+pageup 1abe",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+alt+meta+right",
-    "command": "(model) ctrl+alt+meta+right c9dd",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+alt+meta+up",
-    "command": "(model) ctrl+alt+meta+up fb0e",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+alt+pagedown",
-    "command": "(model) ctrl+alt+pagedown 5165",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+alt+pageup",
-    "command": "(model) ctrl+alt+pageup e735",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+alt+right",
-    "command": "(model) ctrl+alt+right ad1a",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+alt+up",
-    "command": "(model) ctrl+alt+up c957",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+down",
-    "command": "(model) ctrl+down ab9b",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+end",
-    "command": "(model) ctrl+end 4811",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+home",
-    "command": "(model) ctrl+home 8049",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+left",
-    "command": "(model) ctrl+left 8d3f",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+pagedown",
-    "command": "(model) ctrl+pagedown 92fc",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+pageup",
-    "command": "(model) ctrl+pageup f3f5",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+right",
-    "command": "(model) ctrl+right 35e8",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+shift+alt+down",
-    "command": "(model) ctrl+shift+alt+down e7be",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+shift+alt+end",
-    "command": "(model) ctrl+shift+alt+end 129e",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+shift+alt+home",
-    "command": "(model) ctrl+shift+alt+home 9cb8",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+shift+alt+left",
-    "command": "(model) ctrl+shift+alt+left 5a92",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+shift+alt+meta+down",
-    "command": "(model) ctrl+shift+alt+meta+down 57b9",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+shift+alt+meta+end",
-    "command": "(model) ctrl+shift+alt+meta+end e639",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+shift+alt+meta+home",
-    "command": "(model) ctrl+shift+alt+meta+home 81fc",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+shift+alt+meta+left",
-    "command": "(model) ctrl+shift+alt+meta+left 0ffc",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+shift+alt+meta+pagedown",
-    "command": "(model) ctrl+shift+alt+meta+pagedown ccff",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+shift+alt+meta+pageup",
-    "command": "(model) ctrl+shift+alt+meta+pageup 06fc",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+shift+alt+meta+right",
-    "command": "(model) ctrl+shift+alt+meta+right d495",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+shift+alt+meta+up",
-    "command": "(model) ctrl+shift+alt+meta+up 660c",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+shift+alt+pagedown",
-    "command": "(model) ctrl+shift+alt+pagedown 09fd",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+shift+alt+pageup",
-    "command": "(model) ctrl+shift+alt+pageup 9e96",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+shift+alt+right",
-    "command": "(model) ctrl+shift+alt+right a753",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+shift+alt+up",
-    "command": "(model) ctrl+shift+alt+up fed7",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+up",
-    "command": "(model) ctrl+up 75a4",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "shift+alt+down",
-    "command": "(model) shift+alt+down 3207",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "shift+alt+end",
-    "command": "(model) shift+alt+end de88",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "shift+alt+home",
-    "command": "(model) shift+alt+home b1e2",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (left) (arrow)
-    "key": "shift+alt+left",
-    "command": "(model) shift+alt+left ebdf",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "shift+alt+meta+down",
-    "command": "(model) shift+alt+meta+down 5568",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "shift+alt+meta+end",
-    "command": "(model) shift+alt+meta+end 09cc",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (arrow)
-    "key": "shift+alt+meta+home",
-    "command": "(model) shift+alt+meta+home 5c45",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (left) (arrow)
-    "key": "shift+alt+meta+left",
-    "command": "(model) shift+alt+meta+left 89c3",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "shift+alt+meta+pagedown",
-    "command": "(model) shift+alt+meta+pagedown c27e",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "shift+alt+meta+pageup",
-    "command": "(model) shift+alt+meta+pageup 20d0",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (right) (arrow)
-    "key": "shift+alt+meta+right",
-    "command": "(model) shift+alt+meta+right c3ed",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "shift+alt+meta+up",
-    "command": "(model) shift+alt+meta+up 27ae",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "shift+alt+pagedown",
-    "command": "(model) shift+alt+pagedown 902a",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "shift+alt+pageup",
-    "command": "(model) shift+alt+pageup 400d",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (right) (arrow)
-    "key": "shift+alt+right",
-    "command": "(model) shift+alt+right cc6f",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow)
-    "key": "shift+alt+up",
-    "command": "(model) shift+alt+up b80b",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
   },
   {
     // (right) (juke) (all) (gold)
@@ -2256,817 +3134,6 @@ Notes:
     "when": "config.keyboardNavigation.enabled && neovim.init"
   },
   {
-    // (panel) (position) - rotate clockwise
-    "key": "alt+a alt+p",
-    "command": "workbench.action.positionPanelLeft",
-    // "command": "alt+a alt+p 77a1",
-    "when": "panelPosition == 'bottom' && config.keyboardNavigation.enabled"
-  },
-  {
-    // (panel) (position) - rotate clockwise
-    "key": "alt+a alt+p",
-    "command": "workbench.action.positionPanelTop",
-    // "command": "alt+a alt+p 77a2",
-    "when": "panelPosition == 'left' && config.keyboardNavigation.enabled"
-  },
-  {
-    // (panel) (position) - rotate clockwise
-    "key": "alt+a alt+p",
-    "command": "workbench.action.positionPanelBottom",
-    // "command": "alt+a alt+p 77a3",
-    "when": "panelPosition == 'right' && config.keyboardNavigation.enabled"
-  },
-  {
-    // (panel) (position) - rotate clockwise
-    "key": "alt+a alt+p",
-    "command": "workbench.action.positionPanelRight",
-    // "command": "alt+a alt+p 77a4",
-    "when": "panelPosition == 'top' && config.keyboardNavigation.enabled"
-  },
-  {
-    // (action) (chord) (primary) (gold)
-    "key": "alt+a a",
-    "command": "alt+a a 39f8",
-    // "command": "workbench.action.toggleActivityBarVisibility",
-    "when": "sideBarFocus && config.keyboardNavigation.enabled"
-  },
-  {
-    // (action) (zoom) (panel) (gold) - toggle maximized panel
-    "key": "alt+a z",
-    "command": "workbench.action.toggleMaximizedPanel",
-    // "command": "alt+a z cbb4",
-    "when": "!editorFocus && panelFocus && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow)
-    "key": "alt+down",
-    "command": "(model) alt+down 0f37",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow) (end)
-    "key": "alt+end",
-    "command": "(model) alt+end fd5e",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "alt+home",
-    "command": "(model) alt+home 2e66",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "alt+left",
-    "command": "(model) alt+left 7ae8",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "alt+pagedown",
-    "command": "(model) alt+pagedown b793",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "alt+pageup",
-    "command": "(model) alt+pageup 7a39",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "alt+right",
-    "command": "(model) alt+right dd24",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "alt+up",
-    "command": "(model) alt+up fb05",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+alt+down",
-    "command": "(model) ctrl+alt+down c7d0",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+alt+end",
-    "command": "(model) ctrl+alt+end 56f7",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+alt+home",
-    "command": "(model) ctrl+alt+home cbd2",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+alt+left",
-    "command": "(model) ctrl+alt+left 0db8",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+alt+meta+down",
-    "command": "(model) ctrl+alt+meta+down 3b15",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+alt+meta+end",
-    "command": "(model) ctrl+alt+meta+end 0308",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+alt+meta+home",
-    "command": "(model) ctrl+alt+meta+home 8cd7",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+alt+meta+left",
-    "command": "(model) ctrl+alt+meta+left b71a",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+alt+meta+pagedown",
-    "command": "(model) ctrl+alt+meta+pagedown 5304",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+alt+meta+pageup",
-    "command": "(model) ctrl+alt+meta+pageup d103",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+alt+meta+right",
-    "command": "(model) ctrl+alt+meta+right 14b4",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+alt+meta+up",
-    "command": "(model) ctrl+alt+meta+up afa3",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+alt+pagedown",
-    "command": "(model) ctrl+alt+pagedown f740",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+alt+pageup",
-    "command": "(model) ctrl+alt+pageup 3cd9",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+alt+right",
-    "command": "(model) ctrl+alt+right c48f",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+alt+up",
-    "command": "(model) ctrl+alt+up f6ee",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+down",
-    "command": "(model) ctrl+down 510f",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+end",
-    "command": "(model) ctrl+end aec4",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+home",
-    "command": "(model) ctrl+home df08",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+left",
-    "command": "(model) ctrl+left 795a",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+pagedown",
-    "command": "(model) ctrl+pagedown ace5",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+pageup",
-    "command": "(model) ctrl+pageup 0142",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+right",
-    "command": "(model) ctrl+right e458",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+shift+alt+down",
-    "command": "(model) ctrl+shift+alt+down 751a",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+shift+alt+end",
-    "command": "(model) ctrl+shift+alt+end b975",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+shift+alt+home",
-    "command": "(model) ctrl+shift+alt+home 4495",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+shift+alt+left",
-    "command": "(model) ctrl+shift+alt+left 153a",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+shift+alt+meta+down",
-    "command": "(model) ctrl+shift+alt+meta+down 2c70",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+shift+alt+meta+end",
-    "command": "(model) ctrl+shift+alt+meta+end e188",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+shift+alt+meta+home",
-    "command": "(model) ctrl+shift+alt+meta+home e5cc",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+shift+alt+meta+left",
-    "command": "(model) ctrl+shift+alt+meta+left 26ff",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+shift+alt+meta+pagedown",
-    "command": "(model) ctrl+shift+alt+meta+pagedown b380",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+shift+alt+meta+pageup",
-    "command": "(model) ctrl+shift+alt+meta+pageup f3fc",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+shift+alt+meta+right",
-    "command": "(model) ctrl+shift+alt+meta+right 7432",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+shift+alt+meta+up",
-    "command": "(model) ctrl+shift+alt+meta+up c4c8",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+shift+alt+pagedown",
-    "command": "(model) ctrl+shift+alt+pagedown 138c",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+shift+alt+pageup",
-    "command": "(model) ctrl+shift+alt+pageup 0fb6",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+shift+alt+right",
-    "command": "(model) ctrl+shift+alt+right ba72",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+shift+alt+up",
-    "command": "(model) ctrl+shift+alt+up 0497",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+up",
-    "command": "(model) ctrl+up 498b",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "shift+alt+down",
-    "command": "(model) shift+alt+down 36b0",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "shift+alt+end",
-    "command": "(model) shift+alt+end 06fb",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "shift+alt+home",
-    "command": "(model) shift+alt+home 61ad",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "shift+alt+left",
-    "command": "(model) shift+alt+left ae55",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "shift+alt+meta+down",
-    "command": "(model) shift+alt+meta+down cf5e",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "shift+alt+meta+end",
-    "command": "(model) shift+alt+meta+end 5eca",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "shift+alt+meta+home",
-    "command": "(model) shift+alt+meta+home 594e",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "shift+alt+meta+left",
-    "command": "(model) shift+alt+meta+left 44b0",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "shift+alt+meta+pagedown",
-    "command": "(model) shift+alt+meta+pagedown aa74",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "shift+alt+meta+pageup",
-    "command": "(model) shift+alt+meta+pageup 0d68",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "shift+alt+meta+right",
-    "command": "(model) shift+alt+meta+right 6613",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "shift+alt+meta+up",
-    "command": "(model) shift+alt+meta+up bc28",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "shift+alt+pagedown",
-    "command": "(model) shift+alt+pagedown b444",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "shift+alt+pageup",
-    "command": "(model) shift+alt+pageup 1699",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "shift+alt+right",
-    "command": "(model) shift+alt+right a109",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "shift+alt+up",
-    "command": "(model) shift+alt+up 460b",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "alt+down",
-    "command": "(model) alt+down 74dd",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow) (end)
-    "key": "alt+end",
-    "command": "(model) alt+end a560",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "alt+home",
-    "command": "-noop",
-    // "command": "(model) alt+home a7d0",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "alt+left",
-    "command": "(model) alt+left ca28",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "alt+pagedown",
-    "command": "(model) alt+pagedown aacf",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "alt+pageup",
-    "command": "(model) alt+pageup e9c0",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "alt+right",
-    "command": "(model) alt+right b7ae",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "alt+up",
-    "command": "(model) alt+up 8991",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+alt+down",
-    "command": "(model) ctrl+alt+down b16b",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+alt+end",
-    "command": "(model) ctrl+alt+end 5900",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+alt+home",
-    "command": "(model) ctrl+alt+home 0c71",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+alt+left",
-    "command": "(model) ctrl+alt+left c8ec",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+alt+meta+down",
-    "command": "(model) ctrl+alt+meta+down 055e",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+alt+meta+end",
-    "command": "(model) ctrl+alt+meta+end 488d",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+alt+meta+home",
-    "command": "(model) ctrl+alt+meta+home 4023",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+alt+meta+left",
-    "command": "(model) ctrl+alt+meta+left 490f",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+alt+meta+pagedown",
-    "command": "(model) ctrl+alt+meta+pagedown 06e5",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+alt+meta+pageup",
-    "command": "(model) ctrl+alt+meta+pageup 27a3",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+alt+meta+right",
-    "command": "(model) ctrl+alt+meta+right 18e5",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+alt+meta+up",
-    "command": "(model) ctrl+alt+meta+up b1ce",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+alt+pagedown",
-    "command": "(model) ctrl+alt+pagedown 0c35",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+alt+pageup",
-    "command": "(model) ctrl+alt+pageup b95f",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+alt+right",
-    "command": "(model) ctrl+alt+right 384e",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+alt+up",
-    "command": "(model) ctrl+alt+up 87f3",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+down",
-    "command": "(model) ctrl+down 8606",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+end",
-    "command": "(model) ctrl+end 406f",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+home",
-    "command": "(model) ctrl+home c5f3",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+left",
-    "command": "(model) ctrl+left f2f8",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+pagedown",
-    "command": "(model) ctrl+pagedown c0dd",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+pageup",
-    "command": "(model) ctrl+pageup afcf",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+right",
-    "command": "(model) ctrl+right 3dc2",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+shift+alt+down",
-    "command": "(model) ctrl+shift+alt+down f91a",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+shift+alt+end",
-    "command": "(model) ctrl+shift+alt+end 0808",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+shift+alt+home",
-    "command": "(model) ctrl+shift+alt+home 4032",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+shift+alt+left",
-    "command": "(model) ctrl+shift+alt+left c29e",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+shift+alt+meta+down",
-    "command": "(model) ctrl+shift+alt+meta+down c006",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+shift+alt+meta+end",
-    "command": "(model) ctrl+shift+alt+meta+end 5437",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "ctrl+shift+alt+meta+home",
-    "command": "(model) ctrl+shift+alt+meta+home 4f76",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "ctrl+shift+alt+meta+left",
-    "command": "(model) ctrl+shift+alt+meta+left ed52",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+shift+alt+meta+pagedown",
-    "command": "(model) ctrl+shift+alt+meta+pagedown d0c5",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+shift+alt+meta+pageup",
-    "command": "(model) ctrl+shift+alt+meta+pageup fdf7",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+shift+alt+meta+right",
-    "command": "(model) ctrl+shift+alt+meta+right 77f6",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+shift+alt+meta+up",
-    "command": "(model) ctrl+shift+alt+meta+up 90d8",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "ctrl+shift+alt+pagedown",
-    "command": "(model) ctrl+shift+alt+pagedown 01e4",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+shift+alt+pageup",
-    "command": "(model) ctrl+shift+alt+pageup 5c80",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "ctrl+shift+alt+right",
-    "command": "(model) ctrl+shift+alt+right 5c94",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+shift+alt+up",
-    "command": "(model) ctrl+shift+alt+up 7300",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "ctrl+up",
-    "command": "(model) ctrl+up 9adb",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "shift+alt+down",
-    "command": "(model) shift+alt+down 0284",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "shift+alt+end",
-    "command": "(model) shift+alt+end 91e6",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "shift+alt+home",
-    "command": "(model) shift+alt+home 2384",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "shift+alt+left",
-    "command": "(model) shift+alt+left 56d6",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "shift+alt+meta+down",
-    "command": "(model) shift+alt+meta+down e059",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "shift+alt+meta+end",
-    "command": "(model) shift+alt+meta+end 8c87",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (arrow)
-    "key": "shift+alt+meta+home",
-    "command": "(model) shift+alt+meta+home 2955",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (arrow)
-    "key": "shift+alt+meta+left",
-    "command": "(model) shift+alt+meta+left b199",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "shift+alt+meta+pagedown",
-    "command": "(model) shift+alt+meta+pagedown df5d",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "shift+alt+meta+pageup",
-    "command": "(model) shift+alt+meta+pageup 3f29",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "shift+alt+meta+right",
-    "command": "(model) shift+alt+meta+right 3ba4",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "shift+alt+meta+up",
-    "command": "(model) shift+alt+meta+up 73d7",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (arrow)
-    "key": "shift+alt+pagedown",
-    "command": "(model) shift+alt+pagedown 79f3",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "shift+alt+pageup",
-    "command": "(model) shift+alt+pageup 62fd",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (arrow)
-    "key": "shift+alt+right",
-    "command": "(model) shift+alt+right 771e",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (arrow)
-    "key": "shift+alt+up",
-    "command": "(model) shift+alt+up 1d08",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
-  },
-  {
     // (left) (vi)
     "key": "alt+h",
     "command": "(model) alt+h eaa5",
@@ -3452,7 +3519,27 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
-    // (left) (all) (editor) (juke)
+    "key": "shift+alt+j",
+    "command": "alt+a a 67f8",
+    // "command": "workbench.action.toggleActivityBarVisibility",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.activityBar.location == 'bottom'"
+    //"when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (vi) (nowrap)
+    "key": "shift+alt+h",
+    "command": "alt+h 9e22",
+    "when": "config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (action) (zoom) (panel) (gold) - toggle maximized panel
+    "key": "alt+a z",
+    "command": "workbench.action.toggleMaximizedPanel",
+    // "command": "alt+a z cbb4",
+    "when": "!editorFocus && panelFocus && config.keyboardNavigation.enabled"
+  },
+  {
+    // (left) (juke) (editor) (gold)
     "key": "alt+,",
     "command": "workbench.action.previousEditor",
     // "command": "alt+, de62",
@@ -3539,14 +3626,351 @@ Notes:
     "key": "ctrl+shift+alt+end",
     "command": "workbench.action.moveEditorToEnd",
     // "command": "ctrl+shift+alt+end 23e9",
-    "when": "editorFocus && config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
   },
   {
     // (home) (arrow) (editor) (gold)
     "key": "ctrl+shift+alt+home",
     "command": "workbench.action.moveEditorToStart",
     // "command": "ctrl+shift+alt+home 23e8",
-    "when": "editorFocus && config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
+  },
+  {
+    // (zoom) - toggle maximize editor group
+    "key": "alt+a z",
+    "command": "workbench.action.toggleMaximizeEditorGroup",
+    // "command": "workbench.action.maximizeEditorHideSidebar",
+    // "command": "alt+a z fe33",
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && multipleEditorGroups"
+  },
+  {
+    // (left) (vi)
+    // (note) vi-like extensions disabled
+    "key": "alt+h",
+    "command": "alt+h 31ae",
+    // "command": "cursorLeft",
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !neovim.init"
+  },
+  {
+    // (down) (vi)
+    // (note) vi-like extensions disabled
+    "key": "alt+j",
+    "command": "alt+j 9831",
+    // "command": "cursorDown",
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !neovim.init"
+  },
+  {
+    // (left) (vi) (gold) (editor) (wrap)
+    "key": "alt+h",
+    "command": "workbench.action.focusLeftGroup",
+    // "command": "alt+h 1b9f",
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (vi) (gold) (editor) (wrap)
+    "key": "alt+j",
+    "command": "workbench.action.focusBelowGroup",
+    // "command": "alt+j da98",
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (vi) (gold) (editor) (edge) (wrap) - focus above group can not wrap by itself like focus below group can (a bug?)
+    "key": "alt+k",
+    // "command": "alt+k b79d",
+    "command": "workbench.action.focusAboveGroup",
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (vi) (gold) (editor) (wrap)
+    "key": "alt+l",
+    "command": "workbench.action.focusRightGroup",
+    // "command": "alt+l 3bef",
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (vi)
+    "key": "shift+alt+j",
+    "command": "shift+alt+j d44f",
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (vi)
+    "key": "shift+alt+k",
+    "command": "shift+alt+k d44a",
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (editor) - open markdown preview editor to the side
+    "key": "alt+a p",
+    "command": "markdown.showPreview",
+    // "command": "alt+a 50a9",
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && editorLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/ && !notebookEditorFocused"
+  },
+  {
+    // (right) (juke) (editor) (gold) (text)
+    "key": "alt+.",
+    "command": "shift+alt+up 65a0",
+    // "command": "workbench.action.focusOtherSide",
+    "when": "editorFocus && editorTextFocus && !panelFocus && config.keyboardNavigation.enabled && !activeEditorCanSplitInGroup"
+  },
+  {
+    // (vertical) (split) (gold) (editor) (text)
+    "key": "alt+=",
+    "command": "alt+= d67f",
+    // "command": "workbench.action.splitEditor",
+    "when": "editorFocus && editorTextFocus && !panelFocus && config.keyboardNavigation.enabled && activeEditorCanSplitInGroup"
+  },
+  {
+    // (left) (vi) (panel) (gold) (edge)
+    "key": "shift+alt+h",
+    "command": "workbench.action.focusSideBar",
+    // "command": "shift+alt+h 8d95",
+    "when": "!editorFocus && panelFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
+  },
+  {
+    // (right) (vi) (edge)
+    "key": "shift+alt+l",
+    "command": "workbench.action.focusAuxiliaryBar",
+    // "command": "shift+alt+h 0811",
+    "when": "editorFocus && !panelFocus && !auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
+  },
+  {
+    // (down) (vi)
+    "key": "shift+alt+j",
+    "command": "runCommands",
+    "args": {
+      "commands": ["workbench.action.focusPanel"]
+    },
+    // "command": "shift+alt+j d49a",
+    "when": "editorFocus && !panelFocus && !panelVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (vi) (edge)
+    "key": "shift+alt+l",
+    "command": "workbench.action.focusAuxiliaryBar",
+    // "command": "shift+alt+h 0711",
+    "when": "editorFocus && !panelFocus && auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
+  },
+  {
+    // (up) (vi)
+    "key": "shift+alt+k",
+    "command": "shift+alt+k d44c",
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && !multipleEditorGroups"
+  },
+  {
+    // (up) (vi) (gold) (editor) (edge) (wrap)
+    "key": "shift+alt+k",
+    "command": "workbench.action.focusPanel",
+    // "command": "alt+k b80d",
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorGroupIndex == 1"
+    // "when": "&& activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && !multipleEditorGroups"
+  },
+  {
+    // (down) (vi)
+    "key": "shift+alt+j",
+    "command": "workbench.action.focusPanel",
+    // "command": "shift+alt+j d43f",
+    "when": "editorFocus && !panelFocus && panelVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (vi)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h add5",
+    // "command": "workbench.action.toggleSidebarVisibility",
+    "when": "editorFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (vi) (edge) (wrap)
+    "key": "shift+alt+h",
+    "command": "workbench.action.focusSideBar",
+    // "command": "shift+alt+h 0812",
+    "when": "editorFocus && !panelFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (vi)
+    "key": "shift+alt+k",
+    "command": "shift+alt+k d44b",
+    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorGroupIndex > 1 && multipleEditorGroups"
+  },
+  {
+    // (left) (vi)
+    "key": "shift+alt+h",
+    "command": "workbench.action.focusSideBar",
+    // "command": "shift+alt+h 33ad",
+    "when": "editorFocus && !panelFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (vi) (edge) (wrap)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 080e",
+    "when": "editorFocus && !panelFocus && panelVisible && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (corner) (editor) (gold)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h cd7e",
+    "when": "editorFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
+  },
+  {
+    // (left) (corner)
+    "key": "alt+h",
+    "command": "alt+h ad8d",
+    // "command": "workbench.action.focusSideBar",
+    "when": "editorFocus && !panelFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
+  },
+  {
+    // (left) (corner) (editor) (gold)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h cd8d",
+    // "command": "workbench.action.focusSideBar",
+    "when": "editorFocus && !panelFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
+  },
+  {
+    // (negate) (neovim) (editor) (gold) (insert) (user)
+    // (note) ctrl+k must be a chord for native vscode keybindings to work
+    "key": "ctrl+k",
+    "command": "ctrl+k 43f7",
+    // "command": "-vscode-neovim.send",
+    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.k && neovim.init && neovim.mode == 'insert'"
+  },
+  {
+    // (negate) (neovim) (editor) (gold) (insert) (user)
+    "key": "ctrl+y",
+    "command": "vscode-neovim.send",
+    //"command": "ctrl+y 1279",
+    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.y && neovim.init && neovim.mode != 'insert'"
+  },
+  {
+    // (negate) (neovim) (editor) (gold) (insert) (user)
+    "key": "ctrl+y",
+    "command": "ctrl+y 1277",
+    // "command": "vscode-neovim.send",
+    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.y && neovim.init && neovim.mode == 'insert'"
+  },
+  {
+    // (negate) (neovim) (editor) (gold) (insert) (user) - unbind ctrl+k in normal mode to allow native vscode keybindings to work
+    // (note) ctrl+k must be a chord for native vscode keybindings to work
+    "key": "ctrl+k",
+    "command": "-vscode-neovim.send",
+    // "command": "ctrl+k 1678",
+    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.k && neovim.init && neovim.mode != 'insert'"
+  },
+  {
+    // (negate) (neovim) (editor) (gold) (insert) (user) - unbind ctrl+y in normal mode to allow native vscode keybindings to work
+    // (note) ctrl+y must be a chord for native vscode keybindings to work
+    "key": "ctrl+y",
+    "command": "-vscode-neovim.send",
+    //"command": "ctrl+y 1278",
+    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.y && neovim.init && neovim.mode != 'insert'"
+  },
+  {
+    // (left) (vi) (panel) (gold) (edge) (nowrap)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 8d96",
+    "when": "panelFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (vi) (panel) (gold) (edge) (wrap)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 8e22",
+    // "command": "workbench.action.focusActiveEditorGroup",
+    "when": "panelFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && editorIsOpen"
+  },
+  {
+    // (left) (vi) (panel) (gold) (edge) (wrap)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 8e20",
+    // "command": "workbench.action.focusActiveEditorGroup",
+    "when": "panelFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && editorIsOpen"
+  },
+  {
+    // (panel) (position) - rotate clockwise
+    "key": "alt+a alt+p",
+    "command": "workbench.action.positionPanelLeft",
+    // "command": "alt+a alt+p 77a1",
+    "when": "panelPosition == 'bottom' && config.keyboardNavigation.enabled"
+  },
+  {
+    // (panel) (position) - rotate clockwise
+    "key": "alt+a alt+p",
+    "command": "workbench.action.positionPanelTop",
+    // "command": "alt+a alt+p 77a2",
+    "when": "panelPosition == 'left' && config.keyboardNavigation.enabled"
+  },
+  {
+    // (panel) (position) - rotate clockwise
+    "key": "alt+a alt+p",
+    "command": "workbench.action.positionPanelBottom",
+    // "command": "alt+a alt+p 77a3",
+    "when": "panelPosition == 'right' && config.keyboardNavigation.enabled"
+  },
+  {
+    // (panel) (position) - rotate clockwise
+    "key": "alt+a alt+p",
+    "command": "workbench.action.positionPanelRight",
+    // "command": "alt+a alt+p 77a4",
+    "when": "panelPosition == 'top' && config.keyboardNavigation.enabled"
+  },
+  {
+    // (action) (chord) (primary) (gold)
+    "key": "alt+a a",
+    "command": "alt+a a 39f8",
+    // "command": "workbench.action.toggleActivityBarVisibility",
+    "when": "sideBarFocus && config.keyboardNavigation.enabled"
+  },
+  {
+    // (left) (vi) (primary) (gold)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h e12e",
+    "when": "sideBarFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (up) (vi) (primary) (gold)
+    "key": "shift+alt+k",
+    "command": "shift+alt+k e32e",
+    "when": "sideBarFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (vi) (primary) (gold)
+    "key": "shift+alt+l",
+    "command": "shift+alt+l e11e",
+    "when": "sideBarFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (down) (vi) (primary) (gold)
+    "key": "shift+alt+j",
+    "command": "workbench.action.focusActivityBar",
+    // "command": "workbench.action.toggleActivityBarVisibility",
+    // "command": "shift+alt+j e42a",
+    "when": "sideBarFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.activityBar.location == 'bottom'"
+  },
+  {
+    // (down) (vi) (primary) (gold)
+    "key": "shift+alt+j",
+    "command": "workbench.action.toggleActivityBarVisibility",
+    // "command": "shift+alt+j e42e",
+    "when": "sideBarFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.activityBar.location == 'hidden'"
+  },
+  {
+    // (left) (vi)
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 6317",
+    // "command": "workbench.action.focusAuxiliaryBar",
+    "when": "sideBarFocus && auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (left) (vi)
+    "key": "shift+alt+h",
+    "command": "workbench.action.toggleSidebarVisibility",
+    // "command": "shift+alt+h acd4",
+    "when": "sideBarFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
+  },
+  {
+    // (right) (vi)
+    "key": "shift+alt+l",
+    "command": "workbench.action.focusActiveEditorGroup",
+    // "command": "(model) shift+alt+l b62d",
+    "when": "sideBarFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && editorIsOpen"
   },
   {
     // (right) (juke) (terminal) (gold)
@@ -4417,61 +4841,6 @@ Notes:
     "key": "shift+alt+meta+d",
     "command": "(model) shift+alt+meta+d fbe1",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal"
-  },
-  {
-    "key": "shift+alt+j",
-    "command": "alt+a a 67f8",
-    // "command": "workbench.action.toggleActivityBarVisibility",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.activityBar.location == 'bottom'"
-    //"when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (vi) (nowrap)
-    "key": "shift+alt+h",
-    "command": "alt+h 9e22",
-    "when": "config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (zoom) - toggle maximize editor group
-    "key": "alt+a z",
-    "command": "workbench.action.toggleMaximizeEditorGroup",
-    // "command": "workbench.action.maximizeEditorHideSidebar",
-    // "command": "alt+a z fe33",
-    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && multipleEditorGroups"
-  },
-  {
-    // (left) (vi)
-    // (note) vi-like extensions disabled
-    "key": "alt+h",
-    "command": "alt+h 31ae",
-    // "command": "cursorLeft",
-    "when": "editorFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !neovim.init"
-  },
-  {
-    // (down) (vi)
-    // (note) vi-like extensions disabled
-    "key": "alt+j",
-    "command": "alt+j 9831",
-    // "command": "cursorDown",
-    "when": "editorFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !neovim.init"
-  },
-  {
-    // (left) (vi) (primary) (gold)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h e12e",
-    "when": "sideBarFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (vi) (primary) (gold)
-    "key": "shift+alt+k",
-    "command": "shift+alt+k e32e",
-    "when": "sideBarFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (vi) (primary) (gold)
-    "key": "shift+alt+l",
-    "command": "shift+alt+l e11e",
-    "when": "sideBarFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
     // (down) (arrow)
@@ -6944,9 +7313,11 @@ Notes:
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
-    // (horizontal) (split) (terminal) (gold)
+    // (horizontal) (split) (terminal) (gold) - terminal only splits one way, depending on where it's docked
     "key": "alt+-",
-    "command": "(model) alt+- cf53",
+    "command": "workbench.action.terminal.new",
+    // "command": "workbench.action.terminal.split",
+    // "command": "alt+- cf52",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
@@ -7367,133 +7738,6 @@ Notes:
     "key": "shift+alt+meta+d",
     "command": "(model) shift+alt+meta+d e0e8",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (vi) (secondary) (gold) (edge) (wrap)
-    "key": "shift+alt+l",
-    "command": "workbench.action.toggleAuxiliaryBar",
-    // "command": "shift+alt+h 0712",
-    "when": "auxiliaryBarFocus && auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
-  },
-  {
-    // (left) (vi) (secondary) (gold)
-    "key": "shift+alt+h",
-    "command": "workbench.action.focusActiveEditorGroup",
-    // "command": "shift+alt+h 6318",
-    "when": "auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorIsOpen"
-  },
-  {
-    // (left) (vi) (gold) (editor) (wrap)
-    "key": "alt+h",
-    "command": "workbench.action.focusLeftGroup",
-    // "command": "alt+h 1b9f",
-    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (vi) (gold) (editor) (wrap)
-    "key": "alt+j",
-    "command": "workbench.action.focusBelowGroup",
-    // "command": "alt+j da98",
-    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (vi) (gold) (editor) (edge) (wrap) - focus above group can not wrap by itself like focus below group can (a bug?)
-    "key": "alt+k",
-    // "command": "alt+k b79d",
-    "command": "workbench.action.focusAboveGroup",
-    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (vi) (gold) (editor) (wrap)
-    "key": "alt+l",
-    "command": "workbench.action.focusRightGroup",
-    // "command": "alt+l 3bef",
-    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (vi)
-    "key": "shift+alt+j",
-    "command": "shift+alt+j d44f",
-    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (vi)
-    "key": "shift+alt+k",
-    "command": "shift+alt+k d44a",
-    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (editor) - open markdown preview editor to the side
-    "key": "alt+a p",
-    "command": "markdown.showPreview",
-    // "command": "alt+a 50a9",
-    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && editorLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/ && !notebookEditorFocused"
-  },
-  {
-    // (split) (all) (gold) (editor) (text)
-    "key": "alt+=",
-    "command": "alt+= d67f",
-    // "command": "workbench.action.splitEditor",
-    "when": "editorFocus && editorTextFocus && !panelFocus && config.keyboardNavigation.enabled && activeEditorCanSplitInGroup"
-  },
-  {
-    // (up) (vi) (neovim) (user)
-    // (note) ctrl+k must be a chord for native vscode keybindings to work
-    "key": "ctrl+k",
-    "command": "ctrl+k 43f7",
-    // "command": "-vscode-neovim.send",
-    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.k && neovim.init && neovim.mode == 'insert'"
-  },
-  {
-    "key": "ctrl+y",
-    "command": "vscode-neovim.send",
-    //"command": "ctrl+y 1279",
-    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.y && neovim.init && neovim.mode != 'insert'"
-  },
-  {
-    "key": "ctrl+y",
-    "command": "ctrl+y 1277",
-    // "command": "vscode-neovim.send",
-    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.y && neovim.init && neovim.mode == 'insert'"
-  },
-  {
-    // (up) (vi) (neovim) (user) - unbind ctrl+k in normal mode to allow native vscode keybindings to work
-    // (note) ctrl+k must be a chord for native vscode keybindings to work
-    "key": "ctrl+k",
-    "command": "-vscode-neovim.send",
-    // "command": "ctrl+k 1678",
-    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.k && neovim.init && neovim.mode != 'insert'"
-  },
-  {
-    // (up) (vi) (neovim) (user) - unbind ctrl+y in normal mode to allow native vscode keybindings to work
-    // (note) ctrl+y must be a chord for native vscode keybindings to work
-    "key": "ctrl+y",
-    "command": "-vscode-neovim.send",
-    //"command": "ctrl+y 1278",
-    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.y && neovim.init && neovim.mode != 'insert'"
-  },
-  {
-    // (horizontal) (split) (terminal) (gold) - terminal only splits one way, depending on where it's docked
-    "key": "alt+-",
-    "command": "workbench.action.terminal.new",
-    // "command": "workbench.action.terminal.split",
-    // "command": "alt+- cf52",
-    "when": "panelFocus && terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (vi) (primary) (gold)
-    "key": "shift+alt+j",
-    "command": "workbench.action.focusActivityBar",
-    // "command": "workbench.action.toggleActivityBarVisibility",
-    // "command": "shift+alt+j e42a",
-    "when": "sideBarFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.activityBar.location == 'bottom'"
-  },
-  {
-    // (down) (vi) (primary) (gold)
-    "key": "shift+alt+j",
-    "command": "workbench.action.toggleActivityBarVisibility",
-    // "command": "shift+alt+j e42e",
-    "when": "sideBarFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.activityBar.location == 'hidden'"
   },
   {
     // (right) (vi) (terminal) (gold)
@@ -9616,15 +9860,17 @@ Notes:
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
-    // (down) (vi)
+    // (down) (vi) (panel) (gold) (terminal)
     "key": "alt+j",
-    "command": "(model) alt+j da97",
+    "command": "workbench.action.terminal.focusNext",
+    // "command": "(model) alt+j da97",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
-    // (up) (vi)
+    // (up) (vi) (panel) (gold) (terminal)
     "key": "alt+k",
-    "command": "(model) alt+k b79c",
+    "command": "workbench.action.terminal.focusPrevious",
+    // "command": "alt+k b79a",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
@@ -9803,120 +10049,6 @@ Notes:
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
-    // (left) (vi) (panel) (gold) (edge)
-    "key": "shift+alt+h",
-    "command": "workbench.action.focusSideBar",
-    // "command": "shift+alt+h 8d95",
-    "when": "!editorFocus && panelFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
-  },
-  {
-    // (left) (vi)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h 43ad",
-    // "command": "workbench.action.focusPanel",
-    "when": "auxiliaryBarFocus && panelVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (vi) (secondary) (gold)
-    "key": "shift+alt+h",
-    "command": "workbench.action.focusActiveEditorGroup",
-    // "command": "shift+alt+h 6319",
-    "when": "auxiliaryBarFocus && panelVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorIsOpen"
-  },
-  {
-    // (left) (all) (secondary) (gold)
-    "key": "shift+alt+,",
-    "command": "workbench.action.focusPanel",
-    // "command": "shift+alt+h 1319",
-    "when": "auxiliaryBarFocus && panelVisible && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
-  },
-  {
-    // (right) (vi) (edge)
-    "key": "shift+alt+l",
-    "command": "workbench.action.focusAuxiliaryBar",
-    // "command": "shift+alt+h 0811",
-    "when": "editorFocus && !panelFocus && !auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
-  },
-  {
-    // (down) (vi)
-    "key": "shift+alt+j",
-    "command": "runCommands",
-    "args": {
-      "commands": ["workbench.action.focusPanel"]
-    },
-    // "command": "shift+alt+j d49a",
-    "when": "editorFocus && !panelFocus && !panelVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (right) (vi) (edge)
-    "key": "shift+alt+l",
-    "command": "workbench.action.focusAuxiliaryBar",
-    // "command": "shift+alt+h 0711",
-    "when": "editorFocus && !panelFocus && auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
-  },
-  {
-    // (up) (vi)
-    "key": "shift+alt+k",
-    "command": "shift+alt+k d44c",
-    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && !multipleEditorGroups"
-  },
-  {
-    // (up) (vi) (gold) (editor) (edge) (wrap)
-    "key": "shift+alt+k",
-    "command": "workbench.action.focusPanel",
-    // "command": "alt+k b80d",
-    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorGroupIndex == 1"
-    // "when": "&& activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && !multipleEditorGroups"
-  },
-  {
-    // (down) (vi)
-    "key": "shift+alt+j",
-    "command": "workbench.action.focusPanel",
-    // "command": "shift+alt+j d43f",
-    "when": "editorFocus && !panelFocus && panelVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (vi)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h add5",
-    // "command": "workbench.action.toggleSidebarVisibility",
-    "when": "editorFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (vi) (panel) (gold) (edge) (nowrap)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h 8d96",
-    "when": "panelFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (down) (vi) (panel) (gold) (terminal)
-    "key": "alt+j",
-    "command": "workbench.action.terminal.focusNext",
-    // "command": "alt+j b79b",
-    "when": "panelFocus && terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (vi) (panel) (gold) (terminal)
-    "key": "alt+k",
-    "command": "workbench.action.terminal.focusPrevious",
-    // "command": "alt+k b79a",
-    "when": "panelFocus && terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (vi)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h 6317",
-    // "command": "workbench.action.focusAuxiliaryBar",
-    "when": "sideBarFocus && auxiliaryBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (vi)
-    "key": "shift+alt+h",
-    "command": "workbench.action.toggleSidebarVisibility",
-    // "command": "shift+alt+h acd4",
-    "when": "sideBarFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
     // (right) (vi)
     "key": "shift+alt+l",
     "command": "shift+alt+l cf34",
@@ -9950,145 +10082,5 @@ Notes:
     // "command": "workbench.action.focusActiveEditorGroup",
     "when": "terminalFocus && panelPosition == 'bottom' && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
     //"when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && panelPosition == 'bottom' && terminalFocus && editorIsOpen"
-  },
-  {
-    // (left) (vi) (edge) (wrap)
-    "key": "shift+alt+h",
-    "command": "workbench.action.focusSideBar",
-    // "command": "shift+alt+h 0812",
-    "when": "editorFocus && !panelFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (up) (vi)
-    "key": "shift+alt+k",
-    "command": "shift+alt+k d44b",
-    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorGroupIndex > 1 && multipleEditorGroups"
-  },
-  {
-    // (left) (vi)
-    "key": "shift+alt+h",
-    "command": "workbench.action.focusSideBar",
-    // "command": "shift+alt+h 33ad",
-    "when": "editorFocus && !panelFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (vi) (edge) (wrap)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h 080e",
-    "when": "editorFocus && panelVisible && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap"
-  },
-  {
-    // (left) (vi) (panel) (gold) (edge) (wrap)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h 8e22",
-    // "command": "workbench.action.focusActiveEditorGroup",
-    "when": "panelFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && editorIsOpen"
-  },
-  {
-    // (left) (vi) (panel) (gold) (edge) (wrap)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h 8e20",
-    // "command": "workbench.action.focusActiveEditorGroup",
-    "when": "panelFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && editorIsOpen"
-  },
-  {
-    // (right) (vi)
-    "key": "shift+alt+l",
-    "command": "workbench.action.focusActiveEditorGroup",
-    // "command": "(model) shift+alt+l b62d",
-    "when": "sideBarFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && editorIsOpen"
-  },
-  {
-    // (left) (corner) (editor) (gold)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h cd7e",
-    "when": "editorFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
-  },
-  {
-    // (left) (corner)
-    "key": "alt+h",
-    "command": "alt+h ad8d",
-    // "command": "workbench.action.focusSideBar",
-    "when": "editorFocus && !panelFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
-  },
-  {
-    // (left) (corner) (editor) (gold)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h cd8d",
-    // "command": "workbench.action.focusSideBar",
-    "when": "editorFocus && !panelFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
-  },
-  {
-    // (left) (juke) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
-    "key": "alt+,",
-    "command": "workbench.action.previousEditor",
-    // "command": "alt+, 03ab",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && activeEditorIsReadonly && editorIsOpen"
-  },
-  {
-    // (horizontal) (split) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
-    "key": "alt+-",
-    "command": "workbench.action.splitEditorDown",
-    // "command": "alt+- 83bb",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && activeEditorIsReadonly && editorIsOpen"
-  },
-  {
-    // (right) (juke) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
-    "key": "alt+.",
-    "command": "workbench.action.nextEditor",
-    // "command": "alt+. 03ac",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && activeEditorIsReadonly && editorIsOpen"
-  },
-  {
-    // (right) (split) (vertical) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
-    "key": "alt+=",
-    "command": "workbench.action.splitEditor",
-    // "command": "alt+= 83bc",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && activeEditorIsReadonly && editorIsOpen"
-  },
-  {
-    // (left) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
-    "key": "alt+h",
-    "command": "alt+h 2a1a",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditorIsReadonly && editorIsOpen"
-  },
-  {
-    // (down) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
-    "key": "alt+j",
-    "command": "workbench.action.focusBelowGroup",
-    // "command": "alt+j 42a6",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditorIsReadonly && editorIsOpen"
-  },
-  {
-    // (right) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
-    "key": "alt+l",
-    "command": "alt+l 2b2a",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditorIsReadonly && editorIsOpen"
-  },
-  {
-    // (left) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
-    "key": "shift+alt+h",
-    "command": "shift+alt+h 4b2a",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditorIsReadonly && editorIsOpen"
-  },
-  {
-    // (left) (vi) (editor) (gold) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (not first in group)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h 8b41",
-    // "command": "workbench.action.focusSideBar",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorIsReadonly"
-  },
-  {
-    // (left) (corner) (editor) (gold) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar hidden (first in group)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h 4b2b",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && !sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly"
-  },
-  {
-    // (left) (corner) (editor) (gold) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (first in group)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h 4b2c",
-    // "command": "workbench.action.focusSideBar",
-    "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && sideBarVisible && config.workbench.sideBar.location == 'left' && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly"
   }
 ]
