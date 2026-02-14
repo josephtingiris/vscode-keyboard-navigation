@@ -7,7 +7,8 @@ See:
 
 Scope:
 
-  * The following variant prefixes are in scope:
+  * Modifier prefixes:
+    * Included modifiers: `alt+ ctrl+ ctrl+alt+ shift+alt+ ctrl+alt+meta+ ctrl+shift+alt+ shift+alt+meta+ ctrl+shift+alt+meta+`
       * Single-modifier:
         - alt+
         - ctrl+
@@ -15,8 +16,10 @@ Scope:
         - ctrl+alt+
         - shift+alt+
       * Three-modifier:
+        - ctrl+alt+meta+
         - ctrl+shift+alt+
-  * Included modifiers: `alt+ ctrl+ ctrl+alt+ shift+alt+ ctrl+alt+meta+ ctrl+shift+alt+ shift+alt+meta+ ctrl+shift+alt+meta+`
+        - shift+alt+meta+
+
   * Modifier order is not significant (e.g., ctrl+alt+k == alt+ctrl+k), but a canonical ordering is ctrl+shift+alt+<key>
   * left/right variants are treated as identical (leftAlt, rightAlt, leftCtrl, rightCtrl, leftShift, rightShift, leftMeta, rightMeta)
   * Support for differentiating leftAlt from rightAlt or rightShift is not supported and treated as a single key (e.g., alt instead of leftAlt/rightAlt)
@@ -36,7 +39,8 @@ Conventions:
   * 'command not found' pseudo command: placeholders:
     - are left in to help with debugging, sorting, and future key binding placements
     - should contain the key and a 4-character UNIQUE identifier, i.e. 'alt+l jj4e' or 'alt+l 8df3'
-  * comment convention: `(direction | omni) (key group | all) (ring group color | black) [(model)] [(terminal)] [(wrap)] [(edge)]`
+
+  * comment convention: `<(direction | omni) (key group | all) (focus | all) (ring group color | black)> [(model)] [(wrap)] [(corner)] [(edge)] ...`
 
 Constraints:
 
@@ -186,68 +190,75 @@ Copy/Paste:
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
-    // (left) (all) (editor) (juke) - Settings editor, Keyboard Shortcuts, et al
+    // (left) (juke) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
     "key": "alt+,",
     "command": "workbench.action.previousEditor",
     // "command": "alt+, 03ab",
     "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && activeEditorIsReadonly && editorIsOpen"
   },
   {
-    // (split) (horizontal)
+    // (horizontal) (split) (all) (gold)
     "key": "alt+-",
     "command": "(model) alt+- c53e",
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // (horizontal) (split) (all) (gold)
     "key": "alt+-",
     "command": "(model) alt+- f8cb",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
+    // (horizontal) (split) (all) (gold)
     "key": "alt+-",
     "command": "(model) alt+- 8490",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
   },
   {
-    // (split) (all) (gold) (editor)
+    // (horizontal) (split) (editor) (gold)
     "key": "alt+-",
     "command": "workbench.action.splitEditorDown",
     // "command": "alt+- cf54",
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled"
   },
   {
+    // (horizontal) (split) (terminal) (gold)
     "key": "alt+-",
     "command": "(model) alt+- 14ba",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal"
   },
   {
+    // (horizontal) (split) (terminal) (gold)
     "key": "alt+-",
     "command": "(model) alt+- d755",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal"
   },
   {
+    // (horizontal) (split) (terminal) (gold)
     "key": "alt+-",
     "command": "(model) alt+- b752",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap"
   },
   {
+    // (horizontal) (split) (terminal) (gold)
     "key": "alt+-",
     "command": "(model) alt+- f404",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
+    // (horizontal) (split) (terminal) (gold)
     "key": "alt+-",
     "command": "(model) alt+- 9b4b",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap"
   },
   {
-    // (noop) (all) (model) (terminal) (wrap)
+    // (horizontal) (split) (terminal) (gold)
     "key": "alt+-",
     "command": "(model) alt+- cf53",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
-    // (split) (horizontal) (panel) (gold) - terminal only splits one way, depending on where it's docked
+    // (horizontal) (split) (terminal) (gold) - terminal only splits one way, depending on where it's docked
     "key": "alt+-",
     "command": "workbench.action.terminal.new",
     // "command": "workbench.action.terminal.split",
@@ -255,195 +266,198 @@ Copy/Paste:
     "when": "panelFocus && terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
-    // (down) (split) (horizontal) - Settings editor, Keyboard Shortcuts, et al
+    // (horizontal) (split) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
     "key": "alt+-",
     "command": "workbench.action.splitEditorDown",
     // "command": "alt+- 83bb",
     "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && activeEditorIsReadonly && editorIsOpen"
   },
   {
-    // (right)
+    // (right) (juke) (all) (gold)
     "key": "alt+.",
     "command": "(model) alt+. 7739",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (right)
+    // (right) (juke) (all) (gold)
     "key": "alt+.",
     "command": "(model) alt+. 398b",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (right)
+    // (right) (juke) (all) (gold)
     "key": "alt+.",
     "command": "(model) alt+. e878",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
   },
   {
-    // (right) (all) (editor) (juke)
+    // (right) (juke) (editor) (gold)
     "key": "alt+.",
     "command": "workbench.action.nextEditor",
     // "command": "alt., de63",
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled"
   },
   {
-    // (right)
+    // (right) (juke) (terminal) (gold)
     "key": "alt+.",
     "command": "(model) alt+. 5fbd",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal"
   },
   {
-    // (right)
+    // (right) (juke) (terminal) (gold)
     "key": "alt+.",
     "command": "(model) alt+. 48a5",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal"
   },
   {
-    // (right)
+    // (right) (juke) (terminal) (gold)
     "key": "alt+.",
     "command": "(model) alt+. 42a4",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap"
   },
   {
-    // (right)
+    // (right) (juke) (terminal) (gold)
     "key": "alt+.",
     "command": "(model) alt+. 8435",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
-    // (right)
+    // (right) (juke) (terminal) (gold)
     "key": "alt+.",
     "command": "(model) alt+. b05b",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap"
   },
   {
-    // (right)
+    // (right) (juke) (terminal) (gold)
     "key": "alt+.",
     "command": "(model) alt+. f411",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
-    // (right) (all) (editor) (juke) - Settings editor, Keyboard Shortcuts, et al
+    // (right) (juke) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
     "key": "alt+.",
     "command": "workbench.action.nextEditor",
     // "command": "alt+. 03ac",
     "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && activeEditorIsReadonly && editorIsOpen"
   },
   {
-    "key": "alt+/",
-    "command": "alt+/ e9b2",
-    // "command": "editor.action.previousMatchFindAction",
-    "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled"
-  },
-  {
-    // (left)
+    // (left) (juke) (all) (gold)
     "key": "alt+;",
     "command": "(model) alt+; f54a",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (left)
+    // (left) (juke) (all) (gold)
     "key": "alt+;",
     "command": "(model) alt+; 135d",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (left)
+    // (left) (juke) (all) (gold)
     "key": "alt+;",
     "command": "(model) alt+; da62",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
   },
   {
+    // (left) (juke) (editor) (gold)
     "key": "alt+;",
     "command": "alt+; afa2",
     // "command": "cursorHome", // maybe for non-neovim profiles but for neovim users there are many ways to navigate to the beginning of a line ...
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled"
   },
   {
-    // (left)
+    // (left) (juke) (terminal) (gold)
     "key": "alt+;",
     "command": "(model) alt+; fed7",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal"
   },
   {
-    // (left)
+    // (left) (juke) (terminal) (gold)
     "key": "alt+;",
     "command": "(model) alt+; 3b65",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal"
   },
   {
-    // (left)
+    // (left) (juke) (terminal) (gold)
     "key": "alt+;",
     "command": "(model) alt+; 5546",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap"
   },
   {
-    // (left)
+    // (left) (juke) (terminal) (gold)
     "key": "alt+;",
     "command": "(model) alt+; 4fb3",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
-    // (left)
+    // (left) (juke) (terminal) (gold)
     "key": "alt+;",
     "command": "(model) alt+; ab8f",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap"
   },
   {
-    // (left)
+    // (left) (juke) (terminal) (gold)
     "key": "alt+;",
     "command": "(model) alt+; 9a93",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
+    // (horizontal) (split) (all) (gold)
     "key": "alt+=",
     "command": "(model) alt+= 2916",
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // (horizontal) (split) (all) (gold) (model)
     "key": "alt+=",
     "command": "(model) alt+= 6e2e",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
+    // (horizontal) (split) (all) (gold) (model) (wrap)
     "key": "alt+=",
     "command": "(model) alt+= 7893",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
   },
   {
-    // (split) (all) (gold) (editor)
+    // (horizontal) (split) (all) (gold) (editor)
     "key": "alt+=",
     "command": "workbench.action.splitEditor",
     // "command": "alt+= d6bf",
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled"
   },
   {
+    // (horizontal) (split) (all) (terminal) (gold) (model)
     "key": "alt+=",
     "command": "(model) alt+= 8d1f",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal"
   },
   {
+    // (horizontal) (split) (all) (terminal) (gold) (model)
     "key": "alt+=",
     "command": "(model) alt+= c857",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal"
   },
   {
+    // (horizontal) (split) (all) (terminal) (gold) (model)
     "key": "alt+=",
     "command": "(model) alt+= fc3d",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap"
   },
   {
+    // (horizontal) (split) (all) (terminal) (gold) (model) (wrap)
     "key": "alt+=",
     "command": "(model) alt+= e6b0",
     "when": "terminalFocus && config.keyboardNavigation.enabled && !config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
   },
   {
+    // (horizontal) (split) (all) (terminal) (gold) (model)
     "key": "alt+=",
     "command": "(model) alt+= 8ce8",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && !config.keyboardNavigation.wrap"
   },
   {
-    // (noop) (all) (model) (terminal)
+    // (horizontal) (split)(noop) (all) (model) (terminal)
     "key": "alt+=",
     "command": "(model) alt+= d2be",
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.wrap"
@@ -456,7 +470,7 @@ Copy/Paste:
     "when": "editorFocus && editorTextFocus && !panelFocus && config.keyboardNavigation.enabled && activeEditorCanSplitInGroup"
   },
   {
-    // (right) (split) (vertical) - Settings editor, Keyboard Shortcuts, et al
+    // (right) (split) (vertical) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
     "key": "alt+=",
     "command": "workbench.action.splitEditor",
     // "command": "alt+= 83bc",
@@ -736,6 +750,30 @@ Copy/Paste:
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // (debug) (chord) - redraw screen?
+    "key": "alt+d alt+l",
+    "command": "workbench.explorer.openEditorsView.resetViewLocation", // this opens the OPEN EDITORS viewlet and focuses it
+    // "command": "workbench.explorer.openEditorsView.resetViewLocation", // this opens the OPEN EDITORS viewlet and focuses it
+    // "command": "workbench.explorer.fileView.resetViewLocation", // this opens the FILE EXPLORER viewlet and focuses it
+    // "command": "workbench.action.zoomReset",
+    // "command": "workbench.action.terminal.resetSuggestWidgetSize",
+    // "command": "workbench.action.terminal.fontZoomReset",
+    // "command": "workbench.action.resetViewLocations", // try this again
+    // "command": "workbench.action.resetFocusedViewLocation",
+    // "command": "workbench.action.files.resetActiveEditorReadonlyInSession",
+    // "command": "workbench.action.chat.resetTrustedTools",
+    // "command": "timeline.resetViewLocation", // this opens the exlorer TIMELINE viewlet and focuses it
+    // "command": "terminal.resetViewLocation",
+    // "command": "terminal.resetViewContainerLocation",
+    // "command": "outline.resetViewLocation", // this opens the exlorer OUTLINE viewlet and focuses it
+    // "command": "menu.resetHiddenStates",
+    // "command": "extensions.recommendedList.resetViewLocation",
+    // "command": "editor.inlayHints.Reset",
+    // "command": "editor.action.resetSuggestSize",
+    // "command": "alt+d 3912",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
     // (debug) (chord) - reload window
     "key": "alt+d alt+r",
     "command": "workbench.action.reloadWindow",
@@ -928,7 +966,7 @@ Copy/Paste:
     "when": "editorFocus && !panelFocus && sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
   },
   {
-    // (left) (vi) - Settings editor, Keyboard Shortcuts, et al
+    // (left) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
     "key": "alt+h",
     "command": "alt+h 2a1a",
     "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditorIsReadonly && editorIsOpen"
@@ -1067,7 +1105,7 @@ Copy/Paste:
     "when": "panelFocus && terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
-    // (down) (vi) - Settings editor, Keyboard Shortcuts, et al
+    // (down) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
     "key": "alt+j",
     "command": "workbench.action.focusBelowGroup",
     // "command": "alt+j 42a6",
@@ -1203,7 +1241,7 @@ Copy/Paste:
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
-    // (right) (vi) - Settings editor, Keyboard Shortcuts, et al
+    // (right) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
     "key": "alt+l",
     "command": "alt+l 2b2a",
     "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditorIsReadonly && editorIsOpen"
@@ -7955,6 +7993,13 @@ Copy/Paste:
     "when": "terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.terminal && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
+    // (left) (vi) (panel) (gold) (edge)
+    "key": "shift+alt+h",
+    "command": "workbench.action.focusSideBar",
+    // "command": "shift+alt+h 8d95",
+    "when": "!editorFocus && panelFocus && sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left'"
+  },
+  {
     // (left) (vi)
     "key": "shift+alt+h",
     "command": "shift+alt+h 43ad",
@@ -7980,13 +8025,6 @@ Copy/Paste:
     "key": "shift+alt+h",
     "command": "shift+alt+h 8d96",
     "when": "panelFocus && !sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left'"
-  },
-  {
-    // (left) (vi) (panel) (gold) (edge) (wrap)
-    "key": "shift+alt+h",
-    "command": "shift+alt+h 8d95",
-    // "command": "workbench.action.focusSideBar",
-    "when": "panelFocus && sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left'"
   },
   {
     // (left) (vi)
@@ -8037,39 +8075,39 @@ Copy/Paste:
     "when": "panelFocus && !sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorIsOpen"
   },
   {
-    // (left) (topleft)
+    // (left) (corner) (editor) (gold)
     "key": "shift+alt+h",
     "command": "shift+alt+h cd7e",
     "when": "editorFocus && !sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
   },
   {
-    // (left) (corner)
+    // (left) (corner) (editor) (gold)
     "key": "shift+alt+h",
     "command": "shift+alt+h cd8d",
     // "command": "workbench.action.focusSideBar",
     "when": "editorFocus && !panelFocus && sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup"
   },
   {
-    // (left) (vi) - Settings editor, Keyboard Shortcuts, et al
+    // (left) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
     "key": "shift+alt+h",
     "command": "shift+alt+h 4b2a",
     "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditorIsReadonly && editorIsOpen"
   },
   {
-    // (left) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (not first in group)
+    // (left) (vi) (editor) (gold) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (not first in group)
     "key": "shift+alt+h",
     "command": "shift+alt+h 8b41",
     // "command": "workbench.action.focusSideBar",
     "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditorIsReadonly"
   },
   {
-    // (left) (corner) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar hidden (first in group)
+    // (left) (corner) (editor) (gold) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar hidden (first in group)
     "key": "shift+alt+h",
     "command": "shift+alt+h 4b2b",
     "when": "activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && !sideBarVisible && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly"
   },
   {
-    // (left) (corner) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (first in group)
+    // (left) (corner) (editor) (gold) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (first in group)
     "key": "shift+alt+h",
     "command": "shift+alt+h 4b2c",
     // "command": "workbench.action.focusSideBar",
