@@ -145,7 +145,7 @@ Notes:
   {
     // (action) (chord) (all) (gold) - test key
     "key": "alt+a 1",
-    // "command": "alt+a 1 1111",
+    "command": "alt+a 1 1111",
     // "command": "editor.action.fontZoomReset",
     // "command": "editor.action.resetSuggestSize",
     // "command": "editor.inlayHints.Reset",
@@ -210,11 +210,10 @@ Notes:
     // "command": "workbench.view.extension.test.resetViewContainerLocation",
     // "command": "workbench.view.extensions.resetViewContainerLocation",
     // "command": "workbench.view.remote.resetViewContainerLocation",
-
     // "command": "workbench.view.scm.resetViewContainerLocation",
     // "command": "workbench.view.search.resetViewContainerLocation",
     // "command": "workbench.view.search.resetViewLocation",
-    // "command": "workbench.view.sync.resetViewContainerLocation",
+    // "command": "workbench.view.sync.resetViewContainerLocation", // this 'looked' kind of cool, but i'm not really sure what it did.  lol
     // "command": "workbench.view.testCoverage.resetViewLocation",
     // "command": "workbench.view.testing.resetViewLocation",
     // "command": "workbench.views.editSessions.data.resetViewLocation",
@@ -322,7 +321,8 @@ Notes:
   {
     // (action) (chord) (primary) (gold) - open and focus the (PRIMARY) SEARCH viewlet
     "key": "alt+a s",
-    "command": "workbench.action.findInFiles",
+    "command": "workbench.view.search.resetViewContainerLocation",
+    // "command": "workbench.action.findInFiles",
     // "command": "alt+a s 55a7",
     "when": "config.keyboardNavigation.enabled"
   },
