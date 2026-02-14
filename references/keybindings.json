@@ -622,7 +622,6 @@ Copy/Paste:
     // (action) (chord) (all) (black) - test key
     "key": "alt+a 1",
     "command": "alt+a 1 1111",
-    // "command": "agentSessions.filter.resetExcludes.agentsessionsviewerfiltersubmenu",
     // "command": "editor.action.fontZoomReset",
     // "command": "editor.action.resetSuggestSize",
     // "command": "editor.inlayHints.Reset",
@@ -636,17 +635,17 @@ Copy/Paste:
     // "command": "menu.resetHiddenStates",
     // "command": "mergeEditor.resetCloseWithConflictsChoice",
     // "command": "mergeEditor.resetResultToBaseAndAutoMerge",
-    // "command": "npm.resetViewLocation",
-    // "command": "outline.resetViewLocation", // this opens the exlorer OUTLINE viewlet and focuses it
     // "command": "refactorPreview.resetViewContainerLocation",
     // "command": "refactorPreview.resetViewLocation",
     // "command": "references-view.tree.resetViewLocation",
+    // "command": "npm.resetViewLocation", // this opens the (EXPLORER) NPM SCRIPTS viewlet and focuses it
+    // "command": "outline.resetViewLocation", // this opens the (EXPLORER) OUTLINE viewlet and focuses it
     // "command": "resetGettingStartedProgress",
     // "command": "terminal.resetViewContainerLocation",
-    // "command": "terminal.resetViewLocation",
-    // "command": "timeline.resetViewLocation", // this opens the exlorer TIMELINE viewlet and focuses it
-    // "command": "workbench.action.chat.openFeatureSettings",
-    // "command": "workbench.action.chat.resetTrustedTools",
+    // "command": "terminal.resetViewLocation", // this opens the (PANEL) TERMINAL viewlet and focuses it (alt+a t)
+    // "command": "timeline.resetViewLocation", // this opens the (EXPLORER) TIMELINE viewlet and focuses it
+    // "command": "workbench.action.chat.openFeatureSettings", // this opens the Settings with '@feature:chat' typed in the input box
+    // "command": "workbench.action.chat.resetTrustedTools", // this resets User settings; DO NOT DO THIS AGAIN (because I have trusted tools)
     // "command": "workbench.action.files.resetActiveEditorReadonlyInSession",
     // "command": "workbench.action.resetFocusedViewLocation",
     // "command": "workbench.action.resetViewLocations", // resets *ALL* view locations to their defaults and focuses the first view container (panel if any views are open, otherwise primary sidebar)
@@ -662,7 +661,7 @@ Copy/Paste:
     // "command": "workbench.debug.welcome.resetViewLocation",
     // "command": "workbench.editSessions.actions.resetAuth",
     // "command": "workbench.explorer.fileView.resetViewLocation", // this opens the (EXPLORER) FILE EXPLORER viewlet and focuses it
-    // "command": "workbench.explorer.openEditorsView.resetViewLocation", // this opens the (EXPLORER) OPEN EDITORS viewlet and focuses it
+    // "command": "workbench.explorer.openEditorsView.resetViewLocation", // this opens the (EXPLORER) OPEN EDITORS viewlet and focuses it (alt+a .) when primary sidebar is left
     // "command": "workbench.mcp.resetCachedTools",
     // "command": "workbench.mcp.resetTrust",
     // "command": "workbench.notebook.layout.webview.reset",
@@ -773,7 +772,7 @@ Copy/Paste:
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled"
   },
   {
-    // (panel) - focus (file) explorer in the primary sidebar
+    // (action) (chord) (all) (black) - open and focus the (ACTIVE) EXPLORER viewlet (alt+a e)
     "key": "alt+a e",
     "command": "workbench.view.explorer",
     // "command": "alt+a 59a7",
@@ -799,6 +798,13 @@ Copy/Paste:
     "command": "markdown.showPreview",
     // "command": "alt+a 50a9",
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && editorLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/ && !notebookEditorFocused"
+  },
+  {
+    // (action) (chord) (all) (black) - open and focus the (PANEL) TERMINAL viewlet (alt+a t)
+    "key": "alt+a t",
+    "command": "terminal.resetViewLocation",
+    // "command": "alt+a 1 1120",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (editor) - toggle line wrapping
