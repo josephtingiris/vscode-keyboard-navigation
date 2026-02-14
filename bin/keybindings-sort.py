@@ -630,12 +630,31 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         canonical_when = canonicalize_when(when_val, mode=tertiary)
         sortable_when = sortable_when_key(when_val, mode=tertiary)
 
+        # Derive the first top-level when token for grouping when primary sorting
+        first_when_token = ''
+        if canonical_when:
+            parts = re.split(r'\s*&&\s*|\s*\|\|\s*', canonical_when.strip())
+            if parts:
+                first_when_token = parts[0].strip()
+                # remove surrounding parentheses and leading negation for grouping
+                while first_when_token.startswith('(') and first_when_token.endswith(')'):
+                    first_when_token = first_when_token[1:-1].strip()
+                if first_when_token.startswith('!'):
+                    first_when_token = first_when_token[1:].lstrip()
+
         # Build a flexible sort tuple based on primary/secondary preferences.
         keys = []
 
         def append_when():
-            # Use canonicalized when for ordering but ignore leading '!'
-            # so negation does not affect sort position. Case-sensitive.
+            # When primary sorting is requested, prefer grouping by the
+            # first top-level when token (alphabetically), then by the
+            # when specificity, and then by the canonicalized when string.
+            if primary == 'when':
+                keys.append(natural_key_case_sensitive(first_when_token))
+                keys.append(when_specificity(when_val))
+                keys.append(natural_key_case_sensitive(sortable_when))
+                return
+            # Default append behavior when not primary
             keys.append(when_specificity(when_val))
             keys.append(natural_key_case_sensitive(sortable_when))
 
