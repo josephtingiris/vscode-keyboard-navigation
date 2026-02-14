@@ -32,6 +32,7 @@ Scope:
       * (neovim) `alt+n ...`
       * (split) `- _ = + \ |`
       * (vi) `h j k l
+      * (zoom) `alt_a z` ... `alt+a alt+z` ...
   
   * Modifier order is not significant (e.g., ctrl+alt+k == alt+ctrl+k), but a canonical ordering is ctrl+shift+alt+<key>
   * left/right variants are treated as identical (leftAlt, rightAlt, leftCtrl, rightCtrl, leftShift, rightShift, leftMeta, rightMeta)
@@ -341,13 +342,13 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (zoom) (alias)
+    // (action) (zoom) (primary) (gold)
     "key": "alt+a z",
     "command": "alt+a z b809",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (noop) (chord) - alt+d chords
+    // (debug) (chord) (all) (gold) - alt+d chords
     "key": "alt+d",
     "command": "(model) alt+d 9911",
     "when": "config.keyboardNavigation.enabled"
@@ -1166,13 +1167,13 @@ Notes:
     "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
   },
   {
-    // (right)
+    // (right) (juke) (all) (gold)
     "key": "alt+'",
     "command": "(model) alt+' 142e",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (left)
+    // (left) (juke) (all) (gold)
     "key": "alt+,",
     "command": "(model) alt+, ef33",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
@@ -1202,99 +1203,103 @@ Notes:
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (left)
+    // (left) (juke) (all) (gold)
     "key": "alt+[",
     "command": "(model) alt+[ 5981",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (right)
+    // (right) (juke) (all) (gold)
     "key": "alt+]",
     "command": "(model) alt+] 334a",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (right)
+    // (right) (juke) (all) (gold)
     "key": "ctrl+'",
     "command": "(model) ctrl+' 5245",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (left)
+    // (left) (juke) (all) (gold)
     "key": "ctrl+,",
     "command": "(model) ctrl+, 138c",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
+    // (horizontal) (split) (all) (gold)
     "key": "ctrl+-",
     "command": "(model) ctrl+- 308d",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (right)
+    // (right) (juke) (all) (gold)
     "key": "ctrl+.",
     "command": "(model) ctrl+. f25d",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (left)
+    // (left) (juke) (all) (gold)
     "key": "ctrl+;",
     "command": "(model) ctrl+; 6565",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
+    // (vertical) (split) (all) (gold)
     "key": "ctrl+=",
     "command": "(model) ctrl+= f90f",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (left)
+    // (left) (juke) (all) (gold)
     "key": "ctrl+[",
     "command": "(model) ctrl+[ 065e",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (right)
+    // (right) (juke) (all) (gold)
     "key": "ctrl+]",
     "command": "(model) ctrl+] 444f",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (right)
+    // (right) (juke) (all) (gold)
     "key": "ctrl+alt+'",
     "command": "(model) ctrl+alt+' 6986",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (left)
+    // (left) (juke) (all) (gold)
     "key": "ctrl+alt+,",
     "command": "(model) ctrl+alt+, 1478",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
+    // (horizontal) (split) (all) (gold)
     "key": "ctrl+alt+-",
     "command": "(model) ctrl+alt+- b524",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (right)
+    // (right) (juke) (all) (gold)
     "key": "ctrl+alt+.",
     "command": "(model) ctrl+alt+. c0d0",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (left)
+    // (left) (juke) (all) (gold)
     "key": "ctrl+alt+;",
     "command": "(model) ctrl+alt+; fa2c",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
+    // (vertical) (split) (all) (gold)
     "key": "ctrl+alt+=",
     "command": "(model) ctrl+alt+= 5749",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
   },
   {
-    // (left)
+    // (left) (juke) (all) (gold)
     "key": "ctrl+alt+[",
     "command": "(model) ctrl+alt+[ b456",
     "when": "config.keyboardNavigation.enabled && !config.keyboardNavigation.wrap"
@@ -2230,6 +2235,13 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
   },
   {
+    // (action) (zoom) (primary) (gold)
+    "key": "alt+a z",
+    "command": "alt+a z b810",
+    // "command": "workbench.action.zoomReset",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.zoom"
+  },
+  {
     // (neovim)
     "key": "alt+n",
     "command": "alt+n 318f",
@@ -2272,14 +2284,14 @@ Notes:
     "when": "panelPosition == 'top' && config.keyboardNavigation.enabled"
   },
   {
-    // (omni) (action) (chord) - alt+a chords
+    // (action) (chord) (primary) (gold)
     "key": "alt+a a",
     "command": "alt+a a 39f8",
     // "command": "workbench.action.toggleActivityBarVisibility",
     "when": "sideBarFocus && config.keyboardNavigation.enabled"
   },
   {
-    // (zoom) (alias) (panel) (gold) - toggle maximized panel
+    // (action) (zoom) (panel) (gold) - toggle maximized panel
     "key": "alt+a z",
     "command": "workbench.action.toggleMaximizedPanel",
     // "command": "alt+a z cbb4",
