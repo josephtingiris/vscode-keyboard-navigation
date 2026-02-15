@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#
+#  (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+#
 # -----------------------------------------------------------------------------
 # keybindings-install-references.sh — install `references/keybindings.json` into VS Code
 #
@@ -27,11 +30,8 @@
 #
 # Exit codes:
 #   0   Success
-#   1   Usage / bad args
-#   2   Validation / runtime error
-#
-# Author:
-#   (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+#   1   Validation / runtime error
+#   2   Usage / bad args
 # -----------------------------------------------------------------------------
 
 KEYBINDINGS_JSON=""
@@ -43,9 +43,9 @@ aborting() {
 
 usage() {
     echo
-    echo "usage: ${0##*/} [keybindings.json]"
+    echo "usage: ${0##*/} [-h|--help] [keybindings.json]"
     echo
-    exit 99
+    exit 2
 }
 
 validate_json() {
@@ -91,7 +91,11 @@ main() {
     validate_json "${KEYBINDINGS_JSON}"
 
     local user_keybindings_json
-    user_keybindings_json="$(vscode_user_home)/AppData/Roaming/Code/User/keybindings.json"
+	if [ -d "${VSCODE_USER_DIR}" ]; then
+    	user_keybindings_json="${VSCODE_USER_DIR}/keybindings.json"
+	else
+    	user_keybindings_json="$(vscode_user_home)/AppData/Roaming/Code/User/keybindings.json"
+	fi
     if [ ! -r "${user_keybindings_json}" ]; then
         aborting "'${user_keybindings_json}' file not found readable"
     fi
@@ -123,6 +127,14 @@ main() {
 }
 
 DIRNAME="$(dirname "$0")"
+
+for _arg in "$@"; do
+    case "${_arg}" in
+        -h|--help)
+            usage
+            ;;
+    esac
+done
 
 [ "$#" -lt 1 ] && KEYBINDINGS_JSON="${DIRNAME}/../references/keybindings.json" || KEYBINDINGS_JSON="$1"
 [ ! -r "${KEYBINDINGS_JSON}" ] && aborting "'${KEYBINDINGS_JSON}' file not readable"
