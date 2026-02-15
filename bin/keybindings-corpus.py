@@ -28,29 +28,12 @@ from __future__ import annotations
 
 import json
 import sys
+import argparse
 from random import Random
 from itertools import combinations
+from typing import List
 
-# Deterministic RNG for reproducible outputs
-rng = Random(0)
-
-
-def usage(prog: str | None = None) -> None:
-    if prog is None:
-        prog = sys.argv[0].split('/')[-1]
-    msg = (
-        f"Usage: {prog}\n\n"
-        "Options:\n  -h, --help    Show this usage message and exit\n"
-    )
-    print(msg, file=sys.stderr)
-    sys.exit(1)
-
-
-# Respect -h/--help early so scripts invoking this file get the concise usage
-if any(arg in ('-h', '--help') for arg in sys.argv[1:]):
-    usage()
-
-# Include modifiers: `alt+ ctrl+ ctrl+alt+ shift+alt+ ctrl+alt+meta+ ctrl+shift+alt+ shift+alt+meta+ ctrl+shift+alt+meta+`
+# Included modifiers: `alt+ ctrl+ ctrl+alt+ shift+alt+ ctrl+alt+meta+ ctrl+shift+alt+ shift+alt+meta+ ctrl+shift+alt+meta+`
 
 MODIFIERS_SINGLE = ["alt", "ctrl"]
 MODIFIERS_MULTI = [
@@ -72,7 +55,7 @@ VI_KEYS = {"h", "j", "k", "l"}
 ARROW_KEYS = {"end", "home", "pageup",
               "pagedown", "left", "down", "up", "right"}
 
-# Mapping groups for comments
+# key groups for comments
 LEFT_GROUP = {"h", "[", ";", ",", "left"}
 DOWN_GROUP = {"j", "down", "pagedown"}
 UP_GROUP = {"k", "up", "pageup"}
@@ -81,7 +64,7 @@ RIGHT_GROUP = {"l", "]", "'", ".", "right"}
 TAG_ORDER = ["(down)", "(left)", "(right)", "(up)", "(arrow)", "(vi)"]
 
 
-def hex4():
+def hex4(rng: Random) -> str:
     return f"{rng.randint(0, 0xFFFF):04x}"
 
 
@@ -124,34 +107,41 @@ def emit_record(key_str, command_str, when_str, comment_tags):
     return "\n".join(parts)
 
 
-records = []
+def main(argv: List[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    parser = argparse.ArgumentParser(
+        description="Generate a deterministic JSONC array of keybinding objects used as a structural baseline for keyboard-navigation development, debugging, and testing.",
+        epilog="Example: %(prog)s > references/keybindings-corpus.jsonc",
+    )
 
-all_mods = MODIFIERS_SINGLE + MODIFIERS_MULTI
+    # only show help when -h/--help is provided
+    parser.parse_args(argv)
 
-for key in KEYS:
-    for mod in all_mods:
+    # initialize RNG locally so other code can't affect the sequence
+    rng = Random(0)
+
+    # generate records
+    records = []
+    all_mods = MODIFIERS_SINGLE + MODIFIERS_MULTI
+    for key in KEYS:
+        for mod in all_mods:
             key_str = f"{mod}+{key}"
             base_when = when_for(key)
             tags = tags_for(key)
-            # only include comment if key belongs to at least one mapping group
             comment_tags = tags if tags else []
 
-            # include the base when condition with its own unique id
-            cmd_base = f"(model) {key_str} {hex4()}"
+            cmd_base = f"(model) {key_str} {hex4(rng)}"
             records.append((key_str, cmd_base, base_when, comment_tags))
 
-            # additional when-context variants to generate separate objects for
             EXTRA_WHENS = [
                 "config.keyboardNavigation.terminal",
                 "!config.keyboardNavigation.terminal",
                 "config.keyboardNavigation.wrap",
                 "!config.keyboardNavigation.wrap",
             ]
-            # emit records for every non-empty combination of EXTRA_WHENS
             n = len(EXTRA_WHENS)
             for r in range(1, n + 1):
                 for combo in combinations(EXTRA_WHENS, r):
-                    # skip combinations that include both a context and its negation
                     conflict = False
                     seen = {}
                     for extra in combo:
@@ -167,25 +157,26 @@ for key in KEYS:
                         continue
 
                     combined_when = base_when + " && " + " && ".join(combo)
-                    # generate a unique id for each combined variant
-                    cmd_extra = f"(model) {key_str} {hex4()}"
+                    cmd_extra = f"(model) {key_str} {hex4(rng)}"
                     records.append((key_str, cmd_extra, combined_when, comment_tags))
 
-# Ouput JSONC array
-out_lines = []
-out_lines.append("[")
-for i, (k, c, w, tags) in enumerate(records):
-    obj = emit_record(k, c, w, tags)
-    comma = "," if i < len(records) - 1 else ""
-    # ensure comma is on same line as closing brace
-    if comma:
-        # append comma to last line of obj
-        obj = obj + comma
-    out_lines.append(obj)
-out_lines.append("]")
+    out_lines = []
+    out_lines.append("[")
+    for i, (k, c, w, tags) in enumerate(records):
+        obj = emit_record(k, c, w, tags)
+        comma = "," if i < len(records) - 1 else ""
+        if comma:
+            obj = obj + comma
+        out_lines.append(obj)
+    out_lines.append("]")
 
-sys.stdout.write("\n".join(out_lines) + "\n")
-try:
-    sys.stdout.flush()
-except Exception:
-    pass
+    sys.stdout.write("\n".join(out_lines) + "\n")
+    try:
+        sys.stdout.flush()
+    except Exception:
+        pass
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
