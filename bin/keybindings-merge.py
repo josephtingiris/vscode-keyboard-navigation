@@ -494,7 +494,7 @@ def merge_keybinding_files(left_text: str, right_text: str, prefer: str, base: s
 
 
 def main(argv: List[str] | None = None) -> int:
-    raw_argv = argv if argv is not None else sys.argv[1:]
+    argv = sys.argv[1:] if argv is None else argv
     parser = argparse.ArgumentParser(
         description="Merge two VS Code keybindings.json (JSONC) files while preserving comments.",
         epilog="Example: %(prog)s fileA.json fileB.json --prefer left --base right --out merged.json"
@@ -510,11 +510,11 @@ def main(argv: List[str] | None = None) -> int:
     parser.add_argument(
         '--out', type=Path, default=Path('merged-keybindings.json'), help='Output file path')
 
-    if not raw_argv:
+    if not argv:
         parser.print_help()
         return 0
 
-    args = parser.parse_args(raw_argv)
+    args = parser.parse_args(argv)
 
     try:
         left_text = args.left.read_text(encoding='utf8')
