@@ -1,0 +1,47 @@
+# Changelog
+
+All notable changes to this repository will be documented in this file.
+
+This project adheres to "Keep a Changelog" conventions. Entries are grouped by date (YYYY-mm-dd) with sections: Added, Changed, Deprecated, Removed, Fixed, Security. Each bullet references commits or files for traceability.
+
+## 2026-02-14
+
+### Added
+- Add experimental when-grouping/focal-invariant support and token-order tuning for `keybindings-sort.py` (commits ef05394, 970ab28).
+
+### Changed
+- Several checkpoints and refinements to reference data and grouping rules used by sorting and canonicalization logic (multiple checkpoint commits on 2026-02-14).
+
+## 2026-02-13
+
+### Changed
+- Add project and workspace configuration guidance; apply formatting and repository ignore rules (commits fd3b6a9, 0619d6c, d4260b6).
+- Add multiple hand-crafted reference updates to `references/` used for when-token tests (commits 866a780, aca5322).
+
+## 2026-02-12
+
+### Changed
+- Remove sleep and fix race conditions in test/dev helpers; checkpoint reference updates (commits 352a624, ebd475f, 3404625).
+
+## 2026-02-11
+
+### Added
+- Add reference datasets and generated corpus improvements used for sorting and testing (`references/`, `bin/keybindings-corpus.py`) (commits 6a261ac, c33bff9, db9c3e9).
+- Add initial visual overview and examples (commits 6d7a6b4, c3ca052).
+
+### Changed
+- Numerous test/reference additions for EXTRA_WHENS and focus/visibility variants to improve sort correctness (commits f493914, 3615f66, d2bb7a06).
+
+## 2026-02-10
+
+### Added
+- Add primary CLI tools: `bin/keybindings-sort.py`, `bin/keybindings-merge.py`, `bin/keybindings-remove.py`, and supporting scripts for JSONC handling (commits 28f248a, 1dfb5ed, 514a366, 56beb96).
+- Add `bin/keybindings-corpus.py` for deterministic generation of JSONC keybinding objects (commit c5263d1).
+
+### Changed
+- Add README/DEVELOPMENT.md updates and tooling helpers (commits ce74c7b, b1dd13f0).
+
+## 2026-02-09 and earlier
+
+### Added
+- Initial project scaffolding, license, extension metadata, and early reference material (multiple commits, see c9ecbfb, fdd356c, 20944c5).
