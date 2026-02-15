@@ -476,11 +476,9 @@ def canonicalize_when(when_val: str, mode: str = 'default') -> str:
         return ''
 
     focus_keys = {
-        'activeEditor',
         'auxiliaryBarFocus',
         'editorFocus',
         'editorTextFocus',
-        'focusedView',
         'inputFocus',
         'listFocus',
         'notificationFocus',
@@ -488,19 +486,26 @@ def canonicalize_when(when_val: str, mode: str = 'default') -> str:
         'sideBarFocus',
         'terminalFocus',
         'textInputFocus',
+        'config.workbench.sideBar.location',
+        'panel.location',
+        'panelPosition',
+    }
+    positional_prefixes = [
+        'activeEditor',
+        'activePanel',
+        'activeViewlet',
+        'focusedView',
+    ]
+    """
+        TBD: these need to be tested before being integrated, especially with the focial-invariant mode:
         'view.',
         'view.<viewId>.visible',
         'view.container.',
         'viewContainer.',
-        'webviewFindWidgetVisible',
         'workbench.panel.',
         'workbench.view.',
-    }
-    positional_prefixes = [
-        'panel.location',
-        'panelPosition',
-        'config.workbench.sideBar.location',
     ]
+    """
     visibility_keys = {
         'auxiliaryBarVisible',
         'editorVisible',
@@ -513,6 +518,7 @@ def canonicalize_when(when_val: str, mode: str = 'default') -> str:
         'terminalVisible',
         'timeline.visible',
         'view.<viewId>.visible',
+        'webviewFindWidgetVisible',
     }
 
     def left_identifier(text: str) -> str:
