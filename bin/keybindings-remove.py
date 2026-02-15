@@ -30,17 +30,7 @@ import sys
 import os
 import re
 import json
-
-def usage(prog: str | None = None) -> None:
-    """Print a concise usage message to stderr and exit with code 1."""
-    if prog is None:
-        prog = os.path.basename(sys.argv[0])
-    msg = (
-        f"Usage: {prog} <attribute> <search_string>\n\n"
-        "Options:\n  -h, --help    Show this usage message and exit\n"
-    )
-    print(msg, file=sys.stderr)
-    sys.exit(1)
+import argparse
 
 def extract_preamble_postamble(text):
     """
@@ -248,13 +238,21 @@ def should_remove(obj_text, attr, val):
             print(f"DEBUG: failed to parse object text: {obj_str}", file=sys.stderr)
         return False
 
-def main():
-    prog = os.path.basename(sys.argv[0])
-    if any(arg in ('-h', '--help') for arg in sys.argv[1:]):
-        usage(prog)
-    if len(sys.argv) != 3:
-        usage(prog)
-    attr, val = sys.argv[1], sys.argv[2]
+def main(argv: list | None = None) -> int:
+    argv = argv if argv is not None else sys.argv[1:]
+    parser = argparse.ArgumentParser(
+        description="Remove objects from a JSONC keybindings.json array by attribute match.",
+        epilog="Example: %(prog)s command example < keybindings.json > keybindings-noexample.json",
+    )
+    parser.add_argument('attribute', help="Attribute name to match (e.g., 'command')")
+    parser.add_argument('search_string', help='Substring to search for in the attribute value')
+    # If invoked with no arguments, show full help (same as -h/--help) and exit success.
+    if not argv:
+        parser.print_help()
+        return 0
+
+    args = parser.parse_args(argv)
+    attr, val = args.attribute, args.search_string
     raw = sys.stdin.read()
     preamble, array_text, postamble = extract_preamble_postamble(raw)
     units = split_units(array_text)
@@ -273,4 +271,4 @@ def main():
         sys.stdout.write('\n')
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
