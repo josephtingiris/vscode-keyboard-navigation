@@ -821,54 +821,12 @@ def object_has_trailing_comma(obj_text: str) -> bool:
             elif stripped and not stripped.startswith('//') and not stripped.startswith('/*'):
                 return False
     return False
-
-
-def usage(prog: str | None = None, note: str | None = None, exit_code: int = 1) -> None:
-    """Print usage and exit.
-
-    Args:
-        prog: program name to show in usage header. If None, derive from argv.
-        note: optional note or error message to display beneath the usage text.
-        exit_code: exit code to terminate with (non-zero for errors).
-    """
-    if prog is None:
-        prog = sys.argv[0].split('/')[-1]
-    import shutil
-    import textwrap
-
-    usage_text = f"""
-Usage: {prog} [--primary {{key,when}}] [--when-grouping {{default,focal-invariant}}] [--group-sorting {{alpha,beta,natural,negative,positive}}] < keybindings.json
-
-Options:
-  --primary, -p {{key,when}}                                               Primary sort field (default: key)
-  --secondary, -s {{key,when}}                                             Secondary sort field (optional)
-  --when-grouping, -w {{default,focal-invariant}}                          When grouping mode: built-in group/rank modes for when tokens (default: default)
-  --group-sorting, -g {{alpha,beta,natural,negative,positive}}             Group sorting mode: how-to sort within the when token grouping(s) (default: alpha)
-  -h, --help                                                             Show this usage message and exit
-"""
-    print(usage_text, file=sys.stderr)
-    if note:
-        # Keep note visually part of the usage output
-        print(f"\nError: {note}", file=sys.stderr)
-    sys.exit(exit_code)
-
-
-class CustomArgumentParser(argparse.ArgumentParser):
-    """ArgumentParser that reports errors via the script's `usage()` helper.
-
-    This ensures a consistent usage message and allows attaching an
-    explanatory note before exiting with a non-zero status.
-    """
-    def error(self, message: str) -> None:  # override
-        usage(self.prog, note=message, exit_code=2)
-
-
-def main():
-    raw_argv = sys.argv[1:]
-    if any(a in ('-h', '--help') for a in raw_argv):
-        usage()
-    parser = CustomArgumentParser(
-        description='Sort VS Code keybindings.json by key/when')
+def main(argv: List[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    parser = argparse.ArgumentParser(
+        description='Sort VS Code keybindings.json by key/when',
+        epilog="Example: %(prog)s --primary when < keybindings.json > out.json",
+    )
     parser.add_argument('--primary', '-p', choices=['key', 'when'], default='key',
                         help="Primary sort field: 'key' (default) or 'when')")
     parser.add_argument('--secondary', '-s', choices=['key', 'when'], default=None,
@@ -879,7 +837,8 @@ def main():
     parser.add_argument('--sort-when-groups', '--mode', '-m', dest='sort_when_groups',
                         choices=['alpha', 'beta', 'natural', 'negative', 'positive'], default='alpha',
                         help="Token sorting mode (default: alpha)")
-    args = parser.parse_args()
+
+    args = parser.parse_args(argv)
 
     primary_order = args.primary
     secondary_order = args.secondary
@@ -941,7 +900,6 @@ def main():
     sys.stdout.write(trailing_comments)
     # If trailing_comments is present, ensure it ends with a newline so the
     # closing bracket appears on its own line. If no trailing_comments were
-    # object so the bracket will still be on its own line.
     # written, the previous loop already emitted a newline after the last
     if trailing_comments and not trailing_comments.endswith('\n'):
         sys.stdout.write('\n')
@@ -953,7 +911,8 @@ def main():
         sys.stdout.write(']\n' + postamble_trimmed + '\n')
     else:
         sys.stdout.write(']\n')
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
