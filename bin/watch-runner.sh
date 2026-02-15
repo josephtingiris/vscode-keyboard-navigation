@@ -43,7 +43,7 @@ aborting() {
 
 usage() {
     echo
-    echo "usage: ${0##*/} <file-to-watch> <runner-executable>"
+    echo "usage: ${0##*/} [-h|--help] <file-to-watch> <runner-executable>"
     echo
     exit 2
 }
@@ -89,5 +89,14 @@ main() {
 }
 
 DIRNAME="$(dirname "$0")"
+
+# support -h|--help anywhere on the command line
+for _arg in "$@"; do
+    case "${_arg}" in
+        -h|--help)
+            usage
+            ;;
+    esac
+done
 
 main "$@"
