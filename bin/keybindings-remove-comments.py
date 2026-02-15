@@ -29,17 +29,11 @@ from __future__ import annotations
 import re
 import sys
 import os
+import argparse
+from typing import List
 
 
-def usage(prog: str | None = None) -> None:
-    if prog is None:
-        prog = os.path.basename(sys.argv[0])
-    msg = (
-        f"Usage: {prog} < keybindings.json>\n\n"
-        "Options:\n  -h, --help    Show this usage message and exit\n"
-    )
-    print(msg, file=sys.stderr)
-    sys.exit(1)
+# usage is handled by argparse: only show help when -h/--help is provided
 
 
 def strip_comments(jsonc_string: str) -> str:
@@ -109,15 +103,22 @@ def strip_comments(jsonc_string: str) -> str:
     return no_blank_lines.strip()
 
 
-def main() -> None:
-    prog = os.path.basename(sys.argv[0])
-    if any(arg in ('-h', '--help') for arg in sys.argv[1:]):
-        usage(prog)
+def main(argv: List[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    parser = argparse.ArgumentParser(
+        description="Remove comments from JSONC read from stdin and write strict JSON to stdout.",
+        epilog="Example: %(prog)s < references/keybindings.json > tmp.json",
+    )
+
+    # no specific CLI options; argparse will print help and exit on -h/--help
+    parser.parse_args(argv)
+
     # Read from stdin and write the cleaned JSON to stdout
     jsonc_string = sys.stdin.read()
     json_string = strip_comments(jsonc_string)
     print(json_string)
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
