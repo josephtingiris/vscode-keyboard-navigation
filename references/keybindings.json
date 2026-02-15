@@ -1556,15 +1556,16 @@ Notes:
     "key": "alt+a e",
     "command": "workbench.explorer.openEditorsView.resetViewLocation",
     // "command": "workbench.view.explorer", // open and focus the (PRIMARY) ACTIVE EXPLORER viewlet
-    // "command": "alt+a e 59a7",
+    // "command": "alt+a e 19b7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (action) (chord) (primary) (gold) - open and focus the (EXPLORER) FILE viewlet
+    // (action) (chord) (primary) (gold)
+    // (action) (chord) (primary) (gold) - open and focus the (EXPLORER) FILE viewlet //  DEPRECATED (too much like alt+shift+f)
     "key": "alt+a f",
-    "command": "workbench.explorer.fileView.resetViewLocation",
+    "command": "alt+a f 19b8",
+    // "command": "workbench.explorer.fileView.resetViewLocation",
     // "command": "workbench.view.explorer",
-    // "command": "alt+a f 59a7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
@@ -1621,7 +1622,7 @@ Notes:
     // (action) (chord) (primary) (gold) - open and focus the (PRIMARY) EXTENSIONS viewlet
     "key": "alt+a x",
     "command": "workbench.view.extensions",
-    // "command": "alt+a 59a7",
+    // "command": "alt+a 19a7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
@@ -3900,6 +3901,13 @@ Notes:
     "when": "editorFocus && !panelFocus && activeEditorGroupIndex > 1 && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && multipleEditorGroups"
   },
   {
+    // (action) (chord) (primary) (gold) (catch) (fumble) - mimic vscode's default format document keybinding
+    "key": "alt+a f",
+    "command": "editor.action.formatDocument",
+    // "command": "alt+a f 59a7",
+    "when": "editorTextFocus && config.keyboardNavigation.enabled && editorHasDocumentFormattingProvider && !editorReadonly && !inCompositeEditor"
+  },
+  {
     // (negate) (neovim) (editor) (gold) (insert) (user)
     // (note) ctrl+k must be a chord for native vscode keybindings to work
     "key": "ctrl+k",
@@ -4029,13 +4037,6 @@ Notes:
     "command": "workbench.action.closeSidebar",
     // "command": "alt+a s 55a8",
     "when": "sideBarFocus && activeViewlet == 'workbench.view.search' && config.keyboardNavigation.enabled"
-  },
-  {
-    // (action) (chord) (primary) (gold) - close and unfocus the (EXPLORER) FILE viewlet
-    "key": "alt+a f",
-    "command": "workbench.action.closeSidebar",
-    // "command": "alt+a f 59a8",
-    "when": "sideBarFocus && activeViewlet == 'workbench.view.explorer' && focusedView == 'workbench.explorer.fileView' && config.keyboardNavigation.enabled"
   },
   {
     // (action) (chord) (primary) (gold) (jump) (back) - close and unfocus the (EXPLORER) OPEN EDITORS viewlet
