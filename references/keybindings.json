@@ -3663,13 +3663,6 @@ Notes:
     "when": "config.workbench.sideBar.location == 'left' && editorFocus && !panelFocus && sideBarVisible && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
   },
   {
-    // (action) (zoom) (panel) (gold) - toggle maximized panel
-    "key": "alt+a z",
-    "command": "workbench.action.toggleMaximizedPanel",
-    // "command": "alt+a z cbb4",
-    "when": "!editorFocus && panelFocus && config.keyboardNavigation.enabled"
-  },
-  {
     // (left) (juke) (editor) (gold)
     "key": "alt+,",
     "command": "workbench.action.previousEditor",
@@ -3753,10 +3746,11 @@ Notes:
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled"
   },
   {
-    // (right) (juke) (all) (gold)
-    "key": "alt+.",
-    "command": "alt+. e787",
-    "when": "!editorFocus && panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
+    // (action) (zoom) (panel) (gold) - toggle maximized panel
+    "key": "alt+a z",
+    "command": "workbench.action.toggleMaximizedPanel",
+    // "command": "alt+a z cbb4",
+    "when": "!editorFocus && panelFocus && config.keyboardNavigation.enabled"
   },
   {
     // (end) (arrow) (editor) (gold)
@@ -3779,6 +3773,12 @@ Notes:
     // "command": "workbench.action.maximizeEditorHideSidebar",
     // "command": "alt+a z fe33",
     "when": "editorFocus && !panelFocus && config.keyboardNavigation.enabled && multipleEditorGroups"
+  },
+  {
+    // (right) (juke) (all) (gold)
+    "key": "alt+.",
+    "command": "alt+. e787",
+    "when": "!editorFocus && panelFocus && config.keyboardNavigation.enabled && config.keyboardNavigation.wrap"
   },
   {
     // (left) (vi)
