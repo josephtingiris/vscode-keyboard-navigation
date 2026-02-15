@@ -98,8 +98,8 @@ Notes:
   {
     // (action) (chord) (secondary) (gold) (jump) (back) - close and unfocus the (SECONDARY) CHAT viewlet
     "key": "alt+a c",
-    "command": "workbench.action.closeAuxiliaryBar",
-    // "command": "alt+a c 6113",
+    // "command": "workbench.action.closeAuxiliaryBar",
+    "command": "alt+a c 6113",
     "when": "auxiliaryBarFocus && config.keyboardNavigation.enabled && activeAuxiliary == 'workbench.panel.chat'"
   },
   {
@@ -1640,23 +1640,16 @@ Notes:
   },
   {
     // (debug) (chord) - inspect context keys
-    "key": "alt+d alt+i",
+    "key": "alt+d alt+k",
     "command": "workbench.action.inspectContextKeys",
-    // "command": "alt+d 9912",
+    // "command": "alt+d alt+k 9912",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // (debug) (chord) - toggle keybinding logging
-    "key": "alt+d alt+k",
-    "command": "workbench.action.toggleKeybindingsLog",
-    // "command": "alt+d 9913",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // (debug) (chord) - redraw screen?
     "key": "alt+d alt+l",
-    "command": "noop",
-    // "command": "alt+d 3912",
+    "command": "workbench.action.toggleKeybindingsLog",
+    // "command": "alt+d alt+l 9913",
     "when": "config.keyboardNavigation.enabled"
   },
   {
@@ -3947,11 +3940,11 @@ Notes:
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.y && neovim.init && neovim.mode != 'insert'"
   },
   {
-    // (toggle) (user) (toggle) (copilot chat completions)
-  "key": "alt+i",
-  "command": "github.copilot.chat.completions.toggle",
-  "when": "github.copilot.activated && github.copilot.extensionUnification.activated"
-},
+    // (alt) (i) (all) (gold) (toggle) (copilot) (chat) (completions)
+    "key": "alt+i",
+    "command": "github.copilot.chat.completions.toggle",
+    "when": "github.copilot.activated && github.copilot.extensionUnification.activated"
+  },
   {
     // (action) (chord) (panel) (gold) - close and unfocus the (PANEL) PROBLEMS viewlet
     "key": "alt+a p",
