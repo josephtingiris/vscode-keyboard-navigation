@@ -25,13 +25,14 @@ Scope:
       * (action) `alt+a ...`
       * (arrow) `left down up right home end pageUp pageDown`
       * (debug) `alt+d ...`
+      * (emacs) `b n p f`
       * (chord) `alt+a ...` `alt+d ...`
       * (direction) `w a s d h j k l left right up down horizontal vertical`
       * (juke) `q e , . ; ' [ ] pageUp pageDown home end horizontal vertical`
-      * (kbm) `w a s d`
+      * (kbm) `a s w d`
       * (neovim) `alt+n ...`
       * (split) `- _ = + \ |`
-      * (vi) `h j k l
+      * (vi) `h j k l`
       * (zoom) `alt_a z` ... `alt+a alt+z` ...
   
   * Modifier order is not significant (e.g., ctrl+alt+k == alt+ctrl+k), but a canonical ordering is ctrl+shift+alt+<key>
@@ -3528,7 +3529,7 @@ Notes:
   },
   {
     "key": "shift+alt+j",
-    "command": "alt+a a 67f8",
+    "command": "shift+alt+j 67f8",
     // "command": "workbench.action.toggleActivityBarVisibility",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.activityBar.location == 'bottom'"
     //"when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap"
@@ -3908,7 +3909,7 @@ Notes:
     "when": "editorTextFocus && config.keyboardNavigation.enabled && editorHasDocumentFormattingProvider && !editorReadonly && !inCompositeEditor"
   },
   {
-    // (negate) (neovim) (editor) (gold) (insert) (user)
+    // (up) (vi) (editor) (gold) (unbind) (neovim) (insert) (user)
     // (note) ctrl+k must be a chord for native vscode keybindings to work
     "key": "ctrl+k",
     "command": "ctrl+k 43f7",
@@ -3916,21 +3917,21 @@ Notes:
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.k && neovim.init && neovim.mode == 'insert'"
   },
   {
-    // (negate) (neovim) (editor) (gold) (insert) (user)
+    // (ctrl) (y) (editor) (gold) (unbind) (neovim) (insert) (user)
     "key": "ctrl+y",
     "command": "vscode-neovim.send",
     //"command": "ctrl+y 1279",
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.y && neovim.init && neovim.mode != 'insert'"
   },
   {
-    // (negate) (neovim) (editor) (gold) (insert) (user)
+    // (ctrl) (y) (editor) (gold) (unbind) (neovim) (insert) (user)
     "key": "ctrl+y",
     "command": "ctrl+y 1277",
     // "command": "vscode-neovim.send",
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.y && neovim.init && neovim.mode == 'insert'"
   },
   {
-    // (negate) (neovim) (editor) (gold) (insert) (user) - unbind ctrl+k in normal mode to allow native vscode keybindings to work
+    // (up) (vi) (editor) (gold) (unbind) (neovim) (insert) (user) - unbind ctrl+k in normal mode to allow native vscode keybindings to work
     // (note) ctrl+k must be a chord for native vscode keybindings to work
     "key": "ctrl+k",
     "command": "-vscode-neovim.send",
@@ -3938,13 +3939,19 @@ Notes:
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.k && neovim.init && neovim.mode != 'insert'"
   },
   {
-    // (negate) (neovim) (editor) (gold) (insert) (user) - unbind ctrl+y in normal mode to allow native vscode keybindings to work
+    // (ctrl) (y) (editor) (gold) (unbind) (neovim) (insert) (user) - unbind ctrl+y in normal mode to allow native vscode keybindings to work
     // (note) ctrl+y must be a chord for native vscode keybindings to work
     "key": "ctrl+y",
     "command": "-vscode-neovim.send",
     //"command": "ctrl+y 1278",
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.y && neovim.init && neovim.mode != 'insert'"
   },
+  {
+    // (toggle) (user) (toggle) (copilot chat completions)
+  "key": "alt+i",
+  "command": "github.copilot.chat.completions.toggle",
+  "when": "github.copilot.activated && github.copilot.extensionUnification.activated"
+},
   {
     // (action) (chord) (panel) (gold) - close and unfocus the (PANEL) PROBLEMS viewlet
     "key": "alt+a p",
