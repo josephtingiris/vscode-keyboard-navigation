@@ -647,7 +647,7 @@ def canonicalize_when(when_val: str, mode: str = 'default', negation_mode: str =
                     items_with_keys.append((idx, child, (grp, neg_sort, base_key, idx, tok)))
                 items_with_keys.sort(key=lambda t: t[2])
                 sorted_children = [it[1] for it in items_with_keys]
-            # Assign sorted children and remove duplicates while preserving order
+            # assign sorted children and remove duplicates while preserving order
             unique: list[WhenNode] = []
             seen = set()
             for c in sorted_children:
