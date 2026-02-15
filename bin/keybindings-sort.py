@@ -5,7 +5,7 @@
 Sort VS Code `keybindings.json` (JSONC) while preserving comments.
 
 Usage:
-    python3 keybindings-sort.py [--primary {key,when}] [--when-grouping {default,focal-invariant}] [--group-sorting {alpha,beta,natural,negative,positive}] < keybindings.json
+    python3 keybindings-sort.py [--primary {key,when}] [--secondary {key,when}] [--when-grouping {default,focal-invariant}] [--group-sorting {alpha,beta,natural,negative,positive}] < keybindings.json
 
 Examples:
     python3 bin/keybindings-sort.py < keybindings.json > keybindings.sorted.by_key.json
@@ -831,19 +831,19 @@ def main(argv: List[str] | None = None) -> int:
                         help="Primary sort field: 'key' (default) or 'when')")
     parser.add_argument('--secondary', '-s', choices=['key', 'when'], default=None,
                         help="Secondary sort field: 'key' or 'when' (optional)")
-    parser.add_argument('--when-groups', '--tertiary', '-g', '-t', dest='when_groups',
+    parser.add_argument('--when-grouping', '-w', dest='when_grouping',
                         choices=['default', 'focal-invariant'], default='default',
                         help="When grouping mode: how to group/rank top-level when tokens")
-    parser.add_argument('--sort-when-groups', '--mode', '-m', dest='sort_when_groups',
+    parser.add_argument('--group-sorting', '-g', dest='group_sorting',
                         choices=['alpha', 'beta', 'natural', 'negative', 'positive'], default='alpha',
-                        help="Token sorting mode (default: alpha)")
+                        help="Group sorting mode: how to sort tokens within when groups (default: alpha)")
 
     args = parser.parse_args(argv)
 
     primary_order = args.primary
     secondary_order = args.secondary
-    tertiary_mode = args.when_groups
-    negation_mode = args.sort_when_groups
+    tertiary_mode = args.when_grouping
+    negation_mode = args.group_sorting
     # Always normalize `when` clauses so sub-clauses are deduped and grouped
     # consistently before any sorting.
     normalize_when = True
