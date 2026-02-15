@@ -38,10 +38,12 @@ from collections import OrderedDict
 
 # ---- Python version check ----
 if sys.version_info < (3, 7):
-    sys.stderr.write("Error: this script requires Python 3.7 or newer. Please upgrade your Python installation.\n")
+    sys.stderr.write(
+        "Error: this script requires Python 3.7 or newer. Please upgrade your Python installation.\n")
     sys.exit(2)
 
 # ---- Helpers: robust scanning that respects strings and comments ----
+
 
 def find_top_level_array_bounds(text: str) -> Tuple[int, int]:
     """
@@ -108,7 +110,8 @@ def find_top_level_array_bounds(text: str) -> Tuple[int, int]:
         i += 1
 
     if first_bracket == -1:
-        raise ValueError("No top-level '[' found in file (is this a keybindings.json array?)")
+        raise ValueError(
+            "No top-level '[' found in file (is this a keybindings.json array?)")
 
     # find matching ]
     while i < n:
@@ -157,6 +160,7 @@ def find_top_level_array_bounds(text: str) -> Tuple[int, int]:
         i += 1
 
     raise ValueError("Matching ']' for top-level '[' not found")
+
 
 def split_top_level_array_items(array_inner: str) -> List[str]:
     """
@@ -246,6 +250,7 @@ def split_top_level_array_items(array_inner: str) -> List[str]:
 # NOTE: these functions are used only to produce a parseable JSON string for json.loads.
 # They DO NOT alter the original raw item text that will be preserved in the final output.
 
+
 def remove_comments_from_string(s: str) -> str:
     """Remove // and /* */ comments while respecting quoted strings."""
     out_chars: List[str] = []
@@ -302,6 +307,7 @@ def remove_comments_from_string(s: str) -> str:
         i += 1
     return ''.join(out_chars)
 
+
 def remove_trailing_commas(s: str) -> str:
     """
     Remove trailing commas before } or ] at the same syntactic level.
@@ -313,7 +319,8 @@ def remove_trailing_commas(s: str) -> str:
     in_string = False
     string_char = ''
     esc = False
-    stack: List[str] = []  # track { and [ for nesting, to know when comma is trailing
+    # track { and [ for nesting, to know when comma is trailing
+    stack: List[str] = []
     while i < n:
         ch = s[i]
         if in_string:
@@ -354,6 +361,7 @@ def remove_trailing_commas(s: str) -> str:
         i += 1
     return ''.join(out_chars)
 
+
 def parse_item_to_object(item_raw: str) -> Any:
     """
     Try to parse an item (which is raw JSONC text for an object).
@@ -369,6 +377,7 @@ def parse_item_to_object(item_raw: str) -> Any:
 
 # ---- Merge logic preserving raw item text ----
 
+
 def make_key_from_obj(obj: Any) -> str:
     # only objects (dict) are expected; for non-dict return a synthetic key
     if isinstance(obj, dict):
@@ -376,6 +385,7 @@ def make_key_from_obj(obj: Any) -> str:
         when = obj.get('when', '') or ''
         return f"{key}|{when}"
     return "__NON_OBJECT__"
+
 
 def merge_keybinding_files(left_text: str, right_text: str, prefer: str, base: str = 'left') -> Tuple[str, List[str]]:
     """
@@ -425,7 +435,8 @@ def merge_keybinding_files(left_text: str, right_text: str, prefer: str, base: s
             # preserve raw but mark as unparsable; give it a unique key so we don't try to dedupe it
             synthetic = f"__LEFT_UNPARSED_{idx}__"
             mapping[synthetic] = raw
-            warnings.append(f"Warning: left file item #{idx} could not be parsed as JSON: {e}")
+            warnings.append(
+                f"Warning: left file item #{idx} could not be parsed as JSON: {e}")
 
     # process right items
     for idx, raw in enumerate(right_items_raw):
@@ -455,7 +466,8 @@ def merge_keybinding_files(left_text: str, right_text: str, prefer: str, base: s
         except Exception as e:
             synthetic = f"__RIGHT_UNPARSED_{idx}__"
             mapping[synthetic] = raw
-            warnings.append(f"Warning: right file item #{idx} could not be parsed as JSON: {e}")
+            warnings.append(
+                f"Warning: right file item #{idx} could not be parsed as JSON: {e}")
 
     # Build final text using chosen base's wrapper (prefix/suffix)
     if base == 'left':
@@ -480,33 +492,29 @@ def merge_keybinding_files(left_text: str, right_text: str, prefer: str, base: s
     merged_text = prefix + merged_inner + suffix
     return merged_text, warnings
 
-# ---- CLI ----
-
-def usage(prog: str | None = None) -> None:
-    if prog is None:
-        prog = sys.argv[0].split('/')[-1]
-    msg = (
-        f"Usage: {prog} left.json right.json [--prefer left|right] [--base left|right] [--out merged.json]\n\n"
-        "Options:\n  --prefer left|right   Which file wins on duplicate key+when (default: right)\n"
-        "  --base left|right     Which file supplies the wrapper/prefix/suffix (default: left)\n"
-        "  --out PATH            Output file path (default: merged-keybindings.json)\n"
-        "  -h, --help            Show this usage message and exit\n"
-    )
-    print(msg, file=sys.stderr)
-    sys.exit(1)
-
 
 def main(argv: List[str] | None = None) -> int:
     raw_argv = argv if argv is not None else sys.argv[1:]
-    if any(a in ('-h', '--help') for a in raw_argv):
-        usage()
-    parser = argparse.ArgumentParser(description="Merge two VS Code keybindings.json (JSONC) files while preserving comments.")
-    parser.add_argument('left', type=Path, help='Left keybindings file (e.g., fileA.json)')
-    parser.add_argument('right', type=Path, help='Right keybindings file (e.g., fileB.json)')
-    parser.add_argument('--prefer', choices=['left', 'right'], default='right', help='Which file wins on duplicate key+when (default: right)')
-    parser.add_argument('--base', choices=['left', 'right'], default='left', help='Which file supplies the surrounding wrapper/prefix/suffix (default: left)')
-    parser.add_argument('--out', type=Path, default=Path('merged-keybindings.json'), help='Output file path')
-    args = parser.parse_args(argv)
+    parser = argparse.ArgumentParser(
+        description="Merge two VS Code keybindings.json (JSONC) files while preserving comments.",
+        epilog="Example: %(prog)s fileA.json fileB.json --prefer left --base right --out merged.json"
+    )
+    parser.add_argument('left', type=Path,
+                        help='Left keybindings file (e.g., fileA.json)')
+    parser.add_argument('right', type=Path,
+                        help='Right keybindings file (e.g., fileB.json)')
+    parser.add_argument('--prefer', choices=['left', 'right'], default='right',
+                        help='Which file wins on duplicate key+when (default: right)')
+    parser.add_argument('--base', choices=['left', 'right'], default='left',
+                        help='Which file supplies the surrounding wrapper/prefix/suffix (default: left)')
+    parser.add_argument(
+        '--out', type=Path, default=Path('merged-keybindings.json'), help='Output file path')
+
+    if not raw_argv:
+        parser.print_help()
+        return 0
+
+    args = parser.parse_args(raw_argv)
 
     try:
         left_text = args.left.read_text(encoding='utf8')
@@ -520,7 +528,8 @@ def main(argv: List[str] | None = None) -> int:
         return 2
 
     try:
-        merged_text, warnings = merge_keybinding_files(left_text, right_text, args.prefer, base=args.base)
+        merged_text, warnings = merge_keybinding_files(
+            left_text, right_text, args.prefer, base=args.base)
     except Exception as e:
         sys.stderr.write(f"Error merging files: {e}\n")
         return 2
@@ -533,7 +542,8 @@ def main(argv: List[str] | None = None) -> int:
 
     # Print summary
     print(f"Merged '{args.left}' + '{args.right}' -> '{args.out}'")
-    print(f"Preference on duplicate key+when: {args.prefer}; base wrapper: {args.base}")
+    print(
+        f"Preference on duplicate key+when: {args.prefer}; base wrapper: {args.base}")
     if warnings:
         print("Warnings:")
         for w in warnings:
@@ -541,6 +551,7 @@ def main(argv: List[str] | None = None) -> int:
     else:
         print("No parse warnings.")
     return 0
+
 
 if __name__ == '__main__':
     raise SystemExit(main())
