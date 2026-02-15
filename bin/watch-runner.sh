@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#
+#  (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+#
 # -----------------------------------------------------------------------------
 # watch-runner.sh — execute a command when a file changes
 #
@@ -29,8 +32,6 @@
 #   1   Signal/interrupt or other runtime error
 #   2   Usage / bad args
 #
-# Author:
-#   (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
 # -----------------------------------------------------------------------------
 
 WATCH=""
