@@ -485,9 +485,7 @@ def parse_when(expr: str) -> WhenNode:
 
 def canonicalize_when(when_val: str, mode: str = 'default', negation_mode: str = 'alpha') -> str:
     """
-    Produce a canonical string for a `when` clause by sorting operands inside
-    every AND node according to project conventions. Preserves OR groupings and
-    existing parentheses; does not reorder OR-level operands.
+    Produce a canonical string for a `when` clause by sorting operands inside every AND node according to project conventions. Preserves OR groupings and existing parentheses; does not reorder OR-level operands.
     """
     if not when_val:
         return ''
@@ -503,15 +501,16 @@ def canonicalize_when(when_val: str, mode: str = 'default', negation_mode: str =
         'sideBarFocus',
         'terminalFocus',
         'textInputFocus',
-        'config.workbench.sideBar.location',
-        'panel.location',
-        'panelPosition',
     }
     positional_prefixes = [
+        'activeAuxiliary',
         'activeEditor',
         'activePanel',
         'activeViewlet',
+        'config.workbench.sideBar.location',
         'focusedView',
+        'panel.location',
+        'panelPosition',
     ]
     """
         TBD: these need to be tested before being integrated, especially with the focal-invariant mode:
@@ -644,7 +643,8 @@ def canonicalize_when(when_val: str, mode: str = 'default', negation_mode: str =
                         neg_sort = 0 if is_neg else 1
                     else:
                         neg_sort = 0
-                    items_with_keys.append((idx, child, (grp, base_key, neg_sort, idx, tok)))
+                    # prioritize negation flag before base key
+                    items_with_keys.append((idx, child, (grp, neg_sort, base_key, idx, tok)))
                 items_with_keys.sort(key=lambda t: t[2])
                 sorted_children = [it[1] for it in items_with_keys]
             # Assign sorted children and remove duplicates while preserving order
