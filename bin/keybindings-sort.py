@@ -823,7 +823,14 @@ def object_has_trailing_comma(obj_text: str) -> bool:
     return False
 
 
-def usage(prog: str | None = None) -> None:
+def usage(prog: str | None = None, note: str | None = None, exit_code: int = 1) -> None:
+    """Print usage and exit.
+
+    Args:
+        prog: program name to show in usage header. If None, derive from argv.
+        note: optional note or error message to display beneath the usage text.
+        exit_code: exit code to terminate with (non-zero for errors).
+    """
     if prog is None:
         prog = sys.argv[0].split('/')[-1]
     import shutil
@@ -840,14 +847,27 @@ Options:
   -h, --help                                                             Show this usage message and exit
 """
     print(usage_text, file=sys.stderr)
-    sys.exit(1)
+    if note:
+        # Keep note visually part of the usage output
+        print(f"\nError: {note}", file=sys.stderr)
+    sys.exit(exit_code)
+
+
+class CustomArgumentParser(argparse.ArgumentParser):
+    """ArgumentParser that reports errors via the script's `usage()` helper.
+
+    This ensures a consistent usage message and allows attaching an
+    explanatory note before exiting with a non-zero status.
+    """
+    def error(self, message: str) -> None:  # override
+        usage(self.prog, note=message, exit_code=2)
 
 
 def main():
     raw_argv = sys.argv[1:]
     if any(a in ('-h', '--help') for a in raw_argv):
         usage()
-    parser = argparse.ArgumentParser(
+    parser = CustomArgumentParser(
         description='Sort VS Code keybindings.json by key/when')
     parser.add_argument('--primary', '-p', choices=['key', 'when'], default='key',
                         help="Primary sort field: 'key' (default) or 'when')")
