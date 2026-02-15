@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
 Remove comments from JSONC read from stdin and write strict JSON to stdout.
 
 Usage:
@@ -9,10 +11,8 @@ Examples:
     ./bin/keybindings-remove-comments.py < references/keybindings.json > tmp.json
 
 Behavior:
-    - Removes single-line `//` and block `/* ... */` comments while respecting
-      quoted string literals.
-    - Preserves line breaks for most single-line comments; strips block
-      comments using a non-greedy DOTALL approach.
+    - Removes single-line `//` and block `/* ... */` comments while respecting quoted string literals.
+    - Preserves line breaks for most single-line comments; strips block comments using a non-greedy DOTALL approach.
     - Prints cleaned JSON to stdout; does not modify input files.
 
 Inputs / Outputs:
@@ -24,9 +24,6 @@ Exit codes:
     1   Usage / bad args
     2   File read/write or other runtime error
 """
-
-# (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
-
 from __future__ import annotations
 
 import re

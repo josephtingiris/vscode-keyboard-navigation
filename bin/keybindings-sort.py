@@ -1,26 +1,46 @@
 #!/usr/bin/env python3
 """
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
 Sort VS Code `keybindings.json` (JSONC) while preserving comments.
 
 Usage:
-    python3 bin/keybindings-sort.py [--primary {key,when}] < keybindings.json
+    python3 keybindings-sort.py [--primary {key,when}] [--when-grouping {default,focal-invariant}] [--group-sorting {alpha,beta,natural,negative,positive}] < keybindings.json
 
 Examples:
-    python3 bin/keybindings-sort.py < keybindings.json > keybindings.sorted.json
+    python3 bin/keybindings-sort.py < keybindings.json > keybindings.sorted.by_key.json
     python3 bin/keybindings-sort.py --primary when < keybindings.json > keybindings.sorted.by_when.json
 
 Options:
-    --primary, -p {key,when}   Primary sort field (default: key)
-    --secondary, -s {key,when} Secondary sort field (optional)
-    -h, --help                 Show this help and exit
+    --primary, -p {key,when}                                               Primary sort field (default: key)
+    --secondary, -s {key,when}                                             Secondary sort field (optional)
+    --when-grouping, -w {default,focal-invariant}                          When grouping mode: built-in group/rank modes for when tokens (default: default)
+    --group-sorting, -g {alpha,beta,natural,negative,positive}             Group sorting mode: how-to sort within the when token grouping(s) (default: alpha)
+    -h, --help                                                             Show this usage message and exit
 
 Behavior:
-    - Preserves comments and surrounding formatting before/after the top-level
-      array and inside each object.
-    - Sorts by `key` (natural order) and `when` specificity (broad to specific)
-      by default; `--primary when` makes `when` the primary sort key.
-    - Attempts to preserve trailing commas and annotates exact duplicates
-      with a trailing `// DUPLICATE` comment.
+    - Predictably and purposefully sorts entries in a VS Code `keybindings.json` while preserving comments and surrounding formatting.
+
+    Sorting Overview
+        - Default: Sort by `key` (natural, numeric-aware order).
+        - Primary `when`: Use `--primary when` to make `when` the primary sort key; objects are grouped by the first top-level token of the canonicalized `when` and then ordered by `when`-specificity and `key`.
+        - Group sorting option: `--group-sorting` controls token ordering inside canonicalized `when` clauses (modes: `alpha`, `natural`, `positive`, `negative`, `beta`).
+
+    `when` Handling (High Level)
+        1) Canonicalize: Parse and normalize each `when` expression into an AST, flatten safe AND operands, and remove exact duplicate operands.
+        2) Group: Assign every operand to a stable semantic bucket according to `--when-grouping` (examples: `config.*`, positional, focus, visibility, other). Grouping decides which classes of tokens appear before others.
+        3) Sort within groups: Within each bucket, order operands using the comparator chosen by `--group-sorting`. Sorting only reorders operands inside their group and never moves an operand into a different group.
+        4) Render: Reassemble the canonical `when` string, preserving OR structure and parentheses.
+
+    Trailing Commas & Duplicates
+        - Preserve commas: Attempts to preserve trailing commas where present.
+        - Annotate duplicates: Exact duplicate key/`when` pairs receive a trailing `// DUPLICATE` comment.
+        - Duplicate removal rule: Removes exact duplicate operands by rendered-string match; `a` and `!a` are treated as different tokens.
+
+    Additional Details
+        - Stability: Grouping is stable; operands never move between groups during sorting.
+        - Duplicate semantics: Duplicates are determined by exact rendered-string equality.
+        - Formatting preservation: Preserves comments and surrounding formatting before/after the top-level array and inside each object.
 
 Inputs / Outputs:
     stdin:  JSONC text (keybindings array)
@@ -31,9 +51,6 @@ Exit codes:
     1   Usage / bad args
     2   File read/write or other runtime error
 """
-
-# (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
-
 import sys
 import re
 import json
@@ -466,7 +483,7 @@ def parse_when(expr: str) -> WhenNode:
     return parse_or()
 
 
-def canonicalize_when(when_val: str, mode: str = 'default') -> str:
+def canonicalize_when(when_val: str, mode: str = 'default', negation_mode: str = 'alpha') -> str:
     """
     Produce a canonical string for a `when` clause by sorting operands inside
     every AND node according to project conventions. Preserves OR groupings and
@@ -497,7 +514,7 @@ def canonicalize_when(when_val: str, mode: str = 'default') -> str:
         'focusedView',
     ]
     """
-        TBD: these need to be tested before being integrated, especially with the focial-invariant mode:
+        TBD: these need to be tested before being integrated, especially with the focal-invariant mode:
         'view.',
         'view.<viewId>.visible',
         'view.container.',
@@ -573,7 +590,12 @@ def canonicalize_when(when_val: str, mode: str = 'default') -> str:
     def sort_key(idx_and_node):
         idx, node = idx_and_node
         token = render_when_node(node)
+        # strip leading '!' for ordering token but keep for grouping rank
         order_token = token[1:] if token.startswith('!') else token
+        # Default alpha behavior: preserve group_rank and use natural-sensitive ordering
+        if negation_mode == 'alpha':
+            return (group_rank(token), natural_key_case_sensitive(order_token), idx)
+        # For other modes we'll not use this sort_key; they use alternate sorting below
         return (group_rank(token), natural_key_case_sensitive(order_token), idx)
 
     def sort_and_nodes(node: WhenNode):
@@ -581,9 +603,51 @@ def canonicalize_when(when_val: str, mode: str = 'default') -> str:
             for child in node.children:
                 sort_and_nodes(child)
             items = list(enumerate(node.children))
-            items.sort(key=sort_key)
+            # Normalize 'beta' as alias to positive for experimental use
+            if negation_mode == 'beta':
+                nm = 'positive'
+            else:
+                nm = negation_mode
+            # alpha: use existing group-aware sort_key
+            if negation_mode == 'alpha':
+                items.sort(key=sort_key)
+                sorted_children = [it[1] for it in items]
+            else:
+                # For natural/positive/negative/beta: sort by rendered token base
+                def render_base_and_flag(child):
+                    tok = render_when_node(child)
+                    base = tok.strip()
+                    # strip surrounding parentheses
+                    while base.startswith('(') and base.endswith(')'):
+                        base = base[1:-1].strip()
+                    is_neg = base.startswith('!')
+                    if is_neg:
+                        base = base[1:].lstrip()
+                    return base, is_neg, tok
+
+                items_with_keys = []
+                for idx, child in items:
+                    base, is_neg, tok = render_base_and_flag(child)
+                    # natural-style comparison: use natural_key (case-insensitive)
+                    base_key = natural_key(base)
+                    # Always preserve grouping as the primary key so sorting
+                    # does not move operands between buckets.
+                    grp = group_rank(tok)
+                    # natural mode: ignore negation and sort by group then base_key
+                    if nm == 'natural':
+                        items_with_keys.append((idx, child, (grp, base_key, idx, tok)))
+                        continue
+                    # positive/negative: prefer positives or negatives accordingly
+                    if nm == 'positive':
+                        neg_sort = 0 if not is_neg else 1
+                    elif nm == 'negative':
+                        neg_sort = 0 if is_neg else 1
+                    else:
+                        neg_sort = 0
+                    items_with_keys.append((idx, child, (grp, base_key, neg_sort, idx, tok)))
+                items_with_keys.sort(key=lambda t: t[2])
+                sorted_children = [it[1] for it in items_with_keys]
             # Assign sorted children and remove duplicates while preserving order
-            sorted_children = [it[1] for it in items]
             unique: list[WhenNode] = []
             seen = set()
             for c in sorted_children:
@@ -614,15 +678,15 @@ def canonicalize_when(when_val: str, mode: str = 'default') -> str:
     return render_when_node(ast)
 
 
-def sortable_when_key(when_val: str, mode: str = 'default') -> str:
+def sortable_when_key(when_val: str, mode: str = 'default', negation_mode: str = 'alpha') -> str:
     if not when_val:
         return ''
     # Preserve negation for sorting to avoid unstable ordering when
     # otherwise-identical clauses differ only by '!'.
-    return canonicalize_when(when_val, mode=mode)
+    return canonicalize_when(when_val, mode=mode, negation_mode=negation_mode)
 
 
-def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None = None, tertiary: str = 'default') -> Tuple:
+def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None = None, tertiary: str = 'default', negation_mode: str = 'alpha') -> Tuple:
     obj_match = re.search(r'\{.*\}', obj_text, re.DOTALL)
     if not obj_match:
         return ([], '', '')
@@ -633,8 +697,8 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         obj = json.loads(clean)
         key_val = str(obj.get('key', ''))
         when_val = str(obj.get('when', ''))
-        canonical_when = canonicalize_when(when_val, mode=tertiary)
-        sortable_when = sortable_when_key(when_val, mode=tertiary)
+        canonical_when = canonicalize_when(when_val, mode=tertiary, negation_mode=negation_mode)
+        sortable_when = sortable_when_key(when_val, mode=tertiary, negation_mode=negation_mode)
 
         # Derive the first top-level when token for grouping when primary sorting
         first_when_token = ''
@@ -656,9 +720,27 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
             # first top-level when token (alphabetically), then by the
             # when specificity, and then by the canonicalized when string.
             if primary == 'when':
-                keys.append(natural_key_case_sensitive(first_when_token))
-                keys.append(when_specificity(when_val))
-                keys.append(natural_key_case_sensitive(sortable_when))
+                # Build a mode-aware tertiary key for the canonical when.
+                first_key = natural_key_case_sensitive(first_when_token)
+                spec_key = when_specificity(when_val)
+                if negation_mode == 'alpha':
+                    tert = natural_key_case_sensitive(sortable_when)
+                elif negation_mode == 'natural':
+                    base = sortable_when.lstrip('!')
+                    tert = natural_key(base)
+                elif negation_mode in ('positive', 'beta'):
+                    is_neg = 1 if sortable_when.startswith('!') else 0
+                    base = sortable_when.lstrip('!')
+                    tert = (is_neg, natural_key(base))
+                elif negation_mode == 'negative':
+                    is_neg = 0 if sortable_when.startswith('!') else 1
+                    base = sortable_when.lstrip('!')
+                    tert = (is_neg, natural_key(base))
+                else:
+                    tert = natural_key_case_sensitive(sortable_when)
+                keys.append(first_key)
+                keys.append(spec_key)
+                keys.append(tert)
                 return
             # Default append behavior when not primary
             keys.append(when_specificity(when_val))
@@ -691,7 +773,7 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         return ([], '', '')
 
 
-def normalize_when_in_object(obj_text: str, mode: str = 'default') -> Tuple[str, bool]:
+def normalize_when_in_object(obj_text: str, mode: str = 'default', negation_mode: str = 'alpha') -> Tuple[str, bool]:
     pattern = re.compile(r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")')
     match = pattern.search(obj_text)
     if not match:
@@ -699,7 +781,7 @@ def normalize_when_in_object(obj_text: str, mode: str = 'default') -> Tuple[str,
     original_when = match.group(2)
     # Use caller-provided mode (defaults to 'default') so normalization
     # can match sorting behavior when requested.
-    normalized = canonicalize_when(original_when, mode=mode)
+    normalized = canonicalize_when(original_when, mode=mode, negation_mode=negation_mode)
     if normalized == original_when:
         return obj_text, False
     new_obj = obj_text[:match.start(2)] + normalized + obj_text[match.end(2):]
@@ -747,45 +829,17 @@ def usage(prog: str | None = None) -> None:
     import shutil
     import textwrap
 
-    term_width = shutil.get_terminal_size((80, 20)).columns
+    usage_text = f"""
+Usage: {prog} [--primary {{key,when}}] [--when-grouping {{default,focal-invariant}}] [--group-sorting {{alpha,beta,natural,negative,positive}}] < keybindings.json
 
-    usage_line = f"Usage: {prog} [--primary {{key,when}}] [--secondary {{key,when}}] [--tertiary {{default,focal-invariant}}] < keybindings.json"
-
-    opts = [
-        ("--primary, -p", "{key,when}", "Primary sort field (default: key)"),
-        ("--secondary, -s", "{key,when}", "Secondary sort field (optional)"),
-        ("--tertiary, -t", "{default,focal-invariant}",
-         "Tertiary when-grouping mode (default: default)"),
-        ("-h, --help", "", "Show this usage message and exit"),
-    ]
-
-    # Build two justified columns: (1) option + argument, (2) description.
-    left_items = [f"  {name} {arg}".rstrip() for name, arg, _ in opts]
-    max_left = max(len(it) for it in left_items) if left_items else 0
-    # Add two spaces between left and description columns
-    desc_col = max_left + 2
-    lines = [usage_line, "", "Options:"]
-
-    for (name, arg, desc), left_base in zip(opts, left_items):
-        left = left_base.ljust(max_left)
-        wrap_width = term_width - desc_col
-        if wrap_width < 20:
-            # Terminal too narrow: place description on next indented line
-            lines.append(left)
-            indent = ' ' * desc_col
-            wrapped = textwrap.fill(desc, width=max(
-                20, term_width - desc_col), initial_indent=indent, subsequent_indent=indent)
-            lines.append(wrapped)
-        else:
-            wrapped_lines = textwrap.wrap(desc, width=wrap_width)
-            if wrapped_lines:
-                lines.append(f"{left}{'  '}{wrapped_lines[0]}")
-                for rem in wrapped_lines[1:]:
-                    lines.append(' ' * desc_col + rem)
-            else:
-                lines.append(left)
-
-    print("\n".join(lines), file=sys.stderr)
+Options:
+  --primary, -p {{key,when}}                                               Primary sort field (default: key)
+  --secondary, -s {{key,when}}                                             Secondary sort field (optional)
+  --when-grouping, -w {{default,focal-invariant}}                          When grouping mode: built-in group/rank modes for when tokens (default: default)
+  --group-sorting, -g {{alpha,beta,natural,negative,positive}}             Group sorting mode: how-to sort within the when token grouping(s) (default: alpha)
+  -h, --help                                                             Show this usage message and exit
+"""
+    print(usage_text, file=sys.stderr)
     sys.exit(1)
 
 
@@ -799,13 +853,18 @@ def main():
                         help="Primary sort field: 'key' (default) or 'when')")
     parser.add_argument('--secondary', '-s', choices=['key', 'when'], default=None,
                         help="Secondary sort field: 'key' or 'when' (optional)")
-    parser.add_argument('--tertiary', '-t', choices=['default', 'focal-invariant'], default='default',
-                        help="Tertiary when-grouping mode: 'default' (default) or 'focal-invariant'")
+    parser.add_argument('--when-groups', '--tertiary', '-g', '-t', dest='when_groups',
+                        choices=['default', 'focal-invariant'], default='default',
+                        help="When grouping mode: how to group/rank top-level when tokens")
+    parser.add_argument('--sort-when-groups', '--mode', '-m', dest='sort_when_groups',
+                        choices=['alpha', 'beta', 'natural', 'negative', 'positive'], default='alpha',
+                        help="Token sorting mode (default: alpha)")
     args = parser.parse_args()
 
     primary_order = args.primary
     secondary_order = args.secondary
-    tertiary_mode = args.tertiary
+    tertiary_mode = args.when_groups
+    negation_mode = args.sort_when_groups
     # Always normalize `when` clauses so sub-clauses are deduped and grouped
     # consistently before any sorting.
     normalize_when = True
@@ -820,7 +879,7 @@ def main():
         when_changed = False
         if normalize_when:
             obj_out, when_changed = normalize_when_in_object(
-                obj_out, mode=tertiary_mode)
+                obj_out, mode=tertiary_mode, negation_mode=negation_mode)
             if when_changed:
                 comments = re.sub(r'^\s*//\s*when-sorted:.*\n',
                                   '', comments, flags=re.MULTILINE)
@@ -828,7 +887,7 @@ def main():
 
     # Sort by chosen primary (natural), then the other field (natural), then by _comment
     sorted_groups = sorted(normalized_groups, key=lambda pair: extract_sort_keys(
-        pair[1], primary=primary_order, secondary=secondary_order, tertiary=tertiary_mode))
+        pair[1], primary=primary_order, secondary=secondary_order, tertiary=tertiary_mode, negation_mode=negation_mode))
     seen = set()
     sys.stdout.write(preamble)
     # Ensure the opening bracket is on its own line
@@ -837,7 +896,7 @@ def main():
         is_last = (i == len(sorted_groups) - 1)
         obj_out = obj.rstrip()
         key_val, when_val = extract_key_when(obj_out)
-        canonical_when = canonicalize_when(when_val, mode=tertiary_mode)
+        canonical_when = canonicalize_when(when_val, mode=tertiary_mode, negation_mode=negation_mode)
         pair_id = (key_val, canonical_when)
         # Annotate if duplicate
         if pair_id in seen:

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Generate a deterministic JSONC array of keybinding objects used as a structural
-baseline for keyboard-navigation development, debugging, and testing.
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
+Generate a deterministic JSONC array of keybinding objects used as a structural baseline for keyboard-navigation development, debugging, and testing.
 
 Usage:
     ./bin/keybindings-corpus.py
@@ -23,9 +24,6 @@ Exit codes:
     1   Usage / bad args
     2   File read/write or other runtime error
 """
-
-# (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
-
 from __future__ import annotations
 
 import json

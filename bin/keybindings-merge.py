@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
 Merge two JSONC keybindings files while preserving comments and raw items.
 
 Usage:
@@ -12,9 +14,8 @@ Examples:
 Behavior / Notes:
     - Requires Python 3.7 or newer.
     - Does not remove or alter comments; merged output keeps original item text and spacing.
-    - Use `--prefer` to choose which file wins for duplicate key+when entries
-      (default: `right`). Use `--base` to choose which file supplies the
-      wrapper/prefix/suffix (default: `left`).
+    - Use `--prefer` to choose which file wins for duplicate key+when entries (default: `right`).
+    - Use `--base` to choose which file supplies the wrapper/prefix/suffix (default: `left`).
     - Writes output to `--out` (default: `merged-keybindings.json`).
     - Prints warnings for any items that could not be parsed.
 
@@ -27,9 +28,6 @@ Exit codes:
     1   Usage / bad args
     2   File read/write or other runtime error
 """
-
-# (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
-
 from __future__ import annotations
 import argparse
 import json

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-lint and optionally canonicalize in-object key comments in JSONC keybindings.
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
+[WIP] Lint and optionally canonicalize in-object key comments in JSONC keybindings.
 
 Usage:
     python3 bin/keybindings-lint-comments.py [path/to/keybindings.json]
@@ -15,11 +17,8 @@ Examples:
     python3 bin/keybindings-lint-comments.py --update > updated-keybindings.json
 
 Behavior:
-    - Checks that each top-level object containing a `"key"` has exactly one
-      single-line comment immediately above it and that the comment matches
-      the project's heuristic convention.
-    - `--update` emits canonicalized comment lines to stdout; the script
-      itself never writes files in-place.
+    - Checks that each top-level object containing a `"key"` has exactly one single-line comment immediately above it and that the comment matches the project's heuristic convention.
+    - `--update` emits canonicalized comment lines to stdout; the script itself never writes files in-place.
 
 Inputs / Outputs:
     path: Path to JSONC file (defaults to `references/keybindings.json`).
@@ -31,8 +30,6 @@ Exit codes:
     1   Usage / bad args
     2   File read/write or other runtime error
 """
-
-# (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
 from __future__ import annotations
 
 import argparse

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
 Remove objects from a JSONC `keybindings.json` array by attribute match.
 
 Usage:
@@ -10,13 +12,10 @@ Examples:
     python3 bin/keybindings-remove.py command example < keybindings.json > keybindings-noexample.json
 
 Behavior:
-    - Removes matching objects and correctly handles trailing commas so the
-      resulting JSONC remains syntactically valid.
-    - Preserves comments and whitespace before the opening `[` and after the
-      closing `]`, as well as comments inside and around each object.
+    - Removes matching objects and correctly handles trailing commas so the resulting JSONC remains syntactically valid.
+    - Preserves comments and whitespace before the opening `[` and after the closing `]`, as well as comments inside and around each object.
     - Prints the modified content to stdout; does not write files in-place.
-    - Set `KEYBINDINGS_REMOVE_DEBUG=1` to enable debug logging to stderr when
-      parsing or matching issues occur.
+    - Set `KEYBINDINGS_REMOVE_DEBUG=1` to enable debug logging to stderr when parsing or matching issues occur.
 
 Inputs / Outputs:
     stdin:  JSONC text (VS Code keybindings array)
@@ -27,9 +26,6 @@ Exit codes:
     1   Usage / bad args
     2   File read/write or other runtime error
 """
-
-# (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
-
 import sys
 import os
 import re
