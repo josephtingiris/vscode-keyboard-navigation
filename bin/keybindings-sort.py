@@ -5,7 +5,7 @@
 Sort VS Code `keybindings.json` (JSONC) while preserving comments.
 
 Usage:
-    python3 keybindings-sort.py [--primary {key,when}] [--secondary {key,when}] [--when-grouping {default,focal-invariant}] [--group-sorting {alpha,beta,natural,negative,positive}] < keybindings.json
+    python3 keybindings-sort.py [--primary {key,when}] [--secondary {key,when}] [--when-grouping {none,config-first,focal-invariant}] [--group-sorting {alpha,beta,natural,negative,positive}] < keybindings.json
 
 Examples:
     python3 bin/keybindings-sort.py < keybindings.json > keybindings.sorted.by_key.json
@@ -14,7 +14,7 @@ Examples:
 Options:
     --primary, -p {key,when}                                               Primary sort field (default: key)
     --secondary, -s {key,when}                                             Secondary sort field (optional)
-    --when-grouping, -w {default,focal-invariant}                          When grouping mode: built-in group/rank modes for when tokens (default: default)
+    --when-grouping, -w {none,config-first,focal-invariant}                When grouping mode: built-in group/rank modes for when tokens (default: none)
     --group-sorting, -g {alpha,beta,natural,negative,positive}             Group sorting mode: how-to sort within the when token grouping(s) (default: alpha)
     -h, --help                                                             Show this usage message and exit
 
@@ -28,7 +28,7 @@ Behavior:
 
     `when` Handling (High Level)
         1) Canonicalize: Parse and normalize each `when` expression into an AST, flatten safe AND operands, and remove exact duplicate operands.
-        2) Group: Assign every operand to a stable semantic bucket according to `--when-grouping` (examples: `config.*`, positional, focus, visibility, other). Grouping decides which classes of tokens appear before others.
+        2) Group: Assign every operand to a stable semantic bucket according to `--when-grouping` (examples: `config.*`, positional, focus, visibility, other). Grouping decides which classes of tokens appear before others. Use `none` to disable grouping.
         3) Sort within groups: Within each bucket, order operands using the comparator chosen by `--group-sorting`. Sorting only reorders operands inside their group and never moves an operand into a different group.
         4) Render: Reassemble the canonical `when` string, preserving OR structure and parentheses.
 
@@ -56,6 +56,47 @@ import re
 import json
 import argparse
 from typing import List, Tuple
+
+# Module-level canonical when-token classification sets to avoid duplication
+FOCUS_KEYS = {
+    'auxiliaryBarFocus',
+    'editorFocus',
+    'editorTextFocus',
+    'inputFocus',
+    'listFocus',
+    'notificationFocus',
+    'panelFocus',
+    'sideBarFocus',
+    'terminalFocus',
+    'textInputFocus',
+}
+
+POSITIONAL_PREFIXES = [
+    'activeAuxiliary',
+    'activeEditor',
+    'activePanel',
+    'activeViewlet',
+    'config.workbench.activityBar.location',
+    'config.workbench.sideBar.location',
+    'focusedView',
+    'panel.location',
+    'panelPosition',
+]
+
+VISIBILITY_KEYS = {
+    'auxiliaryBarVisible',
+    'editorVisible',
+    'notificationCenterVisible',
+    'notificationToastsVisible',
+    'outline.visible',
+    'panelVisible',
+    'searchViewletVisible',
+    'sideBarVisible',
+    'terminalVisible',
+    'timeline.visible',
+    'view.<viewId>.visible',
+    'webviewFindWidgetVisible',
+}
 
 
 def extract_preamble_postamble(text):
@@ -483,35 +524,12 @@ def parse_when(expr: str) -> WhenNode:
     return parse_or()
 
 
-def canonicalize_when(when_val: str, mode: str = 'default', negation_mode: str = 'alpha') -> str:
+def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha') -> str:
     """
     Produce a canonical string for a `when` clause by sorting operands inside every AND node according to project conventions. Preserves OR groupings and existing parentheses; does not reorder OR-level operands.
     """
     if not when_val:
         return ''
-
-    focus_keys = {
-        'auxiliaryBarFocus',
-        'editorFocus',
-        'editorTextFocus',
-        'inputFocus',
-        'listFocus',
-        'notificationFocus',
-        'panelFocus',
-        'sideBarFocus',
-        'terminalFocus',
-        'textInputFocus',
-    }
-    positional_prefixes = [
-        'activeAuxiliary',
-        'activeEditor',
-        'activePanel',
-        'activeViewlet',
-        'config.workbench.sideBar.location',
-        'focusedView',
-        'panel.location',
-        'panelPosition',
-    ]
     """
         TBD: these need to be tested before being integrated, especially with the focal-invariant mode:
         'view.',
@@ -522,20 +540,9 @@ def canonicalize_when(when_val: str, mode: str = 'default', negation_mode: str =
         'workbench.view.',
     ]
     """
-    visibility_keys = {
-        'auxiliaryBarVisible',
-        'editorVisible',
-        'notificationCenterVisible',
-        'notificationToastsVisible',
-        'outline.visible',
-        'panelVisible',
-        'searchViewletVisible',
-        'sideBarVisible',
-        'terminalVisible',
-        'timeline.visible',
-        'view.<viewId>.visible',
-        'webviewFindWidgetVisible',
-    }
+    focus_keys = FOCUS_KEYS
+    positional_prefixes = POSITIONAL_PREFIXES
+    visibility_keys = VISIBILITY_KEYS
 
     def left_identifier(text: str) -> str:
         t = text.strip()
@@ -563,8 +570,11 @@ def canonicalize_when(when_val: str, mode: str = 'default', negation_mode: str =
 
     def group_rank(text: str) -> int:
         left = left_identifier(text)
-        # 'default' Group order: config.* -> positional prefixes -> focus -> visibility -> other
+        # 'config-first' Group order: config.* -> positional prefixes -> focus -> visibility -> other
         # 'focal-invariant' Group order: focus -> visibility -> positional prefixes -> config.* -> other
+        # 'none' disables grouping by returning the same rank for all tokens.
+        if mode == 'none':
+            return 1
         if mode == 'focal-invariant':
             if _is_focus(left):
                 return 1
@@ -575,7 +585,7 @@ def canonicalize_when(when_val: str, mode: str = 'default', negation_mode: str =
             if left.startswith('config.'):
                 return 4
             return 5
-        # default: 'config' ordering
+        # config-first behavior
         if left.startswith('config.'):
             return 1
         if any(left.startswith(p) for p in positional_prefixes):
@@ -634,7 +644,8 @@ def canonicalize_when(when_val: str, mode: str = 'default', negation_mode: str =
                     grp = group_rank(tok)
                     # natural mode: ignore negation and sort by group then base_key
                     if nm == 'natural':
-                        items_with_keys.append((idx, child, (grp, base_key, idx, tok)))
+                        items_with_keys.append(
+                            (idx, child, (grp, base_key, idx, tok)))
                         continue
                     # positive/negative: prefer positives or negatives accordingly
                     if nm == 'positive':
@@ -644,7 +655,8 @@ def canonicalize_when(when_val: str, mode: str = 'default', negation_mode: str =
                     else:
                         neg_sort = 0
                     # prioritize negation flag before base key
-                    items_with_keys.append((idx, child, (grp, neg_sort, base_key, idx, tok)))
+                    items_with_keys.append(
+                        (idx, child, (grp, neg_sort, base_key, idx, tok)))
                 items_with_keys.sort(key=lambda t: t[2])
                 sorted_children = [it[1] for it in items_with_keys]
             # assign sorted children and remove duplicates while preserving order
@@ -678,7 +690,7 @@ def canonicalize_when(when_val: str, mode: str = 'default', negation_mode: str =
     return render_when_node(ast)
 
 
-def sortable_when_key(when_val: str, mode: str = 'default', negation_mode: str = 'alpha') -> str:
+def sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha') -> str:
     if not when_val:
         return ''
     # Preserve negation for sorting to avoid unstable ordering when
@@ -686,7 +698,7 @@ def sortable_when_key(when_val: str, mode: str = 'default', negation_mode: str =
     return canonicalize_when(when_val, mode=mode, negation_mode=negation_mode)
 
 
-def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None = None, tertiary: str = 'default', negation_mode: str = 'alpha') -> Tuple:
+def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None = None, tertiary: str = 'config-first', negation_mode: str = 'alpha') -> Tuple:
     obj_match = re.search(r'\{.*\}', obj_text, re.DOTALL)
     if not obj_match:
         return ([], '', '')
@@ -697,8 +709,10 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         obj = json.loads(clean)
         key_val = str(obj.get('key', ''))
         when_val = str(obj.get('when', ''))
-        canonical_when = canonicalize_when(when_val, mode=tertiary, negation_mode=negation_mode)
-        sortable_when = sortable_when_key(when_val, mode=tertiary, negation_mode=negation_mode)
+        canonical_when = canonicalize_when(
+            when_val, mode=tertiary, negation_mode=negation_mode)
+        sortable_when = sortable_when_key(
+            when_val, mode=tertiary, negation_mode=negation_mode)
 
         # Derive the first top-level when token for grouping when primary sorting
         first_when_token = ''
@@ -773,15 +787,16 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         return ([], '', '')
 
 
-def normalize_when_in_object(obj_text: str, mode: str = 'default', negation_mode: str = 'alpha') -> Tuple[str, bool]:
+def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alpha') -> Tuple[str, bool]:
     pattern = re.compile(r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")')
     match = pattern.search(obj_text)
     if not match:
         return obj_text, False
     original_when = match.group(2)
-    # Use caller-provided mode (defaults to 'default') so normalization
+    # Use caller-provided mode (defaults to 'config-first') so normalization
     # can match sorting behavior when requested.
-    normalized = canonicalize_when(original_when, mode=mode, negation_mode=negation_mode)
+    normalized = canonicalize_when(
+        original_when, mode=mode, negation_mode=negation_mode)
     if normalized == original_when:
         return obj_text, False
     new_obj = obj_text[:match.start(2)] + normalized + obj_text[match.end(2):]
@@ -821,6 +836,8 @@ def object_has_trailing_comma(obj_text: str) -> bool:
             elif stripped and not stripped.startswith('//') and not stripped.startswith('/*'):
                 return False
     return False
+
+
 def main(argv: List[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     parser = argparse.ArgumentParser(
@@ -831,12 +848,12 @@ def main(argv: List[str] | None = None) -> int:
                         help="Primary sort field: 'key' (default) or 'when')")
     parser.add_argument('--secondary', '-s', choices=['key', 'when'], default=None,
                         help="Secondary sort field: 'key' or 'when' (optional)")
-    parser.add_argument('--when-grouping', '-w', dest='when_grouping',
-                        choices=['default', 'focal-invariant'], default='default',
-                        help="When grouping mode: how to group/rank top-level when tokens")
     parser.add_argument('--group-sorting', '-g', dest='group_sorting',
                         choices=['alpha', 'beta', 'natural', 'negative', 'positive'], default='alpha',
                         help="Group sorting mode: how to sort tokens within when groups (default: alpha)")
+    parser.add_argument('--when-grouping', '-w', dest='when_grouping',
+                        choices=['none', 'config-first', 'focal-invariant'], default='none',
+                        help="When grouping mode: how to group/rank top-level when tokens")
 
     args = parser.parse_args(argv)
 
@@ -867,6 +884,88 @@ def main(argv: List[str] | None = None) -> int:
     # Sort by chosen primary (natural), then the other field (natural), then by _comment
     sorted_groups = sorted(normalized_groups, key=lambda pair: extract_sort_keys(
         pair[1], primary=primary_order, secondary=secondary_order, tertiary=tertiary_mode, negation_mode=negation_mode))
+
+    # Partition results by the first top-level `when` token's semantic group
+    # and emit groups in reverse rank order so the most "focused" group
+    # (rank 1 under focal-invariant) ends up at the bottom of the file.
+    def first_when_group_rank(obj_text: str, mode: str) -> int:
+        # Mirror the grouping logic used in `canonicalize_when`.
+        when_key, when_val = extract_key_when(obj_text)
+        canonical = canonicalize_when(
+            when_val, mode=mode, negation_mode=negation_mode)
+        if not canonical:
+            return 5
+        parts = re.split(r'\s*&&\s*|\s*\|\|\s*', canonical.strip())
+        if not parts:
+            return 5
+        first = parts[0].strip()
+        while first.startswith('(') and first.endswith(')'):
+            first = first[1:-1].strip()
+        if first.startswith('!'):
+            left = first[1:].lstrip()
+        else:
+            left = first
+        if not left:
+            return 5
+        left_id = left.split()[0]
+
+        focus_keys = FOCUS_KEYS
+        positional_prefixes = POSITIONAL_PREFIXES
+        visibility_keys = VISIBILITY_KEYS
+
+        def _matches_entry(left: str, entry: str) -> bool:
+            if entry.endswith('.'):
+                return left.startswith(entry)
+            if '<viewId>' in entry:
+                prefix, suffix = entry.split('<viewId>', 1)
+                return left.startswith(prefix) and left.endswith(suffix)
+            return left == entry
+
+        def _is_focus(left: str) -> bool:
+            return any(_matches_entry(left, entry) for entry in focus_keys)
+
+        def _is_visibility(left: str) -> bool:
+            return any(_matches_entry(left, entry) for entry in visibility_keys)
+
+        # Group ranking matches the logic in canonicalize_when
+        if mode == 'focal-invariant':
+            if _is_focus(left_id):
+                return 1
+            if _is_visibility(left_id):
+                return 2
+            if any(left_id.startswith(p) for p in positional_prefixes):
+                return 3
+            if left_id.startswith('config.'):
+                return 4
+            return 5
+        # default ordering
+        if left_id.startswith('config.'):
+            return 1
+        if any(left_id.startswith(p) for p in positional_prefixes):
+            return 2
+        if _is_focus(left_id):
+            return 3
+        if _is_visibility(left_id):
+            return 4
+        return 5
+
+    # If grouping is enabled, partition results by the first top-level `when`
+    # token's semantic group and emit buckets in reverse rank order so the
+    # most "focused" group ends up at the bottom. If grouping is 'none', do
+    # not repartition and keep the previously-sorted order.
+    if tertiary_mode != 'none':
+        buckets: dict[int, list] = {}
+        for pair in sorted_groups:
+            rank = first_when_group_rank(pair[1], tertiary_mode)
+            buckets.setdefault(rank, []).append(pair)
+
+        # Emit buckets in reverse rank order so lower-numbered (focus) groups
+        # end up at the bottom of the output.
+        final_groups: list = []
+        for rank in sorted(buckets.keys(), reverse=True):
+            final_groups.extend(buckets[rank])
+
+        sorted_groups = final_groups
     seen = set()
     sys.stdout.write(preamble)
     # Ensure the opening bracket is on its own line
@@ -875,7 +974,8 @@ def main(argv: List[str] | None = None) -> int:
         is_last = (i == len(sorted_groups) - 1)
         obj_out = obj.rstrip()
         key_val, when_val = extract_key_when(obj_out)
-        canonical_when = canonicalize_when(when_val, mode=tertiary_mode, negation_mode=negation_mode)
+        canonical_when = canonicalize_when(
+            when_val, mode=tertiary_mode, negation_mode=negation_mode)
         pair_id = (key_val, canonical_when)
         # Annotate if duplicate
         if pair_id in seen:
