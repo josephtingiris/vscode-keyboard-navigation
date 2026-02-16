@@ -105,6 +105,8 @@ main() {
         echo "Using provided KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     else
         KEYBINDINGS_SORT_ARGUMENTS="-p key -s when"
+        KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -m focal-invariant"
+        KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -m focal-invariant"
         echo "Using default KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     fi
     export KEYBINDINGS_SORT_ARGUMENTS
