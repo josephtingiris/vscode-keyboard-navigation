@@ -57,8 +57,8 @@ import json
 import argparse
 from typing import List, Tuple
 
-# Module-level canonical when-token classification sets to avoid duplication
-FOCUS_KEYS = {
+# canonical when-token classification sets
+FOCUS_TOKENS = {
     'auxiliaryBarFocus',
     'editorFocus',
     'editorTextFocus',
@@ -71,7 +71,7 @@ FOCUS_KEYS = {
     'textInputFocus',
 }
 
-POSITIONAL_PREFIXES = [
+POSITIONAL_TOKENS = [
     'activeAuxiliary',
     'activeEditor',
     'activePanel',
@@ -83,7 +83,7 @@ POSITIONAL_PREFIXES = [
     'panelPosition',
 ]
 
-VISIBILITY_KEYS = {
+VISIBILITY_TOKENS = {
     'auxiliaryBarVisible',
     'editorVisible',
     'notificationCenterVisible',
@@ -540,9 +540,9 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
         'workbench.view.',
     ]
     """
-    focus_keys = FOCUS_KEYS
-    positional_prefixes = POSITIONAL_PREFIXES
-    visibility_keys = VISIBILITY_KEYS
+    focus_tokens = FOCUS_TOKENS
+    positional_tokens = POSITIONAL_TOKENS
+    visibility_tokens = VISIBILITY_TOKENS
 
     def left_identifier(text: str) -> str:
         t = text.strip()
@@ -563,10 +563,10 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
         return left == entry
 
     def _is_focus(left: str) -> bool:
-        return any(_matches_entry(left, entry) for entry in focus_keys)
+        return any(_matches_entry(left, entry) for entry in focus_tokens)
 
     def _is_visibility(left: str) -> bool:
-        return any(_matches_entry(left, entry) for entry in visibility_keys)
+        return any(_matches_entry(left, entry) for entry in visibility_tokens)
 
     def group_rank(text: str) -> int:
         left = left_identifier(text)
@@ -580,7 +580,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                 return 1
             if _is_visibility(left):
                 return 2
-            if any(left.startswith(p) for p in positional_prefixes):
+            if any(left.startswith(p) for p in positional_tokens):
                 return 3
             if left.startswith('config.'):
                 return 4
@@ -588,7 +588,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
         # config-first behavior
         if left.startswith('config.'):
             return 1
-        if any(left.startswith(p) for p in positional_prefixes):
+        if any(left.startswith(p) for p in positional_tokens):
             return 2
         if _is_focus(left):
             return 3
@@ -727,7 +727,7 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                     first_when_token = first_when_token[1:].lstrip()
 
         # Build a flexible sort tuple based on primary/secondary preferences.
-        keys = []
+        tokens = []
 
         def append_when():
             # When primary sorting is requested, prefer grouping by the
@@ -752,16 +752,16 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                     tert = (is_neg, natural_key(base))
                 else:
                     tert = natural_key_case_sensitive(sortable_when)
-                keys.append(first_key)
-                keys.append(spec_key)
-                keys.append(tert)
+                tokens.append(first_key)
+                tokens.append(spec_key)
+                tokens.append(tert)
                 return
             # Default append behavior when not primary
-            keys.append(when_specificity(when_val))
-            keys.append(natural_key_case_sensitive(sortable_when))
+            tokens.append(when_specificity(when_val))
+            tokens.append(natural_key_case_sensitive(sortable_when))
 
         def append_key():
-            keys.append(natural_key(key_val))
+            tokens.append(natural_key(key_val))
 
         # Primary
         if primary == 'when':
@@ -782,7 +782,7 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         if 'key' not in (primary, secondary):
             append_key()
 
-        return tuple(keys)
+        return tuple(tokens)
     except Exception:
         return ([], '', '')
 
@@ -909,9 +909,9 @@ def main(argv: List[str] | None = None) -> int:
             return 5
         left_id = left.split()[0]
 
-        focus_keys = FOCUS_KEYS
-        positional_prefixes = POSITIONAL_PREFIXES
-        visibility_keys = VISIBILITY_KEYS
+        focus_tokens = FOCUS_TOKENS
+        positional_tokens = POSITIONAL_TOKENS
+        visibility_tokens = VISIBILITY_TOKENS
 
         def _matches_entry(left: str, entry: str) -> bool:
             if entry.endswith('.'):
@@ -922,10 +922,10 @@ def main(argv: List[str] | None = None) -> int:
             return left == entry
 
         def _is_focus(left: str) -> bool:
-            return any(_matches_entry(left, entry) for entry in focus_keys)
+            return any(_matches_entry(left, entry) for entry in focus_tokens)
 
         def _is_visibility(left: str) -> bool:
-            return any(_matches_entry(left, entry) for entry in visibility_keys)
+            return any(_matches_entry(left, entry) for entry in visibility_tokens)
 
         # Group ranking matches the logic in canonicalize_when
         if mode == 'focal-invariant':
@@ -933,7 +933,7 @@ def main(argv: List[str] | None = None) -> int:
                 return 1
             if _is_visibility(left_id):
                 return 2
-            if any(left_id.startswith(p) for p in positional_prefixes):
+            if any(left_id.startswith(p) for p in positional_tokens):
                 return 3
             if left_id.startswith('config.'):
                 return 4
@@ -941,7 +941,7 @@ def main(argv: List[str] | None = None) -> int:
         # default ordering
         if left_id.startswith('config.'):
             return 1
-        if any(left_id.startswith(p) for p in positional_prefixes):
+        if any(left_id.startswith(p) for p in positional_tokens):
             return 2
         if _is_focus(left_id):
             return 3
