@@ -30,7 +30,7 @@ Scope:
       * (direction) `w a s d h j k l left right up down horizontal vertical`
       * (juke) `q e , . ; ' [ ] pageUp pageDown home end horizontal vertical`
       * (kbm) `a s w d`
-      * (neovim) `alt+n ...`
+      * (native) `alt+n ...`
       * (split) `- _ = + \ |`
       * (vi) `h j k l`
       * (zoom) `alt_a z` ... `alt+a alt+z` ...
@@ -58,7 +58,8 @@ Conventions:
 
 Comments:
 
-  * `<(action/direction/intent | omni) (key group | all) (focus | all) (ring/shell group color | black)> [(corpus)] [(corner)] [(edge)] ...`
+  * DAFC:
+    * `<(Direction/intent | omni) (Action/key group | all) (Focus | all) (ring/shell Color | black)> [(corpus)] [(corner)] [(edge)] ...`
 
 Constraints:
 
@@ -90,36 +91,30 @@ Notes:
     "when": "github.copilot.activated && github.copilot.extensionUnification.activated"
   },
   {
+    // (down) (juke)
+    "key": "alt+pagedown",
+    "command": "(corpus) alt+pagedown 9f75",
+    // "command": "workbench.action.navigateBack", // (mimic) - mimic vscode alt+left
+    // "command": "alt+pagedown 8530",
+    "when": "config.keyboardNavigation. && config.keyboardNavigation.juke"
+  },
+  {
+    // (up) (juke) - moves/replaces vscode alt+right
+    "key": "alt+pageup",
+    "command": "workbench.action.navigateForward",
+    // "command": "(model) alt+pageup df44",
+    "when": "config.keyboardNavigation. && config.keyboardNavigation.juke"
+  },
+  {
     // (down) (arrow)
     "key": "alt+down",
     "command": "(corpus) alt+down b7e9",
     "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
   },
   {
-    // (arrow)
-    "key": "alt+home",
-    "command": "-noop",
-    // "command": "alt+home a7d0",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
     // (left) (arrow)
     "key": "alt+left",
     "command": "(corpus) alt+left abfd",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (down) (arrow) - moves/replaces vscode alt+left
-    "key": "alt+pagedown",
-    "command": "workbench.action.navigateBack",
-    // "command": "(model) alt+pagedown 8530",
-    "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (arrow) - moves/replaces vscode alt+right
-    "key": "alt+pageup",
-    "command": "workbench.action.navigateForward",
-    // "command": "(model) alt+pageup df44",
     "when": "config.keyboardNavigation.arrows && config.keyboardNavigation.enabled"
   },
   {
@@ -497,17 +492,15 @@ Notes:
     // (action) (chord) (primary) (gold) (jump) - open and focus the (EXPLORER) OPEN EDITORS viewlet
     "key": "alt+a e",
     "command": "workbench.explorer.openEditorsView.resetViewLocation",
-    // "command": "workbench.view.explorer", // open and focus the (PRIMARY) ACTIVE EXPLORER viewlet
     // "command": "alt+a e 19b7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // (action) (chord) (primary) (gold)
-    // (action) (chord) (primary) (gold) - open and focus the (EXPLORER) FILE viewlet //  DEPRECATED (too much like alt+shift+f)
     "key": "alt+a f",
     "command": "alt+a f 19b8",
     // "command": "workbench.explorer.fileView.resetViewLocation",
-    // "command": "workbench.view.explorer",
+    // "command": "workbench.view.explorer", // open and focus the (PRIMARY) ACTIVE EXPLORER viewlet
     "when": "config.keyboardNavigation.enabled"
   },
   {
@@ -610,12 +603,6 @@ Notes:
     // (up) (juke)
     "key": "alt+home",
     "command": "(corpus) alt+home 8530",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // (down)
-    "key": "alt+pagedown",
-    "command": "(corpus) alt+pagedown 9f75",
     "when": "config.keyboardNavigation.enabled"
   },
   {
@@ -1375,29 +1362,31 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
-    // (left) (vi)
+    // (left) (vi) (all) (gold) (noop)
     "key": "ctrl+h",
-    "command": "(corpus) ctrl+h 1fd7",
+    "command": "-noop",
+    // "command": "(corpus) ctrl+h 1fd7",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
-    // (down) (vi)
+    // (down) (vi) (all) (gold) (noop)
     "key": "ctrl+j",
-    "command": "(corpus) ctrl+j 6085",
+    "command": "-noop",
+    // "command": "(corpus) ctrl+j 6085",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
-    // (up) (vi)
+    // (up) (vi) (all) (gold) (noop)
     "key": "ctrl+k",
     "command": "-noop",
     // "command": "(corpus) ctrl+k 63a1",
-    // "command": "ctrl+k 0678",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
-    // (right) (vi)
+    // (right) (vi) (all) (gold) (noop)
     "key": "ctrl+l",
-    "command": "(corpus) ctrl+l 33f7",
+    "command": "-noop",
+    // "command": "(corpus) ctrl+l 33f7",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
@@ -1504,14 +1493,14 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.zoom"
   },
   {
-    // (neovim)
+    // (native) (navigation) - VS Code Keyboard Navigation Extension
     "key": "alt+n",
     "command": "alt+n 318f",
     // "command": "editor.action.nextMatchFindAction",
     "when": "config.keyboardNavigation.enabled && neovim.init"
   },
   {
-    // (neovim) (only) - restart (only) the neovim extension
+    // (native) (navigation) (neovim) (only) (user) - restart (only) the neovim extension
     "key": "alt+n r",
     "command": "vscode-neovim.restart",
     // "command": "alt+n 419e",
