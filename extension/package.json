@@ -42,17 +42,17 @@
     ],
     "keybindings": [
       {
-        "key": "alt+n escape",
+        "key": "alt+x escape",
         "command": "keyboardNavigation.resetLayout",
         "when": "config.keyboardNavigation.enabled"
       },
       {
-        "key": "alt+n h",
+        "key": "alt+x h",
         "command": "keyboardNavigation.toggleVisualHighlights",
         "when": "config.keyboardNavigation.enabled"
       },
       {
-        "key": "alt+n v",
+        "key": "alt+x v",
         "command": "keyboardNavigation.applyVisualHighlights",
         "when": "config.keyboardNavigation.enabled"
       }
@@ -65,16 +65,31 @@
           "default": true,
           "description": "Enable Keyboard Navigation extension."
         },
+        "keyboardNavigation.chords.action": {
+          "type": "boolean",
+          "default": true,
+          "description": "Activate additional action chords (alt+a/alt+l)."
+        },
+        "keyboardNavigation.chords.debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "Activate additional debug chords (alt+d)."
+        },
+        "keyboardNavigation.chords.extension": {
+          "type": "boolean",
+          "default": true,
+          "description": "Activate additional extension chords (alt+x)."
+        },
         "keyboardNavigation.keys.arrows": {
           "type": "boolean",
           "default": true,
           "description": "Use arrow keys for navigation."
         },
-        "keyboardNavigation.keys.letterGroup": {
+        "keyboardNavigation.keys.letters": {
           "type": "string",
           "enum": ["emacs", "kbm", "vi", "none"],
           "default": "vi",
-          "description": "Select exactly one letter-key navigation group. Choose 'none' to disable letter-key groups. Arrows are controlled separately by keyboardNavigation.keys.arrows."
+          "description": "Select letter keys for navigation."
         },
         "keyboardNavigation.highlights.enabled": {
           "type": "boolean",

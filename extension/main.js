@@ -72,10 +72,10 @@ function activate(context) {
       const cfg = vscode.workspace.getConfiguration('keyboardNavigation');
       const enabled = Boolean(cfg.get('enabled', true));
       const arrows = Boolean(cfg.get('keys.arrows', true));
-      const letterGroup = String(cfg.get('keys.letterGroup', 'vi'));
-      const vi = (letterGroup === 'vi');
-      const emacs = (letterGroup === 'emacs');
-      const kbm = (letterGroup === 'kbm');
+      const letters = String(cfg.get('keys.letters', 'vi'));
+      const vi = (letters === 'vi');
+      const emacs = (letters === 'emacs');
+      const kbm = (letters === 'kbm');
       const orientation = cfg.get('preferences.orientation', 'default');
 
       const stateText = enabled ? 'Active' : 'Inactive';
@@ -116,10 +116,10 @@ function activate(context) {
     const cfg = vscode.workspace.getConfiguration('keyboardNavigation');
     const enabled = Boolean(cfg.get('enabled', true));
     const arrows = Boolean(cfg.get('keys.arrows', true));
-    const letterGroup = String(cfg.get('keys.letterGroup', 'vi'));
-    const vi = (letterGroup === 'vi');
-    const emacs = (letterGroup === 'emacs');
-    const kbm = (letterGroup === 'kbm');
+    const letters = String(cfg.get('keys.letters', 'vi'));
+    const vi = (letters === 'vi');
+    const emacs = (letters === 'emacs');
+    const kbm = (letters === 'kbm');
     const highlights = Boolean(cfg.get('highlights.enabled', false));
     const orientation = cfg.get('preferences.orientation', 'default');
 
