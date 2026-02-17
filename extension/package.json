@@ -1,8 +1,9 @@
 {
+  "version": "0.0.2",
   "name": "keyboard-navigation",
+  "description": "An opinionated keyboard grammar extension that focuses on navigating the workbench UI",
   "displayName": "Keyboard Navigation",
   "publisher": "josephtingiris",
-  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/josephtingiris/vscode-keyboard-navigation"
@@ -12,15 +13,14 @@
   "engines": {
     "vscode": "^1.60.0"
   },
-  "description": "An opinionated keyboard grammar extension that focuses on speedrunning the Workbench UI",
-  "categories": [
-    "Keymaps",
-    "Themes",
-    "Other"
-  ],
-  "main": "./extension.js",
+  "categories": ["Keymaps", "Themes", "Other"],
+  "keywords": ["keyboard", "keboard", "keybindings", "arrows", "emacs", "navigation"],
+  "main": "./main.js",
   "activationEvents": [
-    "onCommand:keyboardNavigation.resetLayout"
+    "onStartupFinished",
+    "onCommand:keyboardNavigation.resetLayout",
+    "onCommand:keyboardNavigation.applyVisualHighlights",
+    "onCommand:keyboardNavigation.toggleVisualHighlights"
   ],
   "contributes": {
     "commands": [
@@ -28,34 +28,32 @@
         "command": "keyboardNavigation.resetLayout",
         "title": "Reset Workbench Layout",
         "category": "Keyboard Navigation"
-      }
-      ,
+      },
       {
         "command": "keyboardNavigation.applyVisualHighlights",
-        "title": "Apply Visual Highlights",
+        "title": "Apply Visual Keyboard Navigation Highlights",
         "category": "Keyboard Navigation"
       },
       {
         "command": "keyboardNavigation.toggleVisualHighlights",
-        "title": "Toggle Visual Highlights",
+        "title": "Toggle Visual Keyboard Navigation Highlights",
         "category": "Keyboard Navigation"
       }
     ],
     "keybindings": [
       {
-        "key": "alt+a escape",
+        "key": "alt+n escape",
         "command": "keyboardNavigation.resetLayout",
-        "when": "config.keyboardNavigation.enabled"
-      }
-      ,
-      {
-        "key": "alt+h a",
-        "command": "keyboardNavigation.applyVisualHighlights",
         "when": "config.keyboardNavigation.enabled"
       },
       {
-        "key": "alt+h t",
+        "key": "alt+n h",
         "command": "keyboardNavigation.toggleVisualHighlights",
+        "when": "config.keyboardNavigation.enabled"
+      },
+      {
+        "key": "alt+n v",
+        "command": "keyboardNavigation.applyVisualHighlights",
         "when": "config.keyboardNavigation.enabled"
       }
     ],
@@ -67,40 +65,21 @@
           "default": true,
           "description": "Enable Keyboard Navigation extension."
         },
-        "keyboardNavigation.orientation": {
+        "keyboardNavigation.keys.arrows": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use arrow keys for navigation."
+        },
+        "keyboardNavigation.keys.letterGroup": {
           "type": "string",
-          "enum": [
-            "default",
-            "left",
-            "right"
-          ],
-          "default": "default",
-          "description": "Preferred orientation ('default' will use the VS Code defaults)."
+          "enum": ["emacs", "kbm", "vi", "none"],
+          "default": "vi",
+          "description": "Select exactly one letter-key navigation group. Choose 'none' to disable letter-key groups. Arrows are controlled separately by keyboardNavigation.keys.arrows."
         },
-        "keyboardNavigation.arrows": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable arrow keys for navigation."
-        },
-        "keyboardNavigation.terminal": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable navigation keys when focused on a terminal (disabling will pass through to the terminal)."
-        },
-        "keyboardNavigation.vi": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable vi keys (h, j, k, l) for navigation."
-        },
-        "keyboardNavigation.wrap": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable wrap around navigation at screen edges."
-        },
-        "keyboardNavigation.highlights": {
+        "keyboardNavigation.highlights.enabled": {
           "type": "boolean",
           "default": false,
-          "description": "Enable visual highlights to aid tracking the focused components (useful for debugging, demonstrations, and code speedruns)."
+          "description": "Enable highlights to aid visually tracking the focused components (useful for debugging, demonstrations, and code speedruns)."
         },
         "keyboardNavigation.highlights.color": {
           "type": "string",
@@ -108,6 +87,17 @@
           "pattern": "^#([A-Fa-f0-9]{6})$",
           "errorMessage": "Enter a hex color like #FF0000",
           "description": "Preferred color for visual highlights, e.g. borders, cursors, et al; enter a hex color value."
+        },
+        "keyboardNavigation.preferences.orientation": {
+          "type": "string",
+          "enum": ["default", "left", "right"],
+          "default": "default",
+          "description": "Preferred orientation hint ('default' will use the VS Code defaults)."
+        },
+        "keyboardNavigation.terminal.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable terminal window & pane navigation."
         }
       }
     }
