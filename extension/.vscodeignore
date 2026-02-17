@@ -1,5 +1,6 @@
-# Exclude the following from the packaged VSIX
+# exclude the following from the packaged VSIX
 *.vsix
+Makefile
 assets/
 dist/
 node_modules/
