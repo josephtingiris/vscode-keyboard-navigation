@@ -2,7 +2,7 @@
 """
 (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
 
-[WIP] Tests for sorting modes in `bin/keybindings-sort.py`.
+[WIP] Tests sorting modes in `bin/keybindings-sort.py`.
 """
 import unittest
 import subprocess
@@ -11,7 +11,10 @@ import re
 import sys
 from textwrap import dedent
 
-SCRIPT = 'bin/keybindings-sort.py'
+import os
+
+# Resolve script path relative to repository root (tests may run with CWD=tests/)
+SCRIPT = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'bin', 'keybindings-sort.py'))
 
 def run_sort(input_json, args=None):
     cmd = [sys.executable, SCRIPT]
@@ -34,7 +37,7 @@ class ModeTests(unittest.TestCase):
           }
         ]
         ''')
-        proc = run_sort(data, ['--primary', 'when', '--mode', 'positive'])
+        proc = run_sort(data, ['--primary', 'when', '--group-sorting', 'positive'])
         out = proc.stdout.decode('utf-8')
         # extract when values in output order
         whens = re.findall(r'"when"\s*:\s*"([^"]*)"', out)
@@ -55,7 +58,7 @@ class ModeTests(unittest.TestCase):
           }
         ]
         ''')
-        proc = run_sort(data, ['--primary', 'when', '--mode', 'negative'])
+        proc = run_sort(data, ['--primary', 'when', '--group-sorting', 'negative'])
         out = proc.stdout.decode('utf-8')
         whens = re.findall(r'"when"\s*:\s*"([^"]*)"', out)
         self.assertGreaterEqual(len(whens), 2)
@@ -75,7 +78,7 @@ class ModeTests(unittest.TestCase):
           }
         ]
         ''')
-        proc = run_sort(data, ['--primary', 'when', '--mode', 'natural'])
+        proc = run_sort(data, ['--primary', 'when', '--group-sorting', 'natural'])
         out = proc.stdout.decode('utf-8')
         whens = re.findall(r'"when"\s*:\s*"([^"]*)"', out)
         self.assertGreaterEqual(len(whens), 2)
@@ -96,7 +99,7 @@ class ModeTests(unittest.TestCase):
           }
         ]
         ''')
-        proc = run_sort(data, ['--primary', 'when', '--mode', 'beta'])
+        proc = run_sort(data, ['--primary', 'when', '--group-sorting', 'beta'])
         out = proc.stdout.decode('utf-8')
         whens = re.findall(r'"when"\s*:\s*"([^"]*)"', out)
         self.assertGreaterEqual(len(whens), 2)
