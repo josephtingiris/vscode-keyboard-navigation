@@ -5,10 +5,12 @@ It is designed to build upon and complement vi/vim/neovim muscle memory by inclu
 the VS Code WorkBench UI components (editor groups, side bars, panel, and terminals).
 
 Why use it
-- Keeps your hands on the keyboard — fast and fluid spatial navigation throughout workbench components.
-- Optional (but useful!) visual highlights for when your fingers are moving faster than your eyes (or an observer is trying to keep up).
-- Configurable orientation and optional wrap behaviors (primary sidebar on the left side of the screen by default).
-- Respects in-element movement (lists, trees, and editor splits) when available.
+- Keeps your hands on the keyboard.
+- Fluid spatial navigation throughout workbench components.
+- Navigate faster and more accurately, without the need to remember a million shortcuts.
+- Optional (but useful!) visual highlights for when your fingers are moving faster than your eyes (or when an observer is trying to keep up).
+- Configurable key groups; enable/disable various well-know key groups such as `arrows` and/or `vi`.  Disable groups that get in your way, or learn them one at a time.
+- Easy. Easy. Easier. Easiest. Intuitive. Smooth.
 
 Highlights
 - intuitive and predictable use of the arrow keys

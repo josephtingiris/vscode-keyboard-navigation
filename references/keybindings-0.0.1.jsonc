@@ -285,7 +285,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
   },
   {
-    // (left) (vi) (nowrap)
+    // (left) (vi)
     "key": "alt+h",
     "command": "alt+h 9e22",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left'"
@@ -299,7 +299,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && editorFocus && !neovim.init"
   },
   {
-    // (left) (vi) (edge) (nowrap)
+    // (left) (vi) (edge)
     "key": "alt+h",
     "command": "alt+h 8d96",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && panelFocus && !sideBarVisible"
@@ -319,7 +319,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorFocus && sideBarVisible"
   },
   {
-    // (left) (vi) (edge) (wrap)
+    // (left) (vi) (edge)
     "key": "alt+h",
     "command": "workbench.action.focusSideBar",
     // "command": "alt+h 8d95",
@@ -347,27 +347,27 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left' && auxiliaryBarFocus && panelVisible && editorIsOpen"
   },
   {
-    // (left) (vi) (edge) (wrap)
+    // (left) (vi) (edge)
     "key": "alt+h",
     "command": "alt+h 080e",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorFocus && panelVisible && !sideBarVisible"
   },
   {
-    // (left) (vi) (edge) (wrap)
+    // (left) (vi) (edge)
     "key": "alt+h",
     "command": "alt+h 8e22",
     // "command": "workbench.action.focusActiveEditorGroup",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && panelFocus && !sideBarVisible && editorIsOpen"
   },
   {
-    // (left) (vi) (edge) (wrap)
+    // (left) (vi) (edge)
     "key": "alt+h",
     "command": "workbench.action.focusPanel",
     // "command": "alt+h 0812",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && editorFocus && panelVisible && !sideBarVisible"
   },
   {
-    // (left) (vi) (edge) (wrap)
+    // (left) (vi) (edge)
     "key": "alt+h",
     "command": "workbench.action.focusActiveEditorGroup",
     // "command": "alt+h 8e20",
@@ -400,20 +400,20 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
   },
   {
-    // (left) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (not first in group)
+    // (left) (vi) (edge) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (not first in group)
     "key": "alt+h",
     "command": "workbench.action.focusSideBar",
     // "command": "alt+h 8b41",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && sideBarVisible && activeEditorIsReadonly"
   },
   {
-    // (left) (topleft) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar hidden (first in group)
+    // (left) (topleft) (vi) (edge) - Settings editor, Keyboard Shortcuts, et al - sidebar hidden (first in group)
     "key": "alt+h",
     "command": "alt+h 4b2b",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.keyboardNavigation.wrap && config.workbench.sideBar.location == 'left' && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && !sideBarVisible && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly"
   },
   {
-    // (left) (topleft) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (first in group)
+    // (left) (topleft) (vi) (edge) - Settings editor, Keyboard Shortcuts, et al - sidebar visible (first in group)
     "key": "alt+h",
     "command": "workbench.action.focusSideBar",
     // "command": "alt+h 4b2c",
@@ -530,14 +530,14 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && panelPosition == 'bottom' && editorFocus && panelFocus"
   },
   {
-    // (up) (vi) (nowrap)
+    // (up) (vi)
     "key": "alt+k",
     "command": "alt+k 12a4",
     // "command": "workbench.action.focusPanel",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && !config.keyboardNavigation.wrap && panelPosition == 'bottom' && editorFocus && !panelFocus && panelVisible && !multipleEditorGroups"
   },
   {
-    // (up) (vi) (wrap) (edge) (editor) - wrap around to the panel on the bottom
+    // (up) (vi) (edge) (editor) - wrap around to the panel on the bottom
     "key": "alt+k",
     "command": "workbench.action.focusPanel",
     // "command": "alt+k 12a5",
@@ -594,7 +594,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && config.workbench.sideBar.location == 'left' && panelFocus && auxiliaryBarVisible"
   },
   {
-    // (right) (vi) (nowrap)
+    // (right) (vi)
     "key": "alt+l",
     "command": "alt+l 53d3",
     // "command": "workbench.action.focusAuxiliaryBar",
@@ -1853,7 +1853,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
   },
   {
-    // (down) (vi) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - if on last editor in last group, wrap to first editor group
+    // (down) (vi) (edge) - Settings editor, Keyboard Shortcuts, et al - if on last editor in last group, wrap to first editor group
     "key": "shift+alt+j",
     "command": "workbench.action.focusFirstEditorGroup",
     // "command": "shift+alt+h 10b9",
@@ -1888,7 +1888,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && panelPosition == 'bottom' && terminalFocus && terminalCount > 1"
   },
   {
-    // (up) (vi) (inside) (editor) (edge) (wrap)
+    // (up) (vi) (inside) (editor) (edge)
     "key": "shift+alt+k",
     // "command": "workbench.action.focusAboveGroup",
     "command": "shift+alt+k a400",
@@ -1919,7 +1919,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.vi && activeEditor != '' && !auxiliaryBarFocus && !editorFocus && focusedView == '' && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && editorIsOpen"
   },
   {
-    // (up) (vi) (inside) (edge) (wrap) - Settings editor, Keyboard Shortcuts, et al - if on first editor group, wrap to last editor group
+    // (up) (vi) (inside) (edge) - Settings editor, Keyboard Shortcuts, et al - if on first editor group, wrap to last editor group
     "key": "shift+alt+k",
     "command": "shift+alt+h 4435",
     // "command": "workbench.action.focusLastEditorGroup",

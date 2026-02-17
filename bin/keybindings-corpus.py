@@ -46,22 +46,32 @@ MODIFIERS_MULTI = [
 ]
 
 KEYS = [
-    "-", "=", "[", "]", ";", "'", ",", ".",
+    "-", "_", "=", "+", "[", "]", ";", "'", ",", ".",
     "a", "d", "h", "j", "k", "l",
     "end", "home", "pageup", "pagedown", "left", "down", "up", "right",
 ]
 
+ACTION_KEYS = {"a"}
+
+ARROW_KEYS = {"left", "down", "up", "right"}
+
+DEBUG_KEYS = {"d"}
+
+EMACS_KEYS = {"b", "n", "p", "f"}
+KBM_KEYS = {"a", "s", "w", "d"}
 VI_KEYS = {"h", "j", "k", "l"}
-ARROW_KEYS = {"end", "home", "pageup",
-              "pagedown", "left", "down", "up", "right"}
+
+JUKE_KEYS = {"end", "home", "pageup", "pagedown" "[", "]", ";", "'", ",", "."}
+SPLIT_KEYS = {"-", "_", "=", "+", "\\", "|"}
 
 # key groups for comments
 LEFT_GROUP = {"h", "[", ";", ",", "left"}
-DOWN_GROUP = {"j", "down", "pagedown"}
-UP_GROUP = {"k", "up", "pageup"}
+DOWN_GROUP = {"end", "j", "down", "pagedown"}
+UP_GROUP = {"home", "k", "up", "pageup"}
 RIGHT_GROUP = {"l", "]", "'", ".", "right"}
 
-TAG_ORDER = ["(down)", "(left)", "(right)", "(up)", "(arrow)", "(vi)"]
+TAG_ORDER = ["(down)", "(left)", "(right)", "(up)", "(juke)",
+             "(split)", "(debug)", "(action)", "(arrow)", "(emacs)", "(kbm)", "(vi)"]
 
 
 def hex4(rng: Random) -> str:
@@ -70,8 +80,6 @@ def hex4(rng: Random) -> str:
 
 def tags_for(key):
     tags = []
-    if key in ARROW_KEYS:
-        tags.append("(arrow)")
     if key in DOWN_GROUP:
         tags.append("(down)")
     if key in LEFT_GROUP:
@@ -80,9 +88,23 @@ def tags_for(key):
         tags.append("(right)")
     if key in UP_GROUP:
         tags.append("(up)")
+    if key in ACTION_KEYS:
+        tags.append("(action)")
+    if key in ARROW_KEYS:
+        tags.append("(arrow)")
+    if key in DEBUG_KEYS:
+        tags.append("(debug)")
+    if key in EMACS_KEYS:
+        tags.append("(emacs)")
+    if key in JUKE_KEYS:
+        tags.append("(juke)")
+    if key in KBM_KEYS:
+        tags.append("(kbm)")
+    if key in SPLIT_KEYS:
+        tags.append("(split)")
     if key in VI_KEYS:
         tags.append("(vi)")
-    # Sort tags according to TAG_ORDER
+
     tags_sorted = [t for t in TAG_ORDER if t in tags]
     return tags_sorted
 
@@ -130,14 +152,12 @@ def main(argv: List[str] | None = None) -> int:
             tags = tags_for(key)
             comment_tags = tags if tags else []
 
-            cmd_base = f"(model) {key_str} {hex4(rng)}"
+            cmd_base = f"(corpus) {key_str} {hex4(rng)}"
             records.append((key_str, cmd_base, base_when, comment_tags))
 
             EXTRA_WHENS = [
-                "config.keyboardNavigation.terminal",
-                "!config.keyboardNavigation.terminal",
-                "config.keyboardNavigation.wrap",
-                "!config.keyboardNavigation.wrap",
+                # "config.keyboardNavigation.terminal",
+                # "!config.keyboardNavigation.terminal",
             ]
             n = len(EXTRA_WHENS)
             for r in range(1, n + 1):
@@ -157,8 +177,9 @@ def main(argv: List[str] | None = None) -> int:
                         continue
 
                     combined_when = base_when + " && " + " && ".join(combo)
-                    cmd_extra = f"(model) {key_str} {hex4(rng)}"
-                    records.append((key_str, cmd_extra, combined_when, comment_tags))
+                    cmd_extra = f"(corpus) {key_str} {hex4(rng)}"
+                    records.append(
+                        (key_str, cmd_extra, combined_when, comment_tags))
 
     out_lines = []
     out_lines.append("[")
