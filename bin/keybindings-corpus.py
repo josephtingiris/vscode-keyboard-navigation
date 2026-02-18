@@ -266,6 +266,7 @@ def main(argv: List[str] | None = None) -> int:
     id_fulls = [hashlib.sha256(f"{k}||{w}".encode()).hexdigest() for (k, w, _) in records]
     n = len(id_fulls)
     assigned: List[str | None] = [None] * n
+
     # assign the shortest unique prefix, starting at 4 chars, up to 12
     for L in range(4, 13):
         prefixes = [h[:L] for h in id_fulls]
@@ -273,6 +274,7 @@ def main(argv: List[str] | None = None) -> int:
         for i, p in enumerate(prefixes):
             if assigned[i] is None and counts[p] == 1:
                 assigned[i] = p
+
     # finalize any remaining by using 12-char prefix
     for i in range(n):
         if assigned[i] is None:
