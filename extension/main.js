@@ -19,7 +19,7 @@ function activate(context) {
 
       const workbench = vscode.workspace.getConfiguration("workbench");
 
-      // Always set the panel to bottom first
+      // always set the panel to bottom first
       try {
         await vscode.commands.executeCommand(
           "workbench.action.positionPanelBottom",
@@ -28,13 +28,12 @@ function activate(context) {
         // ignore if command doesn't exist
       }
 
-      // Behavior: 'default' should reset to VS Code default (left).
       // 'left' forces left, 'right' forces right.
       let target = "left";
       if (orientation === "right") {
         target = "right";
       } else {
-        // For 'default' and any other value, default to 'left'
+        // default
         target = "left";
       }
 
@@ -80,8 +79,8 @@ function activate(context) {
 
       const stateText = enabled ? 'Active' : 'Inactive';
       statusBarItem.text = '$(keyboard)';
-      // For the ideal/normal state, do not draw attention: use the default status-bar color
-      // Only color the icon when disabled (or other non-ideal states in the future).
+
+      // only color the icon when disabled (or other non-ideal states in the future).
       let color = undefined;
       if (!enabled) {
         const highlightsEnabled = Boolean(cfg.get('highlights.enabled', false));
@@ -106,12 +105,12 @@ function activate(context) {
       statusBarItem.tooltip = `Keyboard Navigation — ${stateText}\norientation: ${orientation}`;
     } catch (e) {
       // fall back to a safe state
-      statusBarItem.text = 'KeyNav';
+      statusBarItem.text = 'Keyboard';
       statusBarItem.show();
     }
   }
 
-  // Register a simple status command that shows a configuration summary and quick actions
+  // register a simple status command that shows a configuration summary and quick actions
   const showStatusCmd = vscode.commands.registerCommand('keyboardNavigation.showStatus', async () => {
     const cfg = vscode.workspace.getConfiguration('keyboardNavigation');
     const enabled = Boolean(cfg.get('enabled', true));
