@@ -46,32 +46,44 @@ MODIFIERS_MULTI = [
 ]
 
 KEYS = [
-    "-", "_", "=", "+", "[", "]", ";", "'", ",", ".",
-    "a", "d", "h", "j", "k", "l",
-    "end", "home", "pageup", "pagedown", "left", "down", "up", "right",
+    "left", "down", "up", "right",
+    "b", "n", "p", "f",
+    "a", "s", "w", "d",
+    "h", "j", "k", "l",
+    "end", "home", "pageup", "pagedown",
+    "[", "]", ";", "'", ",", ".",
+    "-", "_", "=", "+", "\\", "|",
+    "x",
 ]
 
-ACTION_KEYS = {"a"}
+# DAFC
 
-ARROW_KEYS = {"left", "down", "up", "right"}
+ARROW_GROUP = {"left", "down", "up", "right"}
+EMACS_GROUP = {"b", "n", "p", "f"}
+KBM_GROUP = {"a", "s", "w", "d"}
+VI_GROUP = {"h", "j", "k", "l"}
 
-DEBUG_KEYS = {"d"}
+JUKE_GROUP = {"end", "home", "pageup",
+              "pagedown", "[", "]", ";", "'", ",", "."}
+SPLIT_GROUP = {"-", "_", "=", "+", "\\", "|"}
 
-EMACS_KEYS = {"b", "n", "p", "f"}
-KBM_KEYS = {"a", "s", "w", "d"}
-VI_KEYS = {"h", "j", "k", "l"}
-
-JUKE_KEYS = {"end", "home", "pageup", "pagedown" "[", "]", ";", "'", ",", "."}
-SPLIT_KEYS = {"-", "_", "=", "+", "\\", "|"}
-
-# key groups for comments
 LEFT_GROUP = {"h", "[", ";", ",", "left"}
 DOWN_GROUP = {"end", "j", "down", "pagedown"}
 UP_GROUP = {"home", "k", "up", "pageup"}
 RIGHT_GROUP = {"l", "]", "'", ".", "right"}
 
-TAG_ORDER = ["(down)", "(left)", "(right)", "(up)", "(juke)",
-             "(split)", "(debug)", "(action)", "(arrow)", "(emacs)", "(kbm)", "(vi)"]
+ACTION_GROUP = {"a"}
+
+DEBUG_GROUP = {"d"}
+
+EXTENSION_GROUP = {"x"}
+
+TAG_ORDER = [
+    "(down)", "(left)", "(right)", "(up)",
+    "(arrow)", "(emacs)", "(kbm)", "(vi)",
+    "(juke)", "(split)",
+    "(debug)", "(action)", "(native)",
+]
 
 
 def hex4(rng: Random) -> str:
@@ -88,33 +100,54 @@ def tags_for(key):
         tags.append("(right)")
     if key in UP_GROUP:
         tags.append("(up)")
-    if key in ACTION_KEYS:
-        tags.append("(action)")
-    if key in ARROW_KEYS:
+    if key in ARROW_GROUP:
         tags.append("(arrow)")
-    if key in DEBUG_KEYS:
-        tags.append("(debug)")
-    if key in EMACS_KEYS:
+    if key in EMACS_GROUP and key in globals().get("ALLOWED_LETTER_KEYS", set()):
         tags.append("(emacs)")
-    if key in JUKE_KEYS:
-        tags.append("(juke)")
-    if key in KBM_KEYS:
+    if key in KBM_GROUP and key in globals().get("ALLOWED_LETTER_KEYS", set()):
         tags.append("(kbm)")
-    if key in SPLIT_KEYS:
-        tags.append("(split)")
-    if key in VI_KEYS:
+    if key in VI_GROUP and key in globals().get("ALLOWED_LETTER_KEYS", set()):
         tags.append("(vi)")
+    if key in JUKE_GROUP:
+        tags.append("(juke)")
+    if key in SPLIT_GROUP:
+        tags.append("(split)")
+    if key in DEBUG_GROUP:
+        tags.append("(debug)")
+    if key in ACTION_GROUP:
+        tags.append("(action)")
+    if key in EXTENSION_GROUP:
+        tags.append("(extension)")
 
     tags_sorted = [t for t in TAG_ORDER if t in tags]
     return tags_sorted
 
 
 def when_for(key):
-    if key in ARROW_KEYS:
-        return "config.keyboardNavigation.enabled && config.keyboardNavigation.arrows"
-    if key in VI_KEYS:
-        return "config.keyboardNavigation.enabled && config.keyboardNavigation.vi"
-    return "config.keyboardNavigation.enabled"
+    parts = ["config.keyboardNavigation.enabled"]
+    seen = set()
+
+    def _add(cond: str) -> None:
+        if cond not in seen:
+            parts.append(cond)
+            seen.add(cond)
+
+    if key in ARROW_GROUP:
+        _add("config.keyboardNavigation.keys.arrows")
+    if key in EMACS_GROUP and key in globals().get("ALLOWED_LETTER_KEYS", set()):
+        _add("config.keyboardNavigation.keys.letters == 'emacs'")
+    if key in KBM_GROUP and key in globals().get("ALLOWED_LETTER_KEYS", set()):
+        _add("config.keyboardNavigation.keys.letters == 'kbm'")
+    if key in VI_GROUP and key in globals().get("ALLOWED_LETTER_KEYS", set()):
+        _add("config.keyboardNavigation.keys.letters == 'vi'")
+    if key in DEBUG_GROUP:
+        _add("config.keyboardNavigation.chords.debug")
+    if key in ACTION_GROUP:
+        _add("config.keyboardNavigation.chords.action")
+    if key in EXTENSION_GROUP:
+        _add("config.keyboardNavigation.chords.extension")
+
+    return " && ".join(parts)
 
 
 def emit_record(key_str, command_str, when_str, comment_tags):
@@ -132,20 +165,83 @@ def emit_record(key_str, command_str, when_str, comment_tags):
 def main(argv: List[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     parser = argparse.ArgumentParser(
-        description="Generate a deterministic JSONC array of keybinding objects used as a structural baseline for keyboard-navigation development, debugging, and testing.",
+        description="Generate a deterministic JSONC array of unique keybinding objects for keyboard navigation development, debugging, and testing.",
         epilog="Example: %(prog)s > references/keybindings-corpus.jsonc",
     )
 
-    # only show help when -h/--help is provided
-    parser.parse_args(argv)
+    # parse CLI args (only show help when -h/--help is provided)
+    parser.add_argument(
+        "-n",
+        "--navigation-group",
+        choices=["emacs", "kbm", "vi", "none"],
+        default="none",
+        help=(
+            "Select the active letter-key navigation group (default: none)."
+        ),
+    )
+    args = parser.parse_args(argv)
 
     # initialize RNG locally so other code can't affect the sequence
     rng = Random(0)
 
+    LETTER_GROUPS = {
+        "emacs": EMACS_GROUP,
+        "kbm": KBM_GROUP,
+        "vi": VI_GROUP,
+    }
+    selected = args.navigation_group
+    if selected == "none":
+        # exclude all letter-key groups
+        allowed_letter_keys = set()
+    else:
+        allowed_letter_keys = set(LETTER_GROUPS[selected])
+
+    # adapt the action key based on the selected letter-key group.
+    action_key_default = "a"
+    action_key = action_key_default
+    contains_a = "a" in allowed_letter_keys
+    contains_l = "l" in allowed_letter_keys
+    if contains_a and not contains_l:
+        action_key = "l"
+    elif contains_a and contains_l:
+        YELLOW = "\x1b[33m"
+        RESET = "\x1b[0m"
+        print(f"{YELLOW}Warning: both 'a' and 'l' present in selected navigation group; using default 'a'.{RESET}", file=sys.stderr)
+
+    globals()["ACTION_GROUP"] = {action_key}
+
+    # expose allowed letter keys for helper functions
+    globals()["ALLOWED_LETTER_KEYS"] = allowed_letter_keys
+
+    # Adapt the debug key similar to the action key: prefer 'j' when 'd' conflicts with an included letter-key; warn if both present.
+    debug_key_default = "d"
+    debug_key = debug_key_default
+    contains_d = "d" in allowed_letter_keys
+    contains_j = "j" in allowed_letter_keys
+    if contains_d and not contains_j:
+        debug_key = "j"
+    elif contains_d and contains_j:
+        YELLOW = "\x1b[33m"
+        RESET = "\x1b[0m"
+        print(f"{YELLOW}Warning: both 'd' and 'j' present in selected navigation group; using default 'd'.{RESET}", file=sys.stderr)
+
+    globals()["DEBUG_GROUP"] = {debug_key}
+
+    keys_to_emit = set()
+    keys_to_emit.update(ARROW_GROUP)
+    keys_to_emit.update(JUKE_GROUP)
+    keys_to_emit.update(SPLIT_GROUP)
+    keys_to_emit.update(DEBUG_GROUP)
+    keys_to_emit.update(EXTENSION_GROUP)
+    keys_to_emit.update(ACTION_GROUP)
+    keys_to_emit.update(allowed_letter_keys)
+
+    keys_ordered = sorted(keys_to_emit)
+
     # generate records
     records = []
     all_mods = MODIFIERS_SINGLE + MODIFIERS_MULTI
-    for key in KEYS:
+    for key in keys_ordered:
         for mod in all_mods:
             key_str = f"{mod}+{key}"
             base_when = when_for(key)
