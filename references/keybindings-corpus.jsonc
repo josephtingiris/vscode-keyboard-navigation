@@ -385,50 +385,50 @@
   },
   {
     // (split)
-    "key": "alt+\",
-    "command": "(corpus) alt+\ 10e1",
+    "key": "alt+\\",
+    "command": "(corpus) alt+\\ 10e1",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // (split)
-    "key": "ctrl+\",
-    "command": "(corpus) ctrl+\ 8526",
+    "key": "ctrl+\\",
+    "command": "(corpus) ctrl+\\ 8526",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // (split)
-    "key": "ctrl+alt+\",
-    "command": "(corpus) ctrl+alt+\ f3fb",
+    "key": "ctrl+alt+\\",
+    "command": "(corpus) ctrl+alt+\\ f3fb",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // (split)
-    "key": "shift+alt+\",
-    "command": "(corpus) shift+alt+\ 235f",
+    "key": "shift+alt+\\",
+    "command": "(corpus) shift+alt+\\ 235f",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // (split)
-    "key": "ctrl+alt+meta+\",
-    "command": "(corpus) ctrl+alt+meta+\ 2dfd",
+    "key": "ctrl+alt+meta+\\",
+    "command": "(corpus) ctrl+alt+meta+\\ 2dfd",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // (split)
-    "key": "ctrl+shift+alt+\",
-    "command": "(corpus) ctrl+shift+alt+\ 42ac",
+    "key": "ctrl+shift+alt+\\",
+    "command": "(corpus) ctrl+shift+alt+\\ 42ac",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // (split)
-    "key": "shift+alt+meta+\",
-    "command": "(corpus) shift+alt+meta+\ 4c91",
+    "key": "shift+alt+meta+\\",
+    "command": "(corpus) shift+alt+meta+\\ 4c91",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // (split)
-    "key": "ctrl+shift+alt+meta+\",
-    "command": "(corpus) ctrl+shift+alt+meta+\ 13c8",
+    "key": "ctrl+shift+alt+meta+\\",
+    "command": "(corpus) ctrl+shift+alt+meta+\\ 13c8",
     "when": "config.keyboardNavigation.enabled"
   },
   {

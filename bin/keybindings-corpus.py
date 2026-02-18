@@ -155,9 +155,9 @@ def emit_record(key_str, command_str, when_str, comment_tags):
     parts.append("  {")
     if comment_tags:
         parts.append("    // " + " ".join(comment_tags))
-    parts.append(f'    "key": "{key_str}",')
-    parts.append(f'    "command": "{command_str}",')
-    parts.append(f'    "when": "{when_str}"')
+    parts.append(f'    "key": {json.dumps(key_str)},')
+    parts.append(f'    "command": {json.dumps(command_str)},')
+    parts.append(f'    "when": {json.dumps(when_str)}')
     parts.append("  }")
     return "\n".join(parts)
 
