@@ -30,7 +30,7 @@ import sys
 import argparse
 from random import Random
 from itertools import combinations
-from typing import List
+from typing import List, Tuple
 from collections import Counter
 import hashlib
 
@@ -159,7 +159,7 @@ def main(argv: List[str] | None = None) -> int:
     parser.add_argument(
         "-n",
         "--navigation-group",
-        choices=["emacs", "kbm", "vi", "none"],
+        choices=["emacs", "kbm", "vi", "none", "all"],
         default="none",
         help=(
             "Select the active letter-key navigation group (default: none)."
@@ -176,7 +176,7 @@ def main(argv: List[str] | None = None) -> int:
     # expose letter-groups and selected mode for helper functions
     globals()["LETTER_GROUPS"] = LETTER_GROUPS
     globals()["SELECTED_NAV_GROUP"] = selected
-    if selected == "none":
+    if selected == "none" or selected == "all":
         allowed_letter_keys = set()
     else:
         allowed_letter_keys = set(LETTER_GROUPS[selected])
@@ -184,83 +184,102 @@ def main(argv: List[str] | None = None) -> int:
     globals()["ALLOWED_LETTER_KEYS"] = allowed_letter_keys
 
     init_directional_groups(selected, LETTER_GROUPS)
+    def generate_records_for_mode(mode: str) -> List[Tuple[str, str, List[str]]]:
+        # Set per-mode globals so helpers `when_for` and `tags_for` behave
+        globals()["SELECTED_NAV_GROUP"] = mode
+        if mode == "none":
+            globals()["ALLOWED_LETTER_KEYS"] = set()
+        else:
+            globals()["ALLOWED_LETTER_KEYS"] = set(LETTER_GROUPS.get(mode, ()))
+        init_directional_groups(mode, LETTER_GROUPS)
 
-    def _select_adaptive_key(primary_group: set, alternate_key: str, label: str) -> str:
-        primary_key = sorted(primary_group)[0]
-        contains_primary = primary_key in allowed_letter_keys
-        contains_alternate = alternate_key in allowed_letter_keys
-        if contains_primary and not contains_alternate:
-            return alternate_key
-        if contains_primary and contains_alternate:
-            YELLOW = "\x1b[33m"
-            RESET = "\x1b[0m"
-            msg = (
-                f"{YELLOW}Warning: both '{primary_key}' and '{alternate_key}' "
-                f"present in selected navigation group; using default "
-                f"'{primary_key}'.{RESET}"
-            )
-            print(msg, file=sys.stderr)
+        def _select_adaptive_key(primary_group: set, alternate_key: str, label: str) -> str:
+            primary_key = sorted(primary_group)[0]
+            contains_primary = primary_key in globals().get("ALLOWED_LETTER_KEYS", set())
+            contains_alternate = alternate_key in globals().get("ALLOWED_LETTER_KEYS", set())
+            if contains_primary and not contains_alternate:
+                return alternate_key
+            if contains_primary and contains_alternate:
+                YELLOW = "\x1b[33m"
+                RESET = "\x1b[0m"
+                allowed = sorted(globals().get("ALLOWED_LETTER_KEYS", set()))
+                primary_group_sorted = sorted(primary_group)
+                msg = (
+                    f"{YELLOW}Warning: mode={mode!r} chord={label!r}: both primary '{primary_key}' (group={primary_group_sorted})"
+                    f" and alternate '{alternate_key}' present in allowed letters {allowed}; using default '{primary_key}'.{RESET}"
+                )
+                print(msg, file=sys.stderr)
+                return primary_key
             return primary_key
-        return primary_key
 
-    # apply adaptive selection for chord keys
-    action_selected = _select_adaptive_key(ACTION_GROUP, ALTERNATE_ACTION_KEY, "action")
-    globals()["ACTION_GROUP"] = {action_selected}
+        # apply adaptive selection for chord keys for this mode
+        globals()["ACTION_GROUP"] = { _select_adaptive_key(ACTION_GROUP, ALTERNATE_ACTION_KEY, "action") }
+        globals()["DEBUG_GROUP"] = { _select_adaptive_key(DEBUG_GROUP, ALTERNATE_DEBUG_KEY, "debug") }
+        globals()["EXTENSION_GROUP"] = { _select_adaptive_key(EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY, "extension") }
 
-    debug_selected = _select_adaptive_key(DEBUG_GROUP, ALTERNATE_DEBUG_KEY, "debug")
-    globals()["DEBUG_GROUP"] = {debug_selected}
+        keys_to_emit = set()
+        keys_to_emit.update(ARROW_GROUP)
+        keys_to_emit.update(JUKE_GROUP)
+        keys_to_emit.update(SPLIT_GROUP)
+        keys_to_emit.update(globals()["DEBUG_GROUP"])
+        keys_to_emit.update(globals()["EXTENSION_GROUP"])
+        keys_to_emit.update(globals()["ACTION_GROUP"])
+        keys_to_emit.update(globals()["ALLOWED_LETTER_KEYS"])
 
-    extension_selected = _select_adaptive_key(EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY, "extension")
-    globals()["EXTENSION_GROUP"] = {extension_selected}
+        keys_ordered = sorted(keys_to_emit)
 
-    keys_to_emit = set()
-    keys_to_emit.update(ARROW_GROUP)
-    keys_to_emit.update(JUKE_GROUP)
-    keys_to_emit.update(SPLIT_GROUP)
-    keys_to_emit.update(DEBUG_GROUP)
-    keys_to_emit.update(EXTENSION_GROUP)
-    keys_to_emit.update(ACTION_GROUP)
-    keys_to_emit.update(allowed_letter_keys)
+        recs: List[Tuple[str, str, List[str]]] = []
+        all_mods = MODIFIERS_SINGLE + MODIFIERS_MULTI
+        for key in keys_ordered:
+            for mod in all_mods:
+                key_str = f"{mod}+{key}"
+                base_when = when_for(key)
+                tags = tags_for(key)
+                comment_tags = tags if tags else []
+                recs.append((key_str, base_when, comment_tags))
 
-    keys_ordered = sorted(keys_to_emit)
+                EXTRA_WHENS: List[str] = [
+                    # "config.keyboardNavigation.terminal",
+                    # "!config.keyboardNavigation.terminal",
+                ]
+                m = len(EXTRA_WHENS)
+                for r in range(1, m + 1):
+                    for combo in combinations(EXTRA_WHENS, r):
+                        conflict = False
+                        seen = {}
+                        for extra in combo:
+                            base = extra[1:] if extra.startswith("!") else extra
+                            neg = extra.startswith("!")
+                            if base in seen:
+                                if seen[base] != neg:
+                                    conflict = True
+                                    break
+                            else:
+                                seen[base] = neg
+                        if conflict:
+                            continue
 
-    records = []
-    all_mods = MODIFIERS_SINGLE + MODIFIERS_MULTI
-    for key in keys_ordered:
-        for mod in all_mods:
-            key_str = f"{mod}+{key}"
-            base_when = when_for(key)
-            tags = tags_for(key)
-            comment_tags = tags if tags else []
+                        combined_when = base_when + " && " + " && ".join(combo)
+                        recs.append((key_str, combined_when, comment_tags))
 
-            # store records without id; ids are computed deterministically
-            # from (key, when) after all records are known so we can choose
-            # minimal unique prefixes per-record
-            records.append((key_str, base_when, comment_tags))
+        return recs
 
-            EXTRA_WHENS = [
-                # "config.keyboardNavigation.terminal",
-                # "!config.keyboardNavigation.terminal",
-            ]
-            n = len(EXTRA_WHENS)
-            for r in range(1, n + 1):
-                for combo in combinations(EXTRA_WHENS, r):
-                    conflict = False
-                    seen = {}
-                    for extra in combo:
-                        base = extra[1:] if extra.startswith("!") else extra
-                        neg = extra.startswith("!")
-                        if base in seen:
-                            if seen[base] != neg:
-                                conflict = True
-                                break
-                        else:
-                            seen[base] = neg
-                    if conflict:
-                        continue
+    # build records for either a single selected mode or all modes
+    modes: List[str]
+    if selected == "all":
+        modes = ["none", "emacs", "kbm", "vi"]
+    else:
+        modes = [selected]
 
-                    combined_when = base_when + " && " + " && ".join(combo)
-                    records.append((key_str, combined_when, comment_tags))
+    seen_pairs = set()
+    records: List[Tuple[str, str, List[str]]] = []
+    for mode in modes:
+        for rec in generate_records_for_mode(mode):
+            pair = (rec[0], rec[1])
+            if pair in seen_pairs:
+                continue
+            seen_pairs.add(pair)
+            records.append(rec)
 
     # compute deterministic per-record ids using SHA-256(key||when)
     id_fulls = [hashlib.sha256(f"{k}||{w}".encode()).hexdigest() for (k, w, _) in records]
