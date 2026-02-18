@@ -366,10 +366,9 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (action)
     "key": "ctrl+a",
-    "command": "(corpus) ctrl+a c2a6",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+    "command": "(corpus) ctrl+a 0358",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (right) (juke)
@@ -690,10 +689,9 @@
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
   },
   {
-    // (debug)
     "key": "ctrl+d",
-    "command": "(corpus) ctrl+d d154",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+    "command": "(corpus) ctrl+d 92f0",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (down) (arrow)
@@ -1074,10 +1072,9 @@
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
   },
   {
-    // (extension)
     "key": "ctrl+x",
-    "command": "(corpus) ctrl+x c574",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+    "command": "(corpus) ctrl+x 251e",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (right) (juke)

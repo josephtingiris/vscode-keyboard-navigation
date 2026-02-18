@@ -33,6 +33,7 @@ from itertools import combinations
 from typing import List, Tuple
 from collections import Counter
 import hashlib
+import inspect
 
 # MODIFIERS
 
@@ -184,6 +185,11 @@ def main(argv: List[str] | None = None) -> int:
     globals()["ALLOWED_LETTER_KEYS"] = allowed_letter_keys
 
     init_directional_groups(selected, LETTER_GROUPS)
+    # preserve the original (base) chord groups so per-mode mutation does
+    # not affect later mode processing when we select adaptive keys.
+    BASE_ACTION_GROUP = set(ACTION_GROUP)
+    BASE_DEBUG_GROUP = set(DEBUG_GROUP)
+    BASE_EXTENSION_GROUP = set(EXTENSION_GROUP)
     def generate_records_for_mode(mode: str) -> List[Tuple[str, str, List[str]]]:
         # Set per-mode globals so helpers `when_for` and `tags_for` behave
         globals()["SELECTED_NAV_GROUP"] = mode
@@ -197,6 +203,11 @@ def main(argv: List[str] | None = None) -> int:
             primary_key = sorted(primary_group)[0]
             contains_primary = primary_key in globals().get("ALLOWED_LETTER_KEYS", set())
             contains_alternate = alternate_key in globals().get("ALLOWED_LETTER_KEYS", set())
+
+            # Correct selection logic:
+            # - If primary conflicts with allowed letters and alternate is free -> use alternate
+            # - If both conflict -> warn and keep primary
+            # - Otherwise -> keep primary
             if contains_primary and not contains_alternate:
                 return alternate_key
             if contains_primary and contains_alternate:
@@ -204,18 +215,31 @@ def main(argv: List[str] | None = None) -> int:
                 RESET = "\x1b[0m"
                 allowed = sorted(globals().get("ALLOWED_LETTER_KEYS", set()))
                 primary_group_sorted = sorted(primary_group)
+                frame = inspect.currentframe()
+                if frame is not None:
+                    lineno = inspect.getframeinfo(frame).lineno
+                else:
+                    lineno = -1
+                loc = f"{__file__}:{lineno}"
                 msg = (
-                    f"{YELLOW}Warning: mode={mode!r} chord={label!r}: both primary '{primary_key}' (group={primary_group_sorted})"
+                    f"{YELLOW}Warning ({loc}): mode={mode!r} chord={label!r}: both primary '{primary_key}' (group={primary_group_sorted})"
                     f" and alternate '{alternate_key}' present in allowed letters {allowed}; using default '{primary_key}'.{RESET}"
                 )
                 print(msg, file=sys.stderr)
                 return primary_key
+
             return primary_key
 
         # apply adaptive selection for chord keys for this mode
-        globals()["ACTION_GROUP"] = { _select_adaptive_key(ACTION_GROUP, ALTERNATE_ACTION_KEY, "action") }
-        globals()["DEBUG_GROUP"] = { _select_adaptive_key(DEBUG_GROUP, ALTERNATE_DEBUG_KEY, "debug") }
-        globals()["EXTENSION_GROUP"] = { _select_adaptive_key(EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY, "extension") }
+        globals()["ACTION_GROUP"] = {
+            _select_adaptive_key(BASE_ACTION_GROUP, ALTERNATE_ACTION_KEY, "action")
+        }
+        globals()["DEBUG_GROUP"] = {
+            _select_adaptive_key(BASE_DEBUG_GROUP, ALTERNATE_DEBUG_KEY, "debug")
+        }
+        globals()["EXTENSION_GROUP"] = {
+            _select_adaptive_key(BASE_EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY, "extension")
+        }
 
         keys_to_emit = set()
         keys_to_emit.update(ARROW_GROUP)
@@ -233,8 +257,8 @@ def main(argv: List[str] | None = None) -> int:
         for key in keys_ordered:
             for mod in all_mods:
                 key_str = f"{mod}+{key}"
-                base_when = when_for(key)
-                tags = tags_for(key)
+                base_when = when_for(key, mod)
+                tags = tags_for(key, mod)
                 comment_tags = tags if tags else []
                 recs.append((key_str, base_when, comment_tags))
 
@@ -318,7 +342,7 @@ def main(argv: List[str] | None = None) -> int:
     return 0
 
 
-def tags_for(key):
+def tags_for(key, mod: str = ""):
     tags = []
     if key in DOWN_GROUP:
         tags.append("(down)")
@@ -344,18 +368,20 @@ def tags_for(key):
         tags.append("(horizontal)")
     if key in SPLIT_VERTICAL_GROUP:
         tags.append("(vertical)")
-    if key in DEBUG_GROUP:
-        tags.append("(debug)")
-    if key in ACTION_GROUP:
-        tags.append("(action)")
-    if key in EXTENSION_GROUP:
-        tags.append("(extension)")
+    # chord tags are only relevant when the modifier includes Alt
+    if "alt" in mod.split("+"):
+        if key in DEBUG_GROUP:
+            tags.append("(debug)")
+        if key in ACTION_GROUP:
+            tags.append("(action)")
+        if key in EXTENSION_GROUP:
+            tags.append("(extension)")
 
     tags_sorted = [t for t in TAG_ORDER if t in tags]
     return tags_sorted
 
 
-def when_for(key):
+def when_for(key, mod: str = ""):
     parts = ["config.keyboardNavigation.enabled"]
     seen = set()
 
@@ -374,6 +400,9 @@ def when_for(key):
         _add("config.keyboardNavigation.keys.letters == 'vi'")
 
     def _qualify_chord(chord_set, chord_name: str) -> None:
+        # Only qualify chord when modifier includes Alt
+        if "alt" not in mod.split("+"):
+            return
         if key in chord_set:
             _add(f"config.keyboardNavigation.chords.{chord_name}")
             sel = globals().get("SELECTED_NAV_GROUP")
