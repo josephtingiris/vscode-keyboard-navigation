@@ -31,6 +31,7 @@ import argparse
 from random import Random
 from itertools import combinations
 from typing import List
+from collections import Counter
 import hashlib
 
 # MODIFIERS
@@ -166,8 +167,6 @@ def main(argv: List[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    rng = Random(0)
-
     LETTER_GROUPS = {
         "emacs": EMACS_GROUP,
         "kbm": KBM_GROUP,
@@ -234,10 +233,10 @@ def main(argv: List[str] | None = None) -> int:
             tags = tags_for(key)
             comment_tags = tags if tags else []
 
-            id_source = f"{key_str}||{base_when}"
-            id_hex = hashlib.sha256(id_source.encode()).hexdigest()[:8]
-            cmd_base = f"(corpus) {key_str} {id_hex}"
-            records.append((key_str, cmd_base, base_when, comment_tags))
+            # store records without id; ids are computed deterministically
+            # from (key, when) after all records are known so we can choose
+            # minimal unique prefixes per-record
+            records.append((key_str, base_when, comment_tags))
 
             EXTRA_WHENS = [
                 # "config.keyboardNavigation.terminal",
@@ -261,14 +260,29 @@ def main(argv: List[str] | None = None) -> int:
                         continue
 
                     combined_when = base_when + " && " + " && ".join(combo)
-                    id_source_extra = f"{key_str}||{combined_when}"
-                    id_hex_extra = hashlib.sha256(id_source_extra.encode()).hexdigest()[:8]
-                    cmd_extra = f"(corpus) {key_str} {id_hex_extra}"
-                    records.append((key_str, cmd_extra, combined_when, comment_tags))
+                    records.append((key_str, combined_when, comment_tags))
 
+    # compute deterministic per-record ids using SHA-256(key||when)
+    id_fulls = [hashlib.sha256(f"{k}||{w}".encode()).hexdigest() for (k, w, _) in records]
+    n = len(id_fulls)
+    assigned: List[str | None] = [None] * n
+    # assign the shortest unique prefix, starting at 4 chars, up to 12
+    for L in range(4, 13):
+        prefixes = [h[:L] for h in id_fulls]
+        counts = Counter(prefixes)
+        for i, p in enumerate(prefixes):
+            if assigned[i] is None and counts[p] == 1:
+                assigned[i] = p
+    # finalize any remaining by using 12-char prefix
+    for i in range(n):
+        if assigned[i] is None:
+            assigned[i] = id_fulls[i][:12]
+
+    # build final objects with assigned ids
     out_lines = ["["]
-    for i, (k, c, w, tags) in enumerate(records):
-        obj = emit_record(k, c, w, tags)
+    for i, (k, w, tags) in enumerate(records):
+        cmd = f"(corpus) {k} {assigned[i]}"
+        obj = emit_record(k, cmd, w, tags)
         comma = "," if i < len(records) - 1 else ""
         if comma:
             obj = obj + comma

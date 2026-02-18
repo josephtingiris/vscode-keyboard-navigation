@@ -270,5 +270,7 @@ def main(argv: list | None = None) -> int:
     if not postamble.endswith('\n'):
         sys.stdout.write('\n')
 
+    return 0
+
 if __name__ == "__main__":
     raise SystemExit(main())
