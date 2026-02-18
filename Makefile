@@ -3,7 +3,7 @@
 .PHONY: help all build test tests clean extension
 
 # subdirectories with their own Makefiles
-SUBDIRS := extension
+SUBDIRS := extension tests
 
 # show help when `make` is run with no args
 help:
@@ -25,17 +25,21 @@ build:
 	done
 	@echo "Repository build complete."
 
+corpus:
+	@echo "Updating reference keybindings corpus files ..."
+	@keybindings-corpus.py | keybindings-sort.py > references/keybindings-corpus.jsonc
+	@keybindings-corpus.py -n emacs | keybindings-sort.py > references/keybindings-corpus-emacs.jsonc
+	@keybindings-corpus.py -n kbm | keybindings-sort.py > references/keybindings-corpus-kbm.jsonc
+	@keybindings-corpus.py -n vi | keybindings-sort.py > references/keybindings-corpus-vi.jsonc
+
 extension:
-	@echAo "Delegating to extension/Makefile (default target) ..."
+	@echo "Delegating to extension/Makefile (default target) ..."
 	@$(MAKE) -C extension
 
-
-# run tests across repository (delegate to tests/Makefile)
 test:
-	@echo "Running tests across repository..."
+	@echo "Running tests ..."
 	@$(MAKE) -C tests tests
 
-# alias `make tests` to `make test`
 tests: test
 
 clean:
