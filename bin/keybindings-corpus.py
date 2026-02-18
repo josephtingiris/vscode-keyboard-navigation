@@ -73,7 +73,7 @@ DOWN_GROUP = {"j", "down"} | FOUR_PACK_DOWN_GROUP
 UP_GROUP = {"k", "up"} | FOUR_PACK_UP_GROUP
 RIGHT_GROUP = {"l", "right"} | PUNCTUATION_RIGHT_GROUP
 
-JUKE_GROUP = {"[", "]", "{", "}", ";", "'", ",", "."} | FOUR_PACK_DOWN_GROUP | FOUR_PACK_UP_GROUP
+JUKE_GROUP = PUNCTUATION_GROUP | FOUR_PACK_GROUP
 
 # split groups for panes/windows
 
