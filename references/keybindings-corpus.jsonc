@@ -150,7 +150,6 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (vertical) (split)
     "key": "alt++",
     "command": "(corpus) alt++ 22d0",
     "when": "config.keyboardNavigation.enabled"
@@ -282,7 +281,6 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (vertical) (split)
     "key": "ctrl++",
     "command": "(corpus) ctrl++ 2d9f",
     "when": "config.keyboardNavigation.enabled"
@@ -354,7 +352,6 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (vertical) (split)
     "key": "ctrl+alt++",
     "command": "(corpus) ctrl+alt++ dd73",
     "when": "config.keyboardNavigation.enabled"
@@ -456,7 +453,6 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (vertical) (split)
     "key": "ctrl+alt+meta++",
     "command": "(corpus) ctrl+alt+meta++ 3346",
     "when": "config.keyboardNavigation.enabled"
@@ -666,7 +662,6 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (vertical) (split)
     "key": "ctrl+shift+alt++",
     "command": "(corpus) ctrl+shift+alt++ c368",
     "when": "config.keyboardNavigation.enabled"
@@ -768,7 +763,6 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (vertical) (split)
     "key": "ctrl+shift+alt+meta++",
     "command": "(corpus) ctrl+shift+alt+meta++ 4c8c",
     "when": "config.keyboardNavigation.enabled"
@@ -942,7 +936,6 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (vertical) (split)
     "key": "shift+alt++",
     "command": "(corpus) shift+alt++ 7c16",
     "when": "config.keyboardNavigation.enabled"
@@ -1044,7 +1037,6 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (vertical) (split)
     "key": "shift+alt+meta++",
     "command": "(corpus) shift+alt+meta++ d18e",
     "when": "config.keyboardNavigation.enabled"

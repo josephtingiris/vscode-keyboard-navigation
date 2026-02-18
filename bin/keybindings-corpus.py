@@ -124,7 +124,7 @@ def init_directional_groups(selected: str, letter_groups: dict) -> None:
     """ensure LEFT_GROUP/DOWN_GROUP/UP_GROUP/RIGHT_GROUP globals include
     the arrow literal and the corresponding letter from the selected
     navigation group (if any). This centralizes startup mutation so
-    helpers like `tags_for` and `when_for` can continue to read globals.
+    helpers can continue to read globals.
     """
     direction_to_var = {
         "left": "LEFT_GROUP",
@@ -192,7 +192,6 @@ def main(argv: List[str] | None = None) -> int:
     BASE_EXTENSION_GROUP = set(EXTENSION_GROUP)
 
     def generate_records_for_mode(mode: str) -> List[Tuple[str, str, List[str]]]:
-        # Set per-mode globals so helpers `when_for` and `tags_for` behave
         globals()["SELECTED_NAV_GROUP"] = mode
         if mode == "none":
             globals()["ALLOWED_LETTER_KEYS"] = set()
@@ -257,39 +256,79 @@ def main(argv: List[str] | None = None) -> int:
         keys_ordered = sorted(keys_to_emit)
 
         recs: List[Tuple[str, str, List[str]]] = []
+        local_seen: set = set()
         all_mods = MODIFIERS_SINGLE + MODIFIERS_MULTI
         for key in keys_ordered:
             for mod in all_mods:
                 key_str = f"{mod}+{key}"
-                base_when = when_for(key, mod)
-                tags = tags_for(key, mod)
-                comment_tags = tags if tags else []
-                recs.append((key_str, base_when, comment_tags))
+                # do not compute tags yet; compute them once the final
+                # records array is assembled to avoid race/ordering effects
+                comment_tags: List[str] = []
+
+                # when under the currently selected mode
+                mode_when = when_for(key, mod)
+
+                # compute generic 'none' when by temporarily forcing SELECTED_NAV_GROUP='none'
+                prev_sel = globals().get("SELECTED_NAV_GROUP")
+                prev_allowed = globals().get("ALLOWED_LETTER_KEYS")
+                prev_LEFT = set(globals().get("LEFT_GROUP", set()))
+                prev_DOWN = set(globals().get("DOWN_GROUP", set()))
+                prev_UP = set(globals().get("UP_GROUP", set()))
+                prev_RIGHT = set(globals().get("RIGHT_GROUP", set()))
+
+                globals()["SELECTED_NAV_GROUP"] = "none"
+                globals()["ALLOWED_LETTER_KEYS"] = set()
+                init_directional_groups("none", LETTER_GROUPS)
+                generic_when = when_for(key, mod)
+
+                # restore
+                globals()["SELECTED_NAV_GROUP"] = prev_sel
+                globals()["ALLOWED_LETTER_KEYS"] = prev_allowed
+                globals()["LEFT_GROUP"] = prev_LEFT
+                globals()["DOWN_GROUP"] = prev_DOWN
+                globals()["UP_GROUP"] = prev_UP
+                globals()["RIGHT_GROUP"] = prev_RIGHT
+
+                # emit generic first if different, then the mode-qualified when
+                emitted_whens = []
+                if generic_when != mode_when:
+                    emitted_whens.append(generic_when)
+                emitted_whens.append(mode_when)
 
                 EXTRA_WHENS: List[str] = [
                     # "config.keyboardNavigation.terminal",
                     # "!config.keyboardNavigation.terminal",
                 ]
                 m = len(EXTRA_WHENS)
-                for r in range(1, m + 1):
-                    for combo in combinations(EXTRA_WHENS, r):
-                        conflict = False
-                        seen = {}
-                        for extra in combo:
-                            base = extra[1:] if extra.startswith(
-                                "!") else extra
-                            neg = extra.startswith("!")
-                            if base in seen:
-                                if seen[base] != neg:
-                                    conflict = True
-                                    break
-                            else:
-                                seen[base] = neg
-                        if conflict:
-                            continue
 
-                        combined_when = base_when + " && " + " && ".join(combo)
-                        recs.append((key_str, combined_when, comment_tags))
+                for base_when in emitted_whens:
+                    pair = (key_str, base_when)
+                    if pair not in local_seen:
+                        local_seen.add(pair)
+                        recs.append((key_str, base_when, comment_tags))
+
+                    for r in range(1, m + 1):
+                        for combo in combinations(EXTRA_WHENS, r):
+                            conflict = False
+                            seen = {}
+                            for extra in combo:
+                                base = extra[1:] if extra.startswith(
+                                    "!") else extra
+                                neg = extra.startswith("!")
+                                if base in seen:
+                                    if seen[base] != neg:
+                                        conflict = True
+                                        break
+                                else:
+                                    seen[base] = neg
+                            if conflict:
+                                continue
+
+                            combined_when = base_when + " && " + " && ".join(combo)
+                            pair = (key_str, combined_when)
+                            if pair not in local_seen:
+                                local_seen.add(pair)
+                                recs.append((key_str, combined_when, comment_tags))
 
         return recs
 
@@ -330,6 +369,53 @@ def main(argv: List[str] | None = None) -> int:
             assigned[i] = id_fulls[i][:12]
 
     # build final objects with assigned ids
+    # compute comment tags now that records are final: set globals based on
+    # each record's when-clause and recompute adaptive chord groups so
+    # tags reflect the final emitted conditionals
+    for idx, (k, w, _) in enumerate(records):
+        # split modifier(s) from key literal
+        try:
+            mod, key = k.rsplit("+", 1)
+        except ValueError:
+            mod = ""
+            key = k
+
+        # determine selected navigation group from when-clause
+        sel = None
+        if "config.keyboardNavigation.keys.letters == 'emacs'" in w:
+            sel = 'emacs'
+        elif "config.keyboardNavigation.keys.letters == 'kbm'" in w:
+            sel = 'kbm'
+        elif "config.keyboardNavigation.keys.letters == 'vi'" in w:
+            sel = 'vi'
+        else:
+            sel = 'none'
+
+        # set ALLOWED_LETTER_KEYS and directional groups for tag calculation
+        globals()["SELECTED_NAV_GROUP"] = sel
+        if sel == 'none':
+            globals()["ALLOWED_LETTER_KEYS"] = set()
+        else:
+            globals()["ALLOWED_LETTER_KEYS"] = set(LETTER_GROUPS.get(sel, ()))
+        init_directional_groups(sel, LETTER_GROUPS)
+
+        # recompute adaptive chord groups for this selection
+        def _select_adaptive_key_local(primary_group: set, alternate_key: str) -> str:
+            primary_key = sorted(primary_group)[0]
+            contains_primary = primary_key in globals().get("ALLOWED_LETTER_KEYS", set())
+            contains_alternate = alternate_key in globals().get("ALLOWED_LETTER_KEYS", set())
+            if contains_primary and not contains_alternate:
+                return alternate_key
+            return primary_key
+
+        globals()["ACTION_GROUP"] = {_select_adaptive_key_local(BASE_ACTION_GROUP, ALTERNATE_ACTION_KEY)}
+        globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(BASE_DEBUG_GROUP, ALTERNATE_DEBUG_KEY)}
+        globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(BASE_EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY)}
+
+        tags = tags_for(key, mod)
+        comment_tags = tags if tags else []
+        records[idx] = (k, w, comment_tags)
+
     out_lines = ["["]
     for i, (k, w, tags) in enumerate(records):
         cmd = f"(corpus) {k} {assigned[i]}"
