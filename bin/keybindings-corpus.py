@@ -190,6 +190,7 @@ def main(argv: List[str] | None = None) -> int:
     BASE_ACTION_GROUP = set(ACTION_GROUP)
     BASE_DEBUG_GROUP = set(DEBUG_GROUP)
     BASE_EXTENSION_GROUP = set(EXTENSION_GROUP)
+
     def generate_records_for_mode(mode: str) -> List[Tuple[str, str, List[str]]]:
         # Set per-mode globals so helpers `when_for` and `tags_for` behave
         globals()["SELECTED_NAV_GROUP"] = mode
@@ -232,13 +233,16 @@ def main(argv: List[str] | None = None) -> int:
 
         # apply adaptive selection for chord keys for this mode
         globals()["ACTION_GROUP"] = {
-            _select_adaptive_key(BASE_ACTION_GROUP, ALTERNATE_ACTION_KEY, "action")
+            _select_adaptive_key(
+                BASE_ACTION_GROUP, ALTERNATE_ACTION_KEY, "action")
         }
         globals()["DEBUG_GROUP"] = {
-            _select_adaptive_key(BASE_DEBUG_GROUP, ALTERNATE_DEBUG_KEY, "debug")
+            _select_adaptive_key(
+                BASE_DEBUG_GROUP, ALTERNATE_DEBUG_KEY, "debug")
         }
         globals()["EXTENSION_GROUP"] = {
-            _select_adaptive_key(BASE_EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY, "extension")
+            _select_adaptive_key(BASE_EXTENSION_GROUP,
+                                 ALTERNATE_EXTENSION_KEY, "extension")
         }
 
         keys_to_emit = set()
@@ -272,7 +276,8 @@ def main(argv: List[str] | None = None) -> int:
                         conflict = False
                         seen = {}
                         for extra in combo:
-                            base = extra[1:] if extra.startswith("!") else extra
+                            base = extra[1:] if extra.startswith(
+                                "!") else extra
                             neg = extra.startswith("!")
                             if base in seen:
                                 if seen[base] != neg:
@@ -306,7 +311,8 @@ def main(argv: List[str] | None = None) -> int:
             records.append(rec)
 
     # compute deterministic per-record ids using SHA-256(key||when)
-    id_fulls = [hashlib.sha256(f"{k}||{w}".encode()).hexdigest() for (k, w, _) in records]
+    id_fulls = [hashlib.sha256(f"{k}||{w}".encode()).hexdigest()
+                for (k, w, _) in records]
     n = len(id_fulls)
     assigned: List[str | None] = [None] * n
 
