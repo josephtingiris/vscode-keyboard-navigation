@@ -45,38 +45,54 @@ MODIFIERS_MULTI = [
     "ctrl+shift+alt+meta",
 ]
 
-KEYS = [
-    "left", "down", "up", "right",
-    "b", "n", "p", "f",
-    "a", "s", "w", "d",
-    "h", "j", "k", "l",
-    "end", "home", "pageup", "pagedown",
-    "[", "]", ";", "'", ",", ".",
-    "-", "_", "=", "+", "\\", "|",
-    "x",
-]
-
 # DAFC
 
-ARROW_GROUP = {"left", "down", "up", "right"}
-EMACS_GROUP = {"b", "n", "p", "f"}
-KBM_GROUP = {"a", "s", "w", "d"}
-VI_GROUP = {"h", "j", "k", "l"}
+# arrow-key navigational group (ordered tuple; index also corresponds to letter-group positions)
+ARROW_GROUP = ("left", "down", "up", "right")
 
-JUKE_GROUP = {"end", "home", "pageup",
-              "pagedown", "[", "]", ";", "'", ",", "."}
-SPLIT_GROUP = {"-", "_", "=", "+", "\\", "|"}
+# destructure for consistency and clarity; the order of the directional keys dictates
+LEFT, DOWN, UP, RIGHT = ARROW_GROUP
 
-LEFT_GROUP = {"h", "[", ";", ",", "left"}
-DOWN_GROUP = {"end", "j", "down", "pagedown"}
-UP_GROUP = {"home", "k", "up", "pageup"}
-RIGHT_GROUP = {"l", "]", "'", ".", "right"}
+# letter-key navigation groups (MUST use the same directional order as ARROW_GROUP)
+EMACS_GROUP = ("b", "n", "p", "f")
+KBM_GROUP = ("a", "s", "w", "d")
+VI_GROUP = ("h", "j", "k", "l")
+
+# directional groups for jukes and moves
+
+FOUR_PACK_DOWN_GROUP = {"end", "pagedown"}
+FOUR_PACK_UP_GROUP = {"home", "pageup"}
+FOUR_PACK_GROUP = FOUR_PACK_DOWN_GROUP | FOUR_PACK_UP_GROUP
+
+PUNCTUATION_LEFT_GROUP = {"[", "{", ";", ","}
+PUNCTUATION_RIGHT_GROUP = {"]", "}", "'", "."}
+PUNCTUATION_GROUP = PUNCTUATION_LEFT_GROUP | PUNCTUATION_RIGHT_GROUP
+
+LEFT_GROUP = {"h", "left"} | PUNCTUATION_LEFT_GROUP
+DOWN_GROUP = {"j", "down"} | FOUR_PACK_DOWN_GROUP
+UP_GROUP = {"k", "up"} | FOUR_PACK_UP_GROUP
+RIGHT_GROUP = {"l", "right"} | PUNCTUATION_RIGHT_GROUP
+
+JUKE_GROUP = {"[", "]", "{", "}", ";", "'", ",", "."} | FOUR_PACK_DOWN_GROUP | FOUR_PACK_UP_GROUP
+
+# split groups for panes/windows
+
+SPLIT_HORIZONTAL_GROUP = {"-", "_"}
+SPLIT_VERTICAL_GROUP = {"=", "+", "\\", "|"}
+SPLIT_GROUP = SPLIT_HORIZONTAL_GROUP | SPLIT_VERTICAL_GROUP
+
+# chord groups for additional functionality
 
 ACTION_GROUP = {"a"}
+ALTERNATE_ACTION_KEY = 'l'
 
 DEBUG_GROUP = {"d"}
+ALTERNATE_DEBUG_KEY = 'j'
 
 EXTENSION_GROUP = {"x"}
+ALTERNATE_EXTENSION_KEY = 'n'
+
+# comments
 
 TAG_ORDER = [
     "(down)", "(left)", "(right)", "(up)",
@@ -196,36 +212,34 @@ def main(argv: List[str] | None = None) -> int:
     else:
         allowed_letter_keys = set(LETTER_GROUPS[selected])
 
-    # adapt the action key based on the selected letter-key group.
-    action_key_default = "a"
-    action_key = action_key_default
-    contains_a = "a" in allowed_letter_keys
-    contains_l = "l" in allowed_letter_keys
-    if contains_a and not contains_l:
-        action_key = "l"
-    elif contains_a and contains_l:
-        YELLOW = "\x1b[33m"
-        RESET = "\x1b[0m"
-        print(f"{YELLOW}Warning: both 'a' and 'l' present in selected navigation group; using default 'a'.{RESET}", file=sys.stderr)
-
-    globals()["ACTION_GROUP"] = {action_key}
-
     # expose allowed letter keys for helper functions
     globals()["ALLOWED_LETTER_KEYS"] = allowed_letter_keys
 
-    # Adapt the debug key similar to the action key: prefer 'j' when 'd' conflicts with an included letter-key; warn if both present.
-    debug_key_default = "d"
-    debug_key = debug_key_default
-    contains_d = "d" in allowed_letter_keys
-    contains_j = "j" in allowed_letter_keys
-    if contains_d and not contains_j:
-        debug_key = "j"
-    elif contains_d and contains_j:
-        YELLOW = "\x1b[33m"
-        RESET = "\x1b[0m"
-        print(f"{YELLOW}Warning: both 'd' and 'j' present in selected navigation group; using default 'd'.{RESET}", file=sys.stderr)
+    def _select_adaptive_key(primary_group: set, alternate_key: str, label: str) -> str:
+        primary_key = sorted(primary_group)[0]
+        contains_primary = primary_key in allowed_letter_keys
+        contains_alternate = alternate_key in allowed_letter_keys
+        if contains_primary and not contains_alternate:
+            # primary conflicts with included letter keys => use alternate
+            return alternate_key
+        if contains_primary and contains_alternate:
+            YELLOW = "\x1b[33m"
+            RESET = "\x1b[0m"
+            print(f"{YELLOW}Warning: both '{primary_key}' and '{alternate_key}' present in selected navigation group; using default '{primary_key}'.{RESET}", file=sys.stderr)
+            return primary_key
+        return primary_key
 
-    globals()["DEBUG_GROUP"] = {debug_key}
+    # ACTION_GROUP
+    action_selected = _select_adaptive_key(ACTION_GROUP, ALTERNATE_ACTION_KEY, "action")
+    globals()["ACTION_GROUP"] = {action_selected}
+
+    # DEBUG_GROUP
+    debug_selected = _select_adaptive_key(DEBUG_GROUP, ALTERNATE_DEBUG_KEY, "debug")
+    globals()["DEBUG_GROUP"] = {debug_selected}
+
+    # EXTENSION_GROUP
+    extension_selected = _select_adaptive_key(EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY, "extension")
+    globals()["EXTENSION_GROUP"] = {extension_selected}
 
     keys_to_emit = set()
     keys_to_emit.update(ARROW_GROUP)
