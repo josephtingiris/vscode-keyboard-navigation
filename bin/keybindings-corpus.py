@@ -31,6 +31,7 @@ import argparse
 from random import Random
 from itertools import combinations
 from typing import List
+import hashlib
 
 # MODIFIERS
 
@@ -233,7 +234,9 @@ def main(argv: List[str] | None = None) -> int:
             tags = tags_for(key)
             comment_tags = tags if tags else []
 
-            cmd_base = f"(corpus) {key_str} {hex4(rng)}"
+            id_source = f"{key_str}||{base_when}"
+            id_hex = hashlib.sha256(id_source.encode()).hexdigest()[:8]
+            cmd_base = f"(corpus) {key_str} {id_hex}"
             records.append((key_str, cmd_base, base_when, comment_tags))
 
             EXTRA_WHENS = [
@@ -258,7 +261,9 @@ def main(argv: List[str] | None = None) -> int:
                         continue
 
                     combined_when = base_when + " && " + " && ".join(combo)
-                    cmd_extra = f"(corpus) {key_str} {hex4(rng)}"
+                    id_source_extra = f"{key_str}||{combined_when}"
+                    id_hex_extra = hashlib.sha256(id_source_extra.encode()).hexdigest()[:8]
+                    cmd_extra = f"(corpus) {key_str} {id_hex_extra}"
                     records.append((key_str, cmd_extra, combined_when, comment_tags))
 
     out_lines = ["["]
