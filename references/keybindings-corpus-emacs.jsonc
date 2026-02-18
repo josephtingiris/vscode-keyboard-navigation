@@ -216,7 +216,7 @@
     "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (left) (emacs)
     "key": "alt+b",
     "command": "(corpus) alt+b da2d",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -240,7 +240,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (right) (emacs)
     "key": "alt+f",
     "command": "(corpus) alt+f df44",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -258,13 +258,13 @@
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
   },
   {
-    // (emacs)
+    // (down) (emacs)
     "key": "alt+n",
     "command": "(corpus) alt+n 9f75",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
   },
   {
-    // (emacs)
+    // (up) (emacs)
     "key": "alt+p",
     "command": "(corpus) alt+p abfd",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -443,7 +443,7 @@
     "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (left) (emacs)
     "key": "ctrl+alt+b",
     "command": "(corpus) ctrl+alt+b 3382",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -467,7 +467,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (right) (emacs)
     "key": "ctrl+alt+f",
     "command": "(corpus) ctrl+alt+f 1f40",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -557,7 +557,7 @@
     "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (left) (emacs)
     "key": "ctrl+alt+meta+b",
     "command": "(corpus) ctrl+alt+meta+b 7003",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -581,7 +581,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (right) (emacs)
     "key": "ctrl+alt+meta+f",
     "command": "(corpus) ctrl+alt+meta+f 1429",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -599,13 +599,13 @@
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
   },
   {
-    // (emacs)
+    // (down) (emacs)
     "key": "ctrl+alt+meta+n",
     "command": "(corpus) ctrl+alt+meta+n 4e8c",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
   },
   {
-    // (emacs)
+    // (up) (emacs)
     "key": "ctrl+alt+meta+p",
     "command": "(corpus) ctrl+alt+meta+p 7af2",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -640,13 +640,13 @@
     "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (down) (emacs)
     "key": "ctrl+alt+n",
     "command": "(corpus) ctrl+alt+n c6fc",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
   },
   {
-    // (emacs)
+    // (up) (emacs)
     "key": "ctrl+alt+p",
     "command": "(corpus) ctrl+alt+p 8fcf",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -681,7 +681,7 @@
     "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (left) (emacs)
     "key": "ctrl+b",
     "command": "(corpus) ctrl+b 1fd7",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -705,7 +705,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (right) (emacs)
     "key": "ctrl+f",
     "command": "(corpus) ctrl+f 5c52",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -723,13 +723,13 @@
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
   },
   {
-    // (emacs)
+    // (down) (emacs)
     "key": "ctrl+n",
     "command": "(corpus) ctrl+n b6dc",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
   },
   {
-    // (emacs)
+    // (up) (emacs)
     "key": "ctrl+p",
     "command": "(corpus) ctrl+p 1765",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -825,7 +825,7 @@
     "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (left) (emacs)
     "key": "ctrl+shift+alt+b",
     "command": "(corpus) ctrl+shift+alt+b 1728",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -849,7 +849,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (right) (emacs)
     "key": "ctrl+shift+alt+f",
     "command": "(corpus) ctrl+shift+alt+f 33ab",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -939,7 +939,7 @@
     "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (left) (emacs)
     "key": "ctrl+shift+alt+meta+b",
     "command": "(corpus) ctrl+shift+alt+meta+b 0dab",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -963,7 +963,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (right) (emacs)
     "key": "ctrl+shift+alt+meta+f",
     "command": "(corpus) ctrl+shift+alt+meta+f 6611",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -981,13 +981,13 @@
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
   },
   {
-    // (emacs)
+    // (down) (emacs)
     "key": "ctrl+shift+alt+meta+n",
     "command": "(corpus) ctrl+shift+alt+meta+n 287c",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
   },
   {
-    // (emacs)
+    // (up) (emacs)
     "key": "ctrl+shift+alt+meta+p",
     "command": "(corpus) ctrl+shift+alt+meta+p 9364",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -1022,13 +1022,13 @@
     "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (down) (emacs)
     "key": "ctrl+shift+alt+n",
     "command": "(corpus) ctrl+shift+alt+n 065e",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
   },
   {
-    // (emacs)
+    // (up) (emacs)
     "key": "ctrl+shift+alt+p",
     "command": "(corpus) ctrl+shift+alt+p f6b2",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -1146,7 +1146,7 @@
     "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (left) (emacs)
     "key": "shift+alt+b",
     "command": "(corpus) shift+alt+b 4aef",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -1170,7 +1170,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (right) (emacs)
     "key": "shift+alt+f",
     "command": "(corpus) shift+alt+f ef2b",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -1260,7 +1260,7 @@
     "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (left) (emacs)
     "key": "shift+alt+meta+b",
     "command": "(corpus) shift+alt+meta+b 25e2",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -1284,7 +1284,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (right) (emacs)
     "key": "shift+alt+meta+f",
     "command": "(corpus) shift+alt+meta+f c855",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -1302,13 +1302,13 @@
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
   },
   {
-    // (emacs)
+    // (down) (emacs)
     "key": "shift+alt+meta+n",
     "command": "(corpus) shift+alt+meta+n ea78",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
   },
   {
-    // (emacs)
+    // (up) (emacs)
     "key": "shift+alt+meta+p",
     "command": "(corpus) shift+alt+meta+p b456",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
@@ -1343,13 +1343,13 @@
     "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
   },
   {
-    // (emacs)
+    // (down) (emacs)
     "key": "shift+alt+n",
     "command": "(corpus) shift+alt+n 807a",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
   },
   {
-    // (emacs)
+    // (up) (emacs)
     "key": "shift+alt+p",
     "command": "(corpus) shift+alt+p 4509",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"

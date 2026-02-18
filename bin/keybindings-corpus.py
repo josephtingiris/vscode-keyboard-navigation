@@ -68,10 +68,11 @@ PUNCTUATION_LEFT_GROUP = {"[", "{", ";", ","}
 PUNCTUATION_RIGHT_GROUP = {"]", "}", "'", "."}
 PUNCTUATION_GROUP = PUNCTUATION_LEFT_GROUP | PUNCTUATION_RIGHT_GROUP
 
-LEFT_GROUP = {"h", "left"} | PUNCTUATION_LEFT_GROUP
-DOWN_GROUP = {"j", "down"} | FOUR_PACK_DOWN_GROUP
-UP_GROUP = {"k", "up"} | FOUR_PACK_UP_GROUP
-RIGHT_GROUP = {"l", "right"} | PUNCTUATION_RIGHT_GROUP
+# letter key groups are injected at runtime by `init_directional_groups` based on the selected `--navigation-group`
+LEFT_GROUP = set(PUNCTUATION_LEFT_GROUP)
+DOWN_GROUP = set(FOUR_PACK_DOWN_GROUP)
+UP_GROUP = set(FOUR_PACK_UP_GROUP)
+RIGHT_GROUP = set(PUNCTUATION_RIGHT_GROUP)
 
 JUKE_GROUP = PUNCTUATION_GROUP | FOUR_PACK_GROUP
 
@@ -100,6 +101,33 @@ TAG_ORDER = [
     "(juke)", "(split)",
     "(debug)", "(action)", "(native)",
 ]
+
+
+def init_directional_groups(selected: str, letter_groups: dict) -> None:
+    """Ensure LEFT_GROUP/DOWN_GROUP/UP_GROUP/RIGHT_GROUP globals include
+    the arrow literal and the corresponding letter from the selected
+    navigation group (if any). This centralizes startup mutation so
+    helpers like `tags_for` and `when_for` can continue to read globals.
+    """
+    direction_to_var = {
+        "left": "LEFT_GROUP",
+        "down": "DOWN_GROUP",
+        "up": "UP_GROUP",
+        "right": "RIGHT_GROUP",
+    }
+
+    for i, direction_name in enumerate(ARROW_GROUP):
+        var_name = direction_to_var[direction_name]
+        current = set(globals().get(var_name, set()))
+        # always include the arrow literal (e.g., "left")
+        current.add(direction_name)
+        # include the corresponding letter from the selected letter group
+        if selected != "none" and selected in letter_groups:
+            group = letter_groups[selected]
+            if i < len(group):
+                current.add(group[i])
+        globals()[var_name] = current
+
 
 
 def hex4(rng: Random) -> str:
@@ -214,6 +242,9 @@ def main(argv: List[str] | None = None) -> int:
 
     # expose allowed letter keys for helper functions
     globals()["ALLOWED_LETTER_KEYS"] = allowed_letter_keys
+
+    # initialize directional globals so helper functions see arrow+letter membership
+    init_directional_groups(selected, LETTER_GROUPS)
 
     def _select_adaptive_key(primary_group: set, alternate_key: str, label: str) -> str:
         primary_key = sorted(primary_group)[0]
