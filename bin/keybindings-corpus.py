@@ -375,14 +375,12 @@ def tags_for(key, mod: str = ""):
     if key in SPLIT_VERTICAL_GROUP:
         tags.append("(vertical)")
 
-    # chord tags are only relevant when the modifier includes Alt
-    if "alt" in mod.split("+"):
-        if key in DEBUG_GROUP:
-            tags.append("(debug)")
-        if key in ACTION_GROUP:
-            tags.append("(action)")
-        if key in EXTENSION_GROUP:
-            tags.append("(extension)")
+    if key in DEBUG_GROUP:
+        tags.append("(debug)")
+    if key in ACTION_GROUP:
+        tags.append("(action)")
+    if key in EXTENSION_GROUP:
+        tags.append("(extension)")
 
     tags_sorted = [t for t in TAG_ORDER if t in tags]
     return tags_sorted

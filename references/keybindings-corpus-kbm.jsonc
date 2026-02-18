@@ -708,11 +708,13 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // (debug)
     "key": "ctrl+j",
     "command": "(corpus) ctrl+j a16b",
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // (action)
     "key": "ctrl+l",
     "command": "(corpus) ctrl+l 6256",
     "when": "config.keyboardNavigation.enabled"
@@ -1072,6 +1074,7 @@
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
   },
   {
+    // (extension)
     "key": "ctrl+x",
     "command": "(corpus) ctrl+x 251e",
     "when": "config.keyboardNavigation.enabled"

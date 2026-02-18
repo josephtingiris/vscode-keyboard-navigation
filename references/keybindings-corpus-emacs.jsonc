@@ -366,6 +366,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // (action)
     "key": "ctrl+a",
     "command": "(corpus) ctrl+a 0358",
     "when": "config.keyboardNavigation.enabled"
@@ -689,6 +690,7 @@
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
   },
   {
+    // (debug)
     "key": "ctrl+d",
     "command": "(corpus) ctrl+d 92f0",
     "when": "config.keyboardNavigation.enabled"
@@ -1072,6 +1074,7 @@
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
   },
   {
+    // (extension)
     "key": "ctrl+x",
     "command": "(corpus) ctrl+x 251e",
     "when": "config.keyboardNavigation.enabled"
