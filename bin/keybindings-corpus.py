@@ -94,7 +94,7 @@ ALTERNATE_DEBUG_KEY = 'j'
 EXTENSION_GROUP = {"x"}
 ALTERNATE_EXTENSION_KEY = 'n'
 
-# comments
+# comment tag/token order
 TAG_ORDER = [
     "(down)", "(left)", "(right)", "(up)",
     "(horizontal)", "(vertical)",
@@ -374,6 +374,7 @@ def tags_for(key, mod: str = ""):
         tags.append("(horizontal)")
     if key in SPLIT_VERTICAL_GROUP:
         tags.append("(vertical)")
+
     # chord tags are only relevant when the modifier includes Alt
     if "alt" in mod.split("+"):
         if key in DEBUG_GROUP:
