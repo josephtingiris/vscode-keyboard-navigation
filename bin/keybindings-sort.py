@@ -924,9 +924,9 @@ def main(argv: List[str] | None = None) -> int:
     parser.add_argument('--when-grouping', '-w', dest='when_grouping',
                         choices=['none', 'config-first', 'focal-invariant'], default='none',
                         help="When grouping mode: how to group/rank top-level when tokens")
-    parser.add_argument('--when-prefix', dest='when_prefix', default=None,
+    parser.add_argument('--when-prefix', '-P', dest='when_prefix', default=None,
                         help="Comma-separated literal when-prefixes to prioritize (exact match). Provide at least one when present.")
-    parser.add_argument('--when-regex', dest='when_regex', default=None,
+    parser.add_argument('--when-regex', '-R', dest='when_regex', default=None,
                         help="Comma-separated regexes to match when-identifiers to prioritize (order matters). Provide at least one when present.")
 
     args = parser.parse_args(argv)
