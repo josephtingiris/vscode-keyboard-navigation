@@ -33,6 +33,8 @@ corpus:
 	@keybindings-corpus.py -n kbm | keybindings-sort.py > references/keybindings-corpus-kbm.jsonc
 	@keybindings-corpus.py -n vi | keybindings-sort.py > references/keybindings-corpus-vi.jsonc
 
+corpora: corpus
+
 extension:
 	@echo "Delegating to extension/Makefile (default target) ..."
 	@$(MAKE) -C extension
