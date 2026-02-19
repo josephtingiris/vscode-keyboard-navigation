@@ -84,7 +84,7 @@ Notes:
 */
 [
   {
-    // (alt) (i) (all) (gold) (toggle) (copilot) (chat) (completions)
+    // (alt) (i) (all) (gold) (toggle) (copilot) (chat) (completions) (user)
     "key": "alt+i",
     "command": "github.copilot.chat.completions.toggle",
     "when": "github.copilot.activated && github.copilot.extensionUnification.activated"
