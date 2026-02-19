@@ -412,6 +412,12 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // (action)
+    "key": "ctrl+a",
+    "command": "(corpus) ctrl+a 54bd",
+    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
     // (right) (juke)
     "key": "ctrl+alt+'",
     "command": "(corpus) ctrl+alt+' ae52",
@@ -810,6 +816,12 @@
     "key": "ctrl+d",
     "command": "(corpus) ctrl+d 92f0",
     "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (debug)
+    "key": "ctrl+d",
+    "command": "(corpus) ctrl+d 8975",
+    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
   },
   {
     // (down) (arrow)
@@ -1306,6 +1318,12 @@
     "key": "ctrl+x",
     "command": "(corpus) ctrl+x 251e",
     "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // (extension)
+    "key": "ctrl+x",
+    "command": "(corpus) ctrl+x 83a9",
+    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
   },
   {
     // (right) (juke)
