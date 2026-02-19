@@ -98,6 +98,9 @@ VISIBILITY_TOKENS = {
     'webviewFindWidgetVisible',
 }
 
+# default literal prefixes to prioritize (can be overridden via CLI)
+DEFAULT_WHEN_PREFIXES = []
+
 
 def extract_preamble_postamble(text):
     """
@@ -524,7 +527,7 @@ def parse_when(expr: str) -> WhenNode:
     return parse_or()
 
 
-def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha') -> str:
+def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """
     Produce a canonical string for a `when` clause by sorting operands inside every AND node according to project conventions. Preserves OR groupings and existing parentheses; does not reorder OR-level operands.
     """
@@ -570,6 +573,27 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
 
     def group_rank(text: str) -> int:
         left = left_identifier(text)
+        # If caller supplied literal prefixes or regexes, match them first
+        if when_prefixes:
+            for pref in when_prefixes:
+                if not pref:
+                    continue
+                # literal exact-match against the left identifier
+                if left == pref:
+                    return 0
+        if when_regexes:
+            for pat in when_regexes:
+                try:
+                    if pat.search(left):
+                        return 0
+                except Exception:
+                    # If user provided a string pattern that wasn't compiled,
+                    # fall back to a simple substring match.
+                    try:
+                        if re.search(pat, left):
+                            return 0
+                    except Exception:
+                        continue
         # 'config-first' Group order: config.* -> positional prefixes -> focus -> visibility -> other
         # 'focal-invariant' Group order: focus -> visibility -> positional prefixes -> config.* -> other
         # 'none' disables grouping by returning the same rank for all tokens.
@@ -612,6 +636,53 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
             for child in node.children:
                 sort_and_nodes(child)
             items = list(enumerate(node.children))
+            # Prioritize any operands that match user-supplied literal prefixes
+            # or regexes. Matched operands are emitted at the front of the
+            # AND clause in the order: all literal-prefix matches (in the
+            # order provided) then regex matches (in the order provided).
+            prioritized = []
+            picked = set()
+            # Helper to get left identifier for an item
+            def _left_id_of(item_node):
+                tok = render_when_node(item_node)
+                lid = left_identifier(tok)
+                return lid
+            if when_prefixes:
+                for pref in when_prefixes:
+                    matches = []
+                    for idx, child in items:
+                        if idx in picked:
+                            continue
+                        lid = _left_id_of(child)
+                        if lid == pref:
+                            matches.append((idx, child))
+                    if matches:
+                        # alphabetical order for multiples
+                        matches.sort(key=lambda t: natural_key_case_sensitive(render_when_node(t[1])))
+                        for m in matches:
+                            prioritized.append(m[1])
+                            picked.add(m[0])
+            if when_regexes:
+                for pat in when_regexes:
+                    matches = []
+                    for idx, child in items:
+                        if idx in picked:
+                            continue
+                        lid = _left_id_of(child)
+                        try:
+                            ok = pat.search(lid)
+                        except Exception:
+                            try:
+                                ok = re.search(pat, lid)
+                            except Exception:
+                                ok = False
+                        if ok:
+                            matches.append((idx, child))
+                    if matches:
+                        matches.sort(key=lambda t: natural_key_case_sensitive(render_when_node(t[1])))
+                        for m in matches:
+                            prioritized.append(m[1])
+                            picked.add(m[0])
             # Normalize 'beta' as alias to positive for experimental use
             if negation_mode == 'beta':
                 nm = 'positive'
@@ -690,15 +761,15 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
     return render_when_node(ast)
 
 
-def sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha') -> str:
+def sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     if not when_val:
         return ''
     # Preserve negation for sorting to avoid unstable ordering when
     # otherwise-identical clauses differ only by '!'.
-    return canonicalize_when(when_val, mode=mode, negation_mode=negation_mode)
+    return canonicalize_when(when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
 
 
-def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None = None, tertiary: str = 'config-first', negation_mode: str = 'alpha') -> Tuple:
+def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None = None, tertiary: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple:
     obj_match = re.search(r'\{.*\}', obj_text, re.DOTALL)
     if not obj_match:
         return ([], '', '')
@@ -710,9 +781,9 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         key_val = str(obj.get('key', ''))
         when_val = str(obj.get('when', ''))
         canonical_when = canonicalize_when(
-            when_val, mode=tertiary, negation_mode=negation_mode)
+            when_val, mode=tertiary, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
         sortable_when = sortable_when_key(
-            when_val, mode=tertiary, negation_mode=negation_mode)
+            when_val, mode=tertiary, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
 
         # Derive the first top-level when token for grouping when primary sorting
         first_when_token = ''
@@ -787,7 +858,7 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         return ([], '', '')
 
 
-def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alpha') -> Tuple[str, bool]:
+def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple[str, bool]:
     pattern = re.compile(r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")')
     match = pattern.search(obj_text)
     if not match:
@@ -796,7 +867,7 @@ def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation
     # Use caller-provided mode (defaults to 'config-first') so normalization
     # can match sorting behavior when requested.
     normalized = canonicalize_when(
-        original_when, mode=mode, negation_mode=negation_mode)
+        original_when, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
     if normalized == original_when:
         return obj_text, False
     new_obj = obj_text[:match.start(2)] + normalized + obj_text[match.end(2):]
@@ -854,6 +925,10 @@ def main(argv: List[str] | None = None) -> int:
     parser.add_argument('--when-grouping', '-w', dest='when_grouping',
                         choices=['none', 'config-first', 'focal-invariant'], default='none',
                         help="When grouping mode: how to group/rank top-level when tokens")
+    parser.add_argument('--when-prefix', dest='when_prefix', default=None,
+                        help="Comma-separated literal when-prefixes to prioritize (exact match). Provide at least one when present.")
+    parser.add_argument('--when-regex', dest='when_regex', default=None,
+                        help="Comma-separated regexes to match when-identifiers to prioritize (order matters). Provide at least one when present.")
 
     args = parser.parse_args(argv)
 
@@ -861,6 +936,29 @@ def main(argv: List[str] | None = None) -> int:
     secondary_order = args.secondary
     tertiary_mode = args.when_grouping
     negation_mode = args.group_sorting
+
+    if args.when_prefix is not None:
+        if args.when_prefix.strip() == '':
+            parser.error('--when-prefix requires a comma-separated list with at least one entry')
+        else:
+            when_prefixes = [p.strip() for p in args.when_prefix.split(',') if p.strip()]
+            if not when_prefixes:
+                parser.error('--when-prefix requires a comma-separated list with at least one entry')
+    else:
+        when_prefixes = DEFAULT_WHEN_PREFIXES.copy()
+    when_regexes = None
+    if args.when_regex:
+        parts = [p.strip() for p in args.when_regex.split(',') if p.strip()]
+        if not parts:
+            parser.error('--when-regex requires a comma-separated list with at least one entry')
+        compiled = []
+        for p in parts:
+            try:
+                compiled.append(re.compile(p))
+            except Exception:
+                # keep raw string fallback (will be tried with re.search)
+                compiled.append(p)
+        when_regexes = compiled
     # Always normalize `when` clauses so sub-clauses are deduped and grouped
     # consistently before any sorting.
     normalize_when = True
@@ -875,7 +973,7 @@ def main(argv: List[str] | None = None) -> int:
         when_changed = False
         if normalize_when:
             obj_out, when_changed = normalize_when_in_object(
-                obj_out, mode=tertiary_mode, negation_mode=negation_mode)
+                obj_out, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
             if when_changed:
                 comments = re.sub(r'^\s*//\s*when-sorted:.*\n',
                                   '', comments, flags=re.MULTILINE)
@@ -883,16 +981,16 @@ def main(argv: List[str] | None = None) -> int:
 
     # Sort by chosen primary (natural), then the other field (natural), then by _comment
     sorted_groups = sorted(normalized_groups, key=lambda pair: extract_sort_keys(
-        pair[1], primary=primary_order, secondary=secondary_order, tertiary=tertiary_mode, negation_mode=negation_mode))
+        pair[1], primary=primary_order, secondary=secondary_order, tertiary=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes))
 
     # Partition results by the first top-level `when` token's semantic group
     # and emit groups in reverse rank order so the most "focused" group
     # (rank 1 under focal-invariant) ends up at the bottom of the file.
-    def first_when_group_rank(obj_text: str, mode: str) -> int:
+    def first_when_group_rank(obj_text: str, mode: str, when_prefixes: list | None = None, when_regexes: list | None = None) -> int:
         # Mirror the grouping logic used in `canonicalize_when`.
         when_key, when_val = extract_key_when(obj_text)
         canonical = canonicalize_when(
-            when_val, mode=mode, negation_mode=negation_mode)
+            when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
         if not canonical:
             return 5
         parts = re.split(r'\s*&&\s*|\s*\|\|\s*', canonical.strip())
@@ -956,7 +1054,7 @@ def main(argv: List[str] | None = None) -> int:
     if tertiary_mode != 'none':
         buckets: dict[int, list] = {}
         for pair in sorted_groups:
-            rank = first_when_group_rank(pair[1], tertiary_mode)
+            rank = first_when_group_rank(pair[1], tertiary_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
             buckets.setdefault(rank, []).append(pair)
 
         # Emit buckets in reverse rank order so lower-numbered (focus) groups
@@ -975,7 +1073,7 @@ def main(argv: List[str] | None = None) -> int:
         obj_out = obj.rstrip()
         key_val, when_val = extract_key_when(obj_out)
         canonical_when = canonicalize_when(
-            when_val, mode=tertiary_mode, negation_mode=negation_mode)
+            when_val, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
         pair_id = (key_val, canonical_when)
         # Annotate if duplicate
         if pair_id in seen:
