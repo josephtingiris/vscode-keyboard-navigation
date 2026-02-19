@@ -844,7 +844,8 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                             except Exception:
                                 ok = False
                         if ok:
-                            match_rank = (len(when_prefixes) if when_prefixes else 0) + i
+                            match_rank = (len(when_prefixes)
+                                          if when_prefixes else 0) + i
                             break
                 spec_key = when_specificity(when_val)
 
@@ -865,6 +866,7 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                 else:
                     tert = natural_key_case_sensitive(sortable_when)
 
+                # (this makes matched groups easier to inspect).
                 if match_rank != 9999:
                     tokens.append(natural_key_case_sensitive(key_val))
                     tokens.append(spec_key)
