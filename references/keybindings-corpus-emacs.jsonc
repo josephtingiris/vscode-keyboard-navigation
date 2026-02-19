@@ -211,8 +211,8 @@
   {
     // (action)
     "key": "alt+a",
-    "command": "(corpus) alt+a 8d02",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
+    "command": "(corpus) alt+a 74ce",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (action)
@@ -235,8 +235,8 @@
   {
     // (debug)
     "key": "alt+d",
-    "command": "(corpus) alt+d 81b5",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
+    "command": "(corpus) alt+d 42c7",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (debug)
@@ -331,8 +331,8 @@
   {
     // (extension)
     "key": "alt+x",
-    "command": "(corpus) alt+x a722",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
+    "command": "(corpus) alt+x d0ff",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (extension)
@@ -479,8 +479,8 @@
   {
     // (action)
     "key": "ctrl+alt+a",
-    "command": "(corpus) ctrl+alt+a 0a8e",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
+    "command": "(corpus) ctrl+alt+a 9dfc",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (action)
@@ -503,8 +503,8 @@
   {
     // (debug)
     "key": "ctrl+alt+d",
-    "command": "(corpus) ctrl+alt+d edb2",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
+    "command": "(corpus) ctrl+alt+d f1da",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (debug)
@@ -616,8 +616,8 @@
   {
     // (action)
     "key": "ctrl+alt+meta+a",
-    "command": "(corpus) ctrl+alt+meta+a 1105",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
+    "command": "(corpus) ctrl+alt+meta+a 6adb",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (action)
@@ -640,8 +640,8 @@
   {
     // (debug)
     "key": "ctrl+alt+meta+d",
-    "command": "(corpus) ctrl+alt+meta+d 04d3",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
+    "command": "(corpus) ctrl+alt+meta+d acab",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (debug)
@@ -736,8 +736,8 @@
   {
     // (extension)
     "key": "ctrl+alt+meta+x",
-    "command": "(corpus) ctrl+alt+meta+x afd4",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
+    "command": "(corpus) ctrl+alt+meta+x 86aa",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (extension)
@@ -796,8 +796,8 @@
   {
     // (extension)
     "key": "ctrl+alt+x",
-    "command": "(corpus) ctrl+alt+x 07cf",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
+    "command": "(corpus) ctrl+alt+x bd54",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (extension)
@@ -969,8 +969,8 @@
   {
     // (action)
     "key": "ctrl+shift+alt+a",
-    "command": "(corpus) ctrl+shift+alt+a 3e7c",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
+    "command": "(corpus) ctrl+shift+alt+a fee3",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (action)
@@ -993,8 +993,8 @@
   {
     // (debug)
     "key": "ctrl+shift+alt+d",
-    "command": "(corpus) ctrl+shift+alt+d 14d7",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
+    "command": "(corpus) ctrl+shift+alt+d b459",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (debug)
@@ -1106,8 +1106,8 @@
   {
     // (action)
     "key": "ctrl+shift+alt+meta+a",
-    "command": "(corpus) ctrl+shift+alt+meta+a 1930",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
+    "command": "(corpus) ctrl+shift+alt+meta+a 8604",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (action)
@@ -1130,8 +1130,8 @@
   {
     // (debug)
     "key": "ctrl+shift+alt+meta+d",
-    "command": "(corpus) ctrl+shift+alt+meta+d 8cb4",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
+    "command": "(corpus) ctrl+shift+alt+meta+d f0e6",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (debug)
@@ -1226,8 +1226,8 @@
   {
     // (extension)
     "key": "ctrl+shift+alt+meta+x",
-    "command": "(corpus) ctrl+shift+alt+meta+x 01bc",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
+    "command": "(corpus) ctrl+shift+alt+meta+x d1aa",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (extension)
@@ -1286,8 +1286,8 @@
   {
     // (extension)
     "key": "ctrl+shift+alt+x",
-    "command": "(corpus) ctrl+shift+alt+x 8d92",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
+    "command": "(corpus) ctrl+shift+alt+x 879a",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (extension)
@@ -1375,8 +1375,8 @@
   {
     // (action)
     "key": "shift+alt+a",
-    "command": "(corpus) shift+alt+a afa5",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
+    "command": "(corpus) shift+alt+a bed2",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (action)
@@ -1399,8 +1399,8 @@
   {
     // (debug)
     "key": "shift+alt+d",
-    "command": "(corpus) shift+alt+d 0f75",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
+    "command": "(corpus) shift+alt+d d20d",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (debug)
@@ -1512,8 +1512,8 @@
   {
     // (action)
     "key": "shift+alt+meta+a",
-    "command": "(corpus) shift+alt+meta+a d85f",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
+    "command": "(corpus) shift+alt+meta+a 29b9",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (action)
@@ -1536,8 +1536,8 @@
   {
     // (debug)
     "key": "shift+alt+meta+d",
-    "command": "(corpus) shift+alt+meta+d 324d",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
+    "command": "(corpus) shift+alt+meta+d 7f1d",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (debug)
@@ -1632,8 +1632,8 @@
   {
     // (extension)
     "key": "shift+alt+meta+x",
-    "command": "(corpus) shift+alt+meta+x 5816",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
+    "command": "(corpus) shift+alt+meta+x 553a",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (extension)
@@ -1692,8 +1692,8 @@
   {
     // (extension)
     "key": "shift+alt+x",
-    "command": "(corpus) shift+alt+x f0a1",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
+    "command": "(corpus) shift+alt+x 9c04",
+    "when": "config.keyboardNavigation.enabled"
   },
   {
     // (extension)

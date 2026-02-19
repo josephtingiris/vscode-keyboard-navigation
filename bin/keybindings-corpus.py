@@ -261,33 +261,45 @@ def main(argv: List[str] | None = None) -> int:
         for key in keys_ordered:
             for mod in all_mods:
                 key_str = f"{mod}+{key}"
-                # do not compute tags yet; compute them once the final
-                # records array is assembled to avoid race/ordering effects
+
+                # do not compute tags yet; compute them afterwards to avoid race/ordering effects
                 comment_tags: List[str] = []
 
-                # when under the currently selected mode
                 mode_when = when_for(key, mod)
 
-                # compute generic 'none' when by temporarily forcing SELECTED_NAV_GROUP='none'
-                prev_sel = globals().get("SELECTED_NAV_GROUP")
-                prev_allowed = globals().get("ALLOWED_LETTER_KEYS")
-                prev_LEFT = set(globals().get("LEFT_GROUP", set()))
-                prev_DOWN = set(globals().get("DOWN_GROUP", set()))
-                prev_UP = set(globals().get("UP_GROUP", set()))
-                prev_RIGHT = set(globals().get("RIGHT_GROUP", set()))
+                SELECTED_NAV_GROUP_state = globals().get("SELECTED_NAV_GROUP")
+                ALLOWED_LETTER_KEYS_state = globals().get("ALLOWED_LETTER_KEYS")
+
+                LEFT_GROUP_state = set(globals().get("LEFT_GROUP", set()))
+                DOWN_GROUP_state = set(globals().get("DOWN_GROUP", set()))
+                UP_GROUP_state = set(globals().get("UP_GROUP", set()))
+                RIGHT_GROUP_state = set(globals().get("RIGHT_GROUP", set()))
+
+                ACTION_GROUP_state = set(globals().get("ACTION_GROUP", set()))
+                DEBUG_GROUP_state = set(globals().get("DEBUG_GROUP", set()))
+                EXTENSION_GROUP_state = set(globals().get("EXTENSION_GROUP", set()))
 
                 globals()["SELECTED_NAV_GROUP"] = "none"
                 globals()["ALLOWED_LETTER_KEYS"] = set()
+                # clear chord groups so generic_when is just the root enabled condition
+                globals()["ACTION_GROUP"] = set()
+                globals()["DEBUG_GROUP"] = set()
+                globals()["EXTENSION_GROUP"] = set()
+
                 init_directional_groups("none", LETTER_GROUPS)
                 generic_when = when_for(key, mod)
 
-                # restore
-                globals()["SELECTED_NAV_GROUP"] = prev_sel
-                globals()["ALLOWED_LETTER_KEYS"] = prev_allowed
-                globals()["LEFT_GROUP"] = prev_LEFT
-                globals()["DOWN_GROUP"] = prev_DOWN
-                globals()["UP_GROUP"] = prev_UP
-                globals()["RIGHT_GROUP"] = prev_RIGHT
+                # restore selected / letter / directional groups
+                globals()["SELECTED_NAV_GROUP"] = SELECTED_NAV_GROUP_state
+                globals()["ALLOWED_LETTER_KEYS"] = ALLOWED_LETTER_KEYS_state
+                globals()["LEFT_GROUP"] = LEFT_GROUP_state
+                globals()["DOWN_GROUP"] = DOWN_GROUP_state
+                globals()["UP_GROUP"] = UP_GROUP_state
+                globals()["RIGHT_GROUP"] = RIGHT_GROUP_state
+                # restore chord state
+                globals()["ACTION_GROUP"] = ACTION_GROUP_state
+                globals()["DEBUG_GROUP"] = DEBUG_GROUP_state
+                globals()["EXTENSION_GROUP"] = EXTENSION_GROUP_state
 
                 # emit generic first if different, then the mode-qualified when
                 emitted_whens = []
