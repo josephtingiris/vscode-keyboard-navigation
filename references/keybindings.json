@@ -335,6 +335,11 @@ Notes:
     // (action) (chord) (all) (gold) - test key
     "key": "alt+a 1",
     "command": "alt+a 1 1111",
+
+    // "command": "workbench.action.chat.toggle", // toggles the entire chat sidebar
+    // "command": "workbench.action.chat.toggleAgentMode", // switches agens in chat, maybe a juke up/down
+    // "command": "workbench.action.newChatWindow", // also very handy; opens chat in a new popped-out window
+    // "command": "workbench.action.openChat", // VERY handy; opens chat in editor
     // "command": "editor.action.fontZoomReset",
     // "command": "editor.action.resetSuggestSize",
     // "command": "editor.inlayHints.Reset",
@@ -393,7 +398,7 @@ Notes:
     // "command": "workbench.scm.repositories.resetViewLocation", // open and focus the (PRIMARY) SCM REPOISITORIES viewlet
     // "command": "workbench.scm.resetViewLocation",
     // "command": "workbench.view.debug.resetViewContainerLocation",
-    // "command": "workbench.view.editSessions.resetViewContainerLocation",
+    //"command": "workbench.view.editSessions.resetViewContainerLocation",
     // "command": "workbench.view.explorer.resetViewContainerLocation",
     // "command": "workbench.view.extension.references-view.resetViewContainerLocation",
     // "command": "workbench.view.extension.test.resetViewContainerLocation",
@@ -813,6 +818,12 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
   },
   {
+    // (down) (vi)
+    "key": "alt+j",
+    "command": "alt+j 0b15",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && agentSessionsViewerFocused"
+  },
+  {
     // (down) (vi) (gold) (editor)
     "key": "alt+j",
     "command": "workbench.action.focusBelowGroup",
@@ -904,6 +915,12 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
   },
   {
+    "key": "alt+k",
+    "command": "alt+k 0b12",
+    // "command": "agentSessions.hideAgentSessionsSidebar",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && agentSessionsViewerFocused"
+  },
+  {
     // (up) (vi) (gold) (editor) (edge) - focus above group can not wrap by itself like focus below group can (a bug?)
     "key": "alt+k",
     // "command": "alt+k b79d",
@@ -937,6 +954,17 @@ Notes:
     "command": "workbench.action.terminal.focusPrevious",
     // "command": "alt+k b79b",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && panelPosition == 'top' && config.keyboardNavigation.terminal.enabled"
+  },
+  {
+    // (up) (vi)
+    "key": "alt+k",
+    "command": "workbench.action.chat.focusAgentSessionsViewer", // YES!
+    //"command": "alt+k d9eb",
+    // "command": "agentSessions.hideAgentSessionsSidebar",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '1' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
+
+    // "when": "!agentSessionsViewerVisible && agentSessionsViewerPosition == '2' || agentSessionsViewerOrientation == '1' && agentSessionsViewerPosition == '2'"
+    // (note) ..Orientation == '2' is went the SESSIONS view is 'Stacked' (on top)
   },
   {
     // (right) (vi) (terminal) (gold) (pivot) (split)
@@ -973,6 +1001,15 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
   },
   {
+    // (right) (vi)
+    "key": "alt+l",
+    "command": "agentSessions.showAgentSessionsSidebar",
+    // "command": "alt+l d7eb",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus"
+    // (note) ..Orientation == '2' is went the SESSIONS view is 'Side by Side' (on right)
+    // "when": "!agentSessionsViewerVisible && agentSessionsViewerPosition == '2' || agentSessionsViewerOrientation == '1' && agentSessionsViewerPosition == '2'"
+  },
+  {
     // (right) (vi) (gold) (editor)
     "key": "alt+l",
     "command": "workbench.action.focusRightGroup",
@@ -987,10 +1024,16 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && sideBarFocus && config.workbench.sideBar.location == 'left'"
   },
   {
+    // (right) (vi)
+    "key": "alt+l",
+    "command": "alt+l d9ec",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && !agentSessionsViewerVisible && !auxiliaryBarMaximized"
+  },
+  {
     // (right) (vi) (edge)
     "key": "alt+l",
-    "command": "workbench.action.focusSideBar",
-    // "command": "alt+l ec4d",
+    "command": "alt+l ec4d",
+    // "command": "workbench.action.focusSideBar",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && sideBarVisible && config.workbench.sideBar.location == 'left'"
   },
   {
@@ -1020,6 +1063,14 @@ Notes:
     "command": "workbench.action.terminal.focusPrevious",
     // "command": "alt+l 9ad8",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && panelPosition == 'right' && config.keyboardNavigation.terminal.enabled"
+  },
+  {
+    // (right) (vi)
+    "key": "alt+l",
+    "command": "agentSessions.hideAgentSessionsSidebar",
+    // "command": "alt+l d8eb",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '2' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
+    // (note) ..Orientation == '2' is went the SESSIONS view is 'Side by Side' (on right)
   },
   {
     // (right) (vi)
@@ -2503,8 +2554,9 @@ Notes:
   {
     // (up) (vi) (inside)
     "key": "shift+alt+k",
-    "command": "workbench.action.terminal.focusPrevious",
+    "command": "workbench.action.focusActiveEditorGroup",
     // "command": "shift+alt+k a2d4",
+    // "command": "workbench.action.terminal.focusPrevious",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && terminalFocus && panelPosition == 'bottom' && terminalCount > 1"
   },
   {
