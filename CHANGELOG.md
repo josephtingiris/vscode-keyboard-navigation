@@ -3,6 +3,38 @@
 All notable changes to this repository will be documented in this file.
 
 This project adheres to "Keep a Changelog" conventions. Entries are grouped by date (YYYY-mm-dd) with sections: Added, Changed, Deprecated, Removed, Fixed, Security. Each bullet references commits or files for traceability.
+## 2026-02-18
+
+### Added
+- Add `--when-prefix` and `--when-regex` options to `bin/keybindings-sort.py` (commit a241ce9).
+- Add comments-handling support to keybindings tooling (commit 4933bb1).
+
+### Changed
+- Set default `KEYBINDINGS_SORT_ARGUMENTS` and default keybindings for `keybindings-sort.py` (commits 7d9ee02, 29adeb3).
+- Prepare 0.0.2 release candidate and tag RC artifacts (commits f973c27, 4f8aaec).
+
+### Fixed
+- Fix root chords parsing/handling (commit c1da95d).
+
+## 2026-02-17
+
+### Changed
+- Update release candidate metadata and checkpoint references (commits 1ea2d71, 9ed6dc6).
+- Adjust SCM/make root handling and housekeeping changes (commits 264a0c8, 1c61ff5).
+
+## 2026-02-16
+
+### Changed
+- Checkpoint and wrapping fixes in references and corpus (commits 16bd339, 457fa70).
+
+## 2026-02-15
+
+### Added
+- Add focal-invariant example for keybinding sorting (commit 185742e).
+
+### Changed
+- Add and revise argument parsing, usage, RNG handling, and formatting for CLI tools (commits a58a750, 3241d71).
+- Consolidate when-token lists and prioritize negation flag before base key (commits 8f99e7e, 1b02f50).
 
 ## 2026-02-14
 
