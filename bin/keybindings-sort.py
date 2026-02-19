@@ -573,7 +573,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
 
     def group_rank(text: str) -> int:
         left = left_identifier(text)
-        # If caller supplied literal prefixes or regexes, match them first
+
         if when_prefixes:
             for pref in when_prefixes:
                 if not pref:
@@ -865,10 +865,16 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                 else:
                     tert = natural_key_case_sensitive(sortable_when)
 
-                # prefer specificity first
-                tokens.append(spec_key)
-                tokens.append(natural_key_case_sensitive(key_val))
-                tokens.append(tert)
+                if match_rank != 9999:
+                    tokens.append(natural_key_case_sensitive(key_val))
+                    tokens.append(spec_key)
+                    tokens.append(tert)
+                else:
+                    # default behavior: include first_when token so grouping remains primary,
+                    # then specificity and tertiary ordering
+                    tokens.append(first_key)
+                    tokens.append(spec_key)
+                    tokens.append(tert)
                 return
 
             tokens.append(when_specificity(when_val))
