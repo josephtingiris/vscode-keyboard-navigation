@@ -6,7 +6,10 @@ import traceback
 
 
 def run_sort(args, input_data):
-    proc = subprocess.run([sys.executable, 'bin/keybindings-sort.py'] + args,
+    # resolve script path relative to repo root so tests work from tests/ cwd
+    import os
+    script = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'bin', 'keybindings-sort.py'))
+    proc = subprocess.run([sys.executable, script] + args,
                           input=json.dumps(input_data, indent=2).encode(),
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
     return json.loads(proc.stdout.decode())
