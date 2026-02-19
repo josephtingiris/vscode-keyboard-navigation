@@ -17,28 +17,37 @@ def run_cmd(cmd, input_bytes=None):
 def test_corpus_roundtrip():
     repo_root = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
     script = os.path.join(repo_root, 'bin', 'keybindings-sort.py')
-    corpus = os.path.join(repo_root, 'references', 'keybindings-corpus.jsonc')
-    if not os.path.exists(corpus):
-        raise SystemExit(2)
+    variants = [
+        'keybindings-corpus.jsonc',
+        'keybindings-corpus-all.jsonc',
+        'keybindings-corpus-emacs.jsonc',
+        'keybindings-corpus-kbm.jsonc',
+        'keybindings-corpus-vi.jsonc',
+    ]
 
-    with open(corpus, 'rb') as f:
-        data = f.read()
+    for name in variants:
+        corpus = os.path.join(repo_root, 'references', name)
+        print(f'CHECK {name}')
+        if not os.path.exists(corpus):
+            print('MISSING', corpus, file=sys.stderr)
+            raise SystemExit(2)
+        with open(corpus, 'rb') as f:
+            data = f.read()
 
-    # basic smoke: script must exit 0 and emit something
-    proc = run_cmd([sys.executable, script], input_bytes=data)
-    if proc.returncode != 0:
-        print('STDERR:', proc.stderr.decode(), file=sys.stderr)
-        raise SystemExit(proc.returncode)
-    out = proc.stdout.decode()
-    if not out.strip():
-        print('Empty output', file=sys.stderr)
-        raise SystemExit(3)
-
-    # ensure the corpus contains keyboardNavigation contexts and the output preserves them
-    if 'config.keyboardNavigation' in data.decode():
-        if 'config.keyboardNavigation' not in out:
-            print('Expected config.keyboardNavigation to appear in output', file=sys.stderr)
-            raise SystemExit(4)
+        proc = run_cmd([sys.executable, script], input_bytes=data)
+        if proc.returncode != 0:
+            print(f'FAILED {name} rc={proc.returncode}', file=sys.stderr)
+            print('STDERR:', proc.stderr.decode(), file=sys.stderr)
+            raise SystemExit(proc.returncode)
+        out = proc.stdout.decode()
+        if not out.strip():
+            print(f'EMPTY OUTPUT {name}', file=sys.stderr)
+            raise SystemExit(3)
+        # basic content sanity checks
+        if 'config.keyboardNavigation' in data.decode():
+            if 'config.keyboardNavigation' not in out:
+                print(f'Expected config.keyboardNavigation in output for {name}', file=sys.stderr)
+                raise SystemExit(4)
 
 
 if __name__ == '__main__':
