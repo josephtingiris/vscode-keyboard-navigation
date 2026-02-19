@@ -734,10 +734,17 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                         (idx, child, (grp, neg_sort, base_key, idx, tok)))
                 items_with_keys.sort(key=lambda t: t[2])
                 sorted_children = [it[1] for it in items_with_keys]
-            # assign sorted children and remove duplicates while preserving order
+
+            if prioritized:
+                prioritized_tokens = [render_when_node(p) for p in prioritized]
+                remaining = [c for c in sorted_children if render_when_node(c) not in set(prioritized_tokens)]
+                merged = prioritized + remaining
+            else:
+                merged = sorted_children
+
             unique: list[WhenNode] = []
             seen = set()
-            for c in sorted_children:
+            for c in merged:
                 tok = render_when_node(c)
                 if tok in seen:
                     continue
