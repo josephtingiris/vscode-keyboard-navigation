@@ -108,7 +108,7 @@ main() {
         KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant"
         KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled"
         KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant"
-        KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled"
+        KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
         echo "Using default KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     fi
     export KEYBINDINGS_SORT_ARGUMENTS
