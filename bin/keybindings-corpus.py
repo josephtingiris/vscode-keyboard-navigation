@@ -2,23 +2,29 @@
 """
 (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
 
-Generate a deterministic JSONC array of keybinding objects for keyboard-navigation development, debugging, and testing.
+Generate a deterministic JSONC array of keybinding objects for keyboard navigation development, debugging, and testing.
 
-Usage:
-    ./bin/keybindings-corpus.py
+Usage
+    ./bin/keybindings-corpus.py [OPTIONS]
 
-Examples:
+Options
+    -n, --navigation-group {emacs,kbm,vi,none,all}  Select the active letter-key navigation group (default: none).
+    -c, --comments FILE|none                        Inject canonical comments into an existing JSONC <FILE>, or use 'none' to emit a pure JSON corpus (no comments).
+
+Examples
     ./bin/keybindings-corpus.py > references/keybindings-corpus.jsonc
+    ./bin/keybindings-corpus.py --navigation-group vi --comments references/keybindings-corpus-vi.jsonc
 
-Behavior:
-    - Writes a JSONC array of keybinding objects to stdout.
-    - Uses a fixed PRNG seed for reproducible output.
-    - Does not modify files on disk.
+Behavior
+    - Emits a comprehensive, canonical JSONC array of unique keybinding objects to stdout.
+    - Every tag sequence is computed so directional, letter-group, and chord tags stay deterministic.
+    - Optionally, inject `[keynav]` annotations into valid keybindings JSONC content read from other files.
+    - Uses a fixed hash for reproducible output and never mutates files in place.
 
-Inputs / Outputs:
-    stdout: JSONC array of keybinding objects encoded as UTF-8
+Inputs / Outputs
+    stdout: JSONC array of keybinding objects encoded as UTF-8 (or modified JSONC file when --comments is supplied).
 
-Exit codes:
+Exit codes
     0   Success
     1   Usage / bad args
     2   File read/write or other runtime error
@@ -81,13 +87,28 @@ PUNCTUATION_LEFT_GROUP = {"[", "{", ";", ","}
 PUNCTUATION_RIGHT_GROUP = {"]", "}", "'", "."}
 PUNCTUATION_GROUP = PUNCTUATION_LEFT_GROUP | PUNCTUATION_RIGHT_GROUP
 
-# letter-key groups are injected at runtime by `init_directional_groups` based on the selected `--navigation-group`
+# variable letter-key groups are injected at runtime by `init_directional_groups` based on the selected `--navigation-group`
 LEFT_GROUP = set(PUNCTUATION_LEFT_GROUP)
 DOWN_GROUP = set(FOUR_PACK_DOWN_GROUP)
 UP_GROUP = set(FOUR_PACK_UP_GROUP)
 RIGHT_GROUP = set(PUNCTUATION_RIGHT_GROUP)
 
 JUKE_GROUP = PUNCTUATION_GROUP | FOUR_PACK_GROUP
+
+# map static direction tags to the literal keys that consistently act as that direction
+DIRECTIONAL_TAG_BASES = [
+    ("(left)", 0, PUNCTUATION_LEFT_GROUP),
+    ("(down)", 1, FOUR_PACK_DOWN_GROUP),
+    ("(up)", 2, FOUR_PACK_UP_GROUP),
+    ("(right)", 3, PUNCTUATION_RIGHT_GROUP),
+]
+
+DIRECTIONAL_KEY_TAGS = {
+    tag: {ARROW_GROUP[idx]} | extra_keys | {
+        group[idx] for group in LETTER_GROUPS.values() if idx < len(group)
+    }
+    for tag, idx, extra_keys in DIRECTIONAL_TAG_BASES
+}
 
 # split groups for panes/windows
 SPLIT_HORIZONTAL_GROUP = {"-", "_"}
@@ -107,8 +128,8 @@ ALTERNATE_EXTENSION_KEY = 'n'
 # comment tag/token order
 TAG_ORDER = [
     "(down)", "(left)", "(right)", "(up)",
-    "(horizontal)", "(vertical)",
     "(arrow)", "(emacs)", "(kbm)", "(vi)",
+    "(horizontal)", "(vertical)",
     "(juke)", "(split)",
     "(debug)", "(action)", "(extension)",
 ]
@@ -182,7 +203,7 @@ def main(argv: List[str] | None = None) -> int:
         "--comments",
         metavar='FILE|none',
         help=(
-            "Inject corpus comments into an existing JSONC <FILE>, or use 'none' to emit a pure JSON corpus (no comments)."
+            "Inject canonical comments into an existing JSONC <FILE>, or use 'none' to emit a pure JSON corpus (no comments)."
         ),
     )
     args = parser.parse_args(argv)
@@ -501,7 +522,7 @@ def main(argv: List[str] | None = None) -> int:
             globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(
                 BASE_EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY)}
 
-            tags = tags_for(literal_key, mod)
+            tags = tags_for(literal_key, mod, when_val)
             if tags:
                 comment_line = "// " + " ".join(tags)
             else:
@@ -618,10 +639,6 @@ def main(argv: List[str] | None = None) -> int:
             contains_primary = primary_key in globals().get("ALLOWED_LETTER_KEYS", set())
             contains_alternate = alternate_key in globals().get("ALLOWED_LETTER_KEYS", set())
 
-            # Correct selection logic:
-            # - If primary conflicts with allowed letters and alternate is free -> use alternate
-            # - If both conflict -> warn and keep primary
-            # - Otherwise -> keep primary
             if contains_primary and not contains_alternate:
                 return alternate_key
             if contains_primary and contains_alternate:
@@ -797,7 +814,7 @@ def main(argv: List[str] | None = None) -> int:
         if assigned[i] is None:
             assigned[i] = id_fulls[i][:12]
 
-    # If comments_arg == 'none', emit pure JSON (no comments) and exit.
+    # if comments_arg == 'none', emit pure JSON (no comments) and exit.
     if comments_arg == 'none':
         out_list = []
         for i, (k, w, _) in enumerate(records):
@@ -807,10 +824,6 @@ def main(argv: List[str] | None = None) -> int:
             out_list, indent=2, ensure_ascii=False) + "\n")
         return 0
 
-    # build final objects with assigned ids
-    # compute comment tags now that records are final
-    #  set globals based on each record's when-clause
-    #  recompute adaptive chord groups so tags reflect the final emitted conditionals
     for idx, (k, w, _) in enumerate(records):
         # split modifier(s) from key literal
         try:
@@ -844,7 +857,7 @@ def main(argv: List[str] | None = None) -> int:
         globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(
             BASE_EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY)}
 
-        tags = tags_for(key, mod)
+        tags = tags_for(key, mod, w)
         comment_tags = tags if tags else []
         records[idx] = (k, w, comment_tags)
 
@@ -866,38 +879,54 @@ def main(argv: List[str] | None = None) -> int:
     return 0
 
 
-def tags_for(key, mod: str = ""):
-    tags = []
-    if key in DOWN_GROUP:
-        tags.append("(down)")
-    if key in LEFT_GROUP:
-        tags.append("(left)")
-    if key in RIGHT_GROUP:
-        tags.append("(right)")
-    if key in UP_GROUP:
-        tags.append("(up)")
-    if key in ARROW_GROUP:
-        tags.append("(arrow)")
-    for name, group in LETTER_GROUPS.items():
-        if key in group and key in globals().get("ALLOWED_LETTER_KEYS", set()):
-            tags.append(f"({name})")
-    if key in JUKE_GROUP:
-        tags.append("(juke)")
-    if key in SPLIT_GROUP:
-        tags.append("(split)")
-    if key in SPLIT_HORIZONTAL_GROUP:
-        tags.append("(horizontal)")
-    if key in SPLIT_VERTICAL_GROUP:
-        tags.append("(vertical)")
-    if key in DEBUG_GROUP:
-        tags.append("(debug)")
-    if key in ACTION_GROUP:
-        tags.append("(action)")
-    if key in EXTENSION_GROUP:
-        tags.append("(extension)")
+def tags_for(key: str, mod: str = "", when_clause: str | None = None) -> List[str]:
+    if not when_clause or "config.keyboardNavigation.enabled" not in when_clause:
+        return []
 
-    tags_sorted = [t for t in TAG_ORDER if t in tags]
-    return tags_sorted
+    ordered_tags: List[str] = ["[keynav]"]
+    dynamic_tags: set[str] = set()
+
+    nav_group_clauses = {
+        name
+        for name in LETTER_GROUPS
+        if f"config.keyboardNavigation.keys.letters == '{name}'" in when_clause
+    }
+
+    for tag, keys in DIRECTIONAL_KEY_TAGS.items():
+        if key not in keys:
+            continue
+        if key in ARROW_GROUP or key in PUNCTUATION_GROUP:
+            dynamic_tags.add(tag)
+            continue
+        if any(key in LETTER_GROUPS[name] for name in nav_group_clauses):
+            dynamic_tags.add(tag)
+
+    if "config.keyboardNavigation.keys.arrows" in when_clause:
+        dynamic_tags.add("(arrow)")
+
+    for name in LETTER_GROUPS:
+        clause = f"config.keyboardNavigation.keys.letters == '{name}'"
+        if clause in when_clause:
+            dynamic_tags.add(f"({name})")
+
+    if key in JUKE_GROUP:
+        dynamic_tags.add("(juke)")
+    if key in SPLIT_GROUP:
+        dynamic_tags.add("(split)")
+    if key in SPLIT_HORIZONTAL_GROUP:
+        dynamic_tags.add("(horizontal)")
+    if key in SPLIT_VERTICAL_GROUP:
+        dynamic_tags.add("(vertical)")
+
+    if "config.keyboardNavigation.chords.debug" in when_clause:
+        dynamic_tags.add("(debug)")
+    if "config.keyboardNavigation.chords.action" in when_clause:
+        dynamic_tags.add("(action)")
+    if "config.keyboardNavigation.chords.extension" in when_clause:
+        dynamic_tags.add("(extension)")
+
+    ordered_tags.extend([tag for tag in TAG_ORDER if tag in dynamic_tags])
+    return ordered_tags
 
 
 def when_for(key, mod: str = ""):
