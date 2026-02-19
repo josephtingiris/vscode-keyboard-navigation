@@ -808,7 +808,47 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         def append_when():
             if primary == 'when':
                 first_key = natural_key_case_sensitive(first_when_token)
+
+                # compute an optional priority rank based on user-supplied when_prefixes
+                match_rank = 9999
+                left_id = first_when_token
+                if left_id.startswith('(') and left_id.endswith(')'):
+                    left_id = left_id[1:-1].strip()
+                if left_id.startswith('!'):
+                    left_id = left_id[1:].lstrip()
+                if when_prefixes:
+                    for i, pref in enumerate(when_prefixes):
+                        if not pref:
+                            continue
+                        # support literal prefix ending in '.' to match startswith
+                        if pref.endswith('.'):
+                            if left_id.startswith(pref):
+                                match_rank = i
+                                break
+                        elif '<viewId>' in pref:
+                            prefix, suffix = pref.split('<viewId>', 1)
+                            if left_id.startswith(prefix) and left_id.endswith(suffix):
+                                match_rank = i
+                                break
+                        else:
+                            if left_id == pref:
+                                match_rank = i
+                                break
+                if when_regexes and match_rank == 9999:
+                    for i, pat in enumerate(when_regexes):
+                        try:
+                            ok = pat.search(left_id)
+                        except Exception:
+                            try:
+                                ok = re.search(pat, left_id)
+                            except Exception:
+                                ok = False
+                        if ok:
+                            match_rank = (len(when_prefixes) if when_prefixes else 0) + i
+                            break
                 spec_key = when_specificity(when_val)
+
+                tokens.append(match_rank)
                 if negation_mode == 'alpha':
                     tert = natural_key_case_sensitive(sortable_when)
                 elif negation_mode == 'natural':
@@ -824,8 +864,10 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                     tert = (is_neg, natural_key(base))
                 else:
                     tert = natural_key_case_sensitive(sortable_when)
-                tokens.append(first_key)
+
+                # prefer specificity first
                 tokens.append(spec_key)
+                tokens.append(natural_key_case_sensitive(key_val))
                 tokens.append(tert)
                 return
 
