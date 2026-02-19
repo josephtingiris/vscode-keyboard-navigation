@@ -3,6 +3,7 @@
 All notable changes to this repository will be documented in this file.
 
 This project adheres to "Keep a Changelog" conventions. Entries are grouped by date (YYYY-mm-dd) with sections: Added, Changed, Deprecated, Removed, Fixed, Security. Each bullet references commits or files for traceability.
+
 ## 2026-02-18
 
 ### Added
