@@ -282,7 +282,7 @@ def when_specificity(when_val: str) -> Tuple[int]:
     """
     if not when_val:
         return (0,)
-    # Count top-level terms via simple operator splitting
+
     term_count = len(re.split(r'\s*&&\s*|\s*\|\|\s*', when_val.strip()))
     return (term_count,)
 
@@ -911,9 +911,12 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         if 'key' not in (primary, secondary):
             append_key()
 
+        if tokens and not isinstance(tokens[0], int):
+            tokens.insert(0, 9999)
         return tuple(tokens)
     except Exception:
-        return ([], '', '')
+        # return a key with the same structural types as a normal sort key: (int rank, list key, tuple specificity, list tertiary)
+        return (9999, [], (0,), [])
 
 
 def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple[str, bool]:

@@ -35,8 +35,6 @@
 #   2   Usage / bad args
 # -----------------------------------------------------------------------------
 
-KEYBINDINGS_JSON=""
-
 aborting() {
     printf '\n%s\n\n' "aborting ... ${*}" >&2
     exit 1
@@ -81,22 +79,33 @@ vscode_user_home() {
 }
 
 main() {
-    [ -z "${1}" ] && usage
+    local keybindings_json
 
-    KEYBINDINGS_JSON="${1}"
-
-    if [ ! -f "${KEYBINDINGS_JSON}" ]; then
-        aborting "file '${KEYBINDINGS_JSON}' does not exist"
+    if [ -f "${1}" ]; then
+        keybindings_json="$1"
+        shift
+    else
+        keybindings_json="${DIRNAME}/../references/keybindings.json"
     fi
 
-    validate_json "${KEYBINDINGS_JSON}"
+    [ ! -r "${keybindings_json}" ] && aborting "'${keybindings_json}' file not readable"
+
+    keybindings_json="$(realpath "${keybindings_json}")"
+
+    [ -z "${keybindings_json}" ] && usage
+
+    if [ ! -f "${keybindings_json}" ]; then
+        aborting "file '${keybindings_json}' does not exist"
+    fi
+
+    validate_json "${keybindings_json}"
 
     local user_keybindings_json
-	if [ -d "${VSCODE_USER_DIR}" ]; then
-    	user_keybindings_json="${VSCODE_USER_DIR}/keybindings.json"
-	else
-    	user_keybindings_json="$(vscode_user_home)/AppData/Roaming/Code/User/keybindings.json"
-	fi
+    if [ -d "${VSCODE_USER_DIR}" ]; then
+        user_keybindings_json="${VSCODE_USER_DIR}/keybindings.json"
+    else
+        user_keybindings_json="$(vscode_user_home)/AppData/Roaming/Code/User/keybindings.json"
+    fi
     if [ ! -r "${user_keybindings_json}" ]; then
         aborting "'${user_keybindings_json}' file not found readable"
     fi
@@ -104,45 +113,91 @@ main() {
     if [ "${KEYBINDINGS_SORT_ARGUMENTS}" ]; then
         echo "Using provided KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     else
-        KEYBINDINGS_SORT_ARGUMENTS="-p key -s when"
-        KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant"
-        KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled"
-        KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant"
-        KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
+        echo "1=$1"
+
+        if [ "${1}" == "1" ]; then
+            KEYBINDINGS_SORT_ARGUMENTS="-p key -s when"
+            if [ "${2}" == "w" ]; then
+                KEYBINDINGS_SORT_ARGUMENTS="-p when -s key"
+            fi
+        fi
+
+        if [ "${1}" == "2" ]; then
+            KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant"
+            if [ "${2}" == "w" ]; then
+                KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant"
+            fi
+        fi
+
+        if [ "${1}" == "3" ]; then
+            KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled"
+            if [ "${2}" == "w" ]; then
+                KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled"
+            fi
+        fi
+
+        if [ "${1}" == "4" ]; then
+            KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
+            if [ "${2}" == "w" ]; then
+                KEYBINDINGS_SORT_ARGUMENTS="-p when -p key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
+            fi
+        fi
+
+        if [ "${1}" == "5" ]; then
+            KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant --when-regex config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters,config.keyboardNavigation"
+            if [ "${2}" == "w" ]; then
+                KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-regex config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters,config.keyboardNavigation"
+            fi
+        fi
+
+        if [ "${1}" == "6" ]; then
+            KEYBINDINGS_SORT_ARGUMENTS="-p key -s when"
+            if [ "${2}" == "w" ]; then
+                KEYBINDINGS_SORT_ARGUMENTS="-p when -s key"
+            fi
+        fi
+
+        if [ "${1}" == "7" ]; then
+            KEYBINDINGS_SORT_ARGUMENTS="-p key -s when"
+            if [ "${2}" == "w" ]; then
+                KEYBINDINGS_SORT_ARGUMENTS="-p when -s key"
+            fi
+        fi
+
+        if [ "${KEYBINDINGS_SORT_ARGUMENTS}" == "" ]; then
+            KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant --when-regex config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters,config.keyboardNavigation"
+        fi
+
         echo "Using default KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     fi
     export KEYBINDINGS_SORT_ARGUMENTS
 
-    echo -n "Sorting JSON '$(basename "${KEYBINDINGS_JSON}")' ... "
+    echo -n "Sorting JSON '$(basename "${keybindings_json}")' ... "
     if type -p keybindings-sort.py > /dev/null 2>&1; then
-        #echo "keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} < \"${KEYBINDINGS_JSON}\" > /tmp/keybindings-sorted.json.$$"
-        keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} < "${KEYBINDINGS_JSON}" > /tmp/keybindings-sorted.json.$$
+        #echo "keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} < \"${keybindings_json}\" > /tmp/keybindings-sorted.json.$$"
+        keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} < "${keybindings_json}" > /tmp/keybindings-sorted.json.$$
         #cat /tmp/keybindings-sorted.json.$$
-        mv /tmp/keybindings-sorted.json.$$ "${KEYBINDINGS_JSON}"
+        mv /tmp/keybindings-sorted.json.$$ "${keybindings_json}"
     fi
     echo "OK."
 
-    validate_json "${KEYBINDINGS_JSON}"
+    validate_json "${keybindings_json}"
 
-    echo -n "Installing 'references/$(basename "${KEYBINDINGS_JSON}")' to '$(vscode_user_home)' ... "
-    cp "${KEYBINDINGS_JSON}" "${user_keybindings_json}"
+    echo -n "Installing 'references/$(basename "${keybindings_json}")' to '$(vscode_user_home)' ... "
+    cp "${keybindings_json}" "${user_keybindings_json}"
     echo "Done."
 
-    #cat "${KEYBINDINGS_JSON}"
+    #cat "${keybindings_json}"
 }
 
 DIRNAME="$(dirname "$0")"
 
 for _arg in "$@"; do
     case "${_arg}" in
-        -h|--help)
+        -h | --help)
             usage
             ;;
     esac
 done
 
-[ "$#" -lt 1 ] && KEYBINDINGS_JSON="${DIRNAME}/../references/keybindings.json" || KEYBINDINGS_JSON="$1"
-[ ! -r "${KEYBINDINGS_JSON}" ] && aborting "'${KEYBINDINGS_JSON}' file not readable"
-KEYBINDINGS_JSON="$(realpath "${KEYBINDINGS_JSON}")"
-
-main "${KEYBINDINGS_JSON}"
+main "${@}"
