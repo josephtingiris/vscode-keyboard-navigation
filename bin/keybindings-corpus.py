@@ -65,6 +65,13 @@ EMACS_GROUP = ("b", "n", "p", "f")
 KBM_GROUP = ("a", "s", "w", "d")
 VI_GROUP = ("h", "j", "k", "l")
 
+# mapping of navigation group name -> tuple (single source of truth)
+LETTER_GROUPS = {
+    "emacs": EMACS_GROUP,
+    "kbm": KBM_GROUP,
+    "vi": VI_GROUP,
+}
+
 # directional groups for jukes and moves
 FOUR_PACK_DOWN_GROUP = {"end", "pagedown"}
 FOUR_PACK_UP_GROUP = {"home", "pageup"}
@@ -139,9 +146,10 @@ def init_directional_groups(selected: str, letter_groups: dict) -> None:
     for i, direction_name in enumerate(ARROW_GROUP):
         var_name = direction_to_var[direction_name]
         current = set(globals().get(var_name, set()))
+
         # always include the arrow literal (e.g., "left")
         current.add(direction_name)
-        # include the corresponding letter from the selected letter group
+
         if selected != "none" and selected in letter_groups:
             group = letter_groups[selected]
             if i < len(group):
@@ -163,7 +171,7 @@ def main(argv: List[str] | None = None) -> int:
     parser.add_argument(
         "-n",
         "--navigation-group",
-        choices=["emacs", "kbm", "vi", "none", "all"],
+        choices=list(LETTER_GROUPS.keys()) + ["none", "all"],
         default="none",
         help=(
             "Select the active letter-key navigation group (default: none)."
@@ -174,20 +182,26 @@ def main(argv: List[str] | None = None) -> int:
         "--comments",
         metavar='FILE|none',
         help=(
-            "Inject corpus comments into an existing JSONC file or 'none' to emit pure JSON."
+            "Inject corpus comments into an existing JSONC <FILE>, or use 'none' to emit a pure JSON corpus (no comments)."
         ),
     )
     args = parser.parse_args(argv)
+
+    # helper: determine selected letter-group from a when-clause
+    def sel_from_when(when_val: str) -> str:
+        for name in LETTER_GROUPS.keys():
+            if f"config.keyboardNavigation.keys.letters == '{name}'" in when_val:
+                return name
+        return 'none'
+
     # comments mode: None (default) | 'none' | filename
     comments_arg = args.comments
 
-    # If comments_arg is a filename, parse and inject comments into that file
-    # and print the modified text to stdout (do not write the file). Fail fast
-    # on errors.
     if comments_arg and comments_arg != 'none':
         fname = comments_arg
         if not os.path.exists(fname) or not os.access(fname, os.R_OK):
-            print(f"error: comments file '{fname}' does not exist or is not readable", file=sys.stderr)
+            print(
+                f"error: comments file '{fname}' does not exist or is not readable", file=sys.stderr)
             return 2
 
         original_text = None
@@ -198,7 +212,7 @@ def main(argv: List[str] | None = None) -> int:
             print(f"error: failed to read '{fname}': {e}", file=sys.stderr)
             return 2
 
-        # Helper: strip JSONC comments safely (state-machine)
+        # strip JSONC comments safely (state-machine)
         def strip_jsonc(text: str) -> str:
             out = []
             i = 0
@@ -253,245 +267,223 @@ def main(argv: List[str] | None = None) -> int:
                 i += 1
             return ''.join(out)
 
-        # Find array bounds (first top-level [ ... ]) using state-machine
-        def find_array_bounds(text: str):
+        def _extract_preamble_postamble(text: str):
             i = 0
             n = len(text)
             in_string = False
             string_char = ''
             esc = False
-            in_line = False
-            in_block = False
+            in_line_comment = False
+            in_block_comment = False
             start = -1
+
             while i < n:
                 ch = text[i]
                 nxt2 = text[i:i+2] if i+2 <= n else ''
-                if in_line:
+
+                if in_line_comment:
                     if ch == '\n':
-                        in_line = False
+                        in_line_comment = False
                     i += 1
                     continue
-                if in_block:
+                if in_block_comment:
                     if nxt2 == '*/':
                         i += 2
-                        in_block = False
+                        in_block_comment = False
                     else:
                         i += 1
                     continue
-                if in_string:
-                    if ch == '\\':
-                        i += 2
-                        continue
-                    if ch == string_char:
-                        in_string = False
-                    i += 1
-                    continue
                 if nxt2 == '//':
-                    in_line = True
+                    in_line_comment = True
                     i += 2
                     continue
                 if nxt2 == '/*':
-                    in_block = True
+                    in_block_comment = True
                     i += 2
                     continue
                 if ch == '"' or ch == "'":
                     in_string = True
                     string_char = ch
                     i += 1
+
+                    # enter string state and skip until close
+                    while i < n:
+                        c = text[i]
+                        if c == '\\':
+                            i += 2
+                            continue
+                        if c == string_char:
+                            i += 1
+                            break
+                        i += 1
                     continue
                 if ch == '[':
                     start = i
                     break
                 i += 1
+
             if start == -1:
-                return -1, -1
+                return None
+
             # find matching ]
             depth = 1
             i = start + 1
             in_string = False
             string_char = ''
-            in_line = False
-            in_block = False
+            in_line_comment = False
+            in_block_comment = False
             while i < n:
                 ch = text[i]
                 nxt2 = text[i:i+2] if i+2 <= n else ''
-                if in_line:
+                if in_line_comment:
                     if ch == '\n':
-                        in_line = False
+                        in_line_comment = False
                     i += 1
                     continue
-                if in_block:
+                if in_block_comment:
                     if nxt2 == '*/':
                         i += 2
-                        in_block = False
+                        in_block_comment = False
                     else:
                         i += 1
-                    continue
-                if in_string:
-                    if ch == '\\':
-                        i += 2
-                        continue
-                    if ch == string_char:
-                        in_string = False
-                    i += 1
-                    continue
-                if nxt2 == '//':
-                    in_line = True
-                    i += 2
-                    continue
-                if nxt2 == '/*':
-                    in_block = True
-                    i += 2
                     continue
                 if ch == '"' or ch == "'":
                     in_string = True
                     string_char = ch
                     i += 1
+                    while i < n:
+                        c = text[i]
+                        if c == '\\':
+                            i += 2
+                            continue
+                        if c == string_char:
+                            i += 1
+                            break
+                        i += 1
+                    continue
+                if nxt2 == '//':
+                    in_line_comment = True
+                    i += 2
+                    continue
+                if nxt2 == '/*':
+                    in_block_comment = True
+                    i += 2
                     continue
                 if ch == '[':
                     depth += 1
                 elif ch == ']':
                     depth -= 1
                     if depth == 0:
-                        return start, i
+                        end = i
+                        preamble = text[:start]
+                        array_text = text[start+1:end]
+                        postamble = text[end+1:]
+                        return preamble, array_text, postamble
                 i += 1
-            return -1, -1
+            return None
 
-        # Find top-level object spans inside the top-level array
-        def find_top_level_object_spans(text: str):
-            a_start, a_end = find_array_bounds(text)
-            if a_start == -1:
-                return []
-            spans = []
-            i = a_start + 1
-            n = a_end
+        def _group_objects_with_comments(array_text: str):
+            groups = []
+            comments_buf = ''
+            obj_buf = ''
             depth = 0
-            in_string = False
-            string_char = ''
-            in_line = False
-            in_block = False
-            obj_start = None
-            while i < n:
-                ch = text[i]
-                nxt2 = text[i:i+2] if i+2 <= len(text) else ''
-                if in_line:
-                    if ch == '\n':
-                        in_line = False
-                    i += 1
-                    continue
-                if in_block:
-                    if nxt2 == '*/':
-                        i += 2
-                        in_block = False
-                    else:
-                        i += 1
-                    continue
-                if in_string:
-                    if ch == '\\':
-                        i += 2
+            in_obj = False
+            for line in array_text.splitlines(keepends=True):
+                stripped = line.strip()
+                if not in_obj:
+                    if stripped.startswith('//') or stripped.startswith('/*'):
+                        comments_buf += line
                         continue
-                    if ch == string_char:
-                        in_string = False
-                    i += 1
-                    continue
-                if nxt2 == '//':
-                    in_line = True
-                    i += 2
-                    continue
-                if nxt2 == '/*':
-                    in_block = True
-                    i += 2
-                    continue
-                if ch == '"' or ch == "'":
-                    in_string = True
-                    string_char = ch
-                    i += 1
-                    continue
-                if ch == '{' and depth == 0:
-                    obj_start = i
-                    depth = 1
-                    i += 1
-                    continue
-                if ch == '{' and depth > 0:
-                    depth += 1
-                    i += 1
-                    continue
-                if ch == '}' and depth > 0:
-                    depth -= 1
-                    if depth == 0 and obj_start is not None:
-                        spans.append((obj_start, i))
-                        obj_start = None
-                    i += 1
-                    continue
-                i += 1
-            return spans
+                    if '{' in line:
+                        in_obj = True
+                        obj_buf = line
+                        # if line contains '}' too, handle short objects
+                        if '}' in line and line.index('}') > line.index('{'):
+                            groups.append((comments_buf, obj_buf))
+                            comments_buf = ''
+                            obj_buf = ''
+                            in_obj = False
+                        continue
+                    # ignore blank or comma lines
+                    if stripped == '' or stripped == ',':
+                        continue
+                    # fallback: accumulate as comments
+                    comments_buf += line
+                else:
+                    obj_buf += line
+                    if '}' in line:
+                        # crude close detection; rely on JSON parse later for exactness
+                        groups.append((comments_buf, obj_buf))
+                        comments_buf = ''
+                        obj_buf = ''
+                        in_obj = False
+            trailing = comments_buf
+            return groups, trailing
 
-        # prepare local letter groups and base chord groups (use globals)
-        LETTER_GROUPS_LOCAL = {
-            "emacs": EMACS_GROUP,
-            "kbm": KBM_GROUP,
-            "vi": VI_GROUP,
-        }
         BASE_ACTION_GROUP = set(ACTION_GROUP)
         BASE_DEBUG_GROUP = set(DEBUG_GROUP)
         BASE_EXTENSION_GROUP = set(EXTENSION_GROUP)
 
-        # simple helper to remove trailing commas (safe for our parsing needs)
+        # remove trailing commas (safe)
         def _strip_trailing_commas(text: str) -> str:
             return re.sub(r',\s*([}\]])', r"\1", text)
 
-        # parse the provided file as JSONC
+        # parse the JSONC into JSON
         try:
             stripped = strip_jsonc(original_text)
             stripped = _strip_trailing_commas(stripped)
             parsed = json.loads(stripped)
         except Exception as e:
-            print(f"error: failed to parse JSONC from '{fname}': {e}", file=sys.stderr)
+            print(
+                f"error: failed to parse JSONC from '{fname}': {e}", file=sys.stderr)
             return 2
 
         if not isinstance(parsed, list):
-            print(f"error: top-level JSON value in '{fname}' is not an array", file=sys.stderr)
+            print(
+                f"error: top-level JSON value in '{fname}' is not an array", file=sys.stderr)
             return 2
 
-        spans = find_top_level_object_spans(original_text)
-        if len(spans) != len(parsed):
-            print(f"error: mismatch between parsed array length ({len(parsed)}) and detected object spans ({len(spans)}) in '{fname}'", file=sys.stderr)
+        preamble_res = _extract_preamble_postamble(original_text)
+        if not preamble_res:
+            print(
+                f"error: could not locate top-level array in '{fname}'", file=sys.stderr)
+            return 2
+        preamble, array_text, postamble = preamble_res
+        groups, trailing_comments = _group_objects_with_comments(array_text)
+        if len(groups) != len(parsed):
+            print(
+                f"error: mismatch between parsed array length ({len(parsed)}) and detected object groups ({len(groups)}) in '{fname}'", file=sys.stderr)
             return 2
 
         # compute comment lines for each object
         comments_lines = []
         for idx, obj in enumerate(parsed):
             if not isinstance(obj, dict):
-                print(f"error: array element {idx} in '{fname}' is not an object", file=sys.stderr)
+                print(
+                    f"error: array element {idx} in '{fname}' is not an object", file=sys.stderr)
                 return 2
             key_val = obj.get('key')
             when_val = obj.get('when')
             if not isinstance(key_val, str) or not isinstance(when_val, str):
-                print(f"error: object at index {idx} missing 'key' or 'when' (or not strings) in '{fname}'", file=sys.stderr)
+                print(
+                    f"error: object at index {idx} missing 'key' or 'when' (or not strings) in '{fname}'", file=sys.stderr)
                 return 2
 
-            # split mod and key
             try:
                 mod, literal_key = key_val.rsplit('+', 1)
             except ValueError:
                 mod = ''
                 literal_key = key_val
 
-            # determine selected nav group from when clause
-            sel = 'none'
-            if "config.keyboardNavigation.keys.letters == 'emacs'" in when_val:
-                sel = 'emacs'
-            elif "config.keyboardNavigation.keys.letters == 'kbm'" in when_val:
-                sel = 'kbm'
-            elif "config.keyboardNavigation.keys.letters == 'vi'" in when_val:
-                sel = 'vi'
+            sel = sel_from_when(when_val)
 
             globals()["SELECTED_NAV_GROUP"] = sel
             if sel == 'none':
                 globals()["ALLOWED_LETTER_KEYS"] = set()
             else:
-                globals()["ALLOWED_LETTER_KEYS"] = set(LETTER_GROUPS_LOCAL.get(sel, ()))
-            init_directional_groups(sel, LETTER_GROUPS_LOCAL)
+                globals()["ALLOWED_LETTER_KEYS"] = set(
+                    LETTER_GROUPS.get(sel, ()))
+            init_directional_groups(sel, LETTER_GROUPS)
 
             # recompute adaptive chord groups
             def _select_adaptive_key_local(primary_group: set, alternate_key: str) -> str:
@@ -502,9 +494,12 @@ def main(argv: List[str] | None = None) -> int:
                     return alternate_key
                 return primary_key
 
-            globals()["ACTION_GROUP"] = {_select_adaptive_key_local(BASE_ACTION_GROUP, ALTERNATE_ACTION_KEY)}
-            globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(BASE_DEBUG_GROUP, ALTERNATE_DEBUG_KEY)}
-            globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(BASE_EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY)}
+            globals()["ACTION_GROUP"] = {_select_adaptive_key_local(
+                BASE_ACTION_GROUP, ALTERNATE_ACTION_KEY)}
+            globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(
+                BASE_DEBUG_GROUP, ALTERNATE_DEBUG_KEY)}
+            globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(
+                BASE_EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY)}
 
             tags = tags_for(literal_key, mod)
             if tags:
@@ -516,27 +511,59 @@ def main(argv: List[str] | None = None) -> int:
         # inject comments into original text (in-memory) and print to stdout
         out_text = original_text
         offset = 0
-        for (start, end), comment_line, obj in zip(spans, comments_lines, parsed):
+        search_pos = original_text.find('[')
+        for (comments_blob, obj_text), comment_line, obj in zip(groups, comments_lines, parsed):
             if not comment_line:
                 continue
-            s = start + offset
-            e = end + offset
-            obj_text = out_text[s:e+1]
+            # locate the object's raw text in the original array portion
+            obj_index = out_text.find(obj_text, search_pos)
+            if obj_index == -1:
+                # fallback: try to locate by key only
+                k = obj.get('key')
+                key_marker = f'"key": "{k}"'
+                key_pos = out_text.find(key_marker, search_pos)
+                if key_pos == -1:
+                    print(
+                        f"warning: could not locate object for key {k!r}; skipping injection", file=sys.stderr)
+                    continue
+                # find the opening brace before the key
+                brace_pos = out_text.rfind('{', 0, key_pos)
+                if brace_pos == -1:
+                    print(
+                        f"warning: could not find object brace for key {k!r}; skipping injection", file=sys.stderr)
+                    continue
+                obj_start = brace_pos
+                obj_end = out_text.find('}', obj_start)
+                if obj_end == -1:
+                    print(
+                        f"warning: could not find object end for key {k!r}; skipping injection", file=sys.stderr)
+                    continue
+                obj_fragment = out_text[obj_start:obj_end+1]
+            else:
+                obj_start = obj_index
+                obj_end = obj_start + len(obj_text) - 1
+                obj_fragment = out_text[obj_start:obj_end+1]
+
             # if exact comment exists anywhere in object (compare stripped lines), skip
             exists = False
-            for line in obj_text.splitlines():
+            for line in obj_fragment.splitlines():
                 if line.strip() == comment_line.strip():
                     exists = True
                     break
             if exists:
+                search_pos = obj_end + 1
                 continue
 
             # find the first occurrence of "key" attribute inside this object text
-            m = re.search(r'"key"\s*:\s*', obj_text)
+            m = re.search(r'"key"\s*:\s*', obj_fragment)
             if not m:
-                print(f"error: could not find 'key' attribute in object span for object starting at {start} in '{fname}'", file=sys.stderr)
-                return 2
-            key_pos = s + m.start()
+                print(
+                    f"warning: could not find 'key' attribute inside object for key {obj.get('key')!r}; skipping", file=sys.stderr)
+                search_pos = obj_end + 1
+                continue
+            key_pos_in_fragment = m.start()
+            key_pos = obj_start + key_pos_in_fragment
+
             # find start of the line containing key_pos
             line_start = out_text.rfind('\n', 0, key_pos)
             if line_start == -1:
@@ -546,24 +573,20 @@ def main(argv: List[str] | None = None) -> int:
             # determine indentation of the key line
             indentation = ''
             if insert_pos < len(out_text):
-                # extract from insert_pos to key_pos
                 indentation = out_text[insert_pos:key_pos]
-                # only keep leading whitespace
                 indentation = re.match(r'[ \t]*', indentation).group(0)
 
             insert_text = indentation + comment_line + '\n'
-            out_text = out_text[:insert_pos] + insert_text + out_text[insert_pos:]
-            offset += len(insert_text)
+            out_text = out_text[:insert_pos] + \
+                insert_text + out_text[insert_pos:]
+            # advance search position past this object to avoid matching earlier duplicates
+            search_pos = obj_end + len(insert_text) + 1
 
         # print modified text to stdout
         sys.stdout.write(out_text)
         return 0
 
-    LETTER_GROUPS = {
-        "emacs": EMACS_GROUP,
-        "kbm": KBM_GROUP,
-        "vi": VI_GROUP,
-    }
+    # LETTER_GROUPS mapping is defined near the top and used as the source of truth
     selected = args.navigation_group
     # expose letter-groups and selected mode for helper functions
     globals()["LETTER_GROUPS"] = LETTER_GROUPS
@@ -668,11 +691,12 @@ def main(argv: List[str] | None = None) -> int:
 
                 ACTION_GROUP_state = set(globals().get("ACTION_GROUP", set()))
                 DEBUG_GROUP_state = set(globals().get("DEBUG_GROUP", set()))
-                EXTENSION_GROUP_state = set(globals().get("EXTENSION_GROUP", set()))
+                EXTENSION_GROUP_state = set(
+                    globals().get("EXTENSION_GROUP", set()))
 
                 globals()["SELECTED_NAV_GROUP"] = "none"
                 globals()["ALLOWED_LETTER_KEYS"] = set()
-                # clear chord groups so generic_when is just the root enabled condition
+
                 globals()["ACTION_GROUP"] = set()
                 globals()["DEBUG_GROUP"] = set()
                 globals()["EXTENSION_GROUP"] = set()
@@ -727,11 +751,13 @@ def main(argv: List[str] | None = None) -> int:
                             if conflict:
                                 continue
 
-                            combined_when = base_when + " && " + " && ".join(combo)
+                            combined_when = base_when + \
+                                " && " + " && ".join(combo)
                             pair = (key_str, combined_when)
                             if pair not in local_seen:
                                 local_seen.add(pair)
-                                recs.append((key_str, combined_when, comment_tags))
+                                recs.append(
+                                    (key_str, combined_when, comment_tags))
 
         return recs
 
@@ -777,13 +803,14 @@ def main(argv: List[str] | None = None) -> int:
         for i, (k, w, _) in enumerate(records):
             cmd = f"(corpus) {k} {assigned[i]}"
             out_list.append({"key": k, "command": cmd, "when": w})
-        sys.stdout.write(json.dumps(out_list, indent=2, ensure_ascii=False) + "\n")
+        sys.stdout.write(json.dumps(
+            out_list, indent=2, ensure_ascii=False) + "\n")
         return 0
 
     # build final objects with assigned ids
-    # compute comment tags now that records are final: set globals based on
-    # each record's when-clause and recompute adaptive chord groups so
-    # tags reflect the final emitted conditionals
+    # compute comment tags now that records are final
+    #  set globals based on each record's when-clause
+    #  recompute adaptive chord groups so tags reflect the final emitted conditionals
     for idx, (k, w, _) in enumerate(records):
         # split modifier(s) from key literal
         try:
@@ -792,18 +819,8 @@ def main(argv: List[str] | None = None) -> int:
             mod = ""
             key = k
 
-        # determine selected navigation group from when-clause
-        sel = None
-        if "config.keyboardNavigation.keys.letters == 'emacs'" in w:
-            sel = 'emacs'
-        elif "config.keyboardNavigation.keys.letters == 'kbm'" in w:
-            sel = 'kbm'
-        elif "config.keyboardNavigation.keys.letters == 'vi'" in w:
-            sel = 'vi'
-        else:
-            sel = 'none'
+        sel = sel_from_when(w)
 
-        # set ALLOWED_LETTER_KEYS and directional groups for tag calculation
         globals()["SELECTED_NAV_GROUP"] = sel
         if sel == 'none':
             globals()["ALLOWED_LETTER_KEYS"] = set()
@@ -820,9 +837,12 @@ def main(argv: List[str] | None = None) -> int:
                 return alternate_key
             return primary_key
 
-        globals()["ACTION_GROUP"] = {_select_adaptive_key_local(BASE_ACTION_GROUP, ALTERNATE_ACTION_KEY)}
-        globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(BASE_DEBUG_GROUP, ALTERNATE_DEBUG_KEY)}
-        globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(BASE_EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY)}
+        globals()["ACTION_GROUP"] = {_select_adaptive_key_local(
+            BASE_ACTION_GROUP, ALTERNATE_ACTION_KEY)}
+        globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(
+            BASE_DEBUG_GROUP, ALTERNATE_DEBUG_KEY)}
+        globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(
+            BASE_EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY)}
 
         tags = tags_for(key, mod)
         comment_tags = tags if tags else []
@@ -858,12 +878,9 @@ def tags_for(key, mod: str = ""):
         tags.append("(up)")
     if key in ARROW_GROUP:
         tags.append("(arrow)")
-    if key in EMACS_GROUP and key in globals().get("ALLOWED_LETTER_KEYS", set()):
-        tags.append("(emacs)")
-    if key in KBM_GROUP and key in globals().get("ALLOWED_LETTER_KEYS", set()):
-        tags.append("(kbm)")
-    if key in VI_GROUP and key in globals().get("ALLOWED_LETTER_KEYS", set()):
-        tags.append("(vi)")
+    for name, group in LETTER_GROUPS.items():
+        if key in group and key in globals().get("ALLOWED_LETTER_KEYS", set()):
+            tags.append(f"({name})")
     if key in JUKE_GROUP:
         tags.append("(juke)")
     if key in SPLIT_GROUP:
@@ -872,7 +889,6 @@ def tags_for(key, mod: str = ""):
         tags.append("(horizontal)")
     if key in SPLIT_VERTICAL_GROUP:
         tags.append("(vertical)")
-
     if key in DEBUG_GROUP:
         tags.append("(debug)")
     if key in ACTION_GROUP:
@@ -895,16 +911,14 @@ def when_for(key, mod: str = ""):
 
     if key in ARROW_GROUP:
         _add("config.keyboardNavigation.keys.arrows")
-    if key in EMACS_GROUP and key in globals().get("ALLOWED_LETTER_KEYS", set()):
-        _add("config.keyboardNavigation.keys.letters == 'emacs'")
-    if key in KBM_GROUP and key in globals().get("ALLOWED_LETTER_KEYS", set()):
-        _add("config.keyboardNavigation.keys.letters == 'kbm'")
-    if key in VI_GROUP and key in globals().get("ALLOWED_LETTER_KEYS", set()):
-        _add("config.keyboardNavigation.keys.letters == 'vi'")
+    for name, group in LETTER_GROUPS.items():
+        if key in group and key in globals().get("ALLOWED_LETTER_KEYS", set()):
+            _add(f"config.keyboardNavigation.keys.letters == '{name}'")
 
     def _qualify_chord(chord_set, chord_name: str) -> None:
-        # Only qualify chord when modifier includes Alt
-        if "alt" not in mod.split("+"):
+        # qualify a chord when it's a combination defined in MODIFIERS_SINGLE or MODIFIERS_MULTI
+        allowed_mods = set(MODIFIERS_SINGLE) | set(MODIFIERS_MULTI)
+        if mod not in allowed_mods:
             return
         if key in chord_set:
             _add(f"config.keyboardNavigation.chords.{chord_name}")
