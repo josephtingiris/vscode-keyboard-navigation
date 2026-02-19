@@ -34,6 +34,9 @@ from typing import List, Tuple
 from collections import Counter
 import hashlib
 import inspect
+import os
+import io
+import re
 
 # MODIFIERS
 
@@ -166,7 +169,395 @@ def main(argv: List[str] | None = None) -> int:
             "Select the active letter-key navigation group (default: none)."
         ),
     )
+    parser.add_argument(
+        "-c",
+        "--comments",
+        metavar='FILE|none',
+        help=(
+            "Inject corpus comments into an existing JSONC file or 'none' to emit pure JSON."
+        ),
+    )
     args = parser.parse_args(argv)
+    # comments mode: None (default) | 'none' | filename
+    comments_arg = args.comments
+
+    # If comments_arg is a filename, parse and inject comments into that file
+    # and print the modified text to stdout (do not write the file). Fail fast
+    # on errors.
+    if comments_arg and comments_arg != 'none':
+        fname = comments_arg
+        if not os.path.exists(fname) or not os.access(fname, os.R_OK):
+            print(f"error: comments file '{fname}' does not exist or is not readable", file=sys.stderr)
+            return 2
+
+        original_text = None
+        try:
+            with open(fname, 'r', encoding='utf-8') as fh:
+                original_text = fh.read()
+        except Exception as e:
+            print(f"error: failed to read '{fname}': {e}", file=sys.stderr)
+            return 2
+
+        # Helper: strip JSONC comments safely (state-machine)
+        def strip_jsonc(text: str) -> str:
+            out = []
+            i = 0
+            n = len(text)
+            in_string = False
+            string_char = ''
+            esc = False
+            in_line = False
+            in_block = False
+            while i < n:
+                ch = text[i]
+                nxt2 = text[i:i+2] if i+2 <= n else ''
+                if in_line:
+                    if ch == '\n':
+                        out.append(ch)
+                        in_line = False
+                    i += 1
+                    continue
+                if in_block:
+                    if nxt2 == '*/':
+                        i += 2
+                        in_block = False
+                    else:
+                        i += 1
+                    continue
+                if in_string:
+                    out.append(ch)
+                    if esc:
+                        esc = False
+                    elif ch == '\\':
+                        esc = True
+                    elif ch == string_char:
+                        in_string = False
+                    i += 1
+                    continue
+                # default
+                if nxt2 == '//':
+                    in_line = True
+                    i += 2
+                    continue
+                if nxt2 == '/*':
+                    in_block = True
+                    i += 2
+                    continue
+                if ch == '"' or ch == "'":
+                    in_string = True
+                    string_char = ch
+                    out.append(ch)
+                    i += 1
+                    continue
+                out.append(ch)
+                i += 1
+            return ''.join(out)
+
+        # Find array bounds (first top-level [ ... ]) using state-machine
+        def find_array_bounds(text: str):
+            i = 0
+            n = len(text)
+            in_string = False
+            string_char = ''
+            esc = False
+            in_line = False
+            in_block = False
+            start = -1
+            while i < n:
+                ch = text[i]
+                nxt2 = text[i:i+2] if i+2 <= n else ''
+                if in_line:
+                    if ch == '\n':
+                        in_line = False
+                    i += 1
+                    continue
+                if in_block:
+                    if nxt2 == '*/':
+                        i += 2
+                        in_block = False
+                    else:
+                        i += 1
+                    continue
+                if in_string:
+                    if ch == '\\':
+                        i += 2
+                        continue
+                    if ch == string_char:
+                        in_string = False
+                    i += 1
+                    continue
+                if nxt2 == '//':
+                    in_line = True
+                    i += 2
+                    continue
+                if nxt2 == '/*':
+                    in_block = True
+                    i += 2
+                    continue
+                if ch == '"' or ch == "'":
+                    in_string = True
+                    string_char = ch
+                    i += 1
+                    continue
+                if ch == '[':
+                    start = i
+                    break
+                i += 1
+            if start == -1:
+                return -1, -1
+            # find matching ]
+            depth = 1
+            i = start + 1
+            in_string = False
+            string_char = ''
+            in_line = False
+            in_block = False
+            while i < n:
+                ch = text[i]
+                nxt2 = text[i:i+2] if i+2 <= n else ''
+                if in_line:
+                    if ch == '\n':
+                        in_line = False
+                    i += 1
+                    continue
+                if in_block:
+                    if nxt2 == '*/':
+                        i += 2
+                        in_block = False
+                    else:
+                        i += 1
+                    continue
+                if in_string:
+                    if ch == '\\':
+                        i += 2
+                        continue
+                    if ch == string_char:
+                        in_string = False
+                    i += 1
+                    continue
+                if nxt2 == '//':
+                    in_line = True
+                    i += 2
+                    continue
+                if nxt2 == '/*':
+                    in_block = True
+                    i += 2
+                    continue
+                if ch == '"' or ch == "'":
+                    in_string = True
+                    string_char = ch
+                    i += 1
+                    continue
+                if ch == '[':
+                    depth += 1
+                elif ch == ']':
+                    depth -= 1
+                    if depth == 0:
+                        return start, i
+                i += 1
+            return -1, -1
+
+        # Find top-level object spans inside the top-level array
+        def find_top_level_object_spans(text: str):
+            a_start, a_end = find_array_bounds(text)
+            if a_start == -1:
+                return []
+            spans = []
+            i = a_start + 1
+            n = a_end
+            depth = 0
+            in_string = False
+            string_char = ''
+            in_line = False
+            in_block = False
+            obj_start = None
+            while i < n:
+                ch = text[i]
+                nxt2 = text[i:i+2] if i+2 <= len(text) else ''
+                if in_line:
+                    if ch == '\n':
+                        in_line = False
+                    i += 1
+                    continue
+                if in_block:
+                    if nxt2 == '*/':
+                        i += 2
+                        in_block = False
+                    else:
+                        i += 1
+                    continue
+                if in_string:
+                    if ch == '\\':
+                        i += 2
+                        continue
+                    if ch == string_char:
+                        in_string = False
+                    i += 1
+                    continue
+                if nxt2 == '//':
+                    in_line = True
+                    i += 2
+                    continue
+                if nxt2 == '/*':
+                    in_block = True
+                    i += 2
+                    continue
+                if ch == '"' or ch == "'":
+                    in_string = True
+                    string_char = ch
+                    i += 1
+                    continue
+                if ch == '{' and depth == 0:
+                    obj_start = i
+                    depth = 1
+                    i += 1
+                    continue
+                if ch == '{' and depth > 0:
+                    depth += 1
+                    i += 1
+                    continue
+                if ch == '}' and depth > 0:
+                    depth -= 1
+                    if depth == 0 and obj_start is not None:
+                        spans.append((obj_start, i))
+                        obj_start = None
+                    i += 1
+                    continue
+                i += 1
+            return spans
+
+        # prepare local letter groups and base chord groups (use globals)
+        LETTER_GROUPS_LOCAL = {
+            "emacs": EMACS_GROUP,
+            "kbm": KBM_GROUP,
+            "vi": VI_GROUP,
+        }
+        BASE_ACTION_GROUP = set(ACTION_GROUP)
+        BASE_DEBUG_GROUP = set(DEBUG_GROUP)
+        BASE_EXTENSION_GROUP = set(EXTENSION_GROUP)
+
+        # simple helper to remove trailing commas (safe for our parsing needs)
+        def _strip_trailing_commas(text: str) -> str:
+            return re.sub(r',\s*([}\]])', r"\1", text)
+
+        # parse the provided file as JSONC
+        try:
+            stripped = strip_jsonc(original_text)
+            stripped = _strip_trailing_commas(stripped)
+            parsed = json.loads(stripped)
+        except Exception as e:
+            print(f"error: failed to parse JSONC from '{fname}': {e}", file=sys.stderr)
+            return 2
+
+        if not isinstance(parsed, list):
+            print(f"error: top-level JSON value in '{fname}' is not an array", file=sys.stderr)
+            return 2
+
+        spans = find_top_level_object_spans(original_text)
+        if len(spans) != len(parsed):
+            print(f"error: mismatch between parsed array length ({len(parsed)}) and detected object spans ({len(spans)}) in '{fname}'", file=sys.stderr)
+            return 2
+
+        # compute comment lines for each object
+        comments_lines = []
+        for idx, obj in enumerate(parsed):
+            if not isinstance(obj, dict):
+                print(f"error: array element {idx} in '{fname}' is not an object", file=sys.stderr)
+                return 2
+            key_val = obj.get('key')
+            when_val = obj.get('when')
+            if not isinstance(key_val, str) or not isinstance(when_val, str):
+                print(f"error: object at index {idx} missing 'key' or 'when' (or not strings) in '{fname}'", file=sys.stderr)
+                return 2
+
+            # split mod and key
+            try:
+                mod, literal_key = key_val.rsplit('+', 1)
+            except ValueError:
+                mod = ''
+                literal_key = key_val
+
+            # determine selected nav group from when clause
+            sel = 'none'
+            if "config.keyboardNavigation.keys.letters == 'emacs'" in when_val:
+                sel = 'emacs'
+            elif "config.keyboardNavigation.keys.letters == 'kbm'" in when_val:
+                sel = 'kbm'
+            elif "config.keyboardNavigation.keys.letters == 'vi'" in when_val:
+                sel = 'vi'
+
+            globals()["SELECTED_NAV_GROUP"] = sel
+            if sel == 'none':
+                globals()["ALLOWED_LETTER_KEYS"] = set()
+            else:
+                globals()["ALLOWED_LETTER_KEYS"] = set(LETTER_GROUPS_LOCAL.get(sel, ()))
+            init_directional_groups(sel, LETTER_GROUPS_LOCAL)
+
+            # recompute adaptive chord groups
+            def _select_adaptive_key_local(primary_group: set, alternate_key: str) -> str:
+                primary_key = sorted(primary_group)[0]
+                contains_primary = primary_key in globals().get("ALLOWED_LETTER_KEYS", set())
+                contains_alternate = alternate_key in globals().get("ALLOWED_LETTER_KEYS", set())
+                if contains_primary and not contains_alternate:
+                    return alternate_key
+                return primary_key
+
+            globals()["ACTION_GROUP"] = {_select_adaptive_key_local(BASE_ACTION_GROUP, ALTERNATE_ACTION_KEY)}
+            globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(BASE_DEBUG_GROUP, ALTERNATE_DEBUG_KEY)}
+            globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(BASE_EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY)}
+
+            tags = tags_for(literal_key, mod)
+            if tags:
+                comment_line = "// " + " ".join(tags)
+            else:
+                comment_line = ''
+            comments_lines.append(comment_line)
+
+        # inject comments into original text (in-memory) and print to stdout
+        out_text = original_text
+        offset = 0
+        for (start, end), comment_line, obj in zip(spans, comments_lines, parsed):
+            if not comment_line:
+                continue
+            s = start + offset
+            e = end + offset
+            obj_text = out_text[s:e+1]
+            # if exact comment exists anywhere in object (compare stripped lines), skip
+            exists = False
+            for line in obj_text.splitlines():
+                if line.strip() == comment_line.strip():
+                    exists = True
+                    break
+            if exists:
+                continue
+
+            # find the first occurrence of "key" attribute inside this object text
+            m = re.search(r'"key"\s*:\s*', obj_text)
+            if not m:
+                print(f"error: could not find 'key' attribute in object span for object starting at {start} in '{fname}'", file=sys.stderr)
+                return 2
+            key_pos = s + m.start()
+            # find start of the line containing key_pos
+            line_start = out_text.rfind('\n', 0, key_pos)
+            if line_start == -1:
+                insert_pos = 0
+            else:
+                insert_pos = line_start + 1
+            # determine indentation of the key line
+            indentation = ''
+            if insert_pos < len(out_text):
+                # extract from insert_pos to key_pos
+                indentation = out_text[insert_pos:key_pos]
+                # only keep leading whitespace
+                indentation = re.match(r'[ \t]*', indentation).group(0)
+
+            insert_text = indentation + comment_line + '\n'
+            out_text = out_text[:insert_pos] + insert_text + out_text[insert_pos:]
+            offset += len(insert_text)
+
+        # print modified text to stdout
+        sys.stdout.write(out_text)
+        return 0
 
     LETTER_GROUPS = {
         "emacs": EMACS_GROUP,
@@ -379,6 +770,15 @@ def main(argv: List[str] | None = None) -> int:
     for i in range(n):
         if assigned[i] is None:
             assigned[i] = id_fulls[i][:12]
+
+    # If comments_arg == 'none', emit pure JSON (no comments) and exit.
+    if comments_arg == 'none':
+        out_list = []
+        for i, (k, w, _) in enumerate(records):
+            cmd = f"(corpus) {k} {assigned[i]}"
+            out_list.append({"key": k, "command": cmd, "when": w})
+        sys.stdout.write(json.dumps(out_list, indent=2, ensure_ascii=False) + "\n")
+        return 0
 
     # build final objects with assigned ids
     # compute comment tags now that records are final: set globals based on
