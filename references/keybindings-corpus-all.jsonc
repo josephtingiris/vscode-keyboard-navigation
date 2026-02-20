@@ -186,7 +186,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (left) (juke) (0) (self) (gold) (X)
+    // [keynav] (left) (juke) (fold) (0) (self) (gold) (X)
     "key": "alt+[",
     "command": "(corpus) alt+[ 27ed",
     "when": "config.keyboardNavigation.enabled"
@@ -198,7 +198,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (right) (juke) (0) (self) (gold) (X)
+    // [keynav] (right) (juke) (fold) (0) (self) (gold) (X)
     "key": "alt+]",
     "command": "(corpus) alt+] 46a4",
     "when": "config.keyboardNavigation.enabled"
@@ -522,7 +522,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (left) (juke)
+    // [keynav] (left) (juke) (fold)
     "key": "ctrl+[",
     "command": "(corpus) ctrl+[ c70b",
     "when": "config.keyboardNavigation.enabled"
@@ -534,7 +534,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (right) (juke)
+    // [keynav] (right) (juke) (fold)
     "key": "ctrl+]",
     "command": "(corpus) ctrl+] afde",
     "when": "config.keyboardNavigation.enabled"
@@ -618,7 +618,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (left) (juke) (jump) (2) (blue) (B)
+    // [keynav] (left) (juke) (fold) (jump) (2) (blue) (B)
     "key": "ctrl+alt+[",
     "command": "(corpus) ctrl+alt+[ 6e54",
     "when": "config.keyboardNavigation.enabled"
@@ -630,7 +630,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (right) (juke) (jump) (2) (blue) (B)
+    // [keynav] (right) (juke) (fold) (jump) (2) (blue) (B)
     "key": "ctrl+alt+]",
     "command": "(corpus) ctrl+alt+] 4f7b",
     "when": "config.keyboardNavigation.enabled"
@@ -852,7 +852,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (left) (juke) (warp) (3) (black) (C)
+    // [keynav] (left) (juke) (fold) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+[",
     "command": "(corpus) ctrl+alt+meta+[ 96c8",
     "when": "config.keyboardNavigation.enabled"
@@ -864,7 +864,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (right) (juke) (warp) (3) (black) (C)
+    // [keynav] (right) (juke) (fold) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+]",
     "command": "(corpus) ctrl+alt+meta+] 6b8d",
     "when": "config.keyboardNavigation.enabled"
@@ -1482,7 +1482,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (left) (juke) (change) (!) (yellow) (+)
+    // [keynav] (left) (juke) (fold) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+[",
     "command": "(corpus) ctrl+shift+alt+[ e957",
     "when": "config.keyboardNavigation.enabled"
@@ -1494,7 +1494,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (right) (juke) (change) (!) (yellow) (+)
+    // [keynav] (right) (juke) (fold) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+]",
     "command": "(corpus) ctrl+shift+alt+] 21c4",
     "when": "config.keyboardNavigation.enabled"
@@ -1716,7 +1716,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (left) (juke)
+    // [keynav] (left) (juke) (fold)
     "key": "ctrl+shift+alt+meta+[",
     "command": "(corpus) ctrl+shift+alt+meta+[ 16d9",
     "when": "config.keyboardNavigation.enabled"
@@ -1728,7 +1728,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (right) (juke)
+    // [keynav] (right) (juke) (fold)
     "key": "ctrl+shift+alt+meta+]",
     "command": "(corpus) ctrl+shift+alt+meta+] 0a6f",
     "when": "config.keyboardNavigation.enabled"
@@ -2202,7 +2202,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (left) (juke) (move) (1) (red) (A)
+    // [keynav] (left) (juke) (fold) (move) (1) (red) (A)
     "key": "shift+alt+[",
     "command": "(corpus) shift+alt+[ b288",
     "when": "config.keyboardNavigation.enabled"
@@ -2214,7 +2214,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (right) (juke) (move) (1) (red) (A)
+    // [keynav] (right) (juke) (fold) (move) (1) (red) (A)
     "key": "shift+alt+]",
     "command": "(corpus) shift+alt+] 7f47",
     "when": "config.keyboardNavigation.enabled"
@@ -2436,7 +2436,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (left) (juke)
+    // [keynav] (left) (juke) (fold)
     "key": "shift+alt+meta+[",
     "command": "(corpus) shift+alt+meta+[ 37fd",
     "when": "config.keyboardNavigation.enabled"
@@ -2448,7 +2448,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (right) (juke)
+    // [keynav] (right) (juke) (fold)
     "key": "shift+alt+meta+]",
     "command": "(corpus) shift+alt+meta+] dbc4",
     "when": "config.keyboardNavigation.enabled"

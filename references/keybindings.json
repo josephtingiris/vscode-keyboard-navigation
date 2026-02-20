@@ -90,7 +90,6 @@ Notes:
 */
 [
   {
-    // [keynav] (left) (juke)
     // [keynav] (left) (juke) (0) (self) (gold) (X)
     "key": "alt+{",
     "command": "(corpus) alt+{ 7fa2",
@@ -103,14 +102,12 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (left) (juke)
     // [keynav] (left) (juke) (jump) (2) (blue) (B)
     "key": "ctrl+alt+{",
     "command": "(corpus) ctrl+alt+{ e09f",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (left) (juke)
     // [keynav] (left) (juke) (move) (1) (red) (A)
     "key": "shift+alt+{",
     "command": "(corpus) shift+alt+{ 9fc1",
@@ -118,13 +115,11 @@ Notes:
   },
   {
     // [keynav] (left) (juke)
-    // [keynav] (left) (juke) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+{",
     "command": "(corpus) ctrl+alt+meta+{ a9dc",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (left) (juke)
     // [keynav] (left) (juke) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+{",
     "command": "(corpus) ctrl+shift+alt+{ b080",
@@ -143,7 +138,6 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (vertical) (split)
     // [keynav] (vertical) (split) (0) (self) (gold) (X)
     "key": "alt+|",
     "command": "(corpus) alt+| df49",
@@ -156,14 +150,12 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (vertical) (split)
     // [keynav] (vertical) (split) (jump) (2) (blue) (B)
     "key": "ctrl+alt+|",
     "command": "(corpus) ctrl+alt+| 01cf",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (vertical) (split)
     // [keynav] (vertical) (split) (move) (1) (red) (A)
     "key": "shift+alt+|",
     "command": "(corpus) shift+alt+| be4a",
