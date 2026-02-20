@@ -1318,6 +1318,13 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // (up) (juke) - moves/replaces vscode alt+right
+    "key": "alt+pageup",
+    "command": "workbench.action.navigateForward",
+    // "command": "alt+pageup df44",
+    "when": "config.keyboardNavigation. && config.keyboardNavigation.juke"
+  },
+  {
     // [keynav] (right) (arrow)
     "key": "alt+right",
     "command": "(corpus) alt+right 66ce",
@@ -3513,18 +3520,19 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
   },
   {
-    // (up) (juke) - moves/replaces vscode alt+right
-    "key": "alt+pageup",
-    "command": "workbench.action.navigateForward",
-    // "command": "alt+pageup df44",
-    "when": "config.keyboardNavigation. && config.keyboardNavigation.juke"
-  },
-  {
     // (up) (vi) (editor) (gold) (unbind) (neovim) (insert) (user)
     "key": "ctrl+k",
     "command": "ctrl+k 43f7",
     // "command": "-vscode-neovim.send",
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.k && neovim.init && neovim.mode == 'insert'"
+    // (note) ctrl+k must be a chord for native vscode keybindings to work
+  },
+  {
+    // (up) (vi) (editor) (gold) (unbind) (neovim) (insert) (user) - unbind ctrl+k in normal mode to allow native vscode keybindings to work
+    "key": "ctrl+k",
+    "command": "-vscode-neovim.send",
+    // "command": "ctrl+k 1678",
+    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.k && neovim.init && neovim.mode != 'insert'"
     // (note) ctrl+k must be a chord for native vscode keybindings to work
   },
   {
@@ -3540,14 +3548,6 @@ Notes:
     "command": "ctrl+y 1277",
     // "command": "vscode-neovim.send",
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.y && neovim.init && neovim.mode == 'insert'"
-  },
-  {
-    // (up) (vi) (editor) (gold) (unbind) (neovim) (insert) (user) - unbind ctrl+k in normal mode to allow native vscode keybindings to work
-    "key": "ctrl+k",
-    "command": "-vscode-neovim.send",
-    // "command": "ctrl+k 1678",
-    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.k && neovim.init && neovim.mode != 'insert'"
-    // (note) ctrl+k must be a chord for native vscode keybindings to work
   },
   {
     // (ctrl) (y) (editor) (gold) (unbind) (neovim) (insert) (user) - unbind ctrl+y in normal mode to allow native vscode keybindings to work
