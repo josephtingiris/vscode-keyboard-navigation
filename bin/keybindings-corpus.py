@@ -88,6 +88,11 @@ PUNCTUATION_LEFT_GROUP = {"[", "{", ";", ","}
 PUNCTUATION_RIGHT_GROUP = {"]", "}", "'", "."}
 PUNCTUATION_GROUP = PUNCTUATION_LEFT_GROUP | PUNCTUATION_RIGHT_GROUP
 
+# fold group for opinionated fold/unfold keybindings
+FOLD_LEFT_GROUP = {"["}
+FOLD_RIGHT_GROUP = {"]"}
+FOLD_GROUP = FOLD_LEFT_GROUP | FOLD_RIGHT_GROUP
+
 # based on the `--navigation-group`, letter-keys are injected at runtime by `init_directional_groups`
 LEFT_GROUP = set(PUNCTUATION_LEFT_GROUP)
 DOWN_GROUP = set(FOUR_PACK_DOWN_GROUP)
@@ -147,6 +152,7 @@ TAG_ORDER = [
 
     "(arrow)", "(emacs)", "(kbm)", "(vi)",
     "(juke)", "(split)",
+    "(fold)",
     "(move)", "(jump)", "(warp)", "(change)", "(assign)",
     "(!)",
 
@@ -951,6 +957,8 @@ def tags_for(key: str, mod: str = "", when_clause: str | None = None) -> List[st
         if clause in when_clause:
             dynamic_tags.add(f"({name})")
 
+    if key in FOLD_GROUP:
+        dynamic_tags.add("(fold)")
     if key in JUKE_GROUP:
         dynamic_tags.add("(juke)")
     if key in SPLIT_GROUP:
