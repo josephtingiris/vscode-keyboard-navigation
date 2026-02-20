@@ -250,9 +250,7 @@ def main(argv: List[str] | None = None) -> int:
         "-c",
         "--comments",
         metavar='FILE|none',
-        help=(
-            "Inject canonical comments into an existing JSONC <FILE>, or use 'none' to emit a pure JSON corpus (no comments)."
-        ),
+        help=("Inject canonical comments into an existing JSONC <FILE>, or use 'none' to emit a pure JSON corpus (no comments)."),
     )
     args = parser.parse_args(argv)
 
@@ -718,8 +716,7 @@ def main(argv: List[str] | None = None) -> int:
                 DEBUG_GROUP_ORIG, ALTERNATE_DEBUG_KEY, "debug")
         }
         globals()["EXTENSION_GROUP"] = {
-            _select_adaptive_key(EXTENSION_GROUP_ORIG,
-                                 ALTERNATE_EXTENSION_KEY, "extension")
+            _select_adaptive_key(EXTENSION_GROUP_ORIG, ALTERNATE_EXTENSION_KEY, "extension")
         }
 
         keys_to_emit = set()
@@ -898,12 +895,9 @@ def main(argv: List[str] | None = None) -> int:
                 return alternate_key
             return primary_key
 
-        globals()["ACTION_GROUP"] = {_select_adaptive_key_local(
-            ACTION_GROUP_ORIG, ALTERNATE_ACTION_KEY)}
-        globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(
-            DEBUG_GROUP_ORIG, ALTERNATE_DEBUG_KEY)}
-        globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(
-            EXTENSION_GROUP_ORIG, ALTERNATE_EXTENSION_KEY)}
+        globals()["ACTION_GROUP"] = {_select_adaptive_key_local(ACTION_GROUP_ORIG, ALTERNATE_ACTION_KEY)}
+        globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(DEBUG_GROUP_ORIG, ALTERNATE_DEBUG_KEY)}
+        globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(EXTENSION_GROUP_ORIG, ALTERNATE_EXTENSION_KEY)}
 
         tags = tags_for(key, mod, w)
         comment_tags = tags if tags else []
