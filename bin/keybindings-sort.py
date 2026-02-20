@@ -636,10 +636,8 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
             for child in node.children:
                 sort_and_nodes(child)
             items = list(enumerate(node.children))
-            # prioritize any operands that match user-supplied literal prefixes
-            # or regexes. Matched operands are emitted at the front of the
-            # AND clause in the order: all literal-prefix matches (in the
-            # order provided) then regex matches (in the order provided).
+
+            # prioritize operands
             prioritized = []
             picked = set()
 
