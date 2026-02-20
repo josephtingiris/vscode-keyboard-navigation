@@ -23,12 +23,12 @@
     "editor.defaultFormatter": "mkhl.shfmt",
     "editor.formatOnSave": true
   },
+  "autopep8.args": ["--max-line-length=120"],
   "files.exclude": {
     "**/.venv": true,
     "**/node_modules": true
   },
   "makefile.configureOnOpen": false,
-  "python.formatting.autopep8Args": ["--max-line-length=120"],
   "search.exclude": {
     "**/node_modules": true
   }
