@@ -11,6 +11,10 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
+  "[makefile]": {
+    "editor.defaultFormatter": "eshojaei.mbake-makefile-formatter",
+    "editor.formatOnSave": true
+  },
   "[python]": {
     "editor.defaultFormatter": "ms-python.autopep8",
     "editor.formatOnSave": true
