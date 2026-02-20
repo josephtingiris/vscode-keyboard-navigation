@@ -128,23 +128,16 @@ ALTERNATE_DEBUG_KEY = 'j'
 EXTENSION_GROUP = {"x"}
 ALTERNATE_EXTENSION_KEY = 'n'
 
-FIN_COLOR_MOD_TAGS = {
-    "alt": "(gold)",
-    "shift+alt": "(red)",
-    "ctrl+alt": "(blue)",
-    "ctrl+alt+meta": "(black)",
-    "ctrl+shift+alt": "(yellow)",
+# FIN tag mapping: modifier -> (color-tag, (meta-tags...))
+FIN_TAGS = {
+    "alt": ("(gold)", ("(self)", "(0)", "(gold)", "(X)")),
+    "shift+alt": ("(red)", ("(move)", "(1)", "(red)", "(A)")),
+    "ctrl+alt": ("(blue)", ("(jump)", "(2)", "(blue)", "(B)")),
+    "ctrl+alt+meta": ("(black)", ("(warp)", "(3)", "(black)", "(C)")),
+    "ctrl+shift+alt": ("(yellow)", ("(change)", "(!)", "(yellow)", "(+ )")),
 }
 
-# semantic/meta tags for FIN modifier bindings (focal-invariant navigation descriptive tags)
-FIN_META_MOD_TAGS = {
-    "alt": ("(self)", "(0)", "(gold)", "(X)"),
-    "shift+alt": ("(move)", "(1)", "(red)", "(A)"),
-    "ctrl+alt": ("(jump)", "(2)", "(blue)", "(B)"),
-    "ctrl+alt+meta": ("(warp)", "(3)", "(black)", "(C)"),
-    "ctrl+shift+alt": ("(change)", "(!)", "(yellow)", "(+)"),
-}
-
+# order of tags for deterministic output
 TAG_ORDER = [
     # D(irection, Heading, or Intent)
     "(down)", "(left)", "(right)", "(up)",
@@ -983,11 +976,11 @@ def tags_for(key: str, mod: str = "", when_clause: str | None = None) -> List[st
     if "config.keyboardNavigation.chords.extension" in when_clause:
         dynamic_tags.add("(extension)")
 
-    color_tag = FIN_COLOR_MOD_TAGS.get(mod)
-    if color_tag:
-        dynamic_tags.add(color_tag)
-        # add semantic/meta tags for modifier-driven FIN semantics
-        meta_tags = FIN_META_MOD_TAGS.get(mod)
+    fin_entry = FIN_TAGS.get(mod)
+    if fin_entry:
+        color_tag, meta_tags = fin_entry
+        if color_tag:
+            dynamic_tags.add(color_tag)
         if meta_tags:
             for t in meta_tags:
                 dynamic_tags.add(t)
