@@ -134,7 +134,7 @@ FIN_TAGS = {
     "shift+alt": ("(red)", ("(move)", "(1)", "(red)", "(A)")),
     "ctrl+alt": ("(blue)", ("(jump)", "(2)", "(blue)", "(B)")),
     "ctrl+alt+meta": ("(black)", ("(warp)", "(3)", "(black)", "(C)")),
-    "ctrl+shift+alt": ("(yellow)", ("(change)", "(!)", "(yellow)", "(+ )")),
+    "ctrl+shift+alt": ("(yellow)", ("(change)", "(!)", "(yellow)", "(+)")),
 }
 
 # order of tags for deterministic output
