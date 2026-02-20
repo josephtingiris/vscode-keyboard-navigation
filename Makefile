@@ -11,6 +11,8 @@ help:
 	@echo "  all                     - make all targets"
 	@echo "  build                   - build (delegates to subdirs)"
 	@echo "  clean                   - clean build/test artifacts"
+	@echo "  corpus                  - generate full corpus in references/"
+	@echo "  corpora                 - alias for corpus"
 	@echo "  extension               - make extension (delegates to ./extension/)"
 	@echo "  test                    - run tests (delegates to ./tests/)"
 	@echo "  tests                   - alias for test"
