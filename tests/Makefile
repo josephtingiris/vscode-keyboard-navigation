@@ -1,29 +1,55 @@
 
-DEFAULT_GOAL := help
+.DEFAULT_GOAL := help
+.PHONY: help all build test tests $(TARGETS)
 
-# find executable files with a shebang
-SCRIPTS := $(shell find . -type f -perm /111 -print | xargs -I{} sh -c 'head -n1 "{}" 2>/dev/null | sed -n "1p" | grep -q "^#!" && echo "{}" || true' | sed 's|^./||')
-
-# derive target names from script paths
-TARGETS := $(foreach s,$(SCRIPTS),$(subst /,.,$(basename $(s))))
-
-.PHONY: help tests $(TARGETS)
-
+# default: show help when `make` is run with no args
 help:
-	@echo "Tests Makefile - available targets:"
-	@echo "  help   - show this message (default)"
-	@echo "  tests  - run all discovered executable scripts with a shebang"
-	@printf "  %-6s %s\n" "targets:" "$(TARGETS)"
+	@echo "usage: make [target]"
+	@echo
+	@echo "Available Targets:"
+	@echo "  help                    - show this message (default)"
+	@echo "  all                     - make all targets"
+	@echo "  build                   - run tests/ build"
+	@echo "  test                    - run all tests, including scripts"
+	@echo "  tests                   - alias for test"
+	@echo
+	@echo "Script Targets:"
+	@for t in $(TARGETS); do \
+		echo "  $$t"; \
+	done
+	@echo
 
-# run all discovered tests
-tests: $(TARGETS)
+#
+# init
+#
+
+# find executables with a shebang
+SCRIPTS := $(shell find . -type f -perm /111 -print | sort | xargs -I{} sh -c 'head -n1 "{}" 2>/dev/null | sed -n "1p" | grep -q "^#!" && echo "{}" || true' | sed 's|^./||')
+
+# dynamic target names for scripts with a shebang (e.g. "test.example" for "test/example.sh")
+TARGETS := $(foreach s,$(SCRIPTS),$(subst /,.,$(basename $(s))))
 
 # dynamic rule generator: create a rule for each discovered script
 define RUN_RULE
 $(1):
-	@echo "Running $(2) ..."
+	@echo "++ Running $(2) ..."
+	@echo --cut--
 	@./$(2)
+	@echo --cut--
+	@echo
 endef
-
 $(foreach s,$(SCRIPTS),$(eval $(call RUN_RULE,$(subst /,.,$(basename $(s))),$(s))))
 
+#
+# targets
+#
+
+all: build test
+
+build:
+	@echo "++ Building tests/ ..."
+	@echo
+
+test: $(TARGETS)
+
+tests: test
