@@ -171,6 +171,7 @@ TAG_ORDER = [
 
     "(primary)", "(secondary)", "(panel)",
     "(editor)", "(terminal)", "(explorer)",
+    "(text)",
 
     # D(etails)
     "(readonly)",
@@ -181,6 +182,7 @@ WHEN_TAG_SELECTORS = [
     ("auxiliarBarFocus", "(secondary)"),
     ("editorFocus", "(editor)"),
     ("editorTextFocus", "(editor)"),
+    ("editorTextFocus", "(text)"),
     ("panelFocus", "(panel)"),
     ("sideBarFocus", "(primary)"),
     ("terminalFocus", "(terminal)"),
