@@ -67,12 +67,18 @@ Constraints:
 
 FIN Ring/Shell Focus & Move Assignments:
 
-  * alt+                = X/Gold
-  * shift+alt           = 1/Red
-  * ctrl+alt            = 2/Blue
-  * ctrl+alt+meta       = 3/Black
-  * ctrl+shift+alt      = Alter/Change/Shift/Move (UI components)
+  * alt+                = Gold = 0 = X = (self)
+  * shift+alt           = Red = 1 = A = (move)
+  * ctrl+alt            = Blue = 2 = B = (jump)
+  * ctrl+alt+meta       = Black = 3 = C = (warp)
+  * ctrl+shift+alt      = Yellow = ! = ! = (change) = Alter/Assign/Change/Shift/Place (UI components)
   
+  Focus / Current : Gold : Gold / X : Center (Ring 0) : Current focal point (origin).
+  Cardinal move : Red : Cardinal : Ring 1 : Move to adjacent neighbor; destination becomes new Gold (re‑center).
+  Juke : Gold : Juke : Center (Ring 0) : Lateral/contextual adjustment; no coordinate change; no re‑centering.
+  Jump : Blue : Jump : Ring 2 : Bypass Ring 1; move to Ring 2; destination becomes new Gold (re‑center).
+  Warp : Black : Warp / Portal : Ring 3 (n ≥ 3) : Teleport to a distant coordinate (3+ steps); destination becomes new Gold; typically gated or undoable.
+
 Notes:
 
   * The keybindings in this reference file use my 'Focal-Invariant Navigation' (FIN) model to determine when contexts.
@@ -1310,13 +1316,6 @@ Notes:
     "key": "alt+pageup",
     "command": "(corpus) alt+pageup 4654",
     "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // (up) (juke) - moves/replaces vscode alt+right
-    "key": "alt+pageup",
-    "command": "workbench.action.navigateForward",
-    // "command": "alt+pageup df44",
-    "when": "config.keyboardNavigation. && config.keyboardNavigation.juke"
   },
   {
     // [keynav] (right) (arrow)
@@ -3001,15 +3000,15 @@ Notes:
   {
     // (down) (vi) - Settings editor, Keyboard Shortcuts, et al
     "key": "shift+alt+j",
-    "command": "workbench.action.focusBelowGroup",
-    // "command": "shift+alt+h 4423",
+    // "command": "workbench.action.focusBelowGroup",
+    "command": "shift+alt+h 4423",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && activeEditorIsReadonly && focusedView == '' && editorIsOpen"
   },
   {
     // (down) (vi) (edge) - Settings editor, Keyboard Shortcuts, et al - if on last editor in last group, wrap to first editor group
     "key": "shift+alt+j",
-    "command": "workbench.action.focusFirstEditorGroup",
-    // "command": "shift+alt+h 10b9",
+    "command": "shift+alt+h 10b9",
+    // "command": "workbench.action.focusFirstEditorGroup",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.wrap && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && activeEditorGroupLast && activeEditorIsLastInGroup && activeEditorIsReadonly && focusedView == '' && editorIsOpen"
   },
   {
@@ -3514,19 +3513,18 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
   },
   {
+    // (up) (juke) - moves/replaces vscode alt+right
+    "key": "alt+pageup",
+    "command": "workbench.action.navigateForward",
+    // "command": "alt+pageup df44",
+    "when": "config.keyboardNavigation. && config.keyboardNavigation.juke"
+  },
+  {
     // (up) (vi) (editor) (gold) (unbind) (neovim) (insert) (user)
     "key": "ctrl+k",
     "command": "ctrl+k 43f7",
     // "command": "-vscode-neovim.send",
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.k && neovim.init && neovim.mode == 'insert'"
-    // (note) ctrl+k must be a chord for native vscode keybindings to work
-  },
-  {
-    // (up) (vi) (editor) (gold) (unbind) (neovim) (insert) (user) - unbind ctrl+k in normal mode to allow native vscode keybindings to work
-    "key": "ctrl+k",
-    "command": "-vscode-neovim.send",
-    // "command": "ctrl+k 1678",
-    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.k && neovim.init && neovim.mode != 'insert'"
     // (note) ctrl+k must be a chord for native vscode keybindings to work
   },
   {
@@ -3542,6 +3540,14 @@ Notes:
     "command": "ctrl+y 1277",
     // "command": "vscode-neovim.send",
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.y && neovim.init && neovim.mode == 'insert'"
+  },
+  {
+    // (up) (vi) (editor) (gold) (unbind) (neovim) (insert) (user) - unbind ctrl+k in normal mode to allow native vscode keybindings to work
+    "key": "ctrl+k",
+    "command": "-vscode-neovim.send",
+    // "command": "ctrl+k 1678",
+    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.k && neovim.init && neovim.mode != 'insert'"
+    // (note) ctrl+k must be a chord for native vscode keybindings to work
   },
   {
     // (ctrl) (y) (editor) (gold) (unbind) (neovim) (insert) (user) - unbind ctrl+y in normal mode to allow native vscode keybindings to work
