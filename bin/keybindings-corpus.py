@@ -1012,6 +1012,11 @@ def tags_for(key: str, mod: str = "", when_clause: str | None = None) -> List[st
                         dynamic_tags.add(tag)
 
     ordered_tags.extend([tag for tag in TAG_ORDER if tag in dynamic_tags])
+
+    # append any remaining dynamic tags not listed in TAG_ORDER, sorted alphabetically
+    remaining = sorted(t for t in dynamic_tags if t not in TAG_ORDER)
+    ordered_tags.extend(remaining)
+
     return ordered_tags
 
 
