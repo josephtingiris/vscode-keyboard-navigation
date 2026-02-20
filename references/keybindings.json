@@ -1069,6 +1069,13 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.terminal.enabled && terminalFocus && panelPosition == 'right' && terminalCount > 1 && terminalSplitPaneActive"
   },
   {
+    // (down) (vi) (edge)
+    "key": "alt+j",
+    "command": "workbench.action.terminal.focusNext",
+    // "command": "alt+k c9e8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.terminal.enabled && panelFocus && terminalFocus && !editorFocus && panelPosition == 'bottom' && terminalCount > 1"
+  },
+  {
     // (down) (vi)
     "key": "alt+j",
     "command": "workbench.action.focusPanel",
@@ -1136,20 +1143,12 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && panelFocus && panelPosition == 'bottom'"
   },
   {
-    // (up) (vi) (edge) - going up to the editor from every panel except the OUTPUT panel
-    "key": "alt+k",
-    "command": "workbench.action.focusActiveEditorGroup",
-    // "command": "alt+k c9e7",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && !editorFocus && panelPosition == 'bottom'"
-  },
-  {
     // (up) (vi)
     "key": "alt+k",
     "command": "workbench.action.chat.focusAgentSessionsViewer", // YES!
     //"command": "alt+k d9eb",
     // "command": "agentSessions.hideAgentSessionsSidebar",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '1' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
-
     // "when": "!agentSessionsViewerVisible && agentSessionsViewerPosition == '2' || agentSessionsViewerOrientation == '1' && agentSessionsViewerPosition == '2'"
     // (note) ..Orientation == '2' is went the SESSIONS view is 'Stacked' (on top)
   },
@@ -1168,6 +1167,13 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.terminal.enabled && terminalFocus && panelPosition == 'right' && terminalCount > 1 && terminalSplitPaneActive"
   },
   {
+    // (up) (vi) (edge)
+    "key": "alt+k",
+    "command": "workbench.action.terminal.focusPrevious",
+    // "command": "alt+k c9e7",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.terminal.enabled && panelFocus && terminalFocus && !editorFocus && panelPosition == 'bottom' && terminalCount > 1"
+  },
+  {
     // (up) (vi) (edge) (editor) - wrap around to the panel on the bottom
     "key": "alt+k",
     "command": "workbench.action.focusPanel",
@@ -1177,8 +1183,8 @@ Notes:
   {
     // (down) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
     "key": "alt+k",
-    "command": "workbench.action.focusAboveGroup",
-    // "command": "alt+k 42a5",
+    "command": "alt+k 42a5",
+    // "command": "workbench.action.focusAboveGroup",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && activeEditorIsReadonly && focusedView == '' && editorIsOpen"
   },
   {
