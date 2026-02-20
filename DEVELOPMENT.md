@@ -155,6 +155,83 @@ Recommended practices:
 
 ---
 
+<a id="code-formatting"></a>
+### Code formatting & formatters
+
+This repository configures language-specific formatters in the workspace `.vscode/settings.json`. The following formatters are active.
+
+- **JavaScript / JSON / JSONC**: `esbenp.prettier-vscode` (Prettier)
+   - Install Prettier (formatter runtime):
+      - npm (recommended):
+
+         ```bash
+         npm install -g prettier
+         ```
+
+      - Additionally, install the VS Code extension:
+
+         ```bash
+         code --install-extension esbenp.prettier-vscode
+         ```
+
+- **Makefile**: `eshojaei.mbake-makefile-formatter` (mbake)
+   - Install the `mbake` formatter (Python package):
+
+      ```bash
+      pip install --user mbake
+      ```
+
+   - Install the VS Code extension:
+
+      ```bash
+      code --install-extension eshojaei.mbake-makefile-formatter
+      ```
+
+- **Python**: `ms-python.autopep8` (autopep8 via the Python extension)
+   - Install the formatter runtime:
+
+      ```bash
+      pip install --user autopep8
+      ```
+
+   - The workspace sets `python.formatting.autopep8Args` with a max line length of 120.
+
+- **Shell scripts**: `mkhl.shfmt` (shfmt)
+   - Install `shfmt` (example Linux installs):
+
+      - Fedora / RHEL / dnf-based:
+
+         ```bash
+         sudo dnf -y install shfmt
+         ```
+
+      - Debian / Ubuntu (if available via apt):
+
+         ```bash
+         sudo apt-get install -y shfmt
+         ```
+
+      - Or download the binary directly from the maintainer (works on most distributions):
+
+         ```bash
+         curl -sSfL https://github.com/mvdan/sh/releases/latest/download/shfmt_linux_amd64 -o shfmt
+         sudo install shfmt /usr/local/bin/shfmt
+         ```
+
+   - Install the VS Code extension (optional):
+
+      ```bash
+      code --install-extension mkhl.shfmt
+      ```
+
+Notes:
+- The VS Code extension provides integration with the editor; the runtime/formatter binary or Python package is usually required for on-disk formatting outside of the editor or when the extension delegates to the installed formatter.
+- If you prefer to install Python tooling system-wide, omit `--user` and use your package manager or a virtual environment as appropriate.
+- To ensure the extension CLI `code` is available, install VS Code and add it to your PATH (the editor provides guidance for this per platform).
+
+
+---
+
 <a id="packaging-local-install-vsix"></a>
 ## Packaging & local install (VSIX)
 
