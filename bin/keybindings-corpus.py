@@ -78,37 +78,40 @@ LETTER_GROUPS = {
     "vi": VI_GROUP,
 }
 
-# directional groups for jukes and moves
+# four pack groups for jukes, moves, jumps, etc.
 FOUR_PACK_DOWN_GROUP = {"end", "pagedown"}
 FOUR_PACK_UP_GROUP = {"home", "pageup"}
 FOUR_PACK_GROUP = FOUR_PACK_DOWN_GROUP | FOUR_PACK_UP_GROUP
 
+# punctuation groups for jukes, moves, jumps, etc.
 PUNCTUATION_LEFT_GROUP = {"[", "{", ";", ","}
 PUNCTUATION_RIGHT_GROUP = {"]", "}", "'", "."}
 PUNCTUATION_GROUP = PUNCTUATION_LEFT_GROUP | PUNCTUATION_RIGHT_GROUP
 
-# variable letter-key groups are injected at runtime by `init_directional_groups` based on the selected `--navigation-group`
+# based on the `--navigation-group`, letter-keys are injected at runtime by `init_directional_groups`
 LEFT_GROUP = set(PUNCTUATION_LEFT_GROUP)
 DOWN_GROUP = set(FOUR_PACK_DOWN_GROUP)
 UP_GROUP = set(FOUR_PACK_UP_GROUP)
 RIGHT_GROUP = set(PUNCTUATION_RIGHT_GROUP)
 
-JUKE_GROUP = PUNCTUATION_GROUP | FOUR_PACK_GROUP
-
-# map static direction tags to the literal keys that consistently act as that direction
-DIRECTIONAL_TAG_BASES = [
+# map directional tags for groups that always use that direction; index corresponds to ARROW_GROUP order
+DIRECTIONAL_GROUP_TAGS = [
     ("(left)", 0, PUNCTUATION_LEFT_GROUP),
     ("(down)", 1, FOUR_PACK_DOWN_GROUP),
     ("(up)", 2, FOUR_PACK_UP_GROUP),
     ("(right)", 3, PUNCTUATION_RIGHT_GROUP),
 ]
 
+# map directional tags to all of the directional keys
 DIRECTIONAL_KEY_TAGS = {
     tag: {ARROW_GROUP[idx]} | extra_keys | {
         group[idx] for group in LETTER_GROUPS.values() if idx < len(group)
     }
-    for tag, idx, extra_keys in DIRECTIONAL_TAG_BASES
+    for tag, idx, extra_keys in DIRECTIONAL_GROUP_TAGS
 }
+
+# juke group
+JUKE_GROUP = PUNCTUATION_GROUP | FOUR_PACK_GROUP
 
 # split groups for panes/windows
 SPLIT_HORIZONTAL_GROUP = {"-", "_"}
@@ -124,18 +127,6 @@ ALTERNATE_DEBUG_KEY = 'j'
 
 EXTENSION_GROUP = {"x"}
 ALTERNATE_EXTENSION_KEY = 'n'
-
-# patterns that start and end with '/' are treated as regular expressions
-CONTEXT_TAG_SELECTORS = [
-    ("auxiliarBarFocus", "(secondary)"),
-    ("editorFocus", "(editor)"),
-    ("editorTextFocus", "(editor)"),
-    ("panelFocus", "(panel)"),
-    ("sideBarFocus", "(primary)"),
-    ("terminalFocus", "(terminal)"),
-    ("/Readonly/", "(readonly)"),
-    # ("explorerViewletVisible", "(explorer)"),
-]
 
 FIN_COLOR_MOD_TAGS = {
     "alt": "(gold)",
@@ -186,6 +177,18 @@ TAG_ORDER = [
     "(readonly)",
 ]
 
+# patterns that start and end with '/' are treated as regular expressions
+WHEN_TAG_SELECTORS = [
+    ("auxiliarBarFocus", "(secondary)"),
+    ("editorFocus", "(editor)"),
+    ("editorTextFocus", "(editor)"),
+    ("panelFocus", "(panel)"),
+    ("sideBarFocus", "(primary)"),
+    ("terminalFocus", "(terminal)"),
+    ("/Readonly/", "(readonly)"),
+    # ("explorerViewletVisible", "(explorer)"),
+]
+
 
 def emit_record(key_str, command_str, when_str, comment_tags):
     parts = []
@@ -207,7 +210,7 @@ def init_directional_groups(selected: str, letter_groups: dict) -> None:
     """ensure LEFT_GROUP/DOWN_GROUP/UP_GROUP/RIGHT_GROUP globals include
     the arrow literal and the corresponding letter from the selected
     navigation group (if any). This centralizes startup mutation so
-    helpers can continue to read globals.
+    subordinates can continue to read globals.
     """
     direction_to_var = {
         "left": "LEFT_GROUP",
@@ -260,7 +263,7 @@ def main(argv: List[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    # helper: determine selected letter-group from a when-clause
+    # determine selected letter-group from a when-clause
     def sel_from_when(when_val: str) -> str:
         for name in LETTER_GROUPS.keys():
             if f"config.keyboardNavigation.keys.letters == '{name}'" in when_val:
@@ -493,9 +496,9 @@ def main(argv: List[str] | None = None) -> int:
             trailing = comments_buf
             return groups, trailing
 
-        BASE_ACTION_GROUP = set(ACTION_GROUP)
-        BASE_DEBUG_GROUP = set(DEBUG_GROUP)
-        BASE_EXTENSION_GROUP = set(EXTENSION_GROUP)
+        ACTION_GROUP_ORIG = set(ACTION_GROUP)
+        DEBUG_GROUP_ORIG = set(DEBUG_GROUP)
+        EXTENSION_GROUP_ORIG = set(EXTENSION_GROUP)
 
         # remove trailing commas (safe)
         def _strip_trailing_commas(text: str) -> str:
@@ -568,11 +571,11 @@ def main(argv: List[str] | None = None) -> int:
                 return primary_key
 
             globals()["ACTION_GROUP"] = {_select_adaptive_key_local(
-                BASE_ACTION_GROUP, ALTERNATE_ACTION_KEY)}
+                ACTION_GROUP_ORIG, ALTERNATE_ACTION_KEY)}
             globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(
-                BASE_DEBUG_GROUP, ALTERNATE_DEBUG_KEY)}
+                DEBUG_GROUP_ORIG, ALTERNATE_DEBUG_KEY)}
             globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(
-                BASE_EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY)}
+                EXTENSION_GROUP_ORIG, ALTERNATE_EXTENSION_KEY)}
 
             tags = tags_for(literal_key, mod, when_val)
             if tags:
@@ -588,7 +591,7 @@ def main(argv: List[str] | None = None) -> int:
         for (comments_blob, obj_text), comment_line, obj in zip(groups, comments_lines, parsed):
             if not comment_line:
                 continue
-            # locate the object's raw text in the original array portion
+
             obj_index = out_text.find(obj_text, search_pos)
             if obj_index == -1:
                 # fallback: try to locate by key only
@@ -599,7 +602,7 @@ def main(argv: List[str] | None = None) -> int:
                     print(
                         f"warning: could not locate object for key {k!r}; skipping injection", file=sys.stderr)
                     continue
-                # find the opening brace before the key
+
                 brace_pos = out_text.rfind('{', 0, key_pos)
                 if brace_pos == -1:
                     print(
@@ -617,7 +620,7 @@ def main(argv: List[str] | None = None) -> int:
                 obj_end = obj_start + len(obj_text) - 1
                 obj_fragment = out_text[obj_start:obj_end+1]
 
-            # if exact comment exists anywhere in object (compare stripped lines), skip
+            # if exact comment exists anywhere in the object (compare stripped lines) then skip
             exists = False
             for line in obj_fragment.splitlines():
                 if line.strip() == comment_line.strip():
@@ -643,6 +646,7 @@ def main(argv: List[str] | None = None) -> int:
                 insert_pos = 0
             else:
                 insert_pos = line_start + 1
+
             # determine indentation of the key line
             indentation = ''
             if insert_pos < len(out_text):
@@ -652,6 +656,7 @@ def main(argv: List[str] | None = None) -> int:
             insert_text = indentation + comment_line + '\n'
             out_text = out_text[:insert_pos] + \
                 insert_text + out_text[insert_pos:]
+
             # advance search position past this object to avoid matching earlier duplicates
             search_pos = obj_end + len(insert_text) + 1
 
@@ -659,9 +664,9 @@ def main(argv: List[str] | None = None) -> int:
         sys.stdout.write(out_text)
         return 0
 
-    # LETTER_GROUPS mapping is defined near the top and used as the source of truth
     selected = args.navigation_group
-    # expose letter-groups and selected mode for helper functions
+
+    # expose letter-groups and selected mode for subordinates
     globals()["LETTER_GROUPS"] = LETTER_GROUPS
     globals()["SELECTED_NAV_GROUP"] = selected
     if selected == "none" or selected == "all":
@@ -672,11 +677,11 @@ def main(argv: List[str] | None = None) -> int:
     globals()["ALLOWED_LETTER_KEYS"] = allowed_letter_keys
 
     init_directional_groups(selected, LETTER_GROUPS)
-    # preserve the original (base) chord groups so per-mode mutation does
-    # not affect later mode processing when we select adaptive keys.
-    BASE_ACTION_GROUP = set(ACTION_GROUP)
-    BASE_DEBUG_GROUP = set(DEBUG_GROUP)
-    BASE_EXTENSION_GROUP = set(EXTENSION_GROUP)
+
+    # preserve the original chord groups
+    ACTION_GROUP_ORIG = set(ACTION_GROUP)
+    DEBUG_GROUP_ORIG = set(DEBUG_GROUP)
+    EXTENSION_GROUP_ORIG = set(EXTENSION_GROUP)
 
     def generate_records_for_mode(mode: str) -> List[Tuple[str, str, List[str]]]:
         globals()["SELECTED_NAV_GROUP"] = mode
@@ -713,17 +718,17 @@ def main(argv: List[str] | None = None) -> int:
 
             return primary_key
 
-        # apply adaptive selection for chord keys for this mode
+        # apply adaptive chord key selection based on mode
         globals()["ACTION_GROUP"] = {
             _select_adaptive_key(
-                BASE_ACTION_GROUP, ALTERNATE_ACTION_KEY, "action")
+                ACTION_GROUP_ORIG, ALTERNATE_ACTION_KEY, "action")
         }
         globals()["DEBUG_GROUP"] = {
             _select_adaptive_key(
-                BASE_DEBUG_GROUP, ALTERNATE_DEBUG_KEY, "debug")
+                DEBUG_GROUP_ORIG, ALTERNATE_DEBUG_KEY, "debug")
         }
         globals()["EXTENSION_GROUP"] = {
-            _select_adaptive_key(BASE_EXTENSION_GROUP,
+            _select_adaptive_key(EXTENSION_GROUP_ORIG,
                                  ALTERNATE_EXTENSION_KEY, "extension")
         }
 
@@ -750,17 +755,17 @@ def main(argv: List[str] | None = None) -> int:
 
                 mode_when = when_for(key, mod)
 
-                SELECTED_NAV_GROUP_state = globals().get("SELECTED_NAV_GROUP")
-                ALLOWED_LETTER_KEYS_state = globals().get("ALLOWED_LETTER_KEYS")
+                SELECTED_NAV_GROUP_STATE = globals().get("SELECTED_NAV_GROUP")
+                ALLOWED_LETTER_KEYS_STATE = globals().get("ALLOWED_LETTER_KEYS")
 
-                LEFT_GROUP_state = set(globals().get("LEFT_GROUP", set()))
-                DOWN_GROUP_state = set(globals().get("DOWN_GROUP", set()))
-                UP_GROUP_state = set(globals().get("UP_GROUP", set()))
-                RIGHT_GROUP_state = set(globals().get("RIGHT_GROUP", set()))
+                LEFT_GROUP_STATE = set(globals().get("LEFT_GROUP", set()))
+                DOWN_GROUP_STATE = set(globals().get("DOWN_GROUP", set()))
+                UP_GROUP_STATE = set(globals().get("UP_GROUP", set()))
+                RIGHT_GROUP_STATE = set(globals().get("RIGHT_GROUP", set()))
 
-                ACTION_GROUP_state = set(globals().get("ACTION_GROUP", set()))
-                DEBUG_GROUP_state = set(globals().get("DEBUG_GROUP", set()))
-                EXTENSION_GROUP_state = set(
+                ACTION_GROUP_STATE = set(globals().get("ACTION_GROUP", set()))
+                DEBUG_GROUP_STATE = set(globals().get("DEBUG_GROUP", set()))
+                EXTENSION_GROUP_STATE = set(
                     globals().get("EXTENSION_GROUP", set()))
 
                 globals()["SELECTED_NAV_GROUP"] = "none"
@@ -774,16 +779,17 @@ def main(argv: List[str] | None = None) -> int:
                 generic_when = when_for(key, mod)
 
                 # restore selected / letter / directional groups
-                globals()["SELECTED_NAV_GROUP"] = SELECTED_NAV_GROUP_state
-                globals()["ALLOWED_LETTER_KEYS"] = ALLOWED_LETTER_KEYS_state
-                globals()["LEFT_GROUP"] = LEFT_GROUP_state
-                globals()["DOWN_GROUP"] = DOWN_GROUP_state
-                globals()["UP_GROUP"] = UP_GROUP_state
-                globals()["RIGHT_GROUP"] = RIGHT_GROUP_state
+                globals()["SELECTED_NAV_GROUP"] = SELECTED_NAV_GROUP_STATE
+                globals()["ALLOWED_LETTER_KEYS"] = ALLOWED_LETTER_KEYS_STATE
+                globals()["LEFT_GROUP"] = LEFT_GROUP_STATE
+                globals()["DOWN_GROUP"] = DOWN_GROUP_STATE
+                globals()["UP_GROUP"] = UP_GROUP_STATE
+                globals()["RIGHT_GROUP"] = RIGHT_GROUP_STATE
+
                 # restore chord state
-                globals()["ACTION_GROUP"] = ACTION_GROUP_state
-                globals()["DEBUG_GROUP"] = DEBUG_GROUP_state
-                globals()["EXTENSION_GROUP"] = EXTENSION_GROUP_state
+                globals()["ACTION_GROUP"] = ACTION_GROUP_STATE
+                globals()["DEBUG_GROUP"] = DEBUG_GROUP_STATE
+                globals()["EXTENSION_GROUP"] = EXTENSION_GROUP_STATE
 
                 # emit generic first if different, then the mode-qualified when
                 emitted_whens = []
@@ -797,11 +803,11 @@ def main(argv: List[str] | None = None) -> int:
                 ]
                 m = len(EXTRA_WHENS)
 
-                for base_when in emitted_whens:
-                    pair = (key_str, base_when)
+                for this_when in emitted_whens:
+                    pair = (key_str, this_when)
                     if pair not in local_seen:
                         local_seen.add(pair)
-                        recs.append((key_str, base_when, comment_tags))
+                        recs.append((key_str, this_when, comment_tags))
 
                     for r in range(1, m + 1):
                         for combo in combinations(EXTRA_WHENS, r):
@@ -820,7 +826,7 @@ def main(argv: List[str] | None = None) -> int:
                             if conflict:
                                 continue
 
-                            combined_when = base_when + \
+                            combined_when = this_when + \
                                 " && " + " && ".join(combo)
                             pair = (key_str, combined_when)
                             if pair not in local_seen:
@@ -903,11 +909,11 @@ def main(argv: List[str] | None = None) -> int:
             return primary_key
 
         globals()["ACTION_GROUP"] = {_select_adaptive_key_local(
-            BASE_ACTION_GROUP, ALTERNATE_ACTION_KEY)}
+            ACTION_GROUP_ORIG, ALTERNATE_ACTION_KEY)}
         globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(
-            BASE_DEBUG_GROUP, ALTERNATE_DEBUG_KEY)}
+            DEBUG_GROUP_ORIG, ALTERNATE_DEBUG_KEY)}
         globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(
-            BASE_EXTENSION_GROUP, ALTERNATE_EXTENSION_KEY)}
+            EXTENSION_GROUP_ORIG, ALTERNATE_EXTENSION_KEY)}
 
         tags = tags_for(key, mod, w)
         comment_tags = tags if tags else []
@@ -980,7 +986,7 @@ def tags_for(key: str, mod: str = "", when_clause: str | None = None) -> List[st
     color_tag = FIN_COLOR_MOD_TAGS.get(mod)
     if color_tag:
         dynamic_tags.add(color_tag)
-        # also add semantic/meta tags for modifier-driven FIN semantics
+        # add semantic/meta tags for modifier-driven FIN semantics
         meta_tags = FIN_META_MOD_TAGS.get(mod)
         if meta_tags:
             for t in meta_tags:
@@ -991,14 +997,14 @@ def tags_for(key: str, mod: str = "", when_clause: str | None = None) -> List[st
 
     # context-based tags: map substrings or regexes in the when-clause to tags
     if when_clause:
-        for pattern, tag in CONTEXT_TAG_SELECTORS:
+        for pattern, tag in WHEN_TAG_SELECTORS:
             if pattern.startswith("/") and pattern.endswith("/"):
                 regex = pattern[1:-1]
                 try:
                     if re.search(regex, when_clause):
                         dynamic_tags.add(tag)
                 except re.error:
-                    # ignore bad regexes
+                    # ignore bad regexes; should probably emit a warning here ...
                     pass
             else:
                 # avoid matching negated occurrences like '!editorFocus'
@@ -1027,12 +1033,13 @@ def when_for(key, mod: str = ""):
 
     if key in ARROW_GROUP:
         _add("config.keyboardNavigation.keys.arrows")
+
     for name, group in LETTER_GROUPS.items():
         if key in group and key in globals().get("ALLOWED_LETTER_KEYS", set()):
             _add(f"config.keyboardNavigation.keys.letters == '{name}'")
 
+    # qualify a chord when it's a valid combination defined in MODIFIERS_SINGLE or MODIFIERS_MULTI
     def _qualify_chord(chord_set, chord_name: str) -> None:
-        # qualify a chord when it's a combination defined in MODIFIERS_SINGLE or MODIFIERS_MULTI
         allowed_mods = set(MODIFIERS_SINGLE) | set(MODIFIERS_MULTI)
         if mod not in allowed_mods:
             return
