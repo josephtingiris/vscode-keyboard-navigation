@@ -305,7 +305,7 @@ Notes:
     "command": "workbench.action.previousEditor",
     // "command": "alt+, 0abc",
     "when": "config.keyboardNavigation.enabled && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && editorIsOpen"
-    // (note) only editor focus??
+    // [note] only editor focus??
   },
   {
     // (left) (juke) (editor) (gold) (readonly)
@@ -313,7 +313,7 @@ Notes:
     "key": "alt+,",
     "command": "alt+, 0aab",
     "when": "config.keyboardNavigation.enabled && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && focusedView == '' && editorIsOpen"
-    // (note) only editor focus??
+    // [note] only editor focus??
   },
   {
     // (left) (juke) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
@@ -392,7 +392,7 @@ Notes:
     "command": "workbench.action.nextEditor",
     // "command": "alt+. 0acc",
     "when": "config.keyboardNavigation.enabled && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && editorIsOpen"
-    // (note) only editor focus??
+    // [note] only editor focus??
   },
   {
     // (right) (juke) (editor) (gold) (readonly)
@@ -400,7 +400,7 @@ Notes:
     "key": "alt+.",
     "command": "alt+. 3aac",
     "when": "config.keyboardNavigation.enabled && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && focusedView == '' && editorIsOpen"
-    // (note) only editor focus??
+    // [note] only editor focus??
   },
   {
     // (right) (juke) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
@@ -473,14 +473,12 @@ Notes:
     "when": "config.keyboardNavigation.enabled && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && activeEditorIsReadonly && focusedView == '' && editorIsOpen"
   },
   {
-    // [keynav] (left) (juke)
     // [keynav] (left) (juke) (fold) (0) (self) (gold) (X)
     "key": "alt+[",
     "command": "(corpus) alt+[ 27ed",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (left) (juke) (editor) (gold)
     // [keynav] (left) (juke) (fold) (0) (self) (gold) (X) (editor)
     "key": "alt+[",
     "command": "alt+[ f982",
@@ -498,14 +496,12 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (right) (juke)
     // [keynav] (right) (juke) (fold) (0) (self) (gold) (X)
     "key": "alt+]",
     "command": "(corpus) alt+] 46a4",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (right) (juke) (editor) (gold)
     // [keynav] (right) (juke) (fold) (0) (self) (gold) (X) (editor)
     "key": "alt+]",
     "command": "alt+] ff82",
@@ -1028,7 +1024,7 @@ Notes:
     "command": "alt+h 31ae",
     // "command": "cursorLeft",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus && !neovim.init"
-    // (note) vi-like extensions disabled
+    // [note] vi-like extensions disabled
   },
   {
     // (left) (vi) (terminal) (gold) (pivot) (split)
@@ -1060,7 +1056,7 @@ Notes:
     "key": "alt+h",
     "command": "alt+h 0aec",
     "when": "config.keyboardNavigation.enabled && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && editorIsOpen"
-    // (note) only editor focus??
+    // [note] only editor focus??
   },
   {
     // (left) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
@@ -1144,7 +1140,7 @@ Notes:
     "command": "alt+j 9831",
     // "command": "cursorDown",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus && !neovim.init"
-    // (note) vi-like extensions disabled
+    // [note] vi-like extensions disabled
   },
   {
     // (down) (vi)
@@ -1272,7 +1268,7 @@ Notes:
     // "command": "agentSessions.hideAgentSessionsSidebar",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '1' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
     // "when": "!agentSessionsViewerVisible && agentSessionsViewerPosition == '2' || agentSessionsViewerOrientation == '1' && agentSessionsViewerPosition == '2'"
-    // (note) ..Orientation == '2' is went the SESSIONS view is 'Stacked' (on top)
+    // [note] ..Orientation == '2' is went the SESSIONS view is 'Stacked' (on top)
   },
   {
     // (right) (vi) (terminal) (gold) (pivot) (split)
@@ -1335,7 +1331,7 @@ Notes:
     "command": "agentSessions.showAgentSessionsSidebar",
     // "command": "alt+l d7eb",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus"
-    // (note) ..Orientation == '2' is went the SESSIONS view is 'Side by Side' (on right)
+    // [note] ..Orientation == '2' is went the SESSIONS view is 'Side by Side' (on right)
     // "when": "!agentSessionsViewerVisible && agentSessionsViewerPosition == '2' || agentSessionsViewerOrientation == '1' && agentSessionsViewerPosition == '2'"
   },
   {
@@ -1408,7 +1404,7 @@ Notes:
     "command": "agentSessions.hideAgentSessionsSidebar",
     // "command": "alt+l d8eb",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '2' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
-    // (note) ..Orientation == '2' is went the SESSIONS view is 'Side by Side' (on right)
+    // [note] ..Orientation == '2' is went the SESSIONS view is 'Side by Side' (on right)
   },
   {
     // (right) (vi)
@@ -1440,7 +1436,7 @@ Notes:
     "key": "alt+l",
     "command": "alt+l 0adc",
     "when": "config.keyboardNavigation.enabled && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && editorIsOpen"
-    // (note) only editor focus??
+    // [note] only editor focus??
   },
   {
     // (right) (vi) (editor) (gold) - Settings editor, Keyboard Shortcuts, et al
@@ -1563,7 +1559,6 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (left) (juke)
     // [keynav] (left) (juke) (fold)
     "key": "ctrl+[",
     "command": "(corpus) ctrl+[ c70b",
@@ -1576,7 +1571,6 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (right) (juke)
     // [keynav] (right) (juke) (fold)
     "key": "ctrl+]",
     "command": "(corpus) ctrl+] afde",
@@ -1661,14 +1655,12 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (left) (juke)
     // [keynav] (left) (juke) (fold) (jump) (2) (blue) (B)
     "key": "ctrl+alt+[",
     "command": "(corpus) ctrl+alt+[ 6e54",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (left) - unfold all
     // [keynav] (left) (juke) (fold) (jump) (2) (blue) (B) (editor)
     "key": "ctrl+alt+[",
     "command": "editor.unfoldAll",
@@ -1683,19 +1675,18 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (right) (juke)
     // [keynav] (right) (juke) (fold) (jump) (2) (blue) (B)
     "key": "ctrl+alt+]",
     "command": "(corpus) ctrl+alt+] 4f7b",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // (right) - fold all except current
     // [keynav] (right) (juke) (fold) (jump) (2) (blue) (B) (editor)
     "key": "ctrl+alt+]",
     "command": "editor.foldAllExcept",
     // "command": "ctrl+alt+] c878",
     "when": "config.keyboardNavigation.enabled && editorFocus && config.workbench.sideBar.location == 'left'"
+    // [note] fold all except current
   },
   {
     // [keynav] (horizontal) (split)
@@ -3936,7 +3927,7 @@ Notes:
     "command": "ctrl+k 43f7",
     // "command": "-vscode-neovim.send",
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.k && neovim.init && neovim.mode == 'insert'"
-    // (note) ctrl+k must be a chord for native vscode keybindings to work
+    // [note] ctrl+k must be a chord for native vscode keybindings to work
   },
   {
     // (up) (vi) (editor) (gold) (unbind) (neovim) (insert) (user) - unbind ctrl+k in normal mode to allow native vscode keybindings to work
@@ -3944,7 +3935,7 @@ Notes:
     "command": "-vscode-neovim.send",
     // "command": "ctrl+k 1678",
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.k && neovim.init && neovim.mode != 'insert'"
-    // (note) ctrl+k must be a chord for native vscode keybindings to work
+    // [note] ctrl+k must be a chord for native vscode keybindings to work
   },
   {
     // (ctrl) (y) (editor) (gold) (unbind) (neovim) (insert) (user)
@@ -3966,6 +3957,6 @@ Notes:
     "command": "-vscode-neovim.send",
     // "command": "ctrl+y 1278",
     "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.y && neovim.init && neovim.mode != 'insert'"
-    // (note) ctrl+y must be a chord for native vscode keybindings to work
+    // [note] ctrl+y must be a chord for native vscode keybindings to work
   }
 ]
