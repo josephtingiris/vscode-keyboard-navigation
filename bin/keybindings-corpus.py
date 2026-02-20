@@ -125,13 +125,65 @@ ALTERNATE_DEBUG_KEY = 'j'
 EXTENSION_GROUP = {"x"}
 ALTERNATE_EXTENSION_KEY = 'n'
 
-# comment tag/token order
+# patterns that start and end with '/' are treated as regular expressions
+CONTEXT_TAG_SELECTORS = [
+    ("auxiliarBarFocus", "(secondary)"),
+    ("editorFocus", "(editor)"),
+    ("editorTextFocus", "(editor)"),
+    ("panelFocus", "(panel)"),
+    ("sideBarFocus", "(primary)"),
+    ("terminalFocus", "(terminal)"),
+    ("/Readonly/", "(readonly)"),
+    # ("explorerViewletVisible", "(explorer)"),
+]
+
+FIN_COLOR_MOD_TAGS = {
+    "alt": "(gold)",
+    "shift+alt": "(red)",
+    "ctrl+alt": "(blue)",
+    "ctrl+alt+meta": "(black)",
+    "ctrl+shift+alt": "(yellow)",
+}
+
+# semantic/meta tags for FIN modifier bindings (focal-invariant navigation descriptive tags)
+FIN_META_MOD_TAGS = {
+    "alt": ("(self)", "(0)", "(gold)", "(X)"),
+    "shift+alt": ("(move)", "(1)", "(red)", "(A)"),
+    "ctrl+alt": ("(jump)", "(2)", "(blue)", "(B)"),
+    "ctrl+alt+meta": ("(warp)", "(3)", "(black)", "(C)"),
+    "ctrl+shift+alt": ("(change)", "(!)", "(yellow)", "(+)"),
+}
+
 TAG_ORDER = [
+    # D(irection, Heading, or Intent)
     "(down)", "(left)", "(right)", "(up)",
-    "(arrow)", "(emacs)", "(kbm)", "(vi)",
     "(horizontal)", "(vertical)",
+
+    # A(ction/Key Group)
+
+    "(arrow)", "(emacs)", "(kbm)", "(vi)",
     "(juke)", "(split)",
+    "(move)", "(jump)", "(warp)", "(change)", "(assign)",
+    "(!)",
+
+    # F(ocus)
+    "(0)", "(1)", "(2)", "(3)",
+    "(self)",
+
+    # C(olors, Characters, Chords, and/or Coordinates)
+    "(gold)", "(red)", "(blue)", "(black)", "(yellow)",
+
+    "(X)", "(A)", "(B)", "(C)",
+    "(+)",
+
     "(debug)", "(action)", "(extension)",
+    "(chord)",
+
+    "(primary)", "(secondary)", "(panel)",
+    "(editor)", "(terminal)", "(explorer)",
+
+    # D(etails)
+    "(readonly)",
 ]
 
 
@@ -924,6 +976,41 @@ def tags_for(key: str, mod: str = "", when_clause: str | None = None) -> List[st
         dynamic_tags.add("(action)")
     if "config.keyboardNavigation.chords.extension" in when_clause:
         dynamic_tags.add("(extension)")
+
+    color_tag = FIN_COLOR_MOD_TAGS.get(mod)
+    if color_tag:
+        dynamic_tags.add(color_tag)
+        # also add semantic/meta tags for modifier-driven FIN semantics
+        meta_tags = FIN_META_MOD_TAGS.get(mod)
+        if meta_tags:
+            for t in meta_tags:
+                dynamic_tags.add(t)
+
+    if when_clause and "config.keyboardNavigation.chords." in when_clause:
+        dynamic_tags.add("(chord)")
+
+    # context-based tags: map substrings or regexes in the when-clause to tags
+    if when_clause:
+        for pattern, tag in CONTEXT_TAG_SELECTORS:
+            if pattern.startswith("/") and pattern.endswith("/"):
+                regex = pattern[1:-1]
+                try:
+                    if re.search(regex, when_clause):
+                        dynamic_tags.add(tag)
+                except re.error:
+                    # ignore bad regexes
+                    pass
+            else:
+                # avoid matching negated occurrences like '!editorFocus'
+                try:
+                    # search for whole-word occurrence not immediately preceded by '!'
+                    regex = rf"(?<!\!)\b{re.escape(pattern)}\b"
+                    if re.search(regex, when_clause):
+                        dynamic_tags.add(tag)
+                except re.error:
+                    # fallback to simple substring match on regex error
+                    if pattern in when_clause:
+                        dynamic_tags.add(tag)
 
     ordered_tags.extend([tag for tag in TAG_ORDER if tag in dynamic_tags])
     return ordered_tags
