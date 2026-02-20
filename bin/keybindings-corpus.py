@@ -563,12 +563,9 @@ def main(argv: List[str] | None = None) -> int:
                     return alternate_key
                 return primary_key
 
-            globals()["ACTION_GROUP"] = {_select_adaptive_key_local(
-                ACTION_GROUP_ORIG, ALTERNATE_ACTION_KEY)}
-            globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(
-                DEBUG_GROUP_ORIG, ALTERNATE_DEBUG_KEY)}
-            globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(
-                EXTENSION_GROUP_ORIG, ALTERNATE_EXTENSION_KEY)}
+            globals()["ACTION_GROUP"] = {_select_adaptive_key_local(ACTION_GROUP_ORIG, ALTERNATE_ACTION_KEY)}
+            globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(DEBUG_GROUP_ORIG, ALTERNATE_DEBUG_KEY)}
+            globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(EXTENSION_GROUP_ORIG, ALTERNATE_EXTENSION_KEY)}
 
             tags = tags_for(literal_key, mod, when_val)
             if tags:
