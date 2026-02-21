@@ -2598,14 +2598,14 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
   },
   {
-    // [keynav] (vi) (0) (self) (gold) (X) (extension) (chord)
+    // [keynav] (vi) (0) (self) (gold) (X) (extension) (chord) (neovim)
     "key": "alt+x",
     "command": "alt+x 318f",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension && neovim.init"
     // [note] VS Code Keyboard Navigation Extension
   },
   {
-    // [keynav] (vi) (0) (self) (gold) (X) (extension) (chord)
+    // [keynav] (vi) (0) (self) (gold) (X) (extension) (chord) (neovim)
     "key": "alt+x r",
     "command": "vscode-neovim.restart",
     // "command": "alt+x 419e",
@@ -3147,7 +3147,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus && !multipleEditorGroups"
   },
   {
-    // [keynav] (left) (vi) (0) (self) (gold) (X) (editor)
+    // [keynav] (left) (vi) (0) (self) (gold) (X) (editor) (monaco)
     "key": "alt+h",
     "command": "alt+h 31ae",
     // "command": "cursorLeft",
@@ -3155,7 +3155,7 @@ Notes:
     // [note] vi-like extensions disabled
   },
   {
-    // [keynav] (down) (vi) (0) (self) (gold) (X) (editor)
+    // [keynav] (down) (vi) (0) (self) (gold) (X) (editor) (monaco)
     "key": "alt+j",
     "command": "alt+j 9831",
     // "command": "cursorDown",
@@ -3163,10 +3163,18 @@ Notes:
     // [note] vi-like extensions disabled
   },
   {
-    // [keynav] (up) (vi) (0) (self) (gold) (X) (editor)
+    // [keynav] (up) (vi) (0) (self) (gold) (X) (editor) (monaco)
     "key": "alt+k",
     "command": "alt+k 31be",
     // "command": "cursorUp",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus && !neovim.init"
+    // [note] vi-like extensions disabled
+  },
+  {
+    // [keynav] (right) (vi) (0) (self) (gold) (X) (editor) (monaco)
+    "key": "alt+l",
+    "command": "alt+l 11ae",
+    // "command": "cursorRight",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus && !neovim.init"
     // [note] vi-like extensions disabled
   },
