@@ -144,6 +144,7 @@ FIN_TAGS = {
 # order of tags for deterministic output
 TAG_ORDER = [
     # D(irection, Heading, or Intent)
+    "(corpus)",
     "(down)", "(left)", "(right)", "(up)",
     "(horizontal)", "(vertical)",
 
@@ -166,7 +167,6 @@ TAG_ORDER = [
     "(+)",
 
     "(debug)", "(action)", "(extension)",
-    "(corpus)",
     "(chord)",
 
     "(primary)", "(secondary)", "(panel)",
