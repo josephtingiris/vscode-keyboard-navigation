@@ -188,6 +188,8 @@ WHEN_TAG_SELECTORS = [
     ("editorTextFocus", "(text)"),
     ("multipleEditorGroups", "(multiple)"),
     (r"/(?i:(?<!!)\b\S*multiple\S*\b)/", "(multiple)"),
+    (r"/(?i:) !neovim.init/", "(monaco)"),
+    ("neovim.init", "(neovim)"),
     ("panelFocus", "(panel)"),
     ("sideBarFocus", "(primary)"),
     ("terminalFocus", "(terminal)"),
