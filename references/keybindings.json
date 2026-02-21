@@ -1815,20 +1815,20 @@ Notes:
   {
     // [keynav] (left) (juke) (0) (self) (gold) (X)
     "key": "alt+,",
-    "command": "alt+, 0abc",
-    // "command": "workbench.action.previousEditor",
+    "command": "workbench.action.previousEditor",
+    // "command": "alt+, 0abc",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && editorIsOpen"
     // [note] only editor focus??
-    // [note] file not found, ...
+    // [note] file not found, ... this is the one
   },
   {
     // [keynav] (right) (juke) (0) (self) (gold) (X)
     "key": "alt+.",
-    "command": "alt+. 0acc",
-    // "command": "workbench.action.nextEditor",
+    "command": "workbench.action.nextEditor",
+    // "command": "alt+. 0acc",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && editorIsOpen"
     // [note] only editor focus??
-    // [note] file not found, ...
+    // [note] file not found, ... this is the one
   },
   {
     // [keynav] (0) (self) (gold) (X)
@@ -1875,8 +1875,8 @@ Notes:
   {
     // [keynav] (readonly) (close)
     "key": "ctrl+d",
-    "command": "workbench.action.closeActiveEditor",
-    // "command": "ctrl+d cc30",
+    "command": "ctrl+d cc30",
+    // "command": "workbench.action.closeActiveEditor",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditorIsReadonly && focusedView == '' && editorIsOpen"
   },
   {
@@ -1972,7 +1972,7 @@ Notes:
     // [keynav] (up) (vi) (0) (self) (gold) (X)
     "key": "alt+k",
     "command": "workbench.action.chat.focusAgentSessionsViewer", // YES!
-    //"command": "alt+k d9eb",
+    // "command": "alt+k d9eb",
     // "command": "agentSessions.hideAgentSessionsSidebar",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '1' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
     // "when": "!agentSessionsViewerVisible && agentSessionsViewerPosition == '2' || agentSessionsViewerOrientation == '1' && agentSessionsViewerPosition == '2'"
@@ -2278,7 +2278,7 @@ Notes:
     // "command": "workbench.scm.repositories.resetViewLocation", // open and focus the (PRIMARY) SCM REPOISITORIES viewlet
     // "command": "workbench.scm.resetViewLocation",
     // "command": "workbench.view.debug.resetViewContainerLocation",
-    //"command": "workbench.view.editSessions.resetViewContainerLocation",
+    // "command": "workbench.view.editSessions.resetViewContainerLocation",
     // "command": "workbench.view.explorer.resetViewContainerLocation",
     // "command": "workbench.view.extension.references-view.resetViewContainerLocation",
     // "command": "workbench.view.extension.test.resetViewContainerLocation",
@@ -3007,6 +3007,13 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus"
   },
   {
+    // [keynav] (editor) (close)
+    "key": "ctrl+d",
+    "command": "workbench.action.closeActiveEditor",
+    // "command": "ctrl+d 2bcb",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !editorTextFocus && !terminalFocus && neovim.mode != 'cmdline' && !filesExplorerFocus && !searchViewletFocus"
+  },
+  {
     // [keynav] (left) (juke) (0) (self) (gold) (X) (editor)
     "key": "alt+,",
     "command": "workbench.action.previousEditor",
@@ -3353,6 +3360,13 @@ Notes:
     "command": "shift+alt+l cd4c",
     // "command": "workbench.action.focusRightGroup",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && multipleEditorGroups"
+  },
+  {
+    // [keynav] (editor) (close)
+    "key": "ctrl+d",
+    "command": "workbench.action.closeActiveEditor",
+    // "command": "ctrl+d 2bcc",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && neovim.mode != 'cmdline'"
   },
   {
     // [keynav] (left) (vi) (juke) (move) (1) (red) (A) (panel) (editor)
