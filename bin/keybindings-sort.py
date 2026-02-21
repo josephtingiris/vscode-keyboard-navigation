@@ -1119,6 +1119,45 @@ def main(argv: List[str] | None = None) -> int:
             final_groups.extend(buckets[rank])
 
         sorted_groups = final_groups
+
+    # for primary `when` sorting (-p when), enforce canonical-when group order for the final output
+    if primary_order == 'when':
+        def _pair_key_literal(obj_text: str) -> str:
+            m = re.search(r'"key"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
+            if not m:
+                return ''
+            raw = m.group(1)
+            try:
+                return bytes(raw, 'utf-8').decode('unicode_escape')
+            except Exception:
+                return raw
+
+        def _pair_when_literal(obj_text: str) -> str:
+            m = re.search(r'"when"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
+            if not m:
+                return ''
+            raw = m.group(1)
+            try:
+                return bytes(raw, 'utf-8').decode('unicode_escape')
+            except Exception:
+                return raw
+
+        decorated: list[tuple[str, str, tuple[str, str]]] = []
+        for pair in sorted_groups:
+            key_val, when_val = extract_key_when(pair[1])
+            if not key_val:
+                key_val = _pair_key_literal(pair[1])
+            if not when_val:
+                when_val = _pair_when_literal(pair[1])
+            decorated.append((key_val, when_val, pair))
+
+        # stable two-pass sort:
+        #   1) key ascending (secondary within group)
+        #   2) when ascending (final primary ordering)
+        decorated = sorted(decorated, key=lambda row: natural_key(row[0]))
+        decorated = sorted(decorated, key=lambda row: row[1])
+        sorted_groups = [row[2] for row in decorated]
+
     seen = set()
     sys.stdout.write(preamble)
 
