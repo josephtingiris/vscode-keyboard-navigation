@@ -548,6 +548,10 @@ def main(argv: List[str] | None = None) -> int:
 
             try:
                 mod, literal_key = key_val.rsplit('+', 1)
+                # handle trailing '+' meaning the literal key is '+' (e.g., 'alt++')
+                if literal_key == '':
+                    mod = mod.rstrip('+')
+                    literal_key = '+'
             except ValueError:
                 mod = ''
                 literal_key = key_val
@@ -891,6 +895,10 @@ def main(argv: List[str] | None = None) -> int:
         # split modifier(s) from key literal
         try:
             mod, key = k.rsplit("+", 1)
+            # handle trailing '+' meaning the literal key is '+' (e.g., 'alt++')
+            if key == "":
+                mod = mod.rstrip('+')
+                key = '+'
         except ValueError:
             mod = ""
             key = k
