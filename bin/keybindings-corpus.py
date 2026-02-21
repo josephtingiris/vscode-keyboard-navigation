@@ -41,7 +41,6 @@ from collections import Counter
 import hashlib
 import inspect
 import os
-import io
 import re
 
 # MODIFIERS
@@ -258,7 +257,9 @@ def main(argv: List[str] | None = None) -> int:
         "-c",
         "--comments",
         metavar='FILE|none',
-        help=("Inject canonical comments into an existing JSONC <FILE>, or use 'none' to emit a pure JSON corpus (no comments)."),
+        help=(
+            "Inject canonical comments into an existing JSONC <FILE>, or use 'none' to emit a pure JSON corpus (no comments)."
+        ),
     )
     args = parser.parse_args(argv)
 
@@ -644,10 +645,11 @@ def main(argv: List[str] | None = None) -> int:
                 insert_pos = line_start + 1
 
             # determine indentation of the key line
-            indentation = ''
             if insert_pos < len(out_text):
-                indentation = out_text[insert_pos:key_pos]
-                indentation = re.match(r'[ \t]*', indentation).group(0)
+                m_indent = re.match(r'[ \t]*', out_text[insert_pos:key_pos])
+                indentation = m_indent.group(0) if m_indent else ''
+            else:
+                indentation = ''
 
             insert_text = indentation + comment_line + '\n'
             out_text = out_text[:insert_pos] + \
