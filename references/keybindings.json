@@ -20,22 +20,9 @@ Scope:
         - ctrl+shift+alt+
         - shift+alt+meta+
 
-  * Key groups:
-    * Included groups: `arrow juke vi`
-      * (action) `alt+a ...`
-      * (arrow) `left down up right home end pageUp pageDown`
-      * (debug) `alt+d ...`
-      * (emacs) `b n p f`
-      * (extension) `alt+x ...`
-      * (chord) `alt+a ...` `alt+d ...`
-      * (direction) `w a s d h j k l left right up down horizontal vertical`
-      * (juke) `q e , . ; ' [ ] pageUp pageDown home end horizontal vertical`
-      * (kbm) `a s w d`
-      * (split) `- _ = + \ |`
-      * (vi) `h j k l`
-      * (zoom) `alt_a z` ... `alt+a alt+z` ...
+  * Key groups: see ...\bin\keybindings-corpus.py for the full corpus of key groups and their associated keys.
   
-  * Modifier order is not significant as a key value (e.g., ctrl+alt+k == alt+ctrl+k), but a canonical ordering is ctrl+shift+alt+<key>
+  * Modifier order is sort-significant but is not significant AS A KEY VALUE (e.g., ctrl+alt+k == alt+ctrl+k), but a canonical ordering is ctrl+shift+alt+<key> 
   * Modified left/right variants are treated as identical (leftAlt, rightAlt, leftCtrl, rightCtrl, leftShift, rightShift, leftMeta, rightMeta)
   * Support for differentiating leftAlt from rightAlt or rightShift is not supported and treated as a single key (e.g., alt instead of leftAlt/rightAlt)
   * on mac keyboards, the 'command' key is a out of scope
