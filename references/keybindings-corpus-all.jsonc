@@ -150,7 +150,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus)
+    // [keynav] (corpus) (vertical) (split) (0) (self) (gold) (X)
     "key": "alt++",
     "command": "(corpus) alt++ 22d0",
     "when": "config.keyboardNavigation.enabled"
@@ -486,7 +486,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus)
+    // [keynav] (corpus) (vertical) (split)
     "key": "ctrl++",
     "command": "(corpus) ctrl++ 2d9f",
     "when": "config.keyboardNavigation.enabled"
@@ -582,7 +582,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus)
+    // [keynav] (corpus) (vertical) (split) (jump) (2) (blue) (B)
     "key": "ctrl+alt++",
     "command": "(corpus) ctrl+alt++ dd73",
     "when": "config.keyboardNavigation.enabled"
@@ -816,7 +816,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus)
+    // [keynav] (corpus) (vertical) (split) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta++",
     "command": "(corpus) ctrl+alt+meta++ 3346",
     "when": "config.keyboardNavigation.enabled"
@@ -1446,7 +1446,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus)
+    // [keynav] (corpus) (vertical) (split) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt++",
     "command": "(corpus) ctrl+shift+alt++ c368",
     "when": "config.keyboardNavigation.enabled"
@@ -1680,7 +1680,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus)
+    // [keynav] (corpus) (vertical) (split)
     "key": "ctrl+shift+alt+meta++",
     "command": "(corpus) ctrl+shift+alt+meta++ 4c8c",
     "when": "config.keyboardNavigation.enabled"
@@ -2166,7 +2166,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus)
+    // [keynav] (corpus) (vertical) (split) (move) (1) (red) (A)
     "key": "shift+alt++",
     "command": "(corpus) shift+alt++ 7c16",
     "when": "config.keyboardNavigation.enabled"
@@ -2400,7 +2400,7 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus)
+    // [keynav] (corpus) (vertical) (split)
     "key": "shift+alt+meta++",
     "command": "(corpus) shift+alt+meta++ d18e",
     "when": "config.keyboardNavigation.enabled"
