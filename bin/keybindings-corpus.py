@@ -174,20 +174,24 @@ TAG_ORDER = [
     "(text)",
 
     # D(etails)
-    "(readonly)",
+    "(multiple)",
+    "(immutable)",
+    "(block)", "(pass)",
 ]
 
 # patterns that start and end with '/' are treated as regular expressions
 WHEN_TAG_SELECTORS = [
     ("auxiliarBarFocus", "(secondary)"),
+    ("config.keyboardNavigation.terminal", "(terminal)"),
     ("editorFocus", "(editor)"),
     ("editorTextFocus", "(editor)"),
     ("editorTextFocus", "(text)"),
+    ("multipleEditorGroups", "(multiple)"),
+    (r"/(?i:(?<!!)\b\S*multiple\S*\b)/", "(multiple)"),
     ("panelFocus", "(panel)"),
     ("sideBarFocus", "(primary)"),
     ("terminalFocus", "(terminal)"),
-    ("/Readonly/", "(readonly)"),
-    # ("explorerViewletVisible", "(explorer)"),
+    (r"/(?i:(?<!!)\b\S*readonly\S*\b)/", "(immutable)"),
 ]
 
 
@@ -579,7 +583,11 @@ def main(argv: List[str] | None = None) -> int:
             globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(DEBUG_GROUP_ORIG, ALTERNATE_DEBUG_KEY)}
             globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(EXTENSION_GROUP_ORIG, ALTERNATE_EXTENSION_KEY)}
 
-            existing_comments_blob = groups[idx][0] if idx < len(groups) else None
+            if idx < len(groups):
+                lead_comments, obj_text = groups[idx]
+                existing_comments_blob = (lead_comments or "") + "\n" + (obj_text or "")
+            else:
+                existing_comments_blob = None
             tags = tags_for(
                 literal_key,
                 mod,
@@ -1007,6 +1015,12 @@ def tags_for(
 
     if existing_comments and "corpus" in existing_comments.lower():
         dynamic_tags.add("(corpus)")
+
+    if command and command.strip().lower() == "-noop":
+        dynamic_tags.add("(pass)")
+
+    if command and command.strip().lower() == "noop":
+        dynamic_tags.add("(block)")
 
     fin_entry = FIN_TAGS.get(mod)
     if fin_entry:
