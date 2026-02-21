@@ -3309,14 +3309,16 @@ Notes:
   {
     // [keynav] (left) (juke) (0) (self) (gold) (X) (editor) (text)
     "key": "alt+,",
-    "command": "alt+, 64a0",
+    "command": "workbench.action.previousEditor",
+    // "command": "alt+, 64a0",
     // "command": "workbench.action.focusOtherSide",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && !panelFocus && !activeEditorCanSplitInGroup"
   },
   {
     // [keynav] (right) (juke) (0) (self) (gold) (X) (editor) (text)
     "key": "alt+.",
-    "command": "alt+. 65a0",
+    "command": "workbench.action.nextEditor",
+    // "command": "alt+. 65a0",
     // "command": "workbench.action.focusOtherSide",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && !panelFocus && !activeEditorCanSplitInGroup"
   },
