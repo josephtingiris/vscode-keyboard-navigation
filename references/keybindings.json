@@ -1663,7 +1663,14 @@ Notes:
     // [keynav] (left) (vi) (move) (1) (red) (A) (immutable)
     "key": "shift+alt+h",
     "command": "shift+alt+h 4b2b",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && !sideBarVisible && activeEditor != '' && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly && config.workbench.sideBar.location == 'left' && focusedView == '' && panelPosition == 'bottom'"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && !sideBarVisible && activeEditor != '' && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly && config.workbench.sideBar.location == 'left' && focusedView == '' && panelPosition == 'left'"
+    // [note] settings editor, keyboard shortcuts, et al
+  },
+  {
+    // [keynav] (right) (vi) (move) (1) (red) (A) (immutable)
+    "key": "shift+alt+l",
+    "command": "shift+alt+l 4b1c",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && !sideBarVisible && activeEditor != '' && activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && activeEditorIsReadonly && config.workbench.sideBar.location == 'left' && focusedView == '' && panelPosition == 'left'"
     // [note] settings editor, keyboard shortcuts, et al
   },
   {
@@ -1724,7 +1731,7 @@ Notes:
   {
     // [keynav] (right) (vi) (0) (self) (gold) (X) (immutable)
     "key": "alt+l",
-    "command": "alt+l 2b2a",
+    "command": "alt+l 1b2a",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && activeEditorIsReadonly && focusedView == '' && editorIsOpen"
     // [note] settings editor, keyboard shortcuts, et al
   },
@@ -1770,8 +1777,15 @@ Notes:
   {
     // [keynav] (up) (vi) (move) (1) (red) (A) (immutable)
     "key": "shift+alt+k",
-    "command": "workbench.action.focusAboveGroup",
-    // "command": "shift+alt+k 229f",
+    "command": "shift+alt+k 229f",
+    // "command": "workbench.action.focusAboveGroup",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && activeEditorIsReadonly && focusedView == '' && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+  },
+  {
+    // [keynav] (right) (vi) (move) (1) (red) (A) (immutable)
+    "key": "shift+alt+l",
+    "command": "shift+alt+l 2b2a",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && activeEditorIsReadonly && focusedView == '' && editorIsOpen"
     // [note] settings editor, keyboard shortcuts, et al
   },
@@ -2347,12 +2361,13 @@ Notes:
     // [note] toggle maximize editor group
   },
   {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (editor) (text) (fumble)
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (editor) (text)
     "key": "alt+a f",
     "command": "editor.action.formatDocument",
     // "command": "alt+a f 59a7",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && editorTextFocus && editorHasDocumentFormattingProvider && !editorReadonly && !inCompositeEditor"
     // [note] mimic vscode's default format document keybinding
+    // [note] (fumble) (pickup) (catch) - this keybinding is an experiment to support 'finger fumbles', or when you unintentionally press the wrong modifier key (in this case, ctrl instead of alt).  the idea is that if you 'fumble' and press ctrl+alt+f instead of alt+f, it will still format the document.  this may be especially helpful for people who may have difficulty pressing multiple modifier keys at once
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (panel)
@@ -3148,6 +3163,14 @@ Notes:
     // [note] vi-like extensions disabled
   },
   {
+    // [keynav] (up) (vi) (0) (self) (gold) (X) (editor)
+    "key": "alt+k",
+    "command": "alt+k 31be",
+    // "command": "cursorUp",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus && !neovim.init"
+    // [note] vi-like extensions disabled
+  },
+  {
     // [keynav] (down) (vi) (move) (1) (red) (A) (editor)
     "key": "shift+alt+j",
     "command": "runCommands",
@@ -3524,13 +3547,22 @@ Notes:
   {
     // [keynav] (left) (vi) (move) (1) (red) (A) (panel) (terminal)
     "key": "shift+alt+h",
-    "command": "shift+alt+h a1c4",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && terminalFocus && panelPosition == 'bottom' && terminalCount > 1"
+    "command": "workbench.action.focusPanel",
+    // "command": "shift+alt+h a1c4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && terminalCount > 1"
+  },
+  {
+    // [keynav] (right) (vi) (move) (1) (red) (A) (panel) (terminal)
+    "key": "shift+alt+l",
+    "command": "workbench.action.focusAuxiliaryBar",
+    // "command": "shift+alt+h a1c6",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && terminalCount > 1"
   },
   {
     // [keynav] (down) (vi) (move) (1) (red) (A) (panel) (terminal)
     "key": "shift+alt+j",
-    "command": "shift+alt+j a1d4",
+    "command": "workbench.action.closePanel",
+    // "command": "shift+alt+j a1d4",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && terminalFocus && panelPosition == 'bottom' && terminalCount > 1"
   },
   {
