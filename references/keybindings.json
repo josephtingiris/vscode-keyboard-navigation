@@ -1853,7 +1853,7 @@ Notes:
     // [note] file not found, ...
   },
   {
-    // [keynav] (close)
+    // [keynav] (vi) (close)
     "key": "ctrl+d",
     "command": "ctrl+d 26cf",
     // "command": "workbench.action.closeActiveEditor",
@@ -2351,7 +2351,7 @@ Notes:
     // [note] toggle maximized editor group
   },
   {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (editor)
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (editor) (multiple)
     "key": "alt+a z",
     "command": "workbench.action.toggleMaximizeEditorGroup",
     // "command": "workbench.action.maximizeEditorHideSidebar",
@@ -3194,7 +3194,7 @@ Notes:
     // "when": "&& activeEditorGroupIndex == 1 && activeEditorIsFirstInGroup && !multipleEditorGroups"
   },
   {
-    // [keynav] (up) (vi) (move) (1) (red) (A) (editor)
+    // [keynav] (up) (vi) (move) (1) (red) (A) (editor) (multiple)
     "key": "shift+alt+k",
     "command": "shift+alt+k d44b",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus && activeEditorGroupIndex > 1 && multipleEditorGroups"
@@ -3270,7 +3270,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && activeEditorGroupIndex == 1 && panelPosition == 'bottom'"
   },
   {
-    // [keynav] (up) (vi) (move) (1) (red) (A) (editor)
+    // [keynav] (up) (vi) (move) (1) (red) (A) (editor) (multiple)
     "key": "shift+alt+k",
     "command": "workbench.action.focusAboveGroup",
     // "command": "shift+alt+j a482",
@@ -3336,27 +3336,27 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && !panelFocus && activeEditorCanSplitInGroup"
   },
   {
-    // [keynav] (left) (vi) (move) (1) (red) (A) (editor)
+    // [keynav] (left) (vi) (move) (1) (red) (A) (editor) (multiple)
     "key": "shift+alt+h",
     "command": "shift+alt+h adec",
     // "command": "workbench.action.focusLeftGroup",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && multipleEditorGroups"
   },
   {
-    // [keynav] (down) (vi) (move) (1) (red) (A) (editor)
+    // [keynav] (down) (vi) (move) (1) (red) (A) (editor) (multiple)
     "key": "shift+alt+j",
     "command": "shift+alt+j b423",
     // "command": "workbench.action.focusBelowGroup",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && multipleEditorGroups"
   },
   {
-    // [keynav] (up) (vi) (move) (1) (red) (A) (editor)
+    // [keynav] (up) (vi) (move) (1) (red) (A) (editor) (multiple)
     "key": "shift+alt+k",
     "command": "shift+alt+k b023",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && multipleEditorGroups"
   },
   {
-    // [keynav] (right) (vi) (move) (1) (red) (A) (editor)
+    // [keynav] (right) (vi) (move) (1) (red) (A) (editor) (multiple)
     "key": "shift+alt+l",
     "command": "shift+alt+l cd4c",
     // "command": "workbench.action.focusRightGroup",
@@ -3423,14 +3423,14 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && panelPosition == 'bottom' && !multipleEditorGroups"
   },
   {
-    // [keynav] (down) (vi) (editor)
+    // [keynav] (down) (vi) (editor) (multiple)
     "key": "shif+alt+j",
     "command": "workbench.action.focusPanel",
     // "command": "shif+alt+j 12a2",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && panelPosition == 'bottom' && multipleEditorGroups"
   },
   {
-    // [keynav] (up) (vi) (editor)
+    // [keynav] (up) (vi) (editor) (multiple)
     "key": "shif+alt+k",
     "command": "shif+alt+j 10a2",
     // "command": "workbench.action.focusPanel",
@@ -3451,7 +3451,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && panelPosition == 'top' && !multipleEditorGroups"
   },
   {
-    // [keynav] (up) (vi) (editor)
+    // [keynav] (up) (vi) (editor) (multiple)
     "key": "shif+alt+k",
     "command": "shif+alt+k e2a2",
     // "command": "workbench.action.focusPanel",
