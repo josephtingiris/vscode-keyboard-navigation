@@ -3565,6 +3565,13 @@ Notes:
     "when": "config.keyboardNavigation.enabled && panelFocus"
   },
   {
+    // [keynav] (right) (juke) (0) (self) (gold) (X) (panel)
+    "key": "alt+.",
+    "command": "workbench.action.nextPanelView",
+    // "command": "alt+, f058",
+    "when": "config.keyboardNavigation.enabled && panelFocus"
+  },
+  {
     // [keynav] (left) (juke) (0) (self) (gold) (X) (panel)
     "key": "alt+,",
     "command": "workbench.action.previousPanelView",
@@ -3574,7 +3581,8 @@ Notes:
   {
     // [keynav] (right) (juke) (0) (self) (gold) (X) (panel)
     "key": "alt+.",
-    "command": "alt+. e787",
+    "command": "workbench.action.nextPanelView",
+    // "command": "alt+. e787",
     "when": "config.keyboardNavigation.enabled && panelFocus && !editorFocus"
   },
   {
@@ -3583,50 +3591,13 @@ Notes:
     "command": "workbench.action.terminal.new",
     // "command": "ctrl+shift+t 7c32",
     "when": "config.keyboardNavigation.enabled && panelFocus && terminalFocus"
-    // [note] open a new terminal when terminal is focused
-  },
-  {
-    // (up) (vi) (editor) (gold) (unbind) (neovim) (insert) (user)
-    "key": "ctrl+k",
-    "command": "ctrl+k 43f7",
-    // "command": "-vscode-neovim.send",
-    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.k && neovim.init && neovim.mode == 'insert'"
-    // [note] ctrl+k must be a chord for native vscode keybindings to work in insert mode
-  },
-  {
-    // (neovim)
-    "key": "ctrl+y",
-    "command": "vscode-neovim.send",
-    // "command": "ctrl+y 1279",
-    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.y && neovim.init && neovim.mode != 'insert'"
-  },
-  {
-    // (neovim)
-    "key": "ctrl+y",
-    "command": "ctrl+y 1277",
-    // "command": "vscode-neovim.send",
-    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysInsert.y && neovim.init && neovim.mode == 'insert'"
-  },
-  {
-    // (neovim)
-    "key": "ctrl+k",
-    "command": "-vscode-neovim.send",
-    // "command": "ctrl+k 1678",
-    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.k && neovim.init && neovim.mode != 'insert'"
-    // [note] ctrl+k must be a chord for native vscode keybindings to work in normal mode
-  },
-  {
-    // (neovim)
-    "key": "ctrl+y",
-    "command": "-vscode-neovim.send",
-    // "command": "ctrl+y 1278",
-    "when": "editorTextFocus && editorLangId not in 'neovim.editorLangIdExclusions' && neovim.ctrlKeysNormal.y && neovim.init && neovim.mode != 'insert'"
-    // [note] ctrl+y must be a chord for native vscode keybindings to work in normal mode
+    // [note] open a new integrated terminal when terminal is focused
   },
   {
     // (alt) (i) (all) (gold) (toggle) (copilot) (chat) (completions) (user)
     "key": "alt+i",
     "command": "github.copilot.chat.completions.toggle",
     "when": "github.copilot.activated && github.copilot.extensionUnification.activated"
+    // [note] chat still works, only completions are disabled
   }
 ]
