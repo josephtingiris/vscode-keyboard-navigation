@@ -1570,7 +1570,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
   },
   {
-    // [keynav] (right) (vi) (corpus)
+    // [keynav] (corpus) (right) (vi)
     "key": "ctrl+l",
     "command": "-noop",
     // "command": "(corpus) ctrl+l c631",
@@ -1853,7 +1853,7 @@ Notes:
     // [note] file not found, ...
   },
   {
-    // [keynav] (vi) (close)
+    // [keynav] (vi)
     "key": "ctrl+d",
     "command": "ctrl+d 26cf",
     // "command": "workbench.action.closeActiveEditor",
@@ -1879,7 +1879,7 @@ Notes:
     // [note] settings editor, keyboard shortcuts, et al
   },
   {
-    // [keynav] (vi) (readonly) (close)
+    // [keynav] (vi) (readonly)
     "key": "ctrl+d",
     "command": "ctrl+d cc30",
     // "command": "workbench.action.closeActiveEditor",
