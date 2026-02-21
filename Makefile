@@ -54,11 +54,11 @@ clean:
 
 corpus:
 	@echo "++ Updating reference keybindings corpus files ..."
-	@keybindings-corpus.py | keybindings-sort.py > references/keybindings-corpus.jsonc
-	@keybindings-corpus.py -n all | keybindings-sort.py > references/keybindings-corpus-all.jsonc
-	@keybindings-corpus.py -n emacs | keybindings-sort.py > references/keybindings-corpus-emacs.jsonc
-	@keybindings-corpus.py -n kbm | keybindings-sort.py > references/keybindings-corpus-kbm.jsonc
-	@keybindings-corpus.py -n vi | keybindings-sort.py > references/keybindings-corpus-vi.jsonc
+	@keybindings-corpus.py | keybindings-sort.py > references/keybindings.corpus.jsonc
+	@keybindings-corpus.py -n all | keybindings-sort.py > references/keybindings.corpus.all.jsonc
+	@keybindings-corpus.py -n emacs | keybindings-sort.py > references/keybindings.corpus.emacs.jsonc
+	@keybindings-corpus.py -n kbm | keybindings-sort.py > references/keybindings.corpus.kbm.jsonc
+	@keybindings-corpus.py -n vi | keybindings-sort.py > references/keybindings.corpus.vi.jsonc
 	@echo
 
 corpora: corpus
