@@ -159,13 +159,14 @@ TAG_ORDER = [
     "(0)", "(1)", "(2)", "(3)",
     "(self)",
 
-    # C(olors, Characters, Chords, and/or Coordinates)
+    # C(olors, Corpus, Characters, Chords, and/or Coordinates)
     "(gold)", "(red)", "(blue)", "(black)", "(yellow)",
 
     "(X)", "(A)", "(B)", "(C)",
     "(+)",
 
     "(debug)", "(action)", "(extension)",
+    "(corpus)",
     "(chord)",
 
     "(primary)", "(secondary)", "(panel)",
@@ -574,7 +575,14 @@ def main(argv: List[str] | None = None) -> int:
             globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(DEBUG_GROUP_ORIG, ALTERNATE_DEBUG_KEY)}
             globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(EXTENSION_GROUP_ORIG, ALTERNATE_EXTENSION_KEY)}
 
-            tags = tags_for(literal_key, mod, when_val)
+            existing_comments_blob = groups[idx][0] if idx < len(groups) else None
+            tags = tags_for(
+                literal_key,
+                mod,
+                when_val,
+                command=obj.get('command'),
+                existing_comments=existing_comments_blob,
+            )
             if tags:
                 comment_line = "// " + " ".join(tags)
             else:
@@ -909,7 +917,8 @@ def main(argv: List[str] | None = None) -> int:
         globals()["DEBUG_GROUP"] = {_select_adaptive_key_local(DEBUG_GROUP_ORIG, ALTERNATE_DEBUG_KEY)}
         globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(EXTENSION_GROUP_ORIG, ALTERNATE_EXTENSION_KEY)}
 
-        tags = tags_for(key, mod, w)
+        cmd = f"(corpus) {k} {assigned[idx]}"
+        tags = tags_for(key, mod, w, command=cmd)
         comment_tags = tags if tags else []
         records[idx] = (k, w, comment_tags)
 
@@ -931,7 +940,13 @@ def main(argv: List[str] | None = None) -> int:
     return 0
 
 
-def tags_for(key: str, mod: str = "", when_clause: str | None = None) -> List[str]:
+def tags_for(
+    key: str,
+    mod: str = "",
+    when_clause: str | None = None,
+    command: str | None = None,
+    existing_comments: str | None = None,
+) -> List[str]:
     if not when_clause or "config.keyboardNavigation.enabled" not in when_clause:
         return []
 
@@ -978,6 +993,12 @@ def tags_for(key: str, mod: str = "", when_clause: str | None = None) -> List[st
         dynamic_tags.add("(action)")
     if "config.keyboardNavigation.chords.extension" in when_clause:
         dynamic_tags.add("(extension)")
+
+    if command and "corpus" in command.lower():
+        dynamic_tags.add("(corpus)")
+
+    if existing_comments and "corpus" in existing_comments.lower():
+        dynamic_tags.add("(corpus)")
 
     fin_entry = FIN_TAGS.get(mod)
     if fin_entry:
