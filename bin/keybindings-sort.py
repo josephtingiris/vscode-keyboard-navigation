@@ -1158,10 +1158,31 @@ def main(argv: List[str] | None = None) -> int:
         decorated = sorted(decorated, key=lambda row: row[1])
         sorted_groups = [row[2] for row in decorated]
 
-    seen = set()
-    sys.stdout.write(preamble)
+    # assemble into buffer for post-processing (e.g. remove blank lines)
+    def post_process(text: str) -> str:
+        lines = text.splitlines(keepends=True)
+        out_lines: list[str] = []
+        in_block = False
+        for line in lines:
+            if in_block:
+                out_lines.append(line)
+                if '*/' in line:
+                    in_block = False
+                continue
+            if '/*' in line:
+                out_lines.append(line)
+                if '*/' not in line:
+                    in_block = True
+                continue
+            if line.strip() == '':
+                continue
+            out_lines.append(line)
+        return ''.join(out_lines)
 
-    sys.stdout.write('[\n')
+    out_parts: list[str] = []
+    out_parts.append(preamble)
+    out_parts.append('[\n')
+    seen = set()
     for i, (comments, obj) in enumerate(sorted_groups):
         is_last = (i == len(sorted_groups) - 1)
         obj_out = obj.rstrip()
@@ -1175,27 +1196,33 @@ def main(argv: List[str] | None = None) -> int:
 
         if comments:
             comments = re.sub(r'(?m)^[ \t]*\n+', '', comments)
-        sys.stdout.write(comments)
+            out_parts.append(comments)
         idx = obj_out.rfind('}')
         if idx != -1:
             after = obj_out[idx+1:]
             after_clean = re.sub(r'^\s*,+', '', after)
             obj_out = obj_out[:idx+1] + after_clean
-        sys.stdout.write(obj_out)
+        out_parts.append(obj_out)
         if not is_last and not object_has_trailing_comma(obj_out):
-            sys.stdout.write(',')
-        sys.stdout.write('\n')
+            out_parts.append(',')
+        out_parts.append('\n')
 
-    sys.stdout.write(trailing_comments)
-
+    out_parts.append(trailing_comments)
     if trailing_comments and not trailing_comments.endswith('\n'):
-        sys.stdout.write('\n')
+        out_parts.append('\n')
 
     postamble_trimmed = re.sub(r'^[ \t\r\n]+|[ \t\r\n]+$', '', postamble)
     if postamble_trimmed:
-        sys.stdout.write(']\n' + postamble_trimmed + '\n')
+        out_parts.append(']\n' + postamble_trimmed + '\n')
     else:
-        sys.stdout.write(']\n')
+        out_parts.append(']\n')
+
+    final_text = ''.join(out_parts)
+
+    processed = post_process(final_text)
+
+    sys.stdout.write(processed)
+
     return 0
 
 
