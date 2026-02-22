@@ -64,6 +64,15 @@ ID_RETRY_LIMIT = 100
 DEFAULT_MODIFIERS = "alt,shift+alt,ctrl+alt"
 DEFAULT_WHEN_CLAUSE = "config.keyboardNavigation.enabled"
 MODIFIER_ORDER = ["ctrl", "shift", "alt", "meta", "cmd", "win"]
+
+_json5 = None
+try:
+    import json5 as _json5  # type: ignore
+    JSON_FLAVOR = "JSON5"
+except Exception:
+    JSON_FLAVOR = "JSONC"
+
+# update GROUP_REGISTRY from keybindings-corpus.py
 GROUP_REGISTRY: dict[str, list[str]] = {
     "arrows": ["left", "down", "up", "right"],
     "emacs": ["b", "n", "p", "f"],
@@ -80,9 +89,6 @@ GROUP_REGISTRY: dict[str, list[str]] = {
     "debug": ["d"],
     "extension": ["x"],
 }
-
-
-# using the standard argparse.ArgumentParser (no custom exit codes)
 
 
 @dataclass
@@ -635,15 +641,16 @@ def build_mapping_pairs(from_keys: list[str], to_keys: list[str]) -> list[tuple[
 
 
 def parse_jsonc_object(obj_text: str) -> Any:
-    """Parse one JSONC object using json5 if available, else fallback stripper."""
+    """Parse one object using JSON5 when available, else JSONC fallback."""
     try:
-        import json5  # type: ignore
-
-        return json5.loads(obj_text)
+        if _json5 is not None:
+            return _json5.loads(obj_text)
     except Exception:
-        clean = strip_json_comments(obj_text)
-        clean = strip_trailing_commas(clean)
-        return json.loads(clean)
+        pass
+
+    clean = strip_json_comments(obj_text)
+    clean = strip_trailing_commas(clean)
+    return json.loads(clean)
 
 
 def remove_trailing_object_comma(obj_text: str) -> str:
@@ -1032,9 +1039,10 @@ def main(argv: List[str] | None = None) -> int:
     """CLI entrypoint."""
     argv = sys.argv[1:] if argv is None else argv
 
+    # add_help= {JSON_FLAVOR}."
     parser = argparse.ArgumentParser(
         description=(
-            "Duplicate keys and optionally detect duplicate/missing ids in VS Code keybindings JSONC."
+            f"Duplicate keys and optionally detect duplicate and/or missing ids in VS Code keybindings."
         ),
         epilog=(
             "Examples:\n"
@@ -1106,7 +1114,7 @@ def main(argv: List[str] | None = None) -> int:
         "input",
         nargs="?",
         default=None,
-        help="Optional JSONC input file path.",
+        help=f"Optional {JSON_FLAVOR} input file path.",
     )
 
     if not argv:
