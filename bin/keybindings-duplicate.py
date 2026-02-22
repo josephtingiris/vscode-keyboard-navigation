@@ -46,6 +46,8 @@ Exit codes
 """
 
 from __future__ import annotations
+from typing import Any
+from typing import NoReturn
 
 import argparse
 import json
@@ -66,11 +68,13 @@ MODIFIER_ORDER = ["ctrl", "shift", "alt", "meta", "cmd", "win"]
 class UsageArgumentParser(argparse.ArgumentParser):
     """Argument parser that exits with code 99 for help and usage errors."""
 
-    def error(self, message: str) -> None:
+    def error(self, message: str) -> NoReturn:
+        # type signature matches base class (which returns NoReturn)
         self.print_usage(sys.stderr)
         self.exit(USAGE_EXIT_CODE, f"{self.prog}: error: {message}\n")
 
-    def exit(self, status: int = 0, message: str | None = None) -> None:
+    def exit(self, status: int = 0, message: str | None = None) -> NoReturn:
+        # also matches base class signature
         if message:
             stream = sys.stdout if status == 0 else sys.stderr
             stream.write(message)
@@ -592,7 +596,7 @@ def parse_comma_list(value: str) -> list[str]:
     return [part for part in parts if part]
 
 
-def parse_jsonc_object(obj_text: str) -> dict:
+def parse_jsonc_object(obj_text: str) -> Any:
     """Parse one JSONC object using json5 if available, else fallback stripper."""
     try:
         import json5  # type: ignore
@@ -955,7 +959,11 @@ def main(argv: list[str] | None = None) -> int:
     try:
         args = parse_args(argv)
     except SystemExit as exc:
-        return int(exc.code)
+        code = exc.code if exc.code is not None else USAGE_EXIT_CODE
+        try:
+            return int(code)
+        except Exception:
+            return USAGE_EXIT_CODE
 
     try:
         raw_text = read_input_text(args.input)
