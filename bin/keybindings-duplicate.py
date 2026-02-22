@@ -5,32 +5,33 @@
 Duplicate keys for and detect duplicates in VS Code keybindings objects.
 
 Usage
-    ./bin/keybindings-duplicate.py --from KEYS --to KEYS [OPTIONS] [FILE]
+    ./bin/keybindings-duplicate.py [INPUT] [OPTIONS]
 
 Options
-    -f, --from KEYS         Comma-separated source keys to map from (required).
-    -t, --to KEYS           Comma-separated target keys to map to (required).
-    -k, --keys KEYS         Comma-separated source keys to duplicate (optional; defaults to --from keys).
-    -m, --modifiers MODS    Comma-separated modifiers for generated keys (default: alt,shift+alt,ctrl+alt).
-    -w, --when-clause WHEN  Additional when clause for generated entries
-                            (default: config.keyboardNavigation.enabled).
-    -h, --help              Show usage/help and exit with code 99.
+    -f, --from-keys KEYS      Comma-separated source key literals.
+    -F, --from-groups GROUPS  Comma-separated source group names.
+    -t, --to-keys KEYS        Comma-separated target key literals.
+    -T, --to-groups GROUPS    Comma-separated target group names.
+    -m, --modifiers MODS      Comma-separated modifiers for matching and emitting keys.
+    -w, --when WHEN           Additional when clause for generated entries
+                              (default: config.keyboardNavigation.enabled).
+    -d, --detect              Run duplicate/id detection after generation.
+    -h, --help                Show usage/help and exit with code 99.
 
 Examples
-    ./bin/keybindings-duplicate.py -f h,j,k,l -t left,down,up,right < references/keybindings.json
-    ./bin/keybindings-duplicate.py -f h,j,k,l -t left,down,up,right -m alt < references/keybindings.corpus.jsonc
-    for f in references/keybindings.corpus.*.json; do
-      ./bin/keybindings-duplicate.py -f h,j,k,l -t left,down,up,right < "$f" > /tmp/out.jsonc
-    done
+        ./bin/keybindings-duplicate.py -d < references/keybindings.json
+        ./bin/keybindings-duplicate.py -f h,j,k,l -t left,down,up,right -m alt,ctrl references/keybindings.json
+        ./bin/keybindings-duplicate.py -F vi -T arrows -m alt,ctrl -d
+        ./bin/keybindings-duplicate.py -f x,y,z -T vi,arrows
 
 Behavior
-    - Reads JSONC from FILE or stdin, preserves preamble/postamble and comments, and writes transformed JSONC to stdout.
+    - Reads JSONC from INPUT or stdin when piped; input is optional for generation-only runs.
     - Never writes files. Emits diagnostics to stderr.
-    - Annotates duplicate object pairs by normalized key + canonical when expression.
-    - Annotates duplicate ids and generates new 4-hex command ids with collision retries.
+    - Expands source->target mappings in source-major order using the order provided.
+    - `--detect` annotates duplicate objects, duplicate ids, and missing ids.
 
 Inputs / Outputs
-    stdin|FILE: JSONC text with a top-level keybinding array
+    stdin|INPUT|none: JSONC text with a top-level keybinding array (optional)
     stdout: transformed JSONC array text
     stderr: diagnostics and parse warnings
 
@@ -63,6 +64,22 @@ ID_RETRY_LIMIT = 100
 DEFAULT_MODIFIERS = "alt,shift+alt,ctrl+alt"
 DEFAULT_WHEN_CLAUSE = "config.keyboardNavigation.enabled"
 MODIFIER_ORDER = ["ctrl", "shift", "alt", "meta", "cmd", "win"]
+GROUP_REGISTRY: dict[str, list[str]] = {
+    "arrows": ["left", "down", "up", "right"],
+    "emacs": ["b", "n", "p", "f"],
+    "kbm": ["a", "s", "w", "d"],
+    "vi": ["h", "j", "k", "l"],
+    "four-pack-down": ["end", "pagedown"],
+    "four-pack-up": ["home", "pageup"],
+    "punctuation-left": ["[", "{", ";", ","],
+    "punctuation-right": ["]", "}", "'", "."],
+    "fold": ["[", "]"],
+    "split-horizontal": ["-", "_"],
+    "split-vertical": ["=", "+", "\\", "|"],
+    "action": ["a"],
+    "debug": ["d"],
+    "extension": ["x"],
+}
 
 
 # using the standard argparse.ArgumentParser (no custom exit codes)
@@ -581,6 +598,42 @@ def parse_comma_list(value: str) -> list[str]:
     return [part for part in parts if part]
 
 
+def parse_comma_list_chunks(values: list[str]) -> list[str]:
+    """Parse repeated comma-list arguments while preserving option order."""
+    parsed: list[str] = []
+    for value in values:
+        parsed.extend(parse_comma_list(value))
+    return parsed
+
+
+def expand_group_names(names: list[str], parser: argparse.ArgumentParser, flag_name: str) -> list[str]:
+    """Expand group names to ordered key literals."""
+    expanded: list[str] = []
+    for raw_name in names:
+        group_name = raw_name.strip().lower()
+        if not group_name:
+            continue
+        if group_name not in GROUP_REGISTRY:
+            known = ", ".join(sorted(GROUP_REGISTRY.keys()))
+            parser.error(f"unknown group '{raw_name}' for {flag_name}; known groups: {known}")
+        expanded.extend([token.lower() for token in GROUP_REGISTRY[group_name]])
+    return expanded
+
+
+def build_mapping_pairs(from_keys: list[str], to_keys: list[str]) -> list[tuple[str, str]]:
+    """Create source-major ordered source->target pairs."""
+    if not from_keys:
+        return []
+    if not to_keys:
+        return [(source, source) for source in from_keys]
+
+    pairs: list[tuple[str, str]] = []
+    for source in from_keys:
+        for target in to_keys:
+            pairs.append((source, target))
+    return pairs
+
+
 def parse_jsonc_object(obj_text: str) -> Any:
     """Parse one JSONC object using json5 if available, else fallback stripper."""
     try:
@@ -755,13 +808,12 @@ def load_records(array_text: str) -> tuple[list[ObjectRecord], str]:
 
 def build_emitted_objects(
     records: list[ObjectRecord],
-    mapping: dict[str, str],
-    key_filter: set[str],
+    mapping_pairs: list[tuple[str, str]],
     modifiers: list[str],
     extra_when_clause: str,
     rng: random.Random,
 ) -> list[EmittedObject]:
-    """Build output objects list including generated duplicates."""
+    """Build output objects list including generated mappings."""
     used_ids: set[str] = set()
     for record in records:
         found_id = extract_any_id(record.parsed_obj, record.leading_comments)
@@ -769,7 +821,6 @@ def build_emitted_objects(
             used_ids.add(found_id)
 
     emitted: list[EmittedObject] = []
-
     for record in records:
         emitted.append(
             EmittedObject(
@@ -780,24 +831,74 @@ def build_emitted_objects(
             )
         )
 
+    expanded_pairs: list[tuple[str, str]] = []
+    for source_literal, target_literal in mapping_pairs:
+        for modifier in modifiers:
+            source_key = combine_modifier_and_key(modifier, source_literal)
+            target_key = combine_modifier_and_key(modifier, target_literal)
+            expanded_pairs.append((source_key, target_key))
+
+    source_to_targets: dict[str, list[str]] = {}
+    for source_key, target_key in expanded_pairs:
+        normalized_source = normalize_key_for_compare(source_key)
+        if normalized_source not in source_to_targets:
+            source_to_targets[normalized_source] = []
+        source_to_targets[normalized_source].append(target_key)
+
+    if not records:
+        for _, generated_key in expanded_pairs:
+            generated_when = merge_when_clause("", extra_when_clause)
+            generated_id = generate_unique_hex_id(used_ids, rng)
+            if generated_id is None:
+                failure = f"// FAILED generating id for {generated_key}/{generated_when}"
+                emitted.append(
+                    EmittedObject(
+                        text=make_generated_object_text(
+                            generated_key,
+                            generated_when,
+                            f"{generated_key} xxxx",
+                        ),
+                        parsed_obj={
+                            "key": generated_key,
+                            "command": f"{generated_key} xxxx",
+                            "when": generated_when,
+                        },
+                        leading_comments="",
+                        parse_error=None,
+                        forced_comment=failure,
+                    )
+                )
+                continue
+
+            generated_command = f"{generated_key} {generated_id}"
+            emitted.append(
+                EmittedObject(
+                    text=make_generated_object_text(generated_key, generated_when, generated_command),
+                    parsed_obj={
+                        "key": generated_key,
+                        "command": generated_command,
+                        "when": generated_when,
+                    },
+                    leading_comments="",
+                    parse_error=None,
+                )
+            )
+        return emitted
+
+    for record in records:
         if record.parsed_obj is None:
             continue
 
         source_key = str(record.parsed_obj.get("key", ""))
-        source_tail = key_tail_literal(source_key)
-        if not source_tail:
-            continue
-        if source_tail not in mapping:
-            continue
-        if key_filter and source_tail not in key_filter:
+        normalized_source = normalize_key_for_compare(source_key)
+        matching_targets = source_to_targets.get(normalized_source)
+        if not matching_targets:
             continue
 
-        target_tail = mapping[source_tail]
         source_when = str(record.parsed_obj.get("when", ""))
         generated_when = merge_when_clause(source_when, extra_when_clause)
 
-        for modifier in modifiers:
-            generated_key = combine_modifier_and_key(modifier, target_tail)
+        for generated_key in matching_targets:
             generated_id = generate_unique_hex_id(used_ids, rng)
             if generated_id is None:
                 failure = f"// FAILED generating id for {generated_key}/{generated_when}"
@@ -838,8 +939,8 @@ def build_emitted_objects(
     return emitted
 
 
-def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str) -> str:
-    """Annotate duplicates and return final array-body text."""
+def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, detect: bool) -> str:
+    """Annotate and return final array-body text."""
     seen_pairs: set[tuple[str, str]] = set()
     seen_ids: dict[str, tuple[str, str]] = {}
     chunks: list[str] = []
@@ -852,7 +953,7 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str) ->
                 f"warn: skipping duplicate checks for unparsable object: {item.parse_error}",
                 file=sys.stderr,
             )
-        elif item.parsed_obj is not None:
+        elif item.parsed_obj is not None and detect:
             key_value = str(item.parsed_obj.get("key", ""))
             when_value = str(item.parsed_obj.get("when", ""))
             normalized_key = normalize_key_for_compare(key_value)
@@ -870,6 +971,8 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str) ->
                     comments.append(f"// DUPLICATE id {found_id} detected for {key_value}/{when_value}")
                 else:
                     seen_ids[found_id] = (key_value, when_value)
+            else:
+                comments.append(f"// MISSING id for {key_value}/{when_value}")
 
         if item.forced_comment:
             comments.append(item.forced_comment)
@@ -895,22 +998,34 @@ def parse_args(argv: list[str], parser: argparse.ArgumentParser) -> argparse.Nam
     """Parse CLI arguments using the provided parser instance."""
     args = parser.parse_args(argv)
 
-    from_keys = parse_comma_list(args.from_keys)
-    to_keys = parse_comma_list(args.to_keys)
-    if len(from_keys) != len(to_keys):
-        parser.error("--from and --to must contain the same number of keys")
-    if not from_keys:
-        parser.error("--from must contain at least one key")
+    from_key_tokens = parse_comma_list_chunks(args.from_keys)
+    from_group_tokens = parse_comma_list_chunks(args.from_groups)
+    to_key_tokens = parse_comma_list_chunks(args.to_keys)
+    to_group_tokens = parse_comma_list_chunks(args.to_groups)
+
+    effective_from_keys = [key.lower() for key in from_key_tokens]
+    effective_from_keys.extend(expand_group_names(from_group_tokens, parser, "--from-groups"))
+
+    effective_to_keys = [key.lower() for key in to_key_tokens]
+    effective_to_keys.extend(expand_group_names(to_group_tokens, parser, "--to-groups"))
+
+    if effective_to_keys and not effective_from_keys:
+        parser.error("target keys/groups require source keys/groups")
+
+    args.effective_from_keys = effective_from_keys
+    args.effective_to_keys = effective_to_keys
 
     return args
 
 
-def read_input_text(path: str) -> str:
-    """Read input from stdin or file path."""
-    if path == "-":
+def read_input_text(path: str | None) -> str | None:
+    """Read input from file, piped stdin, or return None when absent."""
+    if path:
+        with open(path, "r", encoding="utf-8") as handle:
+            return handle.read()
+    if not sys.stdin.isatty():
         return sys.stdin.read()
-    with open(path, "r", encoding="utf-8") as handle:
-        return handle.read()
+    return None
 
 
 def main(argv: List[str] | None = None) -> int:
@@ -919,43 +1034,94 @@ def main(argv: List[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(
         description=(
-            "Duplicate keys for and detect duplicates in VS Code keybindings objects."
+            "Duplicate keys and optionally detect duplicate/missing ids in VS Code keybindings JSONC."
         ),
         epilog=(
             "Examples:\n"
-            "  %(prog)s -f h,j,k,l -t left,down,up,right < file.json\n"
-            "  %(prog)s -f h,j -t left,down -m alt fileA.json fileB.json\n"
-            "  %(prog)s -f h,j,k,l -t left,down,up,right -m alt input.json > out.jsonc\n"
+            "  %(prog)s -d < keybindings.jsonc\n"
+            "\n"
+            "  %(prog)s \\\n    -f h,j,k,l -t left,down,up,right \\\n    -m alt,ctrl -w 'config.keyboardNavigation.enabled' \\\n    keybindings.jsonc\n"
+            "\n"
+            "  %(prog)s \\\n    -F vi -T arrows \\\n    -m alt,ctrl -d\n"
+            "\n"
+            "  %(prog)s \\\n    -f x,y,z -T vi,arrows\n"
+            "\n"
+            "Group names are resolved from this script's GROUP_REGISTRY (aligned with keybinding corpus\n"
+            "naming from bin/keybindings-corpus.py), including common groups: arrows, emacs, kbm, vi.\n"
         ),
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    parser.add_argument("-f", "--from", dest="from_keys", required=True, help="Comma-separated source keys.")
-    parser.add_argument("-t", "--to", dest="to_keys", required=True, help="Comma-separated target keys.")
-    parser.add_argument("-k", "--keys", default="", help="Optional comma-separated source keys filter.")
+    parser.add_argument(
+        "-f",
+        "--from-keys",
+        action="append",
+        default=[],
+        metavar="KEYS",
+        help="Comma-separated source key literals.",
+    )
+    parser.add_argument(
+        "-F",
+        "--from-groups",
+        action="append",
+        default=[],
+        metavar="GROUPS",
+        help=(
+            "Comma-separated source group names from GROUP_REGISTRY "
+            "(aligned with bin/keybindings-corpus.py naming; e.g., arrows, emacs, kbm, vi)."
+        ),
+    )
+    parser.add_argument(
+        "-t",
+        "--to-keys",
+        action="append",
+        default=[],
+        metavar="KEYS",
+        help="Comma-separated target key literals.",
+    )
+    parser.add_argument(
+        "-T",
+        "--to-groups",
+        action="append",
+        default=[],
+        metavar="GROUPS",
+        help=(
+            "Comma-separated target group names from GROUP_REGISTRY "
+            "(aligned with bin/keybindings-corpus.py naming; e.g., arrows, emacs, kbm, vi)."
+        ),
+    )
     parser.add_argument("-m", "--modifiers", default=DEFAULT_MODIFIERS, help="Comma-separated modifiers.")
     parser.add_argument(
         "-w",
-        "--when-clause",
+        "--when",
         default=DEFAULT_WHEN_CLAUSE,
-        help="Additional when clause for generated entries.",
+        help="When clause for generated entries.",
+    )
+    parser.add_argument(
+        "-d",
+        "--detect",
+        action="store_true",
+        help="Run duplicate and id detection over final object set.",
     )
     parser.add_argument(
         "input",
         nargs="?",
-        default="-",
-        help="Input JSONC file path or '-' for stdin (default).",
+        default=None,
+        help="Optional JSONC input file path.",
     )
 
     if not argv:
         parser.print_help()
-        return 0
+        return USAGE_EXIT_CODE
 
     try:
         args = parse_args(argv, parser)
     except SystemExit as exc:
         code = exc.code if exc.code is not None else 2
         try:
-            return int(code)
+            numeric_code = int(code)
+            if numeric_code in (0, 2):
+                return USAGE_EXIT_CODE
+            return numeric_code
         except Exception:
             return USAGE_EXIT_CODE
 
@@ -965,31 +1131,36 @@ def main(argv: List[str] | None = None) -> int:
         print(f"error: failed to read input: {exc}", file=sys.stderr)
         return ERROR_EXIT_CODE
 
-    from_keys = [key.lower() for key in parse_comma_list(args.from_keys)]
-    to_keys = [key.lower() for key in parse_comma_list(args.to_keys)]
-    mapping = {source: target for source, target in zip(from_keys, to_keys)}
+    has_generation = bool(args.effective_from_keys) or bool(args.effective_to_keys)
+    if raw_text is None and not has_generation and not args.detect:
+        print("error: no input provided and no generation/detect options were requested", file=sys.stderr)
+        return USAGE_EXIT_CODE
 
-    keys_arg = parse_comma_list(args.keys)
-    key_filter = set([key.lower() for key in keys_arg]) if keys_arg else set(from_keys)
+    mapping_pairs = build_mapping_pairs(args.effective_from_keys, args.effective_to_keys)
 
     modifiers = parse_comma_list(args.modifiers)
     if not modifiers:
         modifiers = parse_comma_list(DEFAULT_MODIFIERS)
 
-    preamble, array_text, postamble = extract_preamble_postamble(raw_text)
-    records, trailing_comments = load_records(array_text)
+    if raw_text is None:
+        preamble = ""
+        postamble = ""
+        records = []
+        trailing_comments = ""
+    else:
+        preamble, array_text, postamble = extract_preamble_postamble(raw_text)
+        records, trailing_comments = load_records(array_text)
 
     rng = random.Random()
     emitted = build_emitted_objects(
         records=records,
-        mapping=mapping,
-        key_filter=key_filter,
+        mapping_pairs=mapping_pairs,
         modifiers=modifiers,
-        extra_when_clause=args.when_clause,
+        extra_when_clause=args.when,
         rng=rng,
     )
 
-    rendered_body = annotate_and_render(emitted, trailing_comments)
+    rendered_body = annotate_and_render(emitted, trailing_comments, detect=args.detect)
     output_text = f"{preamble}[{rendered_body}]{postamble}"
     sys.stdout.write(output_text)
     return 0

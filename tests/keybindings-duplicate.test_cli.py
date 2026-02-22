@@ -48,10 +48,10 @@ class KeybindingsDuplicateCliTests(unittest.TestCase):
     def test_mismatched_from_to_exits_99(self) -> None:
         proc = run_dup(
             "[]\n",
-            ["-f", "h,j", "-t", "left"],
+            ["-t", "left"],
         )
         self.assertEqual(proc.returncode, 99)
-        self.assertIn("--from and --to", proc.stderr.decode("utf-8"))
+        self.assertIn("target keys/groups require source", proc.stderr.decode("utf-8"))
 
     def test_duplicate_annotations_present(self) -> None:
         data = dedent(
@@ -71,7 +71,7 @@ class KeybindingsDuplicateCliTests(unittest.TestCase):
             """
         )
 
-        proc = run_dup(data, ["-f", "h", "-t", "left", "-m", "alt"])
+        proc = run_dup(data, ["-f", "h", "-t", "left", "-m", "alt", "-d"])
         self.assertEqual(proc.returncode, 0)
         out = proc.stdout.decode("utf-8")
         self.assertIn("// DUPLICATE object detected for alt+h/", out)
