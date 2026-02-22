@@ -853,9 +853,12 @@ def extract_commented_command_id(text: str | None) -> str | None:
     if not text:
         return None
     # look for patterns like: "command": "(...) 1a2b"
-    m = re.search(r"['\"]command['\"]\s*:\s*['\"][^'\"]*?([0-9a-fA-F]{4})", text)
-    if m:
-        return m.group(1).lower()
+    matches = re.findall(r"""['"]command['"]\s*:\s*['"]([^'\"]*?([0-9a-fA-F]{4}))['"]""", text)
+    if matches:
+        # matches is a list of tuples; take the last captured 4-hex group
+        last = matches[-1]
+        # last is (full_match_without_quotes, group_hex)
+        return last[1].lower()
     return None
 
 
@@ -1065,9 +1068,17 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, de
     seen_pairs: set[tuple[str, str]] = set()
     seen_ids: dict[str, tuple[str, str]] = {}
     # collect ids already present in the emitted set (including generated ones)
+    # NOTE: avoid scanning arbitrary leading comments for 4/5-char tokens because
+    # that can pick up unrelated identifiers from prose. Only extract ids from
+    # the `command` field (preferred) or a commented `"command"` inside the
+    # object's own text.
     used_ids: set[str] = set()
     for itm in emitted:
-        fid = extract_any_id(itm.parsed_obj, itm.leading_comments, itm.text)
+        fid = None
+        if itm.parsed_obj is not None:
+            fid = extract_command_id(str(itm.parsed_obj.get("command", "")))
+        if not fid:
+            fid = extract_commented_command_id(itm.text)
         if fid:
             used_ids.add(fid)
 
@@ -1100,6 +1111,7 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, de
                     comments.append(f"// DUPLICATE id {found_id} detected for {key_value}/{when_value}")
                 else:
                     seen_ids[found_id] = (key_value, when_value)
+                pass
             else:
                 new_id = generate_unique_hex_id(used_ids, rng)
                 if new_id:
@@ -1175,7 +1187,7 @@ def main(argv: List[str] | None = None) -> int:
     corpus_modifiers_csv = ", ".join(CORPUS_MODIFIERS)
 
     parser = argparse.ArgumentParser(
-        description=f"Duplicate keys for and detect duplicates in VS Code keybindings.",
+        description="Duplicate keys for and detect duplicates in VS Code keybindings.",
         epilog=(
             "Examples:\n"
             f"  %(prog)s -d < keybindings.json\n"
@@ -1213,7 +1225,7 @@ def main(argv: List[str] | None = None) -> int:
         action="append",
         default=[],
         metavar="GROUPS",
-        help=f"Comma-separated source group names.",
+        help="Comma-separated source group names.",
     )
     parser.add_argument(
         "-t",
@@ -1229,7 +1241,7 @@ def main(argv: List[str] | None = None) -> int:
         action="append",
         default=[],
         metavar="GROUPS",
-        help=f"Comma-separated target group names.",
+        help="Comma-separated target group names.",
     )
     parser.add_argument(
         "-m",

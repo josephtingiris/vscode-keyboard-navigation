@@ -2367,7 +2367,7 @@ Notes:
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
     "key": "alt+a r",
     "command": "workbench.view.remote.resetViewContainerLocation",
-    // "command": "alt+a r 55a52,
+    // "command": "alt+a r 9f45",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
     // [note] open and focus the (PRIMARY) REMOTE EXPLORER viewlet
   },
