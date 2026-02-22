@@ -4592,6 +4592,26 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && terminalFocus && terminalCount > 1 && terminalSplitPaneActive"
   },
   {
+    "key": "alt+h",
+    "command": "alt+h 84b7",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'bottom'"
+  },
+  {
+    "key": "alt+j",
+    "command": "alt+j e114",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'bottom'"
+  },
+  {
+    "key": "alt+k",
+    "command": "alt+k 85b9",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'bottom'"
+  },
+  {
+    "key": "alt+l",
+    "command": "alt+l afea",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'bottom'"
+  },
+  {
     // [keynav] (left) (vi) (jump) (2) (blue) (B)
     "key": "ctrl+alt+h",
     "command": "ctrl+alt+h 308d",
@@ -4616,6 +4636,206 @@ Notes:
     "key": "ctrl+alt+l",
     "command": "ctrl+alt+l 108d",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'bottom'"
+  },
+  {
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 9c2a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'bottom'"
+  },
+  {
+    "key": "shift+alt+j",
+    "command": "shift+alt+j b47e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'bottom'"
+  },
+  {
+    "key": "shift+alt+k",
+    "command": "shift+alt+k b7bd",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'bottom'"
+  },
+  {
+    "key": "shift+alt+l",
+    "command": "shift+alt+l 988b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'bottom'"
+  },
+  {
+    "key": "alt+h",
+    "command": "alt+h ce17",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'left'"
+  },
+  {
+    "key": "alt+j",
+    "command": "alt+j 3ad2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'left'"
+  },
+  {
+    "key": "alt+k",
+    "command": "alt+k ff8c",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'left'"
+  },
+  {
+    "key": "alt+l",
+    "command": "alt+l b722",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'left'"
+  },
+  {
+    "key": "ctrl+alt+h",
+    "command": "ctrl+alt+h c718",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'left'"
+  },
+  {
+    "key": "ctrl+alt+j",
+    "command": "ctrl+alt+j f357",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'left'"
+  },
+  {
+    "key": "ctrl+alt+k",
+    "command": "ctrl+alt+k d544",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'left'"
+  },
+  {
+    "key": "ctrl+alt+l",
+    "command": "ctrl+alt+l 64e3",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'left'"
+  },
+  {
+    "key": "shift+alt+h",
+    "command": "shift+alt+h c364",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'left'"
+  },
+  {
+    "key": "shift+alt+j",
+    "command": "shift+alt+j e0c1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'left'"
+  },
+  {
+    "key": "shift+alt+k",
+    "command": "shift+alt+k b704",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'left'"
+  },
+  {
+    "key": "shift+alt+l",
+    "command": "shift+alt+l 4446",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'left'"
+  },
+  {
+    "key": "alt+h",
+    "command": "alt+h 084a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'right'"
+  },
+  {
+    "key": "alt+j",
+    "command": "alt+j 7c09",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'right'"
+  },
+  {
+    "key": "alt+k",
+    "command": "alt+k c81d",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'right'"
+  },
+  {
+    "key": "alt+l",
+    "command": "alt+l 0667",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'right'"
+  },
+  {
+    "key": "ctrl+alt+h",
+    "command": "ctrl+alt+h 6e20",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'right'"
+  },
+  {
+    "key": "ctrl+alt+j",
+    "command": "ctrl+alt+j cf5b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'right'"
+  },
+  {
+    "key": "ctrl+alt+k",
+    "command": "ctrl+alt+k 5825",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'right'"
+  },
+  {
+    "key": "ctrl+alt+l",
+    "command": "ctrl+alt+l ea0b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'right'"
+  },
+  {
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 4188",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'right'"
+  },
+  {
+    "key": "shift+alt+j",
+    "command": "shift+alt+j 4199",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'right'"
+  },
+  {
+    "key": "shift+alt+k",
+    "command": "shift+alt+k e0eb",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'right'"
+  },
+  {
+    "key": "shift+alt+l",
+    "command": "shift+alt+l 1739",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'right'"
+  },
+  {
+    "key": "alt+h",
+    "command": "alt+h 02f1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'top'"
+  },
+  {
+    "key": "alt+j",
+    "command": "alt+j 9279",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'top'"
+  },
+  {
+    "key": "alt+k",
+    "command": "alt+k b909",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'top'"
+  },
+  {
+    "key": "alt+l",
+    "command": "alt+l be41",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'top'"
+  },
+  {
+    "key": "ctrl+alt+h",
+    "command": "ctrl+alt+h 4d4e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'top'"
+  },
+  {
+    "key": "ctrl+alt+j",
+    "command": "ctrl+alt+j 74ec",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'top'"
+  },
+  {
+    "key": "ctrl+alt+k",
+    "command": "ctrl+alt+k dc1f",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'top'"
+  },
+  {
+    "key": "ctrl+alt+l",
+    "command": "ctrl+alt+l 114c",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'top'"
+  },
+  {
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 96e2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'top'"
+  },
+  {
+    "key": "shift+alt+j",
+    "command": "shift+alt+j 2d36",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'top'"
+  },
+  {
+    "key": "shift+alt+k",
+    "command": "shift+alt+k 0bc2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'top'"
+  },
+  {
+    "key": "shift+alt+l",
+    "command": "shift+alt+l b51b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelPosition == 'top'"
   },
   {
     // [keynav] (left) (vi) (move) (1) (red) (A) (primary)
