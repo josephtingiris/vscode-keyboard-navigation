@@ -664,7 +664,48 @@ def parse_jsonc_object(obj_text: str) -> Any:
 
     clean = strip_json_comments(obj_text)
     clean = strip_trailing_commas(clean)
-    return json.loads(clean)
+    try:
+        return json.loads(clean)
+    except json.JSONDecodeError:
+        # attempt to recover
+        text = clean
+        start = text.find("{")
+        if start == -1:
+            raise
+
+        i = start
+        n = len(text)
+        depth = 0
+        in_string = False
+        esc = False
+        string_char = ""
+        while i < n:
+            ch = text[i]
+            if in_string:
+                if esc:
+                    esc = False
+                elif ch == "\\":
+                    esc = True
+                elif ch == string_char:
+                    in_string = False
+            else:
+                if ch == '"' or ch == "'":
+                    in_string = True
+                    string_char = ch
+                elif ch == "{":
+                    depth += 1
+                elif ch == "}":
+                    depth -= 1
+                    if depth == 0:
+                        obj_sub = text[start: i + 1]
+                        try:
+                            return json.loads(obj_sub)
+                        except Exception:
+                            break
+            i += 1
+
+        # couldn't recover, re-raise the original error
+        return json.loads(clean)
 
 
 def remove_trailing_object_comma(obj_text: str) -> str:
@@ -755,6 +796,38 @@ def merge_when_clause(existing: str, extra: str) -> str:
     return f"{extra} && {existing}"
 
 
+def insert_comments_inside_object(obj_text: str, comments: list[str]) -> str:
+    """Insert comment lines inside an object before its final closing brace.
+
+    Preserves indentation of the object's last line when adding comment lines.
+    If a closing brace can't be found, falls back to appending comments after the
+    object text.
+    """
+    s = obj_text.rstrip()
+    # find last closing brace
+    idx = s.rfind("}")
+    if idx == -1:
+        return s + "\n" + "\n".join(comments)
+
+    # determine indentation based on the line containing the last '}'
+    nl = s.rfind("\n", 0, idx)
+    if nl == -1:
+        indent = ""
+    else:
+        # capture whitespace at start of the line before the '}'
+        line = s[nl + 1: idx]
+        m = re.match(r"(\s*)", line)
+        indent = m.group(1) if m else ""
+
+    comment_block = "\n".join([indent + c for c in comments])
+
+    before = s[:idx]
+    after = s[idx:]
+    if not before.endswith("\n"):
+        before = before + "\n"
+    return before + comment_block + "\n" + after
+
+
 def extract_command_id(command_value: str) -> str | None:
     """Extract preferred 4-hex id from command string."""
     if not command_value:
@@ -775,13 +848,30 @@ def extract_comment_id(comment_text: str) -> str | None:
     return None
 
 
-def extract_any_id(parsed_obj: dict | None, leading_comments: str) -> str | None:
-    """Extract id from command first, then leading comments."""
+def extract_commented_command_id(text: str | None) -> str | None:
+    """Extract a 4-hex id from a commented or uncommented command inside text."""
+    if not text:
+        return None
+    # look for patterns like: "command": "(...) 1a2b"
+    m = re.search(r"['\"]command['\"]\s*:\s*['\"][^'\"]*?([0-9a-fA-F]{4})", text)
+    if m:
+        return m.group(1).lower()
+    return None
+
+
+def extract_any_id(parsed_obj: dict | None, leading_comments: str, object_text: str | None = None) -> str | None:
+    """Extract id from command first, then commented command inside object, then leading comments."""
     if parsed_obj is not None:
         command_value = str(parsed_obj.get("command", ""))
         cmd_id = extract_command_id(command_value)
         if cmd_id:
             return cmd_id
+
+    # attempt to find a commented-out command id inside the object's text
+    commented_id = extract_commented_command_id(object_text or "")
+    if commented_id:
+        return commented_id
+
     return extract_comment_id(leading_comments)
 
 
@@ -847,7 +937,7 @@ def build_emitted_objects(
     """Build output objects list including generated mappings."""
     used_ids: set[str] = set()
     for record in records:
-        found_id = extract_any_id(record.parsed_obj, record.leading_comments)
+        found_id = extract_any_id(record.parsed_obj, record.leading_comments, record.object_text)
         if found_id:
             used_ids.add(found_id)
 
@@ -996,7 +1086,7 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, de
             else:
                 seen_pairs.add(pair)
 
-            found_id = extract_any_id(item.parsed_obj, item.leading_comments)
+            found_id = extract_any_id(item.parsed_obj, item.leading_comments, item.text)
             if found_id:
                 if found_id in seen_ids:
                     comments.append(f"// DUPLICATE id {found_id} detected for {key_value}/{when_value}")
@@ -1010,7 +1100,7 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, de
 
         chunk = item.text.rstrip("\n")
         if comments:
-            chunk += "\n" + "\n".join(comments)
+            chunk = insert_comments_inside_object(chunk, comments)
         chunks.append(chunk)
 
     rendered = ""
