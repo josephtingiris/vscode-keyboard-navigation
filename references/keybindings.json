@@ -3406,6 +3406,26 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.activityBar.location == 'bottom'"
   },
   {
+    "key": "alt+h",
+    "command": "alt+h 0ad1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'left'"
+  },
+  {
+    "key": "alt+j",
+    "command": "alt+j 781b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'left'"
+  },
+  {
+    "key": "alt+k",
+    "command": "alt+k a48d",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'left'"
+  },
+  {
+    "key": "alt+l",
+    "command": "alt+l 1fba",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'left'"
+  },
+  {
     // [keynav] (left) (vi) (jump) (2) (blue) (B)
     "key": "ctrl+alt+h",
     // "command": "workbench.action.toggleSidebarVisibility",
@@ -3458,6 +3478,66 @@ Notes:
     "key": "shift+alt+l",
     "command": "shift+alt+l 9e22",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'left'"
+  },
+  {
+    "key": "alt+h",
+    "command": "alt+h f314",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "alt+j",
+    "command": "alt+j cce1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "alt+k",
+    "command": "alt+k fa40",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "alt+l",
+    "command": "alt+l 14c8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "ctrl+alt+h",
+    "command": "ctrl+alt+h b503",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "ctrl+alt+j",
+    "command": "ctrl+alt+j aa99",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "ctrl+alt+k",
+    "command": "ctrl+alt+k 9dc1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "ctrl+alt+l",
+    "command": "ctrl+alt+l 789b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 7d2b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "shift+alt+j",
+    "command": "shift+alt+j 6fb0",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "shift+alt+k",
+    "command": "shift+alt+k 3f4e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "shift+alt+l",
+    "command": "shift+alt+l 2927",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'right'"
   },
   {
     // [keynav] (left) (vi) (juke) (0) (self) (gold) (X) (editor)
@@ -4651,6 +4731,46 @@ Notes:
     // [note] open a new integrated terminal when terminal is focused
   },
   {
+    "key": "alt+h",
+    "command": "alt+h 01fc",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left'"
+  },
+  {
+    "key": "alt+j",
+    "command": "alt+j e431",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left'"
+  },
+  {
+    "key": "alt+k",
+    "command": "alt+k a0a3",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left'"
+  },
+  {
+    "key": "alt+l",
+    "command": "alt+l 5cac",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left'"
+  },
+  {
+    "key": "ctrl+alt+h",
+    "command": "ctrl+alt+h eb2b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left'"
+  },
+  {
+    "key": "ctrl+alt+j",
+    "command": "ctrl+alt+j 4ef5",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left'"
+  },
+  {
+    "key": "ctrl+alt+k",
+    "command": "ctrl+alt+k 253d",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left'"
+  },
+  {
+    "key": "ctrl+alt+l",
+    "command": "ctrl+alt+l 55b2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left'"
+  },
+  {
     // [keynav] (left) (vi) (move) (1) (red) (A) (terminal)
     "key": "shift+alt+h",
     "command": "shift+alt+h 7619",
@@ -4692,6 +4812,66 @@ Notes:
     "command": "shift+alt+. 7219",
     // "command": "workbench.action.focusSideBar",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
+  },
+  {
+    "key": "alt+h",
+    "command": "alt+h 79bd",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "alt+j",
+    "command": "alt+j 9702",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "alt+k",
+    "command": "alt+k e100",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "alt+l",
+    "command": "alt+l 5458",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "ctrl+alt+h",
+    "command": "ctrl+alt+h 1ccf",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "ctrl+alt+j",
+    "command": "ctrl+alt+j b7c8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "ctrl+alt+k",
+    "command": "ctrl+alt+k a72b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "ctrl+alt+l",
+    "command": "ctrl+alt+l c64e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 8b07",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "shift+alt+j",
+    "command": "shift+alt+j 0068",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "shift+alt+k",
+    "command": "shift+alt+k 1c19",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'right'"
+  },
+  {
+    "key": "shift+alt+l",
+    "command": "shift+alt+l 08e5",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'right'"
   },
   {
     // (alt) (i) (all) (gold) (toggle) (copilot) (chat) (completions) (user)
