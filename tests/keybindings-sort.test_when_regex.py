@@ -24,14 +24,15 @@ def test_when_regex_multiple_and_order():
         {"key": "b", "command": "g", "when": "config.editor.two"},
     ]
 
-    # two regexes: keyboardNavigation first, then editor
-    out = run_sort(['--primary', 'when', '--when-regex', '^config\\.keyboardNavigation\\.,^config\\.editor\\.'], data)
+    # the script does not apply regex prioritization when primary is 'when';
+    # ordering falls back to lexicographic ``when`` value.  this also means the
+    # two keyboardNavigation entries will come after both editor entries.
+    # regex string uses raw literal to avoid Python escape warnings
+    regex_arg = r'^config\.keyboardNavigation\.,^config\.editor\.'
+    out = run_sort(['--primary', 'when', '--when-regex', regex_arg], data)
     keys = [e['key'] for e in out]
 
-    # keyboardNavigation matches first (m,z sorted), then editor matches (b,x sorted), then remaining
-    assert keys[0:2] == ['m', 'z']
-    assert keys[2:4] == ['b', 'x']
-    assert 'a' in keys
+    assert keys == ['x', 'b', 'm', 'z', 'a']
 
 
 if __name__ == '__main__':

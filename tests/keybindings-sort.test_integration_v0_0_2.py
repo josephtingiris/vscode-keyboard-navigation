@@ -18,11 +18,11 @@ def test_corpus_roundtrip():
     repo_root = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
     script = os.path.join(repo_root, 'bin', 'keybindings-sort.py')
     variants = [
-        'keybindings-corpus.jsonc',
-        'keybindings-corpus-all.jsonc',
-        'keybindings-corpus-emacs.jsonc',
-        'keybindings-corpus-kbm.jsonc',
-        'keybindings-corpus-vi.jsonc',
+        'keybindings.corpus.jsonc',
+        'keybindings.corpus.all.jsonc',
+        'keybindings.corpus.emacs.jsonc',
+        'keybindings.corpus.kbm.jsonc',
+        'keybindings.corpus.vi.jsonc',
     ]
 
     for name in variants:
