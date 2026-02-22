@@ -2,7 +2,7 @@
 """
 (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
 
-Duplicate/map VS Code keybindings JSONC entries while preserving comments.
+Duplicate keys for and detect duplicates in VS Code keybindings objects.
 
 Usage
     ./bin/keybindings-duplicate.py --from KEYS --to KEYS [OPTIONS] [FILE]
@@ -46,8 +46,7 @@ Exit codes
 """
 
 from __future__ import annotations
-from typing import Any
-from typing import NoReturn
+from typing import Any, List
 
 import argparse
 import json
@@ -57,30 +56,16 @@ import sys
 from dataclasses import dataclass
 
 
+ABORTING_EXIT_CODE = 1
+ERROR_EXIT_CODE = 2
 USAGE_EXIT_CODE = 99
-RUNTIME_EXIT_CODE = 2
 ID_RETRY_LIMIT = 100
 DEFAULT_MODIFIERS = "alt,shift+alt,ctrl+alt"
 DEFAULT_WHEN_CLAUSE = "config.keyboardNavigation.enabled"
 MODIFIER_ORDER = ["ctrl", "shift", "alt", "meta", "cmd", "win"]
 
 
-class UsageArgumentParser(argparse.ArgumentParser):
-    """Argument parser that exits with code 99 for help and usage errors."""
-
-    def error(self, message: str) -> NoReturn:
-        # type signature matches base class (which returns NoReturn)
-        self.print_usage(sys.stderr)
-        self.exit(USAGE_EXIT_CODE, f"{self.prog}: error: {message}\n")
-
-    def exit(self, status: int = 0, message: str | None = None) -> NoReturn:
-        # also matches base class signature
-        if message:
-            stream = sys.stdout if status == 0 else sys.stderr
-            stream.write(message)
-        if status in (0, 2):
-            raise SystemExit(USAGE_EXIT_CODE)
-        raise SystemExit(status)
+# using the standard argparse.ArgumentParser (no custom exit codes)
 
 
 @dataclass
@@ -906,32 +891,8 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str) ->
     return rendered
 
 
-def parse_args(argv: list[str]) -> argparse.Namespace:
-    """Parse CLI arguments."""
-    parser = UsageArgumentParser(
-        description=(
-            "Duplicate/map VS Code keybindings entries from JSONC while preserving comments. "
-            "Writes transformed JSONC to stdout."
-        ),
-        formatter_class=argparse.RawTextHelpFormatter,
-    )
-    parser.add_argument("-f", "--from", dest="from_keys", required=True, help="Comma-separated source keys.")
-    parser.add_argument("-t", "--to", dest="to_keys", required=True, help="Comma-separated target keys.")
-    parser.add_argument("-k", "--keys", default="", help="Optional comma-separated source keys filter.")
-    parser.add_argument("-m", "--modifiers", default=DEFAULT_MODIFIERS, help="Comma-separated modifiers.")
-    parser.add_argument(
-        "-w",
-        "--when-clause",
-        default=DEFAULT_WHEN_CLAUSE,
-        help="Additional when clause for generated entries.",
-    )
-    parser.add_argument(
-        "input",
-        nargs="?",
-        default="-",
-        help="Input JSONC file path or '-' for stdin (default).",
-    )
-
+def parse_args(argv: list[str], parser: argparse.ArgumentParser) -> argparse.Namespace:
+    """Parse CLI arguments using the provided parser instance."""
     args = parser.parse_args(argv)
 
     from_keys = parse_comma_list(args.from_keys)
@@ -952,14 +913,47 @@ def read_input_text(path: str) -> str:
         return handle.read()
 
 
-def main(argv: list[str] | None = None) -> int:
-    """Run CLI entrypoint."""
+def main(argv: List[str] | None = None) -> int:
+    """CLI entrypoint."""
     argv = sys.argv[1:] if argv is None else argv
 
+    parser = argparse.ArgumentParser(
+        description=(
+            "Duplicate keys for and detect duplicates in VS Code keybindings objects."
+        ),
+        epilog=(
+            "Examples:\n"
+            "  %(prog)s -f h,j,k,l -t left,down,up,right < file.json\n"
+            "  %(prog)s -f h,j -t left,down -m alt fileA.json fileB.json\n"
+            "  %(prog)s -f h,j,k,l -t left,down,up,right -m alt input.json > out.jsonc\n"
+        ),
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    parser.add_argument("-f", "--from", dest="from_keys", required=True, help="Comma-separated source keys.")
+    parser.add_argument("-t", "--to", dest="to_keys", required=True, help="Comma-separated target keys.")
+    parser.add_argument("-k", "--keys", default="", help="Optional comma-separated source keys filter.")
+    parser.add_argument("-m", "--modifiers", default=DEFAULT_MODIFIERS, help="Comma-separated modifiers.")
+    parser.add_argument(
+        "-w",
+        "--when-clause",
+        default=DEFAULT_WHEN_CLAUSE,
+        help="Additional when clause for generated entries.",
+    )
+    parser.add_argument(
+        "input",
+        nargs="?",
+        default="-",
+        help="Input JSONC file path or '-' for stdin (default).",
+    )
+
+    if not argv:
+        parser.print_help()
+        return 0
+
     try:
-        args = parse_args(argv)
+        args = parse_args(argv, parser)
     except SystemExit as exc:
-        code = exc.code if exc.code is not None else USAGE_EXIT_CODE
+        code = exc.code if exc.code is not None else 2
         try:
             return int(code)
         except Exception:
@@ -969,7 +963,7 @@ def main(argv: list[str] | None = None) -> int:
         raw_text = read_input_text(args.input)
     except Exception as exc:
         print(f"error: failed to read input: {exc}", file=sys.stderr)
-        return RUNTIME_EXIT_CODE
+        return ERROR_EXIT_CODE
 
     from_keys = [key.lower() for key in parse_comma_list(args.from_keys)]
     to_keys = [key.lower() for key in parse_comma_list(args.to_keys)]
