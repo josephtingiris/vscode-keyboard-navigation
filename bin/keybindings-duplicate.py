@@ -1217,7 +1217,7 @@ def main(argv: List[str] | None = None) -> int:
         action="append",
         default=[],
         metavar="KEYS",
-        help="Comma-separated source key literals.",
+        help="Comma-separated list of source key literals",
     )
     parser.add_argument(
         "-F",
@@ -1225,7 +1225,7 @@ def main(argv: List[str] | None = None) -> int:
         action="append",
         default=[],
         metavar="GROUPS",
-        help="Comma-separated source group names.",
+        help="Comma-separated list of source key group names",
     )
     parser.add_argument(
         "-t",
@@ -1233,7 +1233,7 @@ def main(argv: List[str] | None = None) -> int:
         action="append",
         default=[],
         metavar="KEYS",
-        help="Comma-separated target key literals.",
+        help="Comma-separated target key literals",
     )
     parser.add_argument(
         "-T",
@@ -1241,34 +1241,33 @@ def main(argv: List[str] | None = None) -> int:
         action="append",
         default=[],
         metavar="GROUPS",
-        help="Comma-separated target group names.",
+        help="Comma-separated list of target key group names",
     )
     parser.add_argument(
         "-m",
         "--modifiers",
         default=DEFAULT_MODIFIERS,
         help=(
-            f"Comma-separated modifiers. Choices: {corpus_modifiers_csv}. "
-            f"Default: {default_modifiers_csv}."
+            f"Comma-separated list of modifiers"
         ),
     )
     parser.add_argument(
         "-w",
         "--when",
         default=DEFAULT_WHEN_CLAUSE,
-        help="When clause for generated entries.",
+        help="When clause for generated entries",
     )
     parser.add_argument(
         "-d",
         "--detect",
         action="store_true",
-        help="Run duplicate and id detection over final object set.",
+        help="Run duplicate and id detection over final object set",
     )
     parser.add_argument(
         "input",
         nargs="?",
         default=None,
-        help=f"Optional {JSON_FLAVOR} input file path.",
+        help=f"Optional {JSON_FLAVOR} input file path",
     )
 
     if not argv:
