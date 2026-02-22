@@ -2,7 +2,7 @@
 """
 (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
 
-Duplicate keys for and detect duplicates in VS Code keybindings objects.
+Duplicate keys for and detect duplicates in VS Code keybindings.
 
 Usage
     ./bin/keybindings-duplicate.py [INPUT] [OPTIONS]
@@ -1070,7 +1070,7 @@ def main(argv: List[str] | None = None) -> int:
     corpus_modifiers_csv = ", ".join(CORPUS_MODIFIERS)
 
     parser = argparse.ArgumentParser(
-        description=f"Duplicate keys and optionally detect duplicate and/or missing ids in VS Code keybindings {JSON_FLAVOR}.",
+        description=f"Duplicate keys for and detect duplicates in VS Code keybindings.",
         epilog=(
             "Examples:\n"
             f"  %(prog)s -d < keybindings.json\n"
