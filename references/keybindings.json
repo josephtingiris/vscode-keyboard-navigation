@@ -2375,7 +2375,7 @@ Notes:
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
     "key": "alt+a t",
     "command": "terminal.resetViewLocation",
-    // "command": "alt+a 1 1120",
+    // "command": "alt+a t 1120",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
     // [note] open and focus the (PANEL) TERMINAL viewlet
   },
@@ -2456,7 +2456,6 @@ Notes:
     // [keynav] (vi) (0) (self) (gold) (X) (debug) (action) (chord)
     "key": "alt+a 1",
     "command": "alt+a 1 1111",
-
     // "command": "workbench.action.chat.toggle", // toggles the entire chat sidebar
     // "command": "workbench.action.chat.toggleAgentMode", // switches agens in chat, maybe a juke up/down
     // "command": "workbench.action.newChatWindow", // also very handy; opens chat in a new popped-out window
