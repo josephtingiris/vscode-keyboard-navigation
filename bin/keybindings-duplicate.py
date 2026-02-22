@@ -61,19 +61,10 @@ ABORTING_EXIT_CODE = 1
 ERROR_EXIT_CODE = 2
 USAGE_EXIT_CODE = 99
 ID_RETRY_LIMIT = 100
-DEFAULT_MODIFIERS = "alt,shift+alt,ctrl+alt"
-DEFAULT_WHEN_CLAUSE = "config.keyboardNavigation.enabled"
-MODIFIER_ORDER = ["ctrl", "shift", "alt", "meta", "cmd", "win"]
 
-_json5 = None
-try:
-    import json5 as _json5  # type: ignore
-    JSON_FLAVOR = "JSON5"
-except Exception:
-    JSON_FLAVOR = "JSONC"
+# update CORPUS_* from keybindings-corpus.py
 
-# update GROUP_REGISTRY from keybindings-corpus.py
-GROUP_REGISTRY: dict[str, list[str]] = {
+CORPUS_GROUPS: dict[str, list[str]] = {
     "arrows": ["left", "down", "up", "right"],
     "emacs": ["b", "n", "p", "f"],
     "kbm": ["a", "s", "w", "d"],
@@ -89,6 +80,29 @@ GROUP_REGISTRY: dict[str, list[str]] = {
     "debug": ["d"],
     "extension": ["x"],
 }
+
+CORPUS_MODIFIERS = [
+    "alt",
+    "ctrl",
+    "ctrl+alt",
+    "shift+alt",
+    "ctrl+alt+meta",
+    "ctrl+shift+alt",
+    "shift+alt+meta",
+    "ctrl+shift+alt+meta",
+]
+
+DEFAULT_MODIFIERS = "alt,shift+alt,ctrl+alt"
+
+DEFAULT_WHEN_CLAUSE = "config.keyboardNavigation.enabled"
+
+# prefer json5 libraries
+_json5 = None
+try:
+    import json5 as _json5  # type: ignore
+    JSON_FLAVOR = "JSON5"
+except Exception:
+    JSON_FLAVOR = "JSONC"
 
 
 @dataclass
@@ -619,10 +633,10 @@ def expand_group_names(names: list[str], parser: argparse.ArgumentParser, flag_n
         group_name = raw_name.strip().lower()
         if not group_name:
             continue
-        if group_name not in GROUP_REGISTRY:
-            known = ", ".join(sorted(GROUP_REGISTRY.keys()))
+        if group_name not in CORPUS_GROUPS:
+            known = ", ".join(sorted(CORPUS_GROUPS.keys()))
             parser.error(f"unknown group '{raw_name}' for {flag_name}; known groups: {known}")
-        expanded.extend([token.lower() for token in GROUP_REGISTRY[group_name]])
+        expanded.extend([token.lower() for token in CORPUS_GROUPS[group_name]])
     return expanded
 
 
@@ -680,11 +694,21 @@ def normalize_key_for_compare(key_value: str) -> str:
         modifiers = [normalize_modifier(bit) for bit in key_bits[:-1]]
         unique_modifiers = list(dict.fromkeys(modifiers))
 
+        corpus_modifier_tokens = list(
+            dict.fromkeys(
+                token
+                for modifier in CORPUS_MODIFIERS
+                for token in modifier.split("+")
+                if token
+            )
+        )
         ordered_modifiers: list[str] = []
-        for token in MODIFIER_ORDER:
+        for token in corpus_modifier_tokens:
             if token in unique_modifiers:
                 ordered_modifiers.append(token)
-        unknown_modifiers = sorted([token for token in unique_modifiers if token not in MODIFIER_ORDER])
+        unknown_modifiers = sorted([
+            token for token in unique_modifiers if token not in corpus_modifier_tokens
+        ])
         ordered_modifiers.extend(unknown_modifiers)
 
         if ordered_modifiers:
@@ -1039,23 +1063,34 @@ def main(argv: List[str] | None = None) -> int:
     """CLI entrypoint."""
     argv = sys.argv[1:] if argv is None else argv
 
-    # add_help= {JSON_FLAVOR}."
+    default_modifiers = parse_comma_list(DEFAULT_MODIFIERS)
+    default_modifiers_csv = ", ".join(default_modifiers)
+    corpus_groups = sorted(CORPUS_GROUPS.keys())
+    corpus_groups_csv = ", ".join(corpus_groups)
+    corpus_modifiers_csv = ", ".join(CORPUS_MODIFIERS)
+
     parser = argparse.ArgumentParser(
-        description=(
-            f"Duplicate keys and optionally detect duplicate and/or missing ids in VS Code keybindings."
-        ),
+        description=f"Duplicate keys and optionally detect duplicate and/or missing ids in VS Code keybindings {JSON_FLAVOR}.",
         epilog=(
             "Examples:\n"
-            "  %(prog)s -d < keybindings.jsonc\n"
+            f"  %(prog)s -d < keybindings.json\n"
             "\n"
-            "  %(prog)s \\\n    -f h,j,k,l -t left,down,up,right \\\n    -m alt,ctrl -w 'config.keyboardNavigation.enabled' \\\n    keybindings.jsonc\n"
+            "  %(prog)s \\\n    -f h,j,k,l -t left,down,up,right \\\n    -m alt,ctrl -w 'config.keyboardNavigation.enabled' \\\n    keybindings.json\n"
             "\n"
             "  %(prog)s \\\n    -F vi -T arrows \\\n    -m alt,ctrl -d\n"
             "\n"
             "  %(prog)s \\\n    -f x,y,z -T vi,arrows\n"
             "\n"
-            "Group names are resolved from this script's GROUP_REGISTRY (aligned with keybinding corpus\n"
-            "naming from bin/keybindings-corpus.py), including common groups: arrows, emacs, kbm, vi.\n"
+            f"Group choices:\n\n"
+            f"  {corpus_groups_csv}"
+            f"\n"
+            f"\n"
+            f"Modifier choices:\n\n"
+            f"  {corpus_modifiers_csv}"
+            f"\n"
+            f"\n"
+            f"Modifier defaults: {default_modifiers_csv}\n"
+            f"\n"
         ),
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -1073,10 +1108,7 @@ def main(argv: List[str] | None = None) -> int:
         action="append",
         default=[],
         metavar="GROUPS",
-        help=(
-            "Comma-separated source group names from GROUP_REGISTRY "
-            "(aligned with bin/keybindings-corpus.py naming; e.g., arrows, emacs, kbm, vi)."
-        ),
+        help=f"Comma-separated source group names.",
     )
     parser.add_argument(
         "-t",
@@ -1092,12 +1124,17 @@ def main(argv: List[str] | None = None) -> int:
         action="append",
         default=[],
         metavar="GROUPS",
+        help=f"Comma-separated target group names.",
+    )
+    parser.add_argument(
+        "-m",
+        "--modifiers",
+        default=DEFAULT_MODIFIERS,
         help=(
-            "Comma-separated target group names from GROUP_REGISTRY "
-            "(aligned with bin/keybindings-corpus.py naming; e.g., arrows, emacs, kbm, vi)."
+            f"Comma-separated modifiers. Choices: {corpus_modifiers_csv}. "
+            f"Default: {default_modifiers_csv}."
         ),
     )
-    parser.add_argument("-m", "--modifiers", default=DEFAULT_MODIFIERS, help="Comma-separated modifiers.")
     parser.add_argument(
         "-w",
         "--when",
