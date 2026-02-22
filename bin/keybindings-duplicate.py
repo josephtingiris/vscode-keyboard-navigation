@@ -1064,6 +1064,14 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, de
     """Annotate and return final array-body text."""
     seen_pairs: set[tuple[str, str]] = set()
     seen_ids: dict[str, tuple[str, str]] = {}
+    # collect ids already present in the emitted set (including generated ones)
+    used_ids: set[str] = set()
+    for itm in emitted:
+        fid = extract_any_id(itm.parsed_obj, itm.leading_comments, itm.text)
+        if fid:
+            used_ids.add(fid)
+
+    rng = random.Random()
     chunks: list[str] = []
 
     for item in emitted:
@@ -1093,7 +1101,14 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, de
                 else:
                     seen_ids[found_id] = (key_value, when_value)
             else:
-                comments.append(f"// MISSING id for {key_value}/{when_value}")
+                new_id = generate_unique_hex_id(used_ids, rng)
+                if new_id:
+                    comments.append(f'// MISSING id: "command": "{key_value} {new_id}",')
+
+                    # duplicate ids
+                    seen_ids[new_id] = (key_value, when_value)
+                else:
+                    comments.append(f"// MISSING id for {key_value}/{when_value}")
 
         if item.forced_comment:
             comments.append(item.forced_comment)
