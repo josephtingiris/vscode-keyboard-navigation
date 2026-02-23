@@ -1,12 +1,12 @@
-[tool.pycodestyle]
-max_line_length = 120
-ignore = ["E501", "W6"]
-
 [tool.autopep8]
 line-length = 120
 
-[tool.black]
-line-length = 120
+[tool.flake8]
+max-line-length = 120
+
+[tool.pycodestyle]
+max_line_length = 120
+ignore = ["E501", "W6"]
 
 [tool.pydocstyle]
 max-line-length = 80
