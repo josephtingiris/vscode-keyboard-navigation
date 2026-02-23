@@ -53,6 +53,7 @@ import argparse
 import json
 import random
 import re
+import hashlib
 import sys
 from dataclasses import dataclass
 
@@ -882,8 +883,26 @@ def extract_any_id(parsed_obj: dict | None, leading_comments: str, object_text: 
     return extract_comment_id(leading_comments)
 
 
-def generate_unique_hex_id(used_ids: set[str], rng: random.Random) -> str | None:
-    """Generate a unique 4-hex id with retry limit."""
+def generate_unique_hex_id(used_ids: set[str], rng: random.Random, seed: str | None = None) -> str | None:
+    """Generate a unique hex id.
+
+    If `seed` is provided, generate deterministic candidates by hashing
+    the seed (e.g. key+when) and taking slices of the hex digest. Fall
+    back to random generation if deterministic attempts collide.
+    """
+    if seed:
+        hexdigest = hashlib.sha256(seed.encode("utf-8")).hexdigest()
+        # try deterministic 4-char slices first, then 5-char slices.
+        for retry in range(ID_RETRY_LIMIT):
+            length = 4 if retry < (ID_RETRY_LIMIT // 2) else 5
+            max_start = len(hexdigest) - length + 1
+            start = (retry * length) % max_start
+            candidate = hexdigest[start: start + length].lower()
+            if candidate not in used_ids:
+                used_ids.add(candidate)
+                return candidate
+
+    # fallback: random 4-hex ids (preserves original behavior)
     for _ in range(ID_RETRY_LIMIT):
         candidate = f"{rng.randint(0, 0xFFFF):04x}"
         if candidate not in used_ids:
@@ -976,7 +995,8 @@ def build_emitted_objects(
     if not records:
         for _, generated_key in expanded_pairs:
             generated_when = merge_when_clause("", extra_when_clause)
-            generated_id = generate_unique_hex_id(used_ids, rng)
+            # deterministic seed based on generated key + when clause
+            generated_id = generate_unique_hex_id(used_ids, rng, seed=f"{generated_key}|{generated_when}")
             if generated_id is None:
                 failure = f"// FAILED generating id for {generated_key}/{generated_when}"
                 emitted.append(
@@ -1027,7 +1047,8 @@ def build_emitted_objects(
         generated_when = merge_when_clause(source_when, extra_when_clause)
 
         for generated_key in matching_targets:
-            generated_id = generate_unique_hex_id(used_ids, rng)
+            # deterministic seed based on generated key + when clause
+            generated_id = generate_unique_hex_id(used_ids, rng, seed=f"{generated_key}|{generated_when}")
             if generated_id is None:
                 failure = f"// FAILED generating id for {generated_key}/{generated_when}"
                 emitted.append(
@@ -1117,7 +1138,8 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, de
                     seen_ids[found_id] = (key_value, when_value)
                 pass
             else:
-                new_id = generate_unique_hex_id(used_ids, rng)
+                # deterministic id preferred for stability based on key+when
+                new_id = generate_unique_hex_id(used_ids, rng, seed=f"{key_value}|{when_value}")
                 if new_id:
                     comments.append(f'// MISSING id: "command": "{key_value} {new_id}",')
 
