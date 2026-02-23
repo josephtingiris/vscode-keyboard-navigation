@@ -274,6 +274,33 @@ def natural_key_case_sensitive(s):
     return [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', s)]
 
 
+def normalize_key_for_compare(key_value):
+    """Lightweight normalization for key sorting used by this script.
+
+    Lowercases, splits chord parts on spaces, orders modifiers alphabetically
+    before the literal, and rejoins chords with spaces.
+    """
+    if not key_value:
+        return ""
+    key_value = str(key_value).strip().lower()
+    if not key_value:
+        return ""
+
+    chords = [p for p in key_value.split() if p.strip()]
+    out_chords = []
+    for chord in chords:
+        parts = [b.strip() for b in chord.split("+") if b.strip()]
+        if not parts:
+            continue
+        lit = parts[-1]
+        mods = sorted(parts[:-1])
+        if mods:
+            out_chords.append("+".join(mods + [lit]))
+        else:
+            out_chords.append(lit)
+    return " ".join(out_chords)
+
+
 def when_specificity(when_val: str) -> Tuple[int]:
     """
     Heuristic specificity score for a when clause. Lower is broader.
@@ -808,6 +835,15 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                     first_when_token = first_when_token[1:].lstrip()
 
         # build a flexible sort tuple based on primary/secondary preferences.
+        # Special-case: when primary is key and secondary is when, ensure
+        # strict key-first ordering by returning a simple tuple: (rank, key, when_specificity, when_sortable)
+        if primary == 'key' and secondary == 'when':
+            norm = normalize_key_for_compare(key_val)
+            key_token = natural_key(norm)
+            spec = when_specificity(when_val)
+            when_token = natural_key_case_sensitive(sortable_when)
+            return (0, key_token, spec, when_token)
+
         tokens = []
 
         def append_when():
@@ -873,7 +909,9 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
 
                 # (this makes matched groups easier to inspect).
                 if match_rank != 9999:
-                    tokens.append(natural_key_case_sensitive(key_val))
+                    # prefer normalized key ordering for stability: modifiers normalized
+                    norm_key = normalize_key_for_compare(key_val)
+                    tokens.append(natural_key(norm_key))
                     tokens.append(spec_key)
                     tokens.append(tert)
                 else:
@@ -888,7 +926,9 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
             tokens.append(natural_key_case_sensitive(sortable_when))
 
         def append_key():
-            tokens.append(natural_key(key_val))
+            # use normalized key comparison (consistent modifier ordering)
+            norm = normalize_key_for_compare(key_val)
+            tokens.append(natural_key(norm))
 
         # primary
         if primary == 'when':
