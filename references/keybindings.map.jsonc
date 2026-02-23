@@ -2,541 +2,541 @@
   {
     // [keynav] (map) (left) (juke) (0) (self) (gold) (X)
     "key": "alt+{",
-    "command": "alt+{ a9cd",
+    "command": "alt+{ fbc7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (move) (1) (red) (A)
     "key": "shift+alt+{",
-    "command": "shift+alt+{ a88d",
+    "command": "shift+alt+{ 238f",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (jump) (2) (blue) (B)
     "key": "ctrl+alt+{",
-    "command": "ctrl+alt+{ c4e0",
+    "command": "ctrl+alt+{ 45a2",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+{",
-    "command": "ctrl+alt+meta+{ 3b23",
+    "command": "ctrl+alt+meta+{ 6ac8",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+{",
-    "command": "ctrl+shift+alt+{ ad4c",
+    "command": "ctrl+shift+alt+{ faa9",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (0) (self) (gold) (X)
     "key": "alt+;",
-    "command": "alt+; f8a1",
+    "command": "alt+; e451",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (move) (1) (red) (A)
     "key": "shift+alt+;",
-    "command": "shift+alt+; 5410",
+    "command": "shift+alt+; a5e7",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (jump) (2) (blue) (B)
     "key": "ctrl+alt+;",
-    "command": "ctrl+alt+; 54c9",
+    "command": "ctrl+alt+; 2e46",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+;",
-    "command": "ctrl+alt+meta+; 61e4",
+    "command": "ctrl+alt+meta+; 6776",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+;",
-    "command": "ctrl+shift+alt+; ba2e",
+    "command": "ctrl+shift+alt+; d6ba",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (0) (self) (gold) (X)
     "key": "alt+,",
-    "command": "alt+, 0ee4",
+    "command": "alt+, c058",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (move) (1) (red) (A)
     "key": "shift+alt+,",
-    "command": "shift+alt+, a60a",
+    "command": "shift+alt+, 638f",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (jump) (2) (blue) (B)
     "key": "ctrl+alt+,",
-    "command": "ctrl+alt+, f1b0",
+    "command": "ctrl+alt+, 25d9",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+,",
-    "command": "ctrl+alt+meta+, 2d04",
+    "command": "ctrl+alt+meta+, d330",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+,",
-    "command": "ctrl+shift+alt+, 26dc",
+    "command": "ctrl+shift+alt+, 3624",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (fold) (0) (self) (gold) (X)
     "key": "alt+]",
-    "command": "alt+] 5c6c",
+    "command": "alt+] 59e4",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (fold) (move) (1) (red) (A)
     "key": "shift+alt+]",
-    "command": "shift+alt+] 5055",
+    "command": "shift+alt+] c71b",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (fold) (jump) (2) (blue) (B)
     "key": "ctrl+alt+]",
-    "command": "ctrl+alt+] 4114",
+    "command": "ctrl+alt+] 9fb1",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (fold) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+]",
-    "command": "ctrl+alt+meta+] 3f1a",
+    "command": "ctrl+alt+meta+] 2274",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (fold) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+]",
-    "command": "ctrl+shift+alt+] 9cf3",
+    "command": "ctrl+shift+alt+] 6839",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (0) (self) (gold) (X)
     "key": "alt+}",
-    "command": "alt+} 8d9d",
+    "command": "alt+} 71cf",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (move) (1) (red) (A)
     "key": "shift+alt+}",
-    "command": "shift+alt+} 12a6",
+    "command": "shift+alt+} 3bf3",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (jump) (2) (blue) (B)
     "key": "ctrl+alt+}",
-    "command": "ctrl+alt+} 3032",
+    "command": "ctrl+alt+} 0da4",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+}",
-    "command": "ctrl+alt+meta+} 2864",
+    "command": "ctrl+alt+meta+} 6bb4",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+}",
-    "command": "ctrl+shift+alt+} f08f",
+    "command": "ctrl+shift+alt+} 0bed",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (0) (self) (gold) (X)
     "key": "alt+'",
-    "command": "alt+' c057",
+    "command": "alt+' b962",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (0) (self) (gold) (X)
     "key": "alt++",
-    "command": "alt++ 6cb4",
+    "command": "alt++ b8b4",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (horizontal) (split) (0) (self) (gold) (X)
     "key": "alt+-",
-    "command": "alt+- a73b",
+    "command": "alt+- 515d",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (0) (self) (gold) (X)
     "key": "alt+.",
-    "command": "alt+. 39c5",
+    "command": "alt+. 388b",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (0) (self) (gold) (X)
     "key": "alt+=",
-    "command": "alt+= cfea",
+    "command": "alt+= ee42",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (fold) (0) (self) (gold) (X)
     "key": "alt+[",
-    "command": "alt+[ b7cb",
+    "command": "alt+[ f419",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (0) (self) (gold) (X)
     "key": "alt+\\",
-    "command": "alt+\\ 0173",
+    "command": "alt+\\ 861b",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (horizontal) (split) (0) (self) (gold) (X)
     "key": "alt+_",
-    "command": "alt+_ c3bf",
+    "command": "alt+_ 4320",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (0) (self) (gold) (X)
     "key": "alt+end",
-    "command": "alt+end 9e7e",
+    "command": "alt+end e703",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (0) (self) (gold) (X)
     "key": "alt+home",
-    "command": "alt+home dd04",
+    "command": "alt+home 265b",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (0) (self) (gold) (X)
     "key": "alt+pagedown",
-    "command": "alt+pagedown adbf",
+    "command": "alt+pagedown a137",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (0) (self) (gold) (X)
     "key": "alt+pageup",
-    "command": "alt+pageup 2185",
+    "command": "alt+pageup 248e",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (0) (self) (gold) (X)
     "key": "alt+|",
-    "command": "alt+| 693f",
+    "command": "alt+| 97bd",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (jump) (2) (blue) (B)
     "key": "ctrl+alt+'",
-    "command": "ctrl+alt+' a279",
+    "command": "ctrl+alt+' f262",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (jump) (2) (blue) (B)
     "key": "ctrl+alt++",
-    "command": "ctrl+alt++ 82c4",
+    "command": "ctrl+alt++ f6e4",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (horizontal) (split) (jump) (2) (blue) (B)
     "key": "ctrl+alt+-",
-    "command": "ctrl+alt+- ece6",
+    "command": "ctrl+alt+- c0f3",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (jump) (2) (blue) (B)
     "key": "ctrl+alt+.",
-    "command": "ctrl+alt+. 32cc",
+    "command": "ctrl+alt+. 65ec",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (jump) (2) (blue) (B)
     "key": "ctrl+alt+=",
-    "command": "ctrl+alt+= 0815",
+    "command": "ctrl+alt+= eb68",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (fold) (jump) (2) (blue) (B)
     "key": "ctrl+alt+[",
-    "command": "ctrl+alt+[ df47",
+    "command": "ctrl+alt+[ 07a2",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (jump) (2) (blue) (B)
     "key": "ctrl+alt+\\",
-    "command": "ctrl+alt+\\ b721",
+    "command": "ctrl+alt+\\ c1ab",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (horizontal) (split) (jump) (2) (blue) (B)
     "key": "ctrl+alt+_",
-    "command": "ctrl+alt+_ fdd0",
+    "command": "ctrl+alt+_ 8f1e",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (jump) (2) (blue) (B)
     "key": "ctrl+alt+end",
-    "command": "ctrl+alt+end feb6",
+    "command": "ctrl+alt+end 0f47",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (jump) (2) (blue) (B)
     "key": "ctrl+alt+home",
-    "command": "ctrl+alt+home 3c59",
+    "command": "ctrl+alt+home 4ece",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+'",
-    "command": "ctrl+alt+meta+' 23fe",
+    "command": "ctrl+alt+meta+' c93f",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta++",
-    "command": "ctrl+alt+meta++ e584",
+    "command": "ctrl+alt+meta++ 8fe2",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (horizontal) (split) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+-",
-    "command": "ctrl+alt+meta+- 72c9",
+    "command": "ctrl+alt+meta+- 09af",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+.",
-    "command": "ctrl+alt+meta+. a598",
+    "command": "ctrl+alt+meta+. da65",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+=",
-    "command": "ctrl+alt+meta+= 7339",
+    "command": "ctrl+alt+meta+= 1671",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (fold) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+[",
-    "command": "ctrl+alt+meta+[ 353c",
+    "command": "ctrl+alt+meta+[ 524e",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+\\",
-    "command": "ctrl+alt+meta+\\ 1c92",
+    "command": "ctrl+alt+meta+\\ 50e1",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (horizontal) (split) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+_",
-    "command": "ctrl+alt+meta+_ deae",
+    "command": "ctrl+alt+meta+_ 0145",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+end",
-    "command": "ctrl+alt+meta+end 9e4f",
+    "command": "ctrl+alt+meta+end 70ea",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+home",
-    "command": "ctrl+alt+meta+home 95f2",
+    "command": "ctrl+alt+meta+home 4f93",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+pagedown",
-    "command": "ctrl+alt+meta+pagedown 3ff3",
+    "command": "ctrl+alt+meta+pagedown d80a",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+pageup",
-    "command": "ctrl+alt+meta+pageup 681c",
+    "command": "ctrl+alt+meta+pageup a74e",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+|",
-    "command": "ctrl+alt+meta+| 9604",
+    "command": "ctrl+alt+meta+| 5d3a",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (jump) (2) (blue) (B)
     "key": "ctrl+alt+pagedown",
-    "command": "ctrl+alt+pagedown 185d",
+    "command": "ctrl+alt+pagedown a53f",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (jump) (2) (blue) (B)
     "key": "ctrl+alt+pageup",
-    "command": "ctrl+alt+pageup 8347",
+    "command": "ctrl+alt+pageup 7bed",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (jump) (2) (blue) (B)
     "key": "ctrl+alt+|",
-    "command": "ctrl+alt+| 2d45",
+    "command": "ctrl+alt+| 69b8",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+'",
-    "command": "ctrl+shift+alt+' bd79",
+    "command": "ctrl+shift+alt+' b957",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt++",
-    "command": "ctrl+shift+alt++ 4879",
+    "command": "ctrl+shift+alt++ 4e58",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (horizontal) (split) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+-",
-    "command": "ctrl+shift+alt+- 81bf",
+    "command": "ctrl+shift+alt+- 27b5",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+.",
-    "command": "ctrl+shift+alt+. 0135",
+    "command": "ctrl+shift+alt+. 0967",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+=",
-    "command": "ctrl+shift+alt+= 24ac",
+    "command": "ctrl+shift+alt+= 1346",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (fold) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+[",
-    "command": "ctrl+shift+alt+[ 047a",
+    "command": "ctrl+shift+alt+[ 81dd",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+\\",
-    "command": "ctrl+shift+alt+\\ 358a",
+    "command": "ctrl+shift+alt+\\ a81e",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (horizontal) (split) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+_",
-    "command": "ctrl+shift+alt+_ 4411",
+    "command": "ctrl+shift+alt+_ c1db",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+end",
-    "command": "ctrl+shift+alt+end df8c",
+    "command": "ctrl+shift+alt+end 92aa",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+home",
-    "command": "ctrl+shift+alt+home 9491",
+    "command": "ctrl+shift+alt+home 3ba8",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+pagedown",
-    "command": "ctrl+shift+alt+pagedown 83c4",
+    "command": "ctrl+shift+alt+pagedown a4df",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+pageup",
-    "command": "ctrl+shift+alt+pageup 7011",
+    "command": "ctrl+shift+alt+pageup 021e",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (change) (!) (yellow) (+)
     "key": "ctrl+shift+alt+|",
-    "command": "ctrl+shift+alt+| 8767",
+    "command": "ctrl+shift+alt+| 9534",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (move) (1) (red) (A)
     "key": "shift+alt+'",
-    "command": "shift+alt+' 7ab8",
+    "command": "shift+alt+' 7dfd",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (move) (1) (red) (A)
     "key": "shift+alt++",
-    "command": "shift+alt++ 3c6f",
+    "command": "shift+alt++ f6bf",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (horizontal) (split) (move) (1) (red) (A)
     "key": "shift+alt+-",
-    "command": "shift+alt+- c4ba",
+    "command": "shift+alt+- 81ec",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (right) (juke) (move) (1) (red) (A)
     "key": "shift+alt+.",
-    "command": "shift+alt+. 40fc",
+    "command": "shift+alt+. 2331",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (move) (1) (red) (A)
     "key": "shift+alt+=",
-    "command": "shift+alt+= f32d",
+    "command": "shift+alt+= db7c",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (left) (juke) (fold) (move) (1) (red) (A)
     "key": "shift+alt+[",
-    "command": "shift+alt+[ 3836",
+    "command": "shift+alt+[ 0465",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (move) (1) (red) (A)
     "key": "shift+alt+\\",
-    "command": "shift+alt+\\ 9f9c",
+    "command": "shift+alt+\\ 70ef",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (horizontal) (split) (move) (1) (red) (A)
     "key": "shift+alt+_",
-    "command": "shift+alt+_ 3d37",
+    "command": "shift+alt+_ 6498",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (move) (1) (red) (A)
     "key": "shift+alt+end",
-    "command": "shift+alt+end 0828",
+    "command": "shift+alt+end 9d52",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (move) (1) (red) (A)
     "key": "shift+alt+home",
-    "command": "shift+alt+home 7f8b",
+    "command": "shift+alt+home 021f",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (move) (1) (red) (A)
     "key": "shift+alt+pagedown",
-    "command": "shift+alt+pagedown ccd1",
+    "command": "shift+alt+pagedown f985",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (juke) (move) (1) (red) (A)
     "key": "shift+alt+pageup",
-    "command": "shift+alt+pageup 4ffa",
+    "command": "shift+alt+pageup 66d6",
     "when": "config.keyboardNavigation.enabled"
   },
   {
     // [keynav] (map) (vertical) (split) (move) (1) (red) (A)
     "key": "shift+alt+|",
-    "command": "shift+alt+| 787c",
+    "command": "shift+alt+| 6821",
     "when": "config.keyboardNavigation.enabled"
   }
 ]
