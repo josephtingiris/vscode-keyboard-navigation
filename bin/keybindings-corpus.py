@@ -145,6 +145,7 @@ FIN_TAGS = {
 TAG_ORDER = [
     # D(irection, Heading, or Intent)
     "(corpus)",
+    "(map)",
     "(down)", "(left)", "(right)", "(up)",
     "(horizontal)", "(vertical)",
 
@@ -183,6 +184,7 @@ TAG_ORDER = [
 WHEN_TAG_SELECTORS = [
     ("auxiliarBarFocus", "(secondary)"),
     ("config.keyboardNavigation.terminal", "(terminal)"),
+    ("config.keyboardNavigation.enabledMap", "(map)"),
     ("editorFocus", "(editor)"),
     ("editorTextFocus", "(editor)"),
     ("editorTextFocus", "(text)"),
@@ -307,7 +309,7 @@ def main(argv: List[str] | None = None) -> int:
             in_block = False
             while i < n:
                 ch = text[i]
-                nxt2 = text[i:i+2] if i+2 <= n else ''
+                nxt2 = text[i:i + 2] if i + 2 <= n else ''
                 if in_line:
                     if ch == '\n':
                         out.append(ch)
@@ -362,7 +364,7 @@ def main(argv: List[str] | None = None) -> int:
 
             while i < n:
                 ch = text[i]
-                nxt2 = text[i:i+2] if i+2 <= n else ''
+                nxt2 = text[i:i + 2] if i + 2 <= n else ''
 
                 if in_line_comment:
                     if ch == '\n':
@@ -417,7 +419,7 @@ def main(argv: List[str] | None = None) -> int:
             in_block_comment = False
             while i < n:
                 ch = text[i]
-                nxt2 = text[i:i+2] if i+2 <= n else ''
+                nxt2 = text[i:i + 2] if i + 2 <= n else ''
                 if in_line_comment:
                     if ch == '\n':
                         in_line_comment = False
@@ -459,8 +461,8 @@ def main(argv: List[str] | None = None) -> int:
                     if depth == 0:
                         end = i
                         preamble = text[:start]
-                        array_text = text[start+1:end]
-                        postamble = text[end+1:]
+                        array_text = text[start + 1:end]
+                        postamble = text[end + 1:]
                         return preamble, array_text, postamble
                 i += 1
             return None
@@ -633,11 +635,11 @@ def main(argv: List[str] | None = None) -> int:
                     print(
                         f"warning: could not find object end for key {k!r}; skipping injection", file=sys.stderr)
                     continue
-                obj_fragment = out_text[obj_start:obj_end+1]
+                obj_fragment = out_text[obj_start:obj_end + 1]
             else:
                 obj_start = obj_index
                 obj_end = obj_start + len(obj_text) - 1
-                obj_fragment = out_text[obj_start:obj_end+1]
+                obj_fragment = out_text[obj_start:obj_end + 1]
 
             # if exact comment exists anywhere in the object (compare stripped lines) then skip
             exists = False
@@ -1017,6 +1019,9 @@ def tags_for(
 
     if existing_comments and "corpus" in existing_comments.lower():
         dynamic_tags.add("(corpus)")
+
+    if existing_comments and "(map)" in existing_comments.lower():
+        dynamic_tags.add("(map)")
 
     if command and command.strip().lower() == "-noop":
         dynamic_tags.add("(pass)")
