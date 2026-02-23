@@ -26,7 +26,7 @@ help:
 # auxiliaryBarFocus editorFocus editorTextFocus filesExplorerFocus inDebugRepl inQuickOpen listFocus listHasSelectionOrFocus notificationFocus panelFocus sideBarFocus terminalFocus
 # auxiliaryBarFocus editorFocus editorTextFocus panelFocus sideBarFocus terminalFocus
 FOCUS_COMPONENTS := auxiliaryBarFocus editorFocus editorTextFocus 'panelFocus && !editorFocus' sideBarFocus terminalFocus
-LETTER_GROUPS := vi
+LETTER_NAV_GROUPS := emacs kbm vi
 MAP_MODIFIERS := alt,shift+alt,ctrl+alt,ctrl+alt+meta,ctrl+shift+alt
 PANEL_POSITIONS := top bottom left right
 SIDEBAR_LOCATIONS := left right
@@ -56,8 +56,8 @@ corpora:
 	@keybindings-corpus.py | keybindings-sort.py > keybindings.corpus.jsonc
 
 	# letter-key groups
-	@for lg in $(LETTER_GROUPS); do \
-		../bin/keybindings-corpus.py -n $$lg | keybindings-sort.py > keybindings.corpus.$$lg.jsonc; \
+	@for lng in $(LETTER_NAV_GROUPS); do \
+		../bin/keybindings-corpus.py -n $$lng | keybindings-sort.py > keybindings.corpus.$$lng.jsonc; \
 	done
 
 	# all
@@ -80,27 +80,27 @@ maps:
 	sed -i '/enabledMap/s//enabled/g' keybindings.map.jsonc; \
 
 	# letter-key groups
-	@for lg in $(LETTER_GROUPS); do \
-		WHEN_PREFIX="config.keyboardNavigation.enabledMap && config.keyboardNavigation.keys.letters == '$$lg'"; \
+	@for lng in $(LETTER_NAV_GROUPS); do \
+		WHEN_PREFIX="config.keyboardNavigation.enabledMap && config.keyboardNavigation.keys.letters == '$$lng'"; \
 		#echo "WHEN_PREFIX="$${WHEN_PREFIX}; \
-		MAP_FILE="keybindings.map.$$lg.jsonc"; \
+		MAP_FILE="keybindings.map.$$lng.jsonc"; \
 		echo '[]' > $${MAP_FILE}; \
 		echo "# + $${MAP_FILE}"; \
-		echo "# + $$lg panel locations"; \
+		echo "# + $$lng panel locations"; \
 		for pp in $(PANEL_POSITIONS); do \
 			for fc in $(FOCUS_COMPONENTS); do \
-				#echo "# + $$lg $$pp $$fc"; \
-				../bin/keybindings-duplicate.py -F juke,split,$$lg -m $(MAP_MODIFIERS) -w "$${WHEN_PREFIX} && panelPosition == '$$pp' && $$fc" > $${MAP_FILE}.panel.jsonc; \
+				#echo "# + $$lng $$pp $$fc"; \
+				../bin/keybindings-duplicate.py -F juke,split,$$lng -m $(MAP_MODIFIERS) -w "$${WHEN_PREFIX} && panelPosition == '$$pp' && $$fc" > $${MAP_FILE}.panel.jsonc; \
 				../bin/keybindings-merge.py $${MAP_FILE}.panel.jsonc $${MAP_FILE} --out $${MAP_FILE}.merged.jsonc 1> /dev/null; \
 				mv -f $${MAP_FILE}.merged.jsonc $${MAP_FILE}; \
 			done; \
 			[ -f $${MAP_FILE}.panel.jsonc ] && rm -f $${MAP_FILE}.panel.jsonc; \
 		done; \
-		echo "# + $$lg sidebar locations"; \
+		echo "# + $$lng sidebar locations"; \
 		for sl in $(SIDEBAR_LOCATIONS); do \
 			for fc in $(FOCUS_COMPONENTS); do \
-				#echo "# + $$lg $$sl $$fc"; \
-				../bin/keybindings-duplicate.py -F juke,split,$$lg -m $(MAP_MODIFIERS) -w "$${WHEN_PREFIX} && config.workbench.sideBar.location == '$$sl' && $$fc" > $${MAP_FILE}.sidebar.jsonc; \
+				#echo "# + $$lng $$sl $$fc"; \
+				../bin/keybindings-duplicate.py -F juke,split,$$lng -m $(MAP_MODIFIERS) -w "$${WHEN_PREFIX} && config.workbench.sideBar.location == '$$sl' && $$fc" > $${MAP_FILE}.sidebar.jsonc; \
 				../bin/keybindings-merge.py $${MAP_FILE}.sidebar.jsonc $${MAP_FILE} --out $${MAP_FILE}.merged.jsonc 1> /dev/null; \
 				mv -f $${MAP_FILE}.merged.jsonc $${MAP_FILE}; \
 			done; \
