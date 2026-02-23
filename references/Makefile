@@ -127,6 +127,7 @@ maps:
 		done; \
 		../bin/keybindings-corpus.py -c $${MAP_FILE} > $${MAP_FILE}.tmp.jsonc; \
 		../bin/keybindings-sort.py < $${MAP_FILE}.tmp.jsonc > $${MAP_FILE}; \
+		sed -i '/enabledMap/s//enabled/g' $${MAP_FILE}; \
 		[ -f $${MAP_FILE}.tmp.jsonc ] && rm -f $${MAP_FILE}.tmp.jsonc; \
 	done
 
