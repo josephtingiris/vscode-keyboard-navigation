@@ -119,7 +119,7 @@ def extract_preamble_postamble(text):
     # find opening bracket, skipping comments and strings
     while i < n:
         ch = text[i]
-        next2 = text[i:i+2] if i+2 <= n else ''
+        next2 = text[i:i + 2] if i + 2 <= n else ''
 
         if in_line_comment:
             if ch == '\n':
@@ -166,7 +166,7 @@ def extract_preamble_postamble(text):
 
     while i < n:
         ch = text[i]
-        next2 = text[i:i+2] if i+2 <= n else ''
+        next2 = text[i:i + 2] if i + 2 <= n else ''
 
         if in_line_comment:
             if ch == '\n':
@@ -217,8 +217,8 @@ def extract_preamble_postamble(text):
         return '', '', text
 
     preamble = text[:start]
-    postamble = text[end+1:]
-    array_text = text[start+1:end]  # exclude [ and ]
+    postamble = text[end + 1:]
+    array_text = text[start + 1:end]  # exclude [ and ]
     return preamble, array_text, postamble
 
 
@@ -424,7 +424,7 @@ def tokenize_when(expr: str):
 
         if expr.startswith('&&', i) or expr.startswith('||', i):
             flush_buf()
-            tokens.append(('OP', expr[i:i+2]))
+            tokens.append(('OP', expr[i:i + 2]))
             i += 2
             prev_nonspace = ''
             continue
@@ -437,7 +437,7 @@ def tokenize_when(expr: str):
             continue
 
         if ch == '!':
-            nxt = expr[i+1] if i + 1 < n else ''
+            nxt = expr[i + 1] if i + 1 < n else ''
             if nxt == '=':
                 buf += ch
                 i += 1
@@ -1191,7 +1191,8 @@ def main(argv: List[str] | None = None) -> int:
             when_val, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
         pair_id = (key_val, canonical_when)
         if pair_id in seen:
-            comments += f'// DUPLICATE key: {key_val!r} when: {canonical_when!r}\n'
+            if key_val or canonical_when:
+                comments += f'// DUPLICATE key: {key_val!r} when: {canonical_when!r}\n'
         seen.add(pair_id)
 
         if comments:
@@ -1199,9 +1200,9 @@ def main(argv: List[str] | None = None) -> int:
             out_parts.append(comments)
         idx = obj_out.rfind('}')
         if idx != -1:
-            after = obj_out[idx+1:]
+            after = obj_out[idx + 1:]
             after_clean = re.sub(r'^\s*,+', '', after)
-            obj_out = obj_out[:idx+1] + after_clean
+            obj_out = obj_out[:idx + 1] + after_clean
         out_parts.append(obj_out)
         if not is_last and not object_has_trailing_comma(obj_out):
             out_parts.append(',')
