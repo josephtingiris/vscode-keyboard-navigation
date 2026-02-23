@@ -949,8 +949,13 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         if 'key' not in (primary, secondary):
             append_key()
 
-        if tokens and not isinstance(tokens[0], int):
-            tokens.insert(0, 9999)
+        if tokens:
+            if not isinstance(tokens[0], int):
+                # prefer a low rank when primary is 'key'
+                if primary == 'key':
+                    tokens.insert(0, 0)
+                else:
+                    tokens.insert(0, 9999)
         return tuple(tokens)
     except Exception:
         # return a key with the same structural types as a normal sort key: (int rank, list key, tuple specificity, list tertiary)
