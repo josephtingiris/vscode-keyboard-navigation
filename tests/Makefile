@@ -1,6 +1,6 @@
 
 .DEFAULT_GOAL := help
-.PHONY: help all build test tests $(TARGETS)
+.PHONY: help all build clean test tests $(TARGETS)
 
 # default: show help when `make` is run with no args
 help:
@@ -10,8 +10,9 @@ help:
 	@echo "  help                    - show this message (default)"
 	@echo "  all                     - make all targets"
 	@echo "  build                   - run tests/ build"
-	@echo "  test                    - run all tests, including scripts"
-	@echo "  tests                   - alias for test"
+	@echo "  clean                   - clean tests/ artifacts"
+	@echo "  tests                   - run all tests, including scripts"
+	@echo "  test                    - alias for tests"
 	@echo
 	@echo "Script Targets:"
 	@for t in $(TARGETS); do \
@@ -44,12 +45,22 @@ $(foreach s,$(SCRIPTS),$(eval $(call RUN_RULE,$(subst /,.,$(basename $(s))),$(s)
 # targets
 #
 
-all: build test
+all: build clean tests
 
 build:
 	@echo "++ Building tests/ ..."
 	@echo
 
-test: $(TARGETS)
+clean:
+	@echo "++ Cleaning tests/ artifacts ..."
+	@echo
 
-tests: test
+	# remove __pycache__
+	-@rm -rf __pycache__
+
+	# remove any other temporary files in extension/
+	-@rm -rf node_modules .cache tmp
+
+tests: $(TARGETS)
+
+test: tests

@@ -1,6 +1,6 @@
 
 .DEFAULT_GOAL := help
-.PHONY: help all build test tests clean package package-install package-uninstall
+.PHONY: help all build clean test tests package package-install package-uninstall
 
 # default: show help when `make` is run with no args
 help:
@@ -10,11 +10,12 @@ help:
 	@echo "  help                    - show this message (default)"
 	@echo "  all                     - make all targets"
 	@echo "  build                   - run extension/ build"
-	@echo "  test                    - run tests (delegates to ../tests/)"
-	@echo "  tests                   - alias for test"
+	@echo "  clean                   - clean extension/ artifacts"
 	@echo "  package                 - package extension into .vsix (dist/)"
 	@echo "  package-install         - install the generated .vsix into VS Code"
 	@echo "  package-uninstall       - uninstall the extension from VS Code"
+	@echo "  tests                   - run all tests in ../tests/"
+	@echo "  test                    - alias for tests"
 	@echo
 
 #
@@ -25,18 +26,25 @@ help:
 # targets
 #
 
-all: clean build test package
+all: clean build tests
 
-build:
+build: package
 	@echo "++ Building extension/ ..."
 	@echo
 
 clean:
-	@echo "++ Cleaning extension artifacts ..."
+	@echo "++ Cleaning extension/ artifacts ..."
 	@echo
-	# remove test-created mock vscode module placed under project node_modules
-	-@rm -rf ../node_modules/vscode
-	# remove any other temporary files
+
+	@vsix_files=$$(ls *.vsix 2>/dev/null); \
+	if [ -n "$$vsix_files" ]; then \
+		mv *.vsix dist/; \
+		echo "# all vsix files moved to dist/"; \
+	else \
+		echo "# no vsix files found."; \
+	fi
+
+	# remove any other temporary files in extension/
 	-@rm -rf node_modules .cache tmp
 
 # package: create a .vsix
@@ -86,12 +94,9 @@ package-uninstall:
 		echo "ERROR: 'code' CLI not found; please uninstall the extension manually: $${ID}"; exit 1; \
 	fi
 
-test:
+tests:
 	@echo "++ Running tests ..."
 	@echo
-	@echo $(MAKE) -C ../tests tests
-	@echo
 	@$(MAKE) -C ../tests tests
-	@echo
 
-tests: test
+test: tests

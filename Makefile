@@ -1,6 +1,6 @@
 
 .DEFAULT_GOAL := help
-.PHONY: help all build clean corpus corpora extension test tests
+.PHONY: help all build clean test tests corpus corpora extension map maps references
 
 # default: show help when `make` is run with no args
 help:
@@ -10,12 +10,14 @@ help:
 	@echo "  help                    - show this message (default)"
 	@echo "  all                     - make all targets"
 	@echo "  build                   - build (delegates to subdirs)"
-	@echo "  clean                   - clean build/test artifacts"
-	@echo "  corpus                  - generate full corpus in references/"
-	@echo "  corpora                 - alias for corpus"
-	@echo "  extension               - make extension (delegates to ./extension/)"
-	@echo "  test                    - run tests (delegates to ./tests/)"
-	@echo "  tests                   - alias for test"
+	@echo "  clean                   - clean all artifacts"
+	@echo "  corpora                 - generate all corpus files in references/"
+	@echo "  corpus                  - alias for corpora"
+	@echo "  maps                    - generate all map files in references/"
+	@echo "  map                     - alias for maps"
+	@echo "  extension               - make extension in extension/"
+	@echo "  tests                   - run all tests in tests/"
+	@echo "  test                    - alias for tests"
 	@echo
 
 #
@@ -23,13 +25,13 @@ help:
 #
 
 # directories with their own Makefiles
-SUBDIRS := extension tests
+SUBDIRS := extension references tests
 
 #
 # targets
 #
 
-all: clean corpus build test
+all: clean build tests
 
 build:
 	@echo "++ Building subdirectories ..."
@@ -44,36 +46,48 @@ build:
 	@echo
 
 clean:
-	@echo "++ Cleaning repository (delegating to sub-makes) ..."
+	@echo "++ Cleaning repository ..."
 	@echo
 	@for d in $(SUBDIRS); do \
 		$(MAKE) -C $$d clean || true; \
 	done
-	@echo "++ Repository clean complete."
+
+	# remove .pytest_cache
+	-@rm -rf .pytest_cache
+
+	# remove any other temporary files
+	-@rm -rf node_modules .cache tmp
+
 	@echo
+	@echo "++ Repository clean complete."
 
 corpus:
-	@echo "++ Updating reference keybindings corpus files ..."
-	@keybindings-corpus.py | keybindings-sort.py > references/keybindings.corpus.jsonc
-	@keybindings-corpus.py -n all | keybindings-sort.py > references/keybindings.corpus.all.jsonc
-	@keybindings-corpus.py -n emacs | keybindings-sort.py > references/keybindings.corpus.emacs.jsonc
-	@keybindings-corpus.py -n kbm | keybindings-sort.py > references/keybindings.corpus.kbm.jsonc
-	@keybindings-corpus.py -n vi | keybindings-sort.py > references/keybindings.corpus.vi.jsonc
+	@echo "++ Making corpus in references/ ..."
 	@echo
+	$(MAKE) -C references corpus
 
 corpora: corpus
 
 extension:
 	@echo "++ Making all in extension/ ..."
 	@echo
-	@echo $(MAKE) -C extension all
-	@echo
 	$(MAKE) -C extension all
 
-test:
-	@echo "++ Running tests ..."
+maps:
+	@echo "++ Making maps in references/ ..."
+	@echo
+	$(MAKE) -C references maps
+
+map: maps
+
+references:
+	@echo "++ Making all in references/ ..."
+	@echo
+	$(MAKE) -C references all
+
+tests:
+	@echo "++ Running all tests/ ..."
 	@echo
 	@$(MAKE) -C tests tests
-	@echo
 
-tests: test
+test: tests
