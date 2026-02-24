@@ -2199,8 +2199,8 @@ workbench.action.terminal.killAll
 workbench.action.terminal.killEditor
 workbench.action.terminal.killViewOrEditor
 workbench.action.terminal.moveIntoNewWindow
-workbench.action.terminal.moveToEditor
-workbench.action.terminal.moveToTerminalPanel
+workbench.action.terminal.moveToEditor # cool
+workbench.action.terminal.moveToTerminalPanel # cool
 workbench.action.terminal.new
 workbench.action.terminal.newInActiveWorkspace
 workbench.action.terminal.newInNewWindow
