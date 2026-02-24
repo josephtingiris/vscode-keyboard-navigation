@@ -25,8 +25,9 @@ help:
 
 # auxiliaryBarFocus editorFocus editorTextFocus filesExplorerFocus inDebugRepl inQuickOpen listFocus listHasSelectionOrFocus notificationFocus panelFocus sideBarFocus terminalFocus
 # auxiliaryBarFocus editorFocus editorTextFocus panelFocus sideBarFocus terminalFocus
-FOCUS_COMPONENTS := auxiliaryBarFocus editorFocus editorTextFocus panelFocus 'panelFocus && editorFocus' 'panelFocus && sideBarFocus' 'panelFocus && terminalFocus' sideBarFocus
-LETTER_NAV_GROUPS := emacs kbm vi
+FOCUS_COMPONENTS := auxiliaryBarFocus editorFocus 'editorFocus && editorTextFocus' 'editorFocus && panelFocus' panelFocus 'panelFocus && sideBarFocus' 'panelFocus && terminalFocus' sideBarFocus
+#LETTER_NAV_GROUPS := emacs kbm vi
+LETTER_NAV_GROUPS := vi
 MAP_MODIFIERS := alt,shift+alt,ctrl+alt,ctrl+alt+meta,ctrl+shift+alt
 PANEL_POSITIONS := top bottom left right
 SIDEBAR_LOCATIONS := left right
