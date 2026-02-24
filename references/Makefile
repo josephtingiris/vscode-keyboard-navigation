@@ -26,8 +26,8 @@ help:
 # auxiliaryBarFocus editorFocus editorTextFocus filesExplorerFocus inDebugRepl inQuickOpen listFocus listHasSelectionOrFocus notificationFocus panelFocus sideBarFocus terminalFocus
 # auxiliaryBarFocus editorFocus editorTextFocus panelFocus sideBarFocus terminalFocus
 FOCUS_COMPONENTS := auxiliaryBarFocus editorFocus 'editorFocus && editorTextFocus' 'editorFocus && panelFocus' panelFocus 'panelFocus && sideBarFocus' 'panelFocus && terminalFocus' sideBarFocus
-#LETTER_NAV_GROUPS := emacs kbm vi
-LETTER_NAV_GROUPS := vi
+LETTER_NAV_GROUPS := emacs kbm vi
+#LETTER_NAV_GROUPS := vi
 MAP_MODIFIERS := alt,shift+alt,ctrl+alt,ctrl+alt+meta,ctrl+shift+alt
 PANEL_POSITIONS := top bottom left right
 SIDEBAR_LOCATIONS := left right
@@ -87,45 +87,27 @@ maps:
  \
 		echo '[]' > $${MAP_FILE}; \
 		if [ "$$lng" != "" ] && [ "$$lng" != "none" ]; then \
-			echo "# + $$lng panel locations"; \
+			echo "# + $$lng panel & sidebar locations"; \
 		else \
 			# none; \
-			echo "# + juke & split panel locations"; \
+			echo "# + juke & split panel & sidebar locations"; \
 		fi; \
  \
 		for pp in $(PANEL_POSITIONS); do \
-			for fc in $(FOCUS_COMPONENTS); do \
-				#echo "# + $$lng $$pp $$fc"; \
-				if [ "$$lng" != "" ] && [ "$$lng" != "none" ]; then \
-					../bin/keybindings-duplicate.py -F juke,split,$$lng -m $(MAP_MODIFIERS) -w "$${WHEN_PREFIX} && panelPosition == '$$pp' && $$fc" > $${MAP_FILE}.panel.jsonc; \
-				else \
-					# none; \
-					../bin/keybindings-duplicate.py -F juke,split -m $(MAP_MODIFIERS) -w "$${WHEN_PREFIX} && panelPosition == '$$pp' && $$fc" > $${MAP_FILE}.panel.jsonc; \
-				fi; \
-				../bin/keybindings-merge.py $${MAP_FILE}.panel.jsonc $${MAP_FILE} --out $${MAP_FILE}.merged.jsonc 1> /dev/null; \
-				mv -f $${MAP_FILE}.merged.jsonc $${MAP_FILE}; \
+			for sl in $(SIDEBAR_LOCATIONS); do \
+				for fc in $(FOCUS_COMPONENTS); do \
+					#echo "# + $$lng $$sl $$fc"; \
+					if [ "$$lng" != "" ] && [ "$$lng" != "none" ]; then \
+						../bin/keybindings-duplicate.py -F juke,split,$$lng -m $(MAP_MODIFIERS) -w "$${WHEN_PREFIX} && config.workbench.sideBar.location == '$$sl' && panelPosition == '$$pp' && $$fc" > $${MAP_FILE}.psf.jsonc; \
+					else \
+						# none; \
+						../bin/keybindings-duplicate.py -F juke,split -m $(MAP_MODIFIERS) -w "$${WHEN_PREFIX} && config.workbench.sideBar.location == '$$sl' && panelPosition == '$$pp' && $$fc" > $${MAP_FILE}.psf.jsonc; \
+					fi; \
+					../bin/keybindings-merge.py $${MAP_FILE}.psf.jsonc $${MAP_FILE} --out $${MAP_FILE}.merged.jsonc 1> /dev/null; \
+					mv -f $${MAP_FILE}.merged.jsonc $${MAP_FILE}; \
+				done; \
+			[ -f $${MAP_FILE}.psf.jsonc ] && rm -f $${MAP_FILE}.psf.jsonc; \
 			done; \
-			[ -f $${MAP_FILE}.panel.jsonc ] && rm -f $${MAP_FILE}.panel.jsonc; \
-		done; \
-		if [ "$$lng" != "" ] && [ "$$lng" != "none" ]; then \
-			echo "# + $$lng sidebar locations"; \
-		else \
-			# none; \
-			echo "# + juke & split sidebar locations"; \
-		fi; \
-		for sl in $(SIDEBAR_LOCATIONS); do \
-			for fc in $(FOCUS_COMPONENTS); do \
-				#echo "# + $$lng $$sl $$fc"; \
-				if [ "$$lng" != "" ] && [ "$$lng" != "none" ]; then \
-					../bin/keybindings-duplicate.py -F juke,split,$$lng -m $(MAP_MODIFIERS) -w "$${WHEN_PREFIX} && config.workbench.sideBar.location == '$$sl' && $$fc" > $${MAP_FILE}.sidebar.jsonc; \
-				else \
-					# none; \
-					../bin/keybindings-duplicate.py -F juke,split -m $(MAP_MODIFIERS) -w "$${WHEN_PREFIX} && config.workbench.sideBar.location == '$$sl' && $$fc" > $${MAP_FILE}.sidebar.jsonc; \
-				fi; \
-				../bin/keybindings-merge.py $${MAP_FILE}.sidebar.jsonc $${MAP_FILE} --out $${MAP_FILE}.merged.jsonc 1> /dev/null; \
-				mv -f $${MAP_FILE}.merged.jsonc $${MAP_FILE}; \
-			done; \
-			[ -f $${MAP_FILE}.sidebar.jsonc ] && rm -f $${MAP_FILE}.sidebar.jsonc; \
 		done; \
 		../bin/keybindings-corpus.py -c $${MAP_FILE} > $${MAP_FILE}.tmp.jsonc; \
 		../bin/keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) < $${MAP_FILE}.tmp.jsonc > $${MAP_FILE}; \
@@ -147,6 +129,30 @@ maps:
 	@echo
 
 map: maps
+
+surfaces:
+	@echo "++ Updating references keybindings surface files ..."
+	@echo
+
+	# none
+	@../bin/keybindings-merge.py keybindings.corpus.jsonc keybindings.map.jsonc --prefer left --out keybindings.merged.surface.jsonc 1> /dev/null
+	@cat keybindings.merged.surface.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) > keybindings.surface.jsonc
+	@rm -f keybindings.merged.surface.jsonc
+
+	# letter-key groups
+	@for lng in $(LETTER_NAV_GROUPS); do \
+		../bin/keybindings-merge.py keybindings.corpus.$$lng.jsonc keybindings.map.$$lng.jsonc --prefer left --out keybindings.merged.surface.$$lng.jsonc 1> /dev/null; \
+		cat keybindings.merged.surface.$$lng.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) > keybindings.surface.$$lng.jsonc; \
+		rm -f keybindings.merged.surface.$$lng.jsonc; \
+	done
+
+	# all
+	@../bin/keybindings-merge.py keybindings.corpus.all.jsonc keybindings.map.all.jsonc --prefer left --out keybindings.merged.surface.all.jsonc 1> /dev/null
+	@cat keybindings.merged.surface.all.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) > keybindings.surface.all.jsonc
+	@rm -f keybindings.merged.surface.all.jsonc
+	@echo
+
+surface: surfaces
 
 tests:
 	@echo "++ Running tests ..."
