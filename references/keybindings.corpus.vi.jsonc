@@ -1,14 +1,15 @@
 [
   {
-    // [keynav] (corpus) (vertical) (split) (0) (self) (gold) (X)
-    "key": "alt++",
-    "command": "(corpus) alt++ 22d0",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
     // [keynav] (corpus) (right) (juke) (0) (self) (gold) (X)
     "key": "alt+'",
     "command": "(corpus) alt+' 1c12",
+    "when": "config.keyboardNavigation.enabled"
+  },
+
+  {
+    // [keynav] (corpus) (vertical) (split) (0) (self) (gold) (X)
+    "key": "alt++",
+    "command": "(corpus) alt++ 22d0",
     "when": "config.keyboardNavigation.enabled"
   },
   {
@@ -234,15 +235,15 @@
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
   },
   {
-    // [keynav] (corpus) (vertical) (split) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta++",
-    "command": "(corpus) ctrl+alt+meta++ 3346",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
     // [keynav] (corpus) (right) (juke) (warp) (3) (black) (C)
     "key": "ctrl+alt+meta+'",
     "command": "(corpus) ctrl+alt+meta+' 522b",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta++",
+    "command": "(corpus) ctrl+alt+meta++ 3346",
     "when": "config.keyboardNavigation.enabled"
   },
   {
@@ -1368,15 +1369,15 @@
     "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
   },
   {
-    // [keynav] (corpus) (vertical) (split)
-    "key": "ctrl++",
-    "command": "(corpus) ctrl++ 2d9f",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
     // [keynav] (corpus) (right) (juke)
     "key": "ctrl+'",
     "command": "(corpus) ctrl+' aeea",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split)
+    "key": "ctrl++",
+    "command": "(corpus) ctrl++ 2d9f",
     "when": "config.keyboardNavigation.enabled"
   },
   {
@@ -1578,12 +1579,6 @@
     "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
   },
   {
-    // [keynav] (corpus) (vertical) (split) (move) (1) (red) (A)
-    "key": "shift+alt++",
-    "command": "(corpus) shift+alt++ 7c16",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
     // [keynav] (corpus) (left) (juke) (0) (self) (gold) (X)
     "key": "alt+{",
     "command": "(corpus) alt+{ 7fa2",
@@ -1727,4 +1722,10 @@
     "command": "(corpus) ctrl+shift+alt+meta+} a9ac",
     "when": "config.keyboardNavigation.enabled"
   }
+  {
+    // [keynav] (corpus) (vertical) (split) (move) (1) (red) (A)
+    "key": "shift+alt++",
+    "command": "(corpus) shift+alt++ 7c16",
+    "when": "config.keyboardNavigation.enabled"
+  },
 ]
