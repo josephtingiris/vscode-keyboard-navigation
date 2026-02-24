@@ -72,1408 +72,16 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a",
-    "command": "(corpus) alt+a 8d02",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (kbm) (0) (self) (gold) (X)
-    "key": "alt+a",
-    "command": "(corpus) alt+a c88f",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a",
-    "command": "(corpus) alt+a f153",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a",
-    "command": "(corpus) alt+a 6356",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
     // [keynav] (corpus) (0) (self) (gold) (X)
     "key": "alt+b",
     "command": "(corpus) alt+b 3435",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus) (left) (emacs) (0) (self) (gold) (X)
-    "key": "alt+b",
-    "command": "(corpus) alt+b cefc",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+'",
-    "command": "(corpus) ctrl+alt+' ae52",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+,",
-    "command": "(corpus) ctrl+alt+, 9ded",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+-",
-    "command": "(corpus) ctrl+alt+- 11de",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+.",
-    "command": "(corpus) ctrl+alt+. d36f",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+;",
-    "command": "(corpus) ctrl+alt+; 65ef",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+=",
-    "command": "(corpus) ctrl+alt+= 47e2",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (fold) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+[",
-    "command": "(corpus) ctrl+alt+[ 6e54",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+\\",
-    "command": "(corpus) ctrl+alt+\\ 9a59",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (fold) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+]",
-    "command": "(corpus) ctrl+alt+] 4f7b",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+_",
-    "command": "(corpus) ctrl+alt+_ 51bf",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+a",
-    "command": "(corpus) ctrl+alt+a 9dfc",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B) (action) (chord)
-    "key": "ctrl+alt+a",
-    "command": "(corpus) ctrl+alt+a 0a8e",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (kbm) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+a",
-    "command": "(corpus) ctrl+alt+a fcc6",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (jump) (2) (blue) (B) (action) (chord)
-    "key": "ctrl+alt+a",
-    "command": "(corpus) ctrl+alt+a 8e63",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (jump) (2) (blue) (B) (action) (chord)
-    "key": "ctrl+alt+a",
-    "command": "(corpus) ctrl+alt+a 1d1b",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+b",
-    "command": "(corpus) ctrl+alt+b c913",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (emacs) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+b",
-    "command": "(corpus) ctrl+alt+b a67f",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+d",
-    "command": "(corpus) ctrl+alt+d f1da",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B) (debug) (chord)
-    "key": "ctrl+alt+d",
-    "command": "(corpus) ctrl+alt+d edb2",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (kbm) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+d",
-    "command": "(corpus) ctrl+alt+d 7673",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (jump) (2) (blue) (B) (debug) (chord)
-    "key": "ctrl+alt+d",
-    "command": "(corpus) ctrl+alt+d 57fa",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (jump) (2) (blue) (B) (debug) (chord)
-    "key": "ctrl+alt+d",
-    "command": "(corpus) ctrl+alt+d bc40",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (down) (arrow) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+down",
-    "command": "(corpus) ctrl+alt+down d780",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (juke) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+end",
-    "command": "(corpus) ctrl+alt+end 8a90",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+f",
-    "command": "(corpus) ctrl+alt+f 9ad3",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (emacs) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+f",
-    "command": "(corpus) ctrl+alt+f 378a",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+h",
-    "command": "(corpus) ctrl+alt+h c008",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (vi) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+h",
-    "command": "(corpus) ctrl+alt+h f46a",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (juke) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+home",
-    "command": "(corpus) ctrl+alt+home 79e0",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+j",
-    "command": "(corpus) ctrl+alt+j a187",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (vi) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+j",
-    "command": "(corpus) ctrl+alt+j 255c",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (jump) (2) (blue) (B) (debug) (chord)
-    "key": "ctrl+alt+j",
-    "command": "(corpus) ctrl+alt+j 230d",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+k",
-    "command": "(corpus) ctrl+alt+k 0d83",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (vi) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+k",
-    "command": "(corpus) ctrl+alt+k 4fe4",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+l",
-    "command": "(corpus) ctrl+alt+l 240e",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (vi) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+l",
-    "command": "(corpus) ctrl+alt+l 4362",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (jump) (2) (blue) (B) (action) (chord)
-    "key": "ctrl+alt+l",
-    "command": "(corpus) ctrl+alt+l b4bd",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (left) (arrow) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+left",
-    "command": "(corpus) ctrl+alt+left b1a9",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+'",
-    "command": "(corpus) ctrl+alt+meta+' 522b",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta++",
-    "command": "(corpus) ctrl+alt+meta++ 3346",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+,",
-    "command": "(corpus) ctrl+alt+meta+, 87d4",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+-",
-    "command": "(corpus) ctrl+alt+meta+- dea2",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+.",
-    "command": "(corpus) ctrl+alt+meta+. 2bd0",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+;",
-    "command": "(corpus) ctrl+alt+meta+; 2eb7",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+=",
-    "command": "(corpus) ctrl+alt+meta+= c1e2",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (fold) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+[",
-    "command": "(corpus) ctrl+alt+meta+[ 96c8",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+\\",
-    "command": "(corpus) ctrl+alt+meta+\\ 40d3",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (fold) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+]",
-    "command": "(corpus) ctrl+alt+meta+] 6b8d",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+_",
-    "command": "(corpus) ctrl+alt+meta+_ bee1",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+a",
-    "command": "(corpus) ctrl+alt+meta+a 6adb",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C) (action) (chord)
-    "key": "ctrl+alt+meta+a",
-    "command": "(corpus) ctrl+alt+meta+a 1105",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (kbm) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+a",
-    "command": "(corpus) ctrl+alt+meta+a f482",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (warp) (3) (black) (C) (action) (chord)
-    "key": "ctrl+alt+meta+a",
-    "command": "(corpus) ctrl+alt+meta+a 3533",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (warp) (3) (black) (C) (action) (chord)
-    "key": "ctrl+alt+meta+a",
-    "command": "(corpus) ctrl+alt+meta+a 914e",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+b",
-    "command": "(corpus) ctrl+alt+meta+b 3929",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (emacs) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+b",
-    "command": "(corpus) ctrl+alt+meta+b 38a6",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+d",
-    "command": "(corpus) ctrl+alt+meta+d acab",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C) (debug) (chord)
-    "key": "ctrl+alt+meta+d",
-    "command": "(corpus) ctrl+alt+meta+d 04d3",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (kbm) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+d",
-    "command": "(corpus) ctrl+alt+meta+d 7965",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (warp) (3) (black) (C) (debug) (chord)
-    "key": "ctrl+alt+meta+d",
-    "command": "(corpus) ctrl+alt+meta+d c73a",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (warp) (3) (black) (C) (debug) (chord)
-    "key": "ctrl+alt+meta+d",
-    "command": "(corpus) ctrl+alt+meta+d bf96",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (down) (arrow) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+down",
-    "command": "(corpus) ctrl+alt+meta+down 47d9",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (juke) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+end",
-    "command": "(corpus) ctrl+alt+meta+end 7586",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+f",
-    "command": "(corpus) ctrl+alt+meta+f 9e5d",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (emacs) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+f",
-    "command": "(corpus) ctrl+alt+meta+f ca69",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+h",
-    "command": "(corpus) ctrl+alt+meta+h 99d2",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (vi) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+h",
-    "command": "(corpus) ctrl+alt+meta+h 72ca",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (juke) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+home",
-    "command": "(corpus) ctrl+alt+meta+home 704d",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+j",
-    "command": "(corpus) ctrl+alt+meta+j 6691",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (vi) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+j",
-    "command": "(corpus) ctrl+alt+meta+j 6763",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (warp) (3) (black) (C) (debug) (chord)
-    "key": "ctrl+alt+meta+j",
-    "command": "(corpus) ctrl+alt+meta+j bba8",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+k",
-    "command": "(corpus) ctrl+alt+meta+k 9af9",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (vi) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+k",
-    "command": "(corpus) ctrl+alt+meta+k bde2",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+l",
-    "command": "(corpus) ctrl+alt+meta+l 34ff",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (vi) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+l",
-    "command": "(corpus) ctrl+alt+meta+l 9cac",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (warp) (3) (black) (C) (action) (chord)
-    "key": "ctrl+alt+meta+l",
-    "command": "(corpus) ctrl+alt+meta+l 5115",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (left) (arrow) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+left",
-    "command": "(corpus) ctrl+alt+meta+left 8697",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+n",
-    "command": "(corpus) ctrl+alt+meta+n 87f8",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (emacs) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+n",
-    "command": "(corpus) ctrl+alt+meta+n 9129",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+p",
-    "command": "(corpus) ctrl+alt+meta+p 5226",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (emacs) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+p",
-    "command": "(corpus) ctrl+alt+meta+p 78c3",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (juke) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+pagedown",
-    "command": "(corpus) ctrl+alt+meta+pagedown 5cc0",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (juke) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+pageup",
-    "command": "(corpus) ctrl+alt+meta+pageup 3593",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (arrow) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+right",
-    "command": "(corpus) ctrl+alt+meta+right c3e3",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+s",
-    "command": "(corpus) ctrl+alt+meta+s 4c4a",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (kbm) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+s",
-    "command": "(corpus) ctrl+alt+meta+s 8a29",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (right) (juke)
-    "key": "ctrl+shift+alt+meta+'",
-    "command": "(corpus) ctrl+shift+alt+meta+' ef04",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke)
-    "key": "ctrl+shift+alt+meta+,",
-    "command": "(corpus) ctrl+shift+alt+meta+, 919d",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split)
-    "key": "ctrl+shift+alt+meta+-",
-    "command": "(corpus) ctrl+shift+alt+meta+- 2eb3",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke)
-    "key": "ctrl+shift+alt+meta+.",
-    "command": "(corpus) ctrl+shift+alt+meta+. 8275",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke)
-    "key": "ctrl+shift+alt+meta+;",
-    "command": "(corpus) ctrl+shift+alt+meta+; 24a4",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split)
-    "key": "ctrl+shift+alt+meta+=",
-    "command": "(corpus) ctrl+shift+alt+meta+= 0f83",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (fold)
-    "key": "ctrl+shift+alt+meta+[",
-    "command": "(corpus) ctrl+shift+alt+meta+[ 16d9",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split)
-    "key": "ctrl+shift+alt+meta+\\",
-    "command": "(corpus) ctrl+shift+alt+meta+\\ 06ee",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (fold)
-    "key": "ctrl+shift+alt+meta+]",
-    "command": "(corpus) ctrl+shift+alt+meta+] 0a6f",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split)
-    "key": "ctrl+shift+alt+meta+_",
-    "command": "(corpus) ctrl+shift+alt+meta+_ 73d9",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+shift+alt+meta+a",
-    "command": "(corpus) ctrl+shift+alt+meta+a 8604",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (action) (chord)
-    "key": "ctrl+shift+alt+meta+a",
-    "command": "(corpus) ctrl+shift+alt+meta+a 1930",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (kbm)
-    "key": "ctrl+shift+alt+meta+a",
-    "command": "(corpus) ctrl+shift+alt+meta+a a7be",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (action) (chord)
-    "key": "ctrl+shift+alt+meta+a",
-    "command": "(corpus) ctrl+shift+alt+meta+a dded",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (action) (chord)
-    "key": "ctrl+shift+alt+meta+a",
-    "command": "(corpus) ctrl+shift+alt+meta+a 4c8a",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+shift+alt+meta+b",
-    "command": "(corpus) ctrl+shift+alt+meta+b 9991",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (emacs)
-    "key": "ctrl+shift+alt+meta+b",
-    "command": "(corpus) ctrl+shift+alt+meta+b 1d8d",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+shift+alt+meta+d",
-    "command": "(corpus) ctrl+shift+alt+meta+d f0e6",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (debug) (chord)
-    "key": "ctrl+shift+alt+meta+d",
-    "command": "(corpus) ctrl+shift+alt+meta+d 8cb4",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (kbm)
-    "key": "ctrl+shift+alt+meta+d",
-    "command": "(corpus) ctrl+shift+alt+meta+d 0933",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (debug) (chord)
-    "key": "ctrl+shift+alt+meta+d",
-    "command": "(corpus) ctrl+shift+alt+meta+d 2e57",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (debug) (chord)
-    "key": "ctrl+shift+alt+meta+d",
-    "command": "(corpus) ctrl+shift+alt+meta+d 1c71",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (down) (arrow)
-    "key": "ctrl+shift+alt+meta+down",
-    "command": "(corpus) ctrl+shift+alt+meta+down eb61",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (juke)
-    "key": "ctrl+shift+alt+meta+end",
-    "command": "(corpus) ctrl+shift+alt+meta+end de61",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+shift+alt+meta+f",
-    "command": "(corpus) ctrl+shift+alt+meta+f 838a",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (emacs)
-    "key": "ctrl+shift+alt+meta+f",
-    "command": "(corpus) ctrl+shift+alt+meta+f 6b83",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+shift+alt+meta+h",
-    "command": "(corpus) ctrl+shift+alt+meta+h b32c",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (vi)
-    "key": "ctrl+shift+alt+meta+h",
-    "command": "(corpus) ctrl+shift+alt+meta+h 09be",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (juke)
-    "key": "ctrl+shift+alt+meta+home",
-    "command": "(corpus) ctrl+shift+alt+meta+home 73cf",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+shift+alt+meta+j",
-    "command": "(corpus) ctrl+shift+alt+meta+j 226a",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (vi)
-    "key": "ctrl+shift+alt+meta+j",
-    "command": "(corpus) ctrl+shift+alt+meta+j 5b8a",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (debug) (chord)
-    "key": "ctrl+shift+alt+meta+j",
-    "command": "(corpus) ctrl+shift+alt+meta+j 9b02",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+shift+alt+meta+k",
-    "command": "(corpus) ctrl+shift+alt+meta+k df42",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (vi)
-    "key": "ctrl+shift+alt+meta+k",
-    "command": "(corpus) ctrl+shift+alt+meta+k 1cc1",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+shift+alt+meta+l",
-    "command": "(corpus) ctrl+shift+alt+meta+l 8b58",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (vi)
-    "key": "ctrl+shift+alt+meta+l",
-    "command": "(corpus) ctrl+shift+alt+meta+l 3ddf",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (action) (chord)
-    "key": "ctrl+shift+alt+meta+l",
-    "command": "(corpus) ctrl+shift+alt+meta+l 0ede",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (left) (arrow)
-    "key": "ctrl+shift+alt+meta+left",
-    "command": "(corpus) ctrl+shift+alt+meta+left 8743",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+shift+alt+meta+n",
-    "command": "(corpus) ctrl+shift+alt+meta+n aaab",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (emacs)
-    "key": "ctrl+shift+alt+meta+n",
-    "command": "(corpus) ctrl+shift+alt+meta+n 47a5",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+shift+alt+meta+p",
-    "command": "(corpus) ctrl+shift+alt+meta+p 93ef",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (emacs)
-    "key": "ctrl+shift+alt+meta+p",
-    "command": "(corpus) ctrl+shift+alt+meta+p 26f8",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (juke)
-    "key": "ctrl+shift+alt+meta+pagedown",
-    "command": "(corpus) ctrl+shift+alt+meta+pagedown 8627",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (juke)
-    "key": "ctrl+shift+alt+meta+pageup",
-    "command": "(corpus) ctrl+shift+alt+meta+pageup 8608",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (arrow)
-    "key": "ctrl+shift+alt+meta+right",
-    "command": "(corpus) ctrl+shift+alt+meta+right 2f36",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+shift+alt+meta+s",
-    "command": "(corpus) ctrl+shift+alt+meta+s 98e5",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (kbm)
-    "key": "ctrl+shift+alt+meta+s",
-    "command": "(corpus) ctrl+shift+alt+meta+s 21d4",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (up) (arrow)
-    "key": "ctrl+shift+alt+meta+up",
-    "command": "(corpus) ctrl+shift+alt+meta+up bb3e",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+shift+alt+meta+w",
-    "command": "(corpus) ctrl+shift+alt+meta+w 1470",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (kbm)
-    "key": "ctrl+shift+alt+meta+w",
-    "command": "(corpus) ctrl+shift+alt+meta+w 2337",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+shift+alt+meta+x",
-    "command": "(corpus) ctrl+shift+alt+meta+x d1aa",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (extension) (chord)
-    "key": "ctrl+shift+alt+meta+x",
-    "command": "(corpus) ctrl+shift+alt+meta+x 01bc",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (emacs) (extension) (chord)
-    "key": "ctrl+shift+alt+meta+x",
-    "command": "(corpus) ctrl+shift+alt+meta+x cf05",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (extension) (chord)
-    "key": "ctrl+shift+alt+meta+x",
-    "command": "(corpus) ctrl+shift+alt+meta+x 3289",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (vi) (extension) (chord)
-    "key": "ctrl+shift+alt+meta+x",
-    "command": "(corpus) ctrl+shift+alt+meta+x 382c",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (up) (arrow) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+up",
-    "command": "(corpus) ctrl+alt+meta+up c0b1",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+w",
-    "command": "(corpus) ctrl+alt+meta+w 1a9b",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (kbm) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+w",
-    "command": "(corpus) ctrl+alt+meta+w 4a94",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C)
-    "key": "ctrl+alt+meta+x",
-    "command": "(corpus) ctrl+alt+meta+x 86aa",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (warp) (3) (black) (C) (extension) (chord)
-    "key": "ctrl+alt+meta+x",
-    "command": "(corpus) ctrl+alt+meta+x afd4",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (emacs) (warp) (3) (black) (C) (extension) (chord)
-    "key": "ctrl+alt+meta+x",
-    "command": "(corpus) ctrl+alt+meta+x 5294",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (warp) (3) (black) (C) (extension) (chord)
-    "key": "ctrl+alt+meta+x",
-    "command": "(corpus) ctrl+alt+meta+x 49e2",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (vi) (warp) (3) (black) (C) (extension) (chord)
-    "key": "ctrl+alt+meta+x",
-    "command": "(corpus) ctrl+alt+meta+x 83f5",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+n",
-    "command": "(corpus) ctrl+alt+n 488b",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (emacs) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+n",
-    "command": "(corpus) ctrl+alt+n b250",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+p",
-    "command": "(corpus) ctrl+alt+p 456b",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (emacs) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+p",
-    "command": "(corpus) ctrl+alt+p e7d9",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (juke) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+pagedown",
-    "command": "(corpus) ctrl+alt+pagedown 6f14",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (juke) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+pageup",
-    "command": "(corpus) ctrl+alt+pageup f188",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (arrow) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+right",
-    "command": "(corpus) ctrl+alt+right 4e4e",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+s",
-    "command": "(corpus) ctrl+alt+s b41d",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (kbm) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+s",
-    "command": "(corpus) ctrl+alt+s 5686",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+'",
-    "command": "(corpus) ctrl+shift+alt+' 3143",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+,",
-    "command": "(corpus) ctrl+shift+alt+, 126a",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+-",
-    "command": "(corpus) ctrl+shift+alt+- 423d",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+.",
-    "command": "(corpus) ctrl+shift+alt+. 2bc6",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+;",
-    "command": "(corpus) ctrl+shift+alt+; 51fe",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+=",
-    "command": "(corpus) ctrl+shift+alt+= 2f5e",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (fold) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+[",
-    "command": "(corpus) ctrl+shift+alt+[ e957",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+\\",
-    "command": "(corpus) ctrl+shift+alt+\\ 9408",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (fold) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+]",
-    "command": "(corpus) ctrl+shift+alt+] 21c4",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+_",
-    "command": "(corpus) ctrl+shift+alt+_ d417",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+a",
-    "command": "(corpus) ctrl+shift+alt+a fee3",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+) (action) (chord)
-    "key": "ctrl+shift+alt+a",
-    "command": "(corpus) ctrl+shift+alt+a 3e7c",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (kbm) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+a",
-    "command": "(corpus) ctrl+shift+alt+a 56fa",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (change) (!) (yellow) (+) (action) (chord)
-    "key": "ctrl+shift+alt+a",
-    "command": "(corpus) ctrl+shift+alt+a 0481",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (change) (!) (yellow) (+) (action) (chord)
-    "key": "ctrl+shift+alt+a",
-    "command": "(corpus) ctrl+shift+alt+a ed72",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+b",
-    "command": "(corpus) ctrl+shift+alt+b 0314",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (emacs) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+b",
-    "command": "(corpus) ctrl+shift+alt+b 3bc2",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+d",
-    "command": "(corpus) ctrl+shift+alt+d b459",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+) (debug) (chord)
-    "key": "ctrl+shift+alt+d",
-    "command": "(corpus) ctrl+shift+alt+d 14d7",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (kbm) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+d",
-    "command": "(corpus) ctrl+shift+alt+d a7a0",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (change) (!) (yellow) (+) (debug) (chord)
-    "key": "ctrl+shift+alt+d",
-    "command": "(corpus) ctrl+shift+alt+d 2f2a",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (change) (!) (yellow) (+) (debug) (chord)
-    "key": "ctrl+shift+alt+d",
-    "command": "(corpus) ctrl+shift+alt+d 3df1",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (down) (arrow) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+down",
-    "command": "(corpus) ctrl+shift+alt+down 5b42",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (juke) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+end",
-    "command": "(corpus) ctrl+shift+alt+end 7549",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+f",
-    "command": "(corpus) ctrl+shift+alt+f 2285",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (emacs) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+f",
-    "command": "(corpus) ctrl+shift+alt+f e693",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+h",
-    "command": "(corpus) ctrl+shift+alt+h 4dbf",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (vi) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+h",
-    "command": "(corpus) ctrl+shift+alt+h 04f4",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (juke) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+home",
-    "command": "(corpus) ctrl+shift+alt+home 993e",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+j",
-    "command": "(corpus) ctrl+shift+alt+j f049",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (vi) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+j",
-    "command": "(corpus) ctrl+shift+alt+j aae9",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (change) (!) (yellow) (+) (debug) (chord)
-    "key": "ctrl+shift+alt+j",
-    "command": "(corpus) ctrl+shift+alt+j ea2e",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+k",
-    "command": "(corpus) ctrl+shift+alt+k d5d1",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (vi) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+k",
-    "command": "(corpus) ctrl+shift+alt+k 269a",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+l",
-    "command": "(corpus) ctrl+shift+alt+l ce48",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (vi) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+l",
-    "command": "(corpus) ctrl+shift+alt+l 59fa",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (change) (!) (yellow) (+) (action) (chord)
-    "key": "ctrl+shift+alt+l",
-    "command": "(corpus) ctrl+shift+alt+l 0eed",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (left) (arrow) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+left",
-    "command": "(corpus) ctrl+shift+alt+left 55bc",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split)
-    "key": "ctrl+shift+alt+meta++",
-    "command": "(corpus) ctrl+shift+alt+meta++ 4c8c",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+n",
-    "command": "(corpus) ctrl+shift+alt+n 58d7",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (emacs) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+n",
-    "command": "(corpus) ctrl+shift+alt+n eecb",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+p",
-    "command": "(corpus) ctrl+shift+alt+p a88f",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (emacs) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+p",
-    "command": "(corpus) ctrl+shift+alt+p 5212",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (juke) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+pagedown",
-    "command": "(corpus) ctrl+shift+alt+pagedown b393",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (juke) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+pageup",
-    "command": "(corpus) ctrl+shift+alt+pageup 49c5",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (arrow) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+right",
-    "command": "(corpus) ctrl+shift+alt+right ed53",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+s",
-    "command": "(corpus) ctrl+shift+alt+s 483b",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (kbm) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+s",
-    "command": "(corpus) ctrl+shift+alt+s 201e",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (up) (arrow) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+up",
-    "command": "(corpus) ctrl+shift+alt+up 6c02",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+w",
-    "command": "(corpus) ctrl+shift+alt+w 59fb",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (kbm) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+w",
-    "command": "(corpus) ctrl+shift+alt+w a6b6",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt+x",
-    "command": "(corpus) ctrl+shift+alt+x 879a",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (change) (!) (yellow) (+) (extension) (chord)
-    "key": "ctrl+shift+alt+x",
-    "command": "(corpus) ctrl+shift+alt+x 8d92",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (emacs) (change) (!) (yellow) (+) (extension) (chord)
-    "key": "ctrl+shift+alt+x",
-    "command": "(corpus) ctrl+shift+alt+x 12e9",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (change) (!) (yellow) (+) (extension) (chord)
-    "key": "ctrl+shift+alt+x",
-    "command": "(corpus) ctrl+shift+alt+x 8cc5",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (vi) (change) (!) (yellow) (+) (extension) (chord)
-    "key": "ctrl+shift+alt+x",
-    "command": "(corpus) ctrl+shift+alt+x cbfc",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (up) (arrow) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+up",
-    "command": "(corpus) ctrl+alt+up 83e0",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+w",
-    "command": "(corpus) ctrl+alt+w f910",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (kbm) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+w",
-    "command": "(corpus) ctrl+alt+w c9d6",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B)
-    "key": "ctrl+alt+x",
-    "command": "(corpus) ctrl+alt+x bd54",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (jump) (2) (blue) (B) (extension) (chord)
-    "key": "ctrl+alt+x",
-    "command": "(corpus) ctrl+alt+x 07cf",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (emacs) (jump) (2) (blue) (B) (extension) (chord)
-    "key": "ctrl+alt+x",
-    "command": "(corpus) ctrl+alt+x 7694",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (jump) (2) (blue) (B) (extension) (chord)
-    "key": "ctrl+alt+x",
-    "command": "(corpus) ctrl+alt+x 0ce9",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (vi) (jump) (2) (blue) (B) (extension) (chord)
-    "key": "ctrl+alt+x",
-    "command": "(corpus) ctrl+alt+x 636e",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
     // [keynav] (corpus) (0) (self) (gold) (X)
     "key": "alt+d",
     "command": "(corpus) alt+d 42c7",
     "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (0) (self) (gold) (X) (debug) (chord)
-    "key": "alt+d",
-    "command": "(corpus) alt+d 81b5",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (kbm) (0) (self) (gold) (X)
-    "key": "alt+d",
-    "command": "(corpus) alt+d 84d4",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (0) (self) (gold) (X) (debug) (chord)
-    "key": "alt+d",
-    "command": "(corpus) alt+d 3379",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (0) (self) (gold) (X) (debug) (chord)
-    "key": "alt+d",
-    "command": "(corpus) alt+d ef1f",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (down) (arrow) (0) (self) (gold) (X)
-    "key": "alt+down",
-    "command": "(corpus) alt+down 33e2",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
   },
   {
     // [keynav] (corpus) (juke) (0) (self) (gold) (X)
@@ -1488,22 +96,10 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus) (right) (emacs) (0) (self) (gold) (X)
-    "key": "alt+f",
-    "command": "(corpus) alt+f 58a2",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
     // [keynav] (corpus) (0) (self) (gold) (X)
     "key": "alt+h",
     "command": "(corpus) alt+h baba",
     "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (vi) (0) (self) (gold) (X)
-    "key": "alt+h",
-    "command": "(corpus) alt+h 9fa2",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
   },
   {
     // [keynav] (corpus) (juke) (0) (self) (gold) (X)
@@ -1518,28 +114,10 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus) (down) (vi) (0) (self) (gold) (X)
-    "key": "alt+j",
-    "command": "(corpus) alt+j ccb3",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (0) (self) (gold) (X) (debug) (chord)
-    "key": "alt+j",
-    "command": "(corpus) alt+j 7c12",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
     // [keynav] (corpus) (0) (self) (gold) (X)
     "key": "alt+k",
     "command": "(corpus) alt+k a12b",
     "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (vi) (0) (self) (gold) (X)
-    "key": "alt+k",
-    "command": "(corpus) alt+k 1057",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
   },
   {
     // [keynav] (corpus) (0) (self) (gold) (X)
@@ -1548,376 +126,16 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus) (right) (vi) (0) (self) (gold) (X)
-    "key": "alt+l",
-    "command": "(corpus) alt+l f2e4",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+l",
-    "command": "(corpus) alt+l 97f5",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (left) (arrow) (0) (self) (gold) (X)
-    "key": "alt+left",
-    "command": "(corpus) alt+left f83f",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (right) (juke)
-    "key": "shift+alt+meta+'",
-    "command": "(corpus) shift+alt+meta+' a172",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke)
-    "key": "shift+alt+meta+,",
-    "command": "(corpus) shift+alt+meta+, d987",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split)
-    "key": "shift+alt+meta+-",
-    "command": "(corpus) shift+alt+meta+- 50bc",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke)
-    "key": "shift+alt+meta+.",
-    "command": "(corpus) shift+alt+meta+. c27b",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke)
-    "key": "shift+alt+meta+;",
-    "command": "(corpus) shift+alt+meta+; 8a3b",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split)
-    "key": "shift+alt+meta+=",
-    "command": "(corpus) shift+alt+meta+= edc3",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (fold)
-    "key": "shift+alt+meta+[",
-    "command": "(corpus) shift+alt+meta+[ 37fd",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split)
-    "key": "shift+alt+meta+\\",
-    "command": "(corpus) shift+alt+meta+\\ 7533",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (fold)
-    "key": "shift+alt+meta+]",
-    "command": "(corpus) shift+alt+meta+] dbc4",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split)
-    "key": "shift+alt+meta+_",
-    "command": "(corpus) shift+alt+meta+_ 0584",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "shift+alt+meta+a",
-    "command": "(corpus) shift+alt+meta+a 29b9",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (action) (chord)
-    "key": "shift+alt+meta+a",
-    "command": "(corpus) shift+alt+meta+a d85f",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (kbm)
-    "key": "shift+alt+meta+a",
-    "command": "(corpus) shift+alt+meta+a a52c",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (action) (chord)
-    "key": "shift+alt+meta+a",
-    "command": "(corpus) shift+alt+meta+a cc97",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (action) (chord)
-    "key": "shift+alt+meta+a",
-    "command": "(corpus) shift+alt+meta+a 99a4",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "shift+alt+meta+b",
-    "command": "(corpus) shift+alt+meta+b 23e1",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (emacs)
-    "key": "shift+alt+meta+b",
-    "command": "(corpus) shift+alt+meta+b 478a",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "shift+alt+meta+d",
-    "command": "(corpus) shift+alt+meta+d 7f1d",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (debug) (chord)
-    "key": "shift+alt+meta+d",
-    "command": "(corpus) shift+alt+meta+d 324d",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (kbm)
-    "key": "shift+alt+meta+d",
-    "command": "(corpus) shift+alt+meta+d 47a4",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (debug) (chord)
-    "key": "shift+alt+meta+d",
-    "command": "(corpus) shift+alt+meta+d 412a",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (debug) (chord)
-    "key": "shift+alt+meta+d",
-    "command": "(corpus) shift+alt+meta+d ca36",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (down) (arrow)
-    "key": "shift+alt+meta+down",
-    "command": "(corpus) shift+alt+meta+down d6c8",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (juke)
-    "key": "shift+alt+meta+end",
-    "command": "(corpus) shift+alt+meta+end 17b1",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "shift+alt+meta+f",
-    "command": "(corpus) shift+alt+meta+f 7af7",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (emacs)
-    "key": "shift+alt+meta+f",
-    "command": "(corpus) shift+alt+meta+f 33c6",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "shift+alt+meta+h",
-    "command": "(corpus) shift+alt+meta+h f9a2",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (vi)
-    "key": "shift+alt+meta+h",
-    "command": "(corpus) shift+alt+meta+h eeed",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (juke)
-    "key": "shift+alt+meta+home",
-    "command": "(corpus) shift+alt+meta+home 2696",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "shift+alt+meta+j",
-    "command": "(corpus) shift+alt+meta+j 106d",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (vi)
-    "key": "shift+alt+meta+j",
-    "command": "(corpus) shift+alt+meta+j 39af",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (debug) (chord)
-    "key": "shift+alt+meta+j",
-    "command": "(corpus) shift+alt+meta+j e5b1",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "shift+alt+meta+k",
-    "command": "(corpus) shift+alt+meta+k d72c",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (vi)
-    "key": "shift+alt+meta+k",
-    "command": "(corpus) shift+alt+meta+k ef81",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "shift+alt+meta+l",
-    "command": "(corpus) shift+alt+meta+l 7373",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (vi)
-    "key": "shift+alt+meta+l",
-    "command": "(corpus) shift+alt+meta+l b218",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (action) (chord)
-    "key": "shift+alt+meta+l",
-    "command": "(corpus) shift+alt+meta+l 80bd",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (left) (arrow)
-    "key": "shift+alt+meta+left",
-    "command": "(corpus) shift+alt+meta+left 07cc",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "shift+alt+meta+n",
-    "command": "(corpus) shift+alt+meta+n ce2a",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (emacs)
-    "key": "shift+alt+meta+n",
-    "command": "(corpus) shift+alt+meta+n 956d",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "shift+alt+meta+p",
-    "command": "(corpus) shift+alt+meta+p 59d2",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (emacs)
-    "key": "shift+alt+meta+p",
-    "command": "(corpus) shift+alt+meta+p 77a6",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (juke)
-    "key": "shift+alt+meta+pagedown",
-    "command": "(corpus) shift+alt+meta+pagedown a644",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (juke)
-    "key": "shift+alt+meta+pageup",
-    "command": "(corpus) shift+alt+meta+pageup bb2a",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (arrow)
-    "key": "shift+alt+meta+right",
-    "command": "(corpus) shift+alt+meta+right f836",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "shift+alt+meta+s",
-    "command": "(corpus) shift+alt+meta+s 5479",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (kbm)
-    "key": "shift+alt+meta+s",
-    "command": "(corpus) shift+alt+meta+s 70bd",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (up) (arrow)
-    "key": "shift+alt+meta+up",
-    "command": "(corpus) shift+alt+meta+up 795b",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "shift+alt+meta+w",
-    "command": "(corpus) shift+alt+meta+w 35e4",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (kbm)
-    "key": "shift+alt+meta+w",
-    "command": "(corpus) shift+alt+meta+w 8e73",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "shift+alt+meta+x",
-    "command": "(corpus) shift+alt+meta+x 553a",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (extension) (chord)
-    "key": "shift+alt+meta+x",
-    "command": "(corpus) shift+alt+meta+x 5816",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (emacs) (extension) (chord)
-    "key": "shift+alt+meta+x",
-    "command": "(corpus) shift+alt+meta+x d57e",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (extension) (chord)
-    "key": "shift+alt+meta+x",
-    "command": "(corpus) shift+alt+meta+x 8f25",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (vi) (extension) (chord)
-    "key": "shift+alt+meta+x",
-    "command": "(corpus) shift+alt+meta+x eb6e",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
     // [keynav] (corpus) (0) (self) (gold) (X)
     "key": "alt+n",
     "command": "(corpus) alt+n 07d4",
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus) (down) (emacs) (0) (self) (gold) (X)
-    "key": "alt+n",
-    "command": "(corpus) alt+n b577",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
     // [keynav] (corpus) (0) (self) (gold) (X)
     "key": "alt+p",
     "command": "(corpus) alt+p ffa2",
     "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (emacs) (0) (self) (gold) (X)
-    "key": "alt+p",
-    "command": "(corpus) alt+p 21af",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
   },
   {
     // [keynav] (corpus) (juke) (0) (self) (gold) (X)
@@ -1932,364 +150,10 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus) (right) (arrow) (0) (self) (gold) (X)
-    "key": "alt+right",
-    "command": "(corpus) alt+right 66ce",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
     // [keynav] (corpus) (0) (self) (gold) (X)
     "key": "alt+s",
     "command": "(corpus) alt+s fcca",
     "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (kbm) (0) (self) (gold) (X)
-    "key": "alt+s",
-    "command": "(corpus) alt+s d197",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (move) (1) (red) (A)
-    "key": "shift+alt+'",
-    "command": "(corpus) shift+alt+' 54bf",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (move) (1) (red) (A)
-    "key": "shift+alt+,",
-    "command": "(corpus) shift+alt+, bcea",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split) (move) (1) (red) (A)
-    "key": "shift+alt+-",
-    "command": "(corpus) shift+alt+- aa9b",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (move) (1) (red) (A)
-    "key": "shift+alt+.",
-    "command": "(corpus) shift+alt+. 623b",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (move) (1) (red) (A)
-    "key": "shift+alt+;",
-    "command": "(corpus) shift+alt+; ab95",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split) (move) (1) (red) (A)
-    "key": "shift+alt+=",
-    "command": "(corpus) shift+alt+= c51e",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (fold) (move) (1) (red) (A)
-    "key": "shift+alt+[",
-    "command": "(corpus) shift+alt+[ b288",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split) (move) (1) (red) (A)
-    "key": "shift+alt+\\",
-    "command": "(corpus) shift+alt+\\ 919e",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (fold) (move) (1) (red) (A)
-    "key": "shift+alt+]",
-    "command": "(corpus) shift+alt+] 7f47",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split) (move) (1) (red) (A)
-    "key": "shift+alt+_",
-    "command": "(corpus) shift+alt+_ 4ce4",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A)
-    "key": "shift+alt+a",
-    "command": "(corpus) shift+alt+a bed2",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A) (action) (chord)
-    "key": "shift+alt+a",
-    "command": "(corpus) shift+alt+a afa5",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (kbm) (move) (1) (red) (A)
-    "key": "shift+alt+a",
-    "command": "(corpus) shift+alt+a 89fc",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (move) (1) (red) (A) (action) (chord)
-    "key": "shift+alt+a",
-    "command": "(corpus) shift+alt+a d576",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (move) (1) (red) (A) (action) (chord)
-    "key": "shift+alt+a",
-    "command": "(corpus) shift+alt+a 6dec",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A)
-    "key": "shift+alt+b",
-    "command": "(corpus) shift+alt+b fc3f",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (emacs) (move) (1) (red) (A)
-    "key": "shift+alt+b",
-    "command": "(corpus) shift+alt+b ab15",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A)
-    "key": "shift+alt+d",
-    "command": "(corpus) shift+alt+d d20d",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A) (debug) (chord)
-    "key": "shift+alt+d",
-    "command": "(corpus) shift+alt+d 0f75",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (kbm) (move) (1) (red) (A)
-    "key": "shift+alt+d",
-    "command": "(corpus) shift+alt+d 42e6",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (move) (1) (red) (A) (debug) (chord)
-    "key": "shift+alt+d",
-    "command": "(corpus) shift+alt+d 391a",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (move) (1) (red) (A) (debug) (chord)
-    "key": "shift+alt+d",
-    "command": "(corpus) shift+alt+d 7eda",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (down) (arrow) (move) (1) (red) (A)
-    "key": "shift+alt+down",
-    "command": "(corpus) shift+alt+down 7216",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (juke) (move) (1) (red) (A)
-    "key": "shift+alt+end",
-    "command": "(corpus) shift+alt+end dffd",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A)
-    "key": "shift+alt+f",
-    "command": "(corpus) shift+alt+f eec3",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (emacs) (move) (1) (red) (A)
-    "key": "shift+alt+f",
-    "command": "(corpus) shift+alt+f 7151",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A)
-    "key": "shift+alt+h",
-    "command": "(corpus) shift+alt+h e3e4",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (vi) (move) (1) (red) (A)
-    "key": "shift+alt+h",
-    "command": "(corpus) shift+alt+h d2a3",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (juke) (move) (1) (red) (A)
-    "key": "shift+alt+home",
-    "command": "(corpus) shift+alt+home 363f",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A)
-    "key": "shift+alt+j",
-    "command": "(corpus) shift+alt+j 8127",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (vi) (move) (1) (red) (A)
-    "key": "shift+alt+j",
-    "command": "(corpus) shift+alt+j 87ba",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (move) (1) (red) (A) (debug) (chord)
-    "key": "shift+alt+j",
-    "command": "(corpus) shift+alt+j 4f64",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A)
-    "key": "shift+alt+k",
-    "command": "(corpus) shift+alt+k 20fb",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (vi) (move) (1) (red) (A)
-    "key": "shift+alt+k",
-    "command": "(corpus) shift+alt+k da58",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A)
-    "key": "shift+alt+l",
-    "command": "(corpus) shift+alt+l 2792",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (vi) (move) (1) (red) (A)
-    "key": "shift+alt+l",
-    "command": "(corpus) shift+alt+l e446",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (move) (1) (red) (A) (action) (chord)
-    "key": "shift+alt+l",
-    "command": "(corpus) shift+alt+l 63d1",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (left) (arrow) (move) (1) (red) (A)
-    "key": "shift+alt+left",
-    "command": "(corpus) shift+alt+left 5d01",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split)
-    "key": "shift+alt+meta++",
-    "command": "(corpus) shift+alt+meta++ d18e",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A)
-    "key": "shift+alt+n",
-    "command": "(corpus) shift+alt+n e3c2",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (emacs) (move) (1) (red) (A)
-    "key": "shift+alt+n",
-    "command": "(corpus) shift+alt+n f471",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A)
-    "key": "shift+alt+p",
-    "command": "(corpus) shift+alt+p 7625",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (emacs) (move) (1) (red) (A)
-    "key": "shift+alt+p",
-    "command": "(corpus) shift+alt+p 28b7",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (juke) (move) (1) (red) (A)
-    "key": "shift+alt+pagedown",
-    "command": "(corpus) shift+alt+pagedown 4d15",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (juke) (move) (1) (red) (A)
-    "key": "shift+alt+pageup",
-    "command": "(corpus) shift+alt+pageup f044",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (arrow) (move) (1) (red) (A)
-    "key": "shift+alt+right",
-    "command": "(corpus) shift+alt+right 442f",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A)
-    "key": "shift+alt+s",
-    "command": "(corpus) shift+alt+s 2179",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (kbm) (move) (1) (red) (A)
-    "key": "shift+alt+s",
-    "command": "(corpus) shift+alt+s 7fdf",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (up) (arrow) (move) (1) (red) (A)
-    "key": "shift+alt+up",
-    "command": "(corpus) shift+alt+up a6ad",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A)
-    "key": "shift+alt+w",
-    "command": "(corpus) shift+alt+w 325c",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (kbm) (move) (1) (red) (A)
-    "key": "shift+alt+w",
-    "command": "(corpus) shift+alt+w ea18",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A)
-    "key": "shift+alt+x",
-    "command": "(corpus) shift+alt+x 9c04",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (move) (1) (red) (A) (extension) (chord)
-    "key": "shift+alt+x",
-    "command": "(corpus) shift+alt+x f0a1",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (emacs) (move) (1) (red) (A) (extension) (chord)
-    "key": "shift+alt+x",
-    "command": "(corpus) shift+alt+x a523",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (move) (1) (red) (A) (extension) (chord)
-    "key": "shift+alt+x",
-    "command": "(corpus) shift+alt+x 32c4",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (vi) (move) (1) (red) (A) (extension) (chord)
-    "key": "shift+alt+x",
-    "command": "(corpus) shift+alt+x 9cd2",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (up) (arrow) (0) (self) (gold) (X)
-    "key": "alt+up",
-    "command": "(corpus) alt+up e294",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
   },
   {
     // [keynav] (corpus) (0) (self) (gold) (X)
@@ -2298,388 +162,10 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus) (up) (kbm) (0) (self) (gold) (X)
-    "key": "alt+w",
-    "command": "(corpus) alt+w 22be",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
     // [keynav] (corpus) (0) (self) (gold) (X)
     "key": "alt+x",
     "command": "(corpus) alt+x d0ff",
     "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (0) (self) (gold) (X) (extension) (chord)
-    "key": "alt+x",
-    "command": "(corpus) alt+x a722",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (emacs) (0) (self) (gold) (X) (extension) (chord)
-    "key": "alt+x",
-    "command": "(corpus) alt+x ad46",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (0) (self) (gold) (X) (extension) (chord)
-    "key": "alt+x",
-    "command": "(corpus) alt+x 1e8b",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (vi) (0) (self) (gold) (X) (extension) (chord)
-    "key": "alt+x",
-    "command": "(corpus) alt+x 1f03",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (right) (juke)
-    "key": "ctrl+'",
-    "command": "(corpus) ctrl+' aeea",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split)
-    "key": "ctrl++",
-    "command": "(corpus) ctrl++ 2d9f",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke)
-    "key": "ctrl+,",
-    "command": "(corpus) ctrl+, 0db5",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split)
-    "key": "ctrl+-",
-    "command": "(corpus) ctrl+- 9e27",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke)
-    "key": "ctrl+.",
-    "command": "(corpus) ctrl+. 8b32",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke)
-    "key": "ctrl+;",
-    "command": "(corpus) ctrl+; 8cb5",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split)
-    "key": "ctrl+=",
-    "command": "(corpus) ctrl+= a4e2",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (juke) (fold)
-    "key": "ctrl+[",
-    "command": "(corpus) ctrl+[ c70b",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split)
-    "key": "ctrl+\\",
-    "command": "(corpus) ctrl+\\ 97ac",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (juke) (fold)
-    "key": "ctrl+]",
-    "command": "(corpus) ctrl+] afde",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (horizontal) (split)
-    "key": "ctrl+_",
-    "command": "(corpus) ctrl+_ 53a2",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+a",
-    "command": "(corpus) ctrl+a 0358",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (action) (chord)
-    "key": "ctrl+a",
-    "command": "(corpus) ctrl+a 5901",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (kbm)
-    "key": "ctrl+a",
-    "command": "(corpus) ctrl+a 7113",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (action) (chord)
-    "key": "ctrl+a",
-    "command": "(corpus) ctrl+a c2a6",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (action) (chord)
-    "key": "ctrl+a",
-    "command": "(corpus) ctrl+a 54bd",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split) (jump) (2) (blue) (B)
-    "key": "ctrl+alt++",
-    "command": "(corpus) ctrl+alt++ dd73",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+b",
-    "command": "(corpus) ctrl+b 11e0",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (emacs)
-    "key": "ctrl+b",
-    "command": "(corpus) ctrl+b fb09",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+d",
-    "command": "(corpus) ctrl+d 92f0",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (debug) (chord)
-    "key": "ctrl+d",
-    "command": "(corpus) ctrl+d 5350",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (kbm)
-    "key": "ctrl+d",
-    "command": "(corpus) ctrl+d 9732",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (emacs) (debug) (chord)
-    "key": "ctrl+d",
-    "command": "(corpus) ctrl+d d154",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (vi) (debug) (chord)
-    "key": "ctrl+d",
-    "command": "(corpus) ctrl+d 8975",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (down) (arrow)
-    "key": "ctrl+down",
-    "command": "(corpus) ctrl+down 3a76",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus) (juke)
-    "key": "ctrl+end",
-    "command": "(corpus) ctrl+end f278",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+f",
-    "command": "(corpus) ctrl+f 7a46",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (emacs)
-    "key": "ctrl+f",
-    "command": "(corpus) ctrl+f 0062",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+h",
-    "command": "(corpus) ctrl+h 0a68",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (left) (vi)
-    "key": "ctrl+h",
-    "command": "(corpus) ctrl+h 96e5",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (juke)
-    "key": "ctrl+home",
-    "command": "(corpus) ctrl+home 6ac5",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+j",
-    "command": "(corpus) ctrl+j a16b",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (vi)
-    "key": "ctrl+j",
-    "command": "(corpus) ctrl+j 1b8f",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (debug) (chord)
-    "key": "ctrl+j",
-    "command": "(corpus) ctrl+j a126",
-    "when": "config.keyboardNavigation.chords.debug && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+k",
-    "command": "(corpus) ctrl+k 4510",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (vi)
-    "key": "ctrl+k",
-    "command": "(corpus) ctrl+k 5580",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+l",
-    "command": "(corpus) ctrl+l 6256",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (vi)
-    "key": "ctrl+l",
-    "command": "(corpus) ctrl+l c631",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (action) (chord)
-    "key": "ctrl+l",
-    "command": "(corpus) ctrl+l dd4a",
-    "when": "config.keyboardNavigation.chords.action && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (left) (arrow)
-    "key": "ctrl+left",
-    "command": "(corpus) ctrl+left 5cb1",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+n",
-    "command": "(corpus) ctrl+n 98ae",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (emacs)
-    "key": "ctrl+n",
-    "command": "(corpus) ctrl+n da0a",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+p",
-    "command": "(corpus) ctrl+p 3f5a",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (emacs)
-    "key": "ctrl+p",
-    "command": "(corpus) ctrl+p 02a0",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (juke)
-    "key": "ctrl+pagedown",
-    "command": "(corpus) ctrl+pagedown c2a0",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (juke)
-    "key": "ctrl+pageup",
-    "command": "(corpus) ctrl+pageup 9602",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (right) (arrow)
-    "key": "ctrl+right",
-    "command": "(corpus) ctrl+right 4ee0",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+s",
-    "command": "(corpus) ctrl+s cd2c",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (down) (kbm)
-    "key": "ctrl+s",
-    "command": "(corpus) ctrl+s bfb3",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (vertical) (split) (change) (!) (yellow) (+)
-    "key": "ctrl+shift+alt++",
-    "command": "(corpus) ctrl+shift+alt++ c368",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (arrow)
-    "key": "ctrl+up",
-    "command": "(corpus) ctrl+up ebd7",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+w",
-    "command": "(corpus) ctrl+w f1a4",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (up) (kbm)
-    "key": "ctrl+w",
-    "command": "(corpus) ctrl+w 4285",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus)
-    "key": "ctrl+x",
-    "command": "(corpus) ctrl+x 251e",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (extension) (chord)
-    "key": "ctrl+x",
-    "command": "(corpus) ctrl+x c9a6",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (emacs) (extension) (chord)
-    "key": "ctrl+x",
-    "command": "(corpus) ctrl+x c574",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
-  },
-  {
-    // [keynav] (corpus) (kbm) (extension) (chord)
-    "key": "ctrl+x",
-    "command": "(corpus) ctrl+x 8ad1",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
-  },
-  {
-    // [keynav] (corpus) (vi) (extension) (chord)
-    "key": "ctrl+x",
-    "command": "(corpus) ctrl+x 83a9",
-    "when": "config.keyboardNavigation.chords.extension && config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
   },
   {
     // [keynav] (corpus) (left) (juke) (0) (self) (gold) (X)
@@ -2826,9 +312,2523 @@
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    // [keynav] (corpus) (right) (juke)
+    "key": "ctrl+'",
+    "command": "(corpus) ctrl+' aeea",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split)
+    "key": "ctrl++",
+    "command": "(corpus) ctrl++ 2d9f",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke)
+    "key": "ctrl+,",
+    "command": "(corpus) ctrl+, 0db5",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split)
+    "key": "ctrl+-",
+    "command": "(corpus) ctrl+- 9e27",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke)
+    "key": "ctrl+.",
+    "command": "(corpus) ctrl+. 8b32",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke)
+    "key": "ctrl+;",
+    "command": "(corpus) ctrl+; 8cb5",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split)
+    "key": "ctrl+=",
+    "command": "(corpus) ctrl+= a4e2",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (fold)
+    "key": "ctrl+[",
+    "command": "(corpus) ctrl+[ c70b",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split)
+    "key": "ctrl+\\",
+    "command": "(corpus) ctrl+\\ 97ac",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (fold)
+    "key": "ctrl+]",
+    "command": "(corpus) ctrl+] afde",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split)
+    "key": "ctrl+_",
+    "command": "(corpus) ctrl+_ 53a2",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+a",
+    "command": "(corpus) ctrl+a 0358",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+'",
+    "command": "(corpus) ctrl+alt+' ae52",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split) (jump) (2) (blue) (B)
+    "key": "ctrl+alt++",
+    "command": "(corpus) ctrl+alt++ dd73",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+,",
+    "command": "(corpus) ctrl+alt+, 9ded",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+-",
+    "command": "(corpus) ctrl+alt+- 11de",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+.",
+    "command": "(corpus) ctrl+alt+. d36f",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+;",
+    "command": "(corpus) ctrl+alt+; 65ef",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+=",
+    "command": "(corpus) ctrl+alt+= 47e2",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (fold) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+[",
+    "command": "(corpus) ctrl+alt+[ 6e54",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+\\",
+    "command": "(corpus) ctrl+alt+\\ 9a59",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (fold) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+]",
+    "command": "(corpus) ctrl+alt+] 4f7b",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+_",
+    "command": "(corpus) ctrl+alt+_ 51bf",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+a",
+    "command": "(corpus) ctrl+alt+a 9dfc",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+b",
+    "command": "(corpus) ctrl+alt+b c913",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+d",
+    "command": "(corpus) ctrl+alt+d f1da",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+end",
+    "command": "(corpus) ctrl+alt+end 8a90",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+f",
+    "command": "(corpus) ctrl+alt+f 9ad3",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+h",
+    "command": "(corpus) ctrl+alt+h c008",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+home",
+    "command": "(corpus) ctrl+alt+home 79e0",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+j",
+    "command": "(corpus) ctrl+alt+j a187",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+k",
+    "command": "(corpus) ctrl+alt+k 0d83",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+l",
+    "command": "(corpus) ctrl+alt+l 240e",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+'",
+    "command": "(corpus) ctrl+alt+meta+' 522b",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta++",
+    "command": "(corpus) ctrl+alt+meta++ 3346",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+,",
+    "command": "(corpus) ctrl+alt+meta+, 87d4",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+-",
+    "command": "(corpus) ctrl+alt+meta+- dea2",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+.",
+    "command": "(corpus) ctrl+alt+meta+. 2bd0",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+;",
+    "command": "(corpus) ctrl+alt+meta+; 2eb7",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+=",
+    "command": "(corpus) ctrl+alt+meta+= c1e2",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (fold) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+[",
+    "command": "(corpus) ctrl+alt+meta+[ 96c8",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+\\",
+    "command": "(corpus) ctrl+alt+meta+\\ 40d3",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (fold) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+]",
+    "command": "(corpus) ctrl+alt+meta+] 6b8d",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+_",
+    "command": "(corpus) ctrl+alt+meta+_ bee1",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+a",
+    "command": "(corpus) ctrl+alt+meta+a 6adb",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+b",
+    "command": "(corpus) ctrl+alt+meta+b 3929",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+d",
+    "command": "(corpus) ctrl+alt+meta+d acab",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+end",
+    "command": "(corpus) ctrl+alt+meta+end 7586",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+f",
+    "command": "(corpus) ctrl+alt+meta+f 9e5d",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+h",
+    "command": "(corpus) ctrl+alt+meta+h 99d2",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+home",
+    "command": "(corpus) ctrl+alt+meta+home 704d",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+j",
+    "command": "(corpus) ctrl+alt+meta+j 6691",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+k",
+    "command": "(corpus) ctrl+alt+meta+k 9af9",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+l",
+    "command": "(corpus) ctrl+alt+meta+l 34ff",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+n",
+    "command": "(corpus) ctrl+alt+meta+n 87f8",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+p",
+    "command": "(corpus) ctrl+alt+meta+p 5226",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+pagedown",
+    "command": "(corpus) ctrl+alt+meta+pagedown 5cc0",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+pageup",
+    "command": "(corpus) ctrl+alt+meta+pageup 3593",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+s",
+    "command": "(corpus) ctrl+alt+meta+s 4c4a",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+w",
+    "command": "(corpus) ctrl+alt+meta+w 1a9b",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+x",
+    "command": "(corpus) ctrl+alt+meta+x 86aa",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+n",
+    "command": "(corpus) ctrl+alt+n 488b",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+p",
+    "command": "(corpus) ctrl+alt+p 456b",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+pagedown",
+    "command": "(corpus) ctrl+alt+pagedown 6f14",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+pageup",
+    "command": "(corpus) ctrl+alt+pageup f188",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+s",
+    "command": "(corpus) ctrl+alt+s b41d",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+w",
+    "command": "(corpus) ctrl+alt+w f910",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+x",
+    "command": "(corpus) ctrl+alt+x bd54",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+b",
+    "command": "(corpus) ctrl+b 11e0",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+d",
+    "command": "(corpus) ctrl+d 92f0",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke)
+    "key": "ctrl+end",
+    "command": "(corpus) ctrl+end f278",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+f",
+    "command": "(corpus) ctrl+f 7a46",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+h",
+    "command": "(corpus) ctrl+h 0a68",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke)
+    "key": "ctrl+home",
+    "command": "(corpus) ctrl+home 6ac5",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+j",
+    "command": "(corpus) ctrl+j a16b",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+k",
+    "command": "(corpus) ctrl+k 4510",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+l",
+    "command": "(corpus) ctrl+l 6256",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+n",
+    "command": "(corpus) ctrl+n 98ae",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+p",
+    "command": "(corpus) ctrl+p 3f5a",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke)
+    "key": "ctrl+pagedown",
+    "command": "(corpus) ctrl+pagedown c2a0",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke)
+    "key": "ctrl+pageup",
+    "command": "(corpus) ctrl+pageup 9602",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+s",
+    "command": "(corpus) ctrl+s cd2c",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+'",
+    "command": "(corpus) ctrl+shift+alt+' 3143",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt++",
+    "command": "(corpus) ctrl+shift+alt++ c368",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+,",
+    "command": "(corpus) ctrl+shift+alt+, 126a",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+-",
+    "command": "(corpus) ctrl+shift+alt+- 423d",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+.",
+    "command": "(corpus) ctrl+shift+alt+. 2bc6",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+;",
+    "command": "(corpus) ctrl+shift+alt+; 51fe",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+=",
+    "command": "(corpus) ctrl+shift+alt+= 2f5e",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (fold) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+[",
+    "command": "(corpus) ctrl+shift+alt+[ e957",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+\\",
+    "command": "(corpus) ctrl+shift+alt+\\ 9408",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (fold) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+]",
+    "command": "(corpus) ctrl+shift+alt+] 21c4",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+_",
+    "command": "(corpus) ctrl+shift+alt+_ d417",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+a",
+    "command": "(corpus) ctrl+shift+alt+a fee3",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+b",
+    "command": "(corpus) ctrl+shift+alt+b 0314",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+d",
+    "command": "(corpus) ctrl+shift+alt+d b459",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+end",
+    "command": "(corpus) ctrl+shift+alt+end 7549",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+f",
+    "command": "(corpus) ctrl+shift+alt+f 2285",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+h",
+    "command": "(corpus) ctrl+shift+alt+h 4dbf",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+home",
+    "command": "(corpus) ctrl+shift+alt+home 993e",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+j",
+    "command": "(corpus) ctrl+shift+alt+j f049",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+k",
+    "command": "(corpus) ctrl+shift+alt+k d5d1",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+l",
+    "command": "(corpus) ctrl+shift+alt+l ce48",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke)
+    "key": "ctrl+shift+alt+meta+'",
+    "command": "(corpus) ctrl+shift+alt+meta+' ef04",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split)
+    "key": "ctrl+shift+alt+meta++",
+    "command": "(corpus) ctrl+shift+alt+meta++ 4c8c",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke)
+    "key": "ctrl+shift+alt+meta+,",
+    "command": "(corpus) ctrl+shift+alt+meta+, 919d",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split)
+    "key": "ctrl+shift+alt+meta+-",
+    "command": "(corpus) ctrl+shift+alt+meta+- 2eb3",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke)
+    "key": "ctrl+shift+alt+meta+.",
+    "command": "(corpus) ctrl+shift+alt+meta+. 8275",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke)
+    "key": "ctrl+shift+alt+meta+;",
+    "command": "(corpus) ctrl+shift+alt+meta+; 24a4",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split)
+    "key": "ctrl+shift+alt+meta+=",
+    "command": "(corpus) ctrl+shift+alt+meta+= 0f83",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (fold)
+    "key": "ctrl+shift+alt+meta+[",
+    "command": "(corpus) ctrl+shift+alt+meta+[ 16d9",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split)
+    "key": "ctrl+shift+alt+meta+\\",
+    "command": "(corpus) ctrl+shift+alt+meta+\\ 06ee",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (fold)
+    "key": "ctrl+shift+alt+meta+]",
+    "command": "(corpus) ctrl+shift+alt+meta+] 0a6f",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split)
+    "key": "ctrl+shift+alt+meta+_",
+    "command": "(corpus) ctrl+shift+alt+meta+_ 73d9",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+shift+alt+meta+a",
+    "command": "(corpus) ctrl+shift+alt+meta+a 8604",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+shift+alt+meta+b",
+    "command": "(corpus) ctrl+shift+alt+meta+b 9991",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+shift+alt+meta+d",
+    "command": "(corpus) ctrl+shift+alt+meta+d f0e6",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke)
+    "key": "ctrl+shift+alt+meta+end",
+    "command": "(corpus) ctrl+shift+alt+meta+end de61",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+shift+alt+meta+f",
+    "command": "(corpus) ctrl+shift+alt+meta+f 838a",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+shift+alt+meta+h",
+    "command": "(corpus) ctrl+shift+alt+meta+h b32c",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke)
+    "key": "ctrl+shift+alt+meta+home",
+    "command": "(corpus) ctrl+shift+alt+meta+home 73cf",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+shift+alt+meta+j",
+    "command": "(corpus) ctrl+shift+alt+meta+j 226a",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+shift+alt+meta+k",
+    "command": "(corpus) ctrl+shift+alt+meta+k df42",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+shift+alt+meta+l",
+    "command": "(corpus) ctrl+shift+alt+meta+l 8b58",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+shift+alt+meta+n",
+    "command": "(corpus) ctrl+shift+alt+meta+n aaab",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+shift+alt+meta+p",
+    "command": "(corpus) ctrl+shift+alt+meta+p 93ef",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke)
+    "key": "ctrl+shift+alt+meta+pagedown",
+    "command": "(corpus) ctrl+shift+alt+meta+pagedown 8627",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke)
+    "key": "ctrl+shift+alt+meta+pageup",
+    "command": "(corpus) ctrl+shift+alt+meta+pageup 8608",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+shift+alt+meta+s",
+    "command": "(corpus) ctrl+shift+alt+meta+s 98e5",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+shift+alt+meta+w",
+    "command": "(corpus) ctrl+shift+alt+meta+w 1470",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+shift+alt+meta+x",
+    "command": "(corpus) ctrl+shift+alt+meta+x d1aa",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+n",
+    "command": "(corpus) ctrl+shift+alt+n 58d7",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+p",
+    "command": "(corpus) ctrl+shift+alt+p a88f",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+pagedown",
+    "command": "(corpus) ctrl+shift+alt+pagedown b393",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+pageup",
+    "command": "(corpus) ctrl+shift+alt+pageup 49c5",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+s",
+    "command": "(corpus) ctrl+shift+alt+s 483b",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+w",
+    "command": "(corpus) ctrl+shift+alt+w 59fb",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+x",
+    "command": "(corpus) ctrl+shift+alt+x 879a",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+w",
+    "command": "(corpus) ctrl+w f1a4",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "ctrl+x",
+    "command": "(corpus) ctrl+x 251e",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (move) (1) (red) (A)
+    "key": "shift+alt+'",
+    "command": "(corpus) shift+alt+' 54bf",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
     // [keynav] (corpus) (vertical) (split) (move) (1) (red) (A)
     "key": "shift+alt++",
     "command": "(corpus) shift+alt++ 7c16",
     "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (move) (1) (red) (A)
+    "key": "shift+alt+,",
+    "command": "(corpus) shift+alt+, bcea",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split) (move) (1) (red) (A)
+    "key": "shift+alt+-",
+    "command": "(corpus) shift+alt+- aa9b",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (move) (1) (red) (A)
+    "key": "shift+alt+.",
+    "command": "(corpus) shift+alt+. 623b",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (move) (1) (red) (A)
+    "key": "shift+alt+;",
+    "command": "(corpus) shift+alt+; ab95",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split) (move) (1) (red) (A)
+    "key": "shift+alt+=",
+    "command": "(corpus) shift+alt+= c51e",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (fold) (move) (1) (red) (A)
+    "key": "shift+alt+[",
+    "command": "(corpus) shift+alt+[ b288",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split) (move) (1) (red) (A)
+    "key": "shift+alt+\\",
+    "command": "(corpus) shift+alt+\\ 919e",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (fold) (move) (1) (red) (A)
+    "key": "shift+alt+]",
+    "command": "(corpus) shift+alt+] 7f47",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split) (move) (1) (red) (A)
+    "key": "shift+alt+_",
+    "command": "(corpus) shift+alt+_ 4ce4",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A)
+    "key": "shift+alt+a",
+    "command": "(corpus) shift+alt+a bed2",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A)
+    "key": "shift+alt+b",
+    "command": "(corpus) shift+alt+b fc3f",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A)
+    "key": "shift+alt+d",
+    "command": "(corpus) shift+alt+d d20d",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (move) (1) (red) (A)
+    "key": "shift+alt+end",
+    "command": "(corpus) shift+alt+end dffd",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A)
+    "key": "shift+alt+f",
+    "command": "(corpus) shift+alt+f eec3",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A)
+    "key": "shift+alt+h",
+    "command": "(corpus) shift+alt+h e3e4",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (move) (1) (red) (A)
+    "key": "shift+alt+home",
+    "command": "(corpus) shift+alt+home 363f",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A)
+    "key": "shift+alt+j",
+    "command": "(corpus) shift+alt+j 8127",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A)
+    "key": "shift+alt+k",
+    "command": "(corpus) shift+alt+k 20fb",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A)
+    "key": "shift+alt+l",
+    "command": "(corpus) shift+alt+l 2792",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke)
+    "key": "shift+alt+meta+'",
+    "command": "(corpus) shift+alt+meta+' a172",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split)
+    "key": "shift+alt+meta++",
+    "command": "(corpus) shift+alt+meta++ d18e",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke)
+    "key": "shift+alt+meta+,",
+    "command": "(corpus) shift+alt+meta+, d987",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split)
+    "key": "shift+alt+meta+-",
+    "command": "(corpus) shift+alt+meta+- 50bc",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke)
+    "key": "shift+alt+meta+.",
+    "command": "(corpus) shift+alt+meta+. c27b",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke)
+    "key": "shift+alt+meta+;",
+    "command": "(corpus) shift+alt+meta+; 8a3b",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split)
+    "key": "shift+alt+meta+=",
+    "command": "(corpus) shift+alt+meta+= edc3",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (left) (juke) (fold)
+    "key": "shift+alt+meta+[",
+    "command": "(corpus) shift+alt+meta+[ 37fd",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (vertical) (split)
+    "key": "shift+alt+meta+\\",
+    "command": "(corpus) shift+alt+meta+\\ 7533",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (right) (juke) (fold)
+    "key": "shift+alt+meta+]",
+    "command": "(corpus) shift+alt+meta+] dbc4",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (horizontal) (split)
+    "key": "shift+alt+meta+_",
+    "command": "(corpus) shift+alt+meta+_ 0584",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "shift+alt+meta+a",
+    "command": "(corpus) shift+alt+meta+a 29b9",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "shift+alt+meta+b",
+    "command": "(corpus) shift+alt+meta+b 23e1",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "shift+alt+meta+d",
+    "command": "(corpus) shift+alt+meta+d 7f1d",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke)
+    "key": "shift+alt+meta+end",
+    "command": "(corpus) shift+alt+meta+end 17b1",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "shift+alt+meta+f",
+    "command": "(corpus) shift+alt+meta+f 7af7",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "shift+alt+meta+h",
+    "command": "(corpus) shift+alt+meta+h f9a2",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke)
+    "key": "shift+alt+meta+home",
+    "command": "(corpus) shift+alt+meta+home 2696",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "shift+alt+meta+j",
+    "command": "(corpus) shift+alt+meta+j 106d",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "shift+alt+meta+k",
+    "command": "(corpus) shift+alt+meta+k d72c",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "shift+alt+meta+l",
+    "command": "(corpus) shift+alt+meta+l 7373",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "shift+alt+meta+n",
+    "command": "(corpus) shift+alt+meta+n ce2a",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "shift+alt+meta+p",
+    "command": "(corpus) shift+alt+meta+p 59d2",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke)
+    "key": "shift+alt+meta+pagedown",
+    "command": "(corpus) shift+alt+meta+pagedown a644",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke)
+    "key": "shift+alt+meta+pageup",
+    "command": "(corpus) shift+alt+meta+pageup bb2a",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "shift+alt+meta+s",
+    "command": "(corpus) shift+alt+meta+s 5479",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "shift+alt+meta+w",
+    "command": "(corpus) shift+alt+meta+w 35e4",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus)
+    "key": "shift+alt+meta+x",
+    "command": "(corpus) shift+alt+meta+x 553a",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A)
+    "key": "shift+alt+n",
+    "command": "(corpus) shift+alt+n e3c2",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A)
+    "key": "shift+alt+p",
+    "command": "(corpus) shift+alt+p 7625",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (move) (1) (red) (A)
+    "key": "shift+alt+pagedown",
+    "command": "(corpus) shift+alt+pagedown 4d15",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (juke) (move) (1) (red) (A)
+    "key": "shift+alt+pageup",
+    "command": "(corpus) shift+alt+pageup f044",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A)
+    "key": "shift+alt+s",
+    "command": "(corpus) shift+alt+s 2179",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A)
+    "key": "shift+alt+w",
+    "command": "(corpus) shift+alt+w 325c",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A)
+    "key": "shift+alt+x",
+    "command": "(corpus) shift+alt+x 9c04",
+    "when": "config.keyboardNavigation.enabled"
+  },
+  {
+    // [keynav] (corpus) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a",
+    "command": "(corpus) alt+a 8d02",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (action) (chord)
+    "key": "ctrl+a",
+    "command": "(corpus) ctrl+a 5901",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B) (action) (chord)
+    "key": "ctrl+alt+a",
+    "command": "(corpus) ctrl+alt+a 0a8e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C) (action) (chord)
+    "key": "ctrl+alt+meta+a",
+    "command": "(corpus) ctrl+alt+meta+a 1105",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+) (action) (chord)
+    "key": "ctrl+shift+alt+a",
+    "command": "(corpus) ctrl+shift+alt+a 3e7c",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (action) (chord)
+    "key": "ctrl+shift+alt+meta+a",
+    "command": "(corpus) ctrl+shift+alt+meta+a 1930",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A) (action) (chord)
+    "key": "shift+alt+a",
+    "command": "(corpus) shift+alt+a afa5",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (action) (chord)
+    "key": "shift+alt+meta+a",
+    "command": "(corpus) shift+alt+meta+a d85f",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (0) (self) (gold) (X) (debug) (chord)
+    "key": "alt+d",
+    "command": "(corpus) alt+d 81b5",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B) (debug) (chord)
+    "key": "ctrl+alt+d",
+    "command": "(corpus) ctrl+alt+d edb2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C) (debug) (chord)
+    "key": "ctrl+alt+meta+d",
+    "command": "(corpus) ctrl+alt+meta+d 04d3",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (debug) (chord)
+    "key": "ctrl+d",
+    "command": "(corpus) ctrl+d 5350",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+) (debug) (chord)
+    "key": "ctrl+shift+alt+d",
+    "command": "(corpus) ctrl+shift+alt+d 14d7",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (debug) (chord)
+    "key": "ctrl+shift+alt+meta+d",
+    "command": "(corpus) ctrl+shift+alt+meta+d 8cb4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A) (debug) (chord)
+    "key": "shift+alt+d",
+    "command": "(corpus) shift+alt+d 0f75",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (debug) (chord)
+    "key": "shift+alt+meta+d",
+    "command": "(corpus) shift+alt+meta+d 324d",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (0) (self) (gold) (X) (extension) (chord)
+    "key": "alt+x",
+    "command": "(corpus) alt+x a722",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (warp) (3) (black) (C) (extension) (chord)
+    "key": "ctrl+alt+meta+x",
+    "command": "(corpus) ctrl+alt+meta+x afd4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (jump) (2) (blue) (B) (extension) (chord)
+    "key": "ctrl+alt+x",
+    "command": "(corpus) ctrl+alt+x 07cf",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (extension) (chord)
+    "key": "ctrl+shift+alt+meta+x",
+    "command": "(corpus) ctrl+shift+alt+meta+x 01bc",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (change) (!) (yellow) (+) (extension) (chord)
+    "key": "ctrl+shift+alt+x",
+    "command": "(corpus) ctrl+shift+alt+x 8d92",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (extension) (chord)
+    "key": "ctrl+x",
+    "command": "(corpus) ctrl+x c9a6",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (extension) (chord)
+    "key": "shift+alt+meta+x",
+    "command": "(corpus) shift+alt+meta+x 5816",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (move) (1) (red) (A) (extension) (chord)
+    "key": "shift+alt+x",
+    "command": "(corpus) shift+alt+x f0a1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (down) (arrow) (0) (self) (gold) (X)
+    "key": "alt+down",
+    "command": "(corpus) alt+down 33e2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (left) (arrow) (0) (self) (gold) (X)
+    "key": "alt+left",
+    "command": "(corpus) alt+left f83f",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (right) (arrow) (0) (self) (gold) (X)
+    "key": "alt+right",
+    "command": "(corpus) alt+right 66ce",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (up) (arrow) (0) (self) (gold) (X)
+    "key": "alt+up",
+    "command": "(corpus) alt+up e294",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (down) (arrow) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+down",
+    "command": "(corpus) ctrl+alt+down d780",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (left) (arrow) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+left",
+    "command": "(corpus) ctrl+alt+left b1a9",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (down) (arrow) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+down",
+    "command": "(corpus) ctrl+alt+meta+down 47d9",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (left) (arrow) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+left",
+    "command": "(corpus) ctrl+alt+meta+left 8697",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (right) (arrow) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+right",
+    "command": "(corpus) ctrl+alt+meta+right c3e3",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (up) (arrow) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+up",
+    "command": "(corpus) ctrl+alt+meta+up c0b1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (right) (arrow) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+right",
+    "command": "(corpus) ctrl+alt+right 4e4e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (up) (arrow) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+up",
+    "command": "(corpus) ctrl+alt+up 83e0",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (down) (arrow)
+    "key": "ctrl+down",
+    "command": "(corpus) ctrl+down 3a76",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (left) (arrow)
+    "key": "ctrl+left",
+    "command": "(corpus) ctrl+left 5cb1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (right) (arrow)
+    "key": "ctrl+right",
+    "command": "(corpus) ctrl+right 4ee0",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (down) (arrow) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+down",
+    "command": "(corpus) ctrl+shift+alt+down 5b42",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (left) (arrow) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+left",
+    "command": "(corpus) ctrl+shift+alt+left 55bc",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (down) (arrow)
+    "key": "ctrl+shift+alt+meta+down",
+    "command": "(corpus) ctrl+shift+alt+meta+down eb61",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (left) (arrow)
+    "key": "ctrl+shift+alt+meta+left",
+    "command": "(corpus) ctrl+shift+alt+meta+left 8743",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (right) (arrow)
+    "key": "ctrl+shift+alt+meta+right",
+    "command": "(corpus) ctrl+shift+alt+meta+right 2f36",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (up) (arrow)
+    "key": "ctrl+shift+alt+meta+up",
+    "command": "(corpus) ctrl+shift+alt+meta+up bb3e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (right) (arrow) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+right",
+    "command": "(corpus) ctrl+shift+alt+right ed53",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (up) (arrow) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+up",
+    "command": "(corpus) ctrl+shift+alt+up 6c02",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (up) (arrow)
+    "key": "ctrl+up",
+    "command": "(corpus) ctrl+up ebd7",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (down) (arrow) (move) (1) (red) (A)
+    "key": "shift+alt+down",
+    "command": "(corpus) shift+alt+down 7216",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (left) (arrow) (move) (1) (red) (A)
+    "key": "shift+alt+left",
+    "command": "(corpus) shift+alt+left 5d01",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (down) (arrow)
+    "key": "shift+alt+meta+down",
+    "command": "(corpus) shift+alt+meta+down d6c8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (left) (arrow)
+    "key": "shift+alt+meta+left",
+    "command": "(corpus) shift+alt+meta+left 07cc",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (right) (arrow)
+    "key": "shift+alt+meta+right",
+    "command": "(corpus) shift+alt+meta+right f836",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (up) (arrow)
+    "key": "shift+alt+meta+up",
+    "command": "(corpus) shift+alt+meta+up 795b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (right) (arrow) (move) (1) (red) (A)
+    "key": "shift+alt+right",
+    "command": "(corpus) shift+alt+right 442f",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (up) (arrow) (move) (1) (red) (A)
+    "key": "shift+alt+up",
+    "command": "(corpus) shift+alt+up a6ad",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
+  },
+  {
+    // [keynav] (corpus) (left) (emacs) (0) (self) (gold) (X)
+    "key": "alt+b",
+    "command": "(corpus) alt+b cefc",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (right) (emacs) (0) (self) (gold) (X)
+    "key": "alt+f",
+    "command": "(corpus) alt+f 58a2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (down) (emacs) (0) (self) (gold) (X)
+    "key": "alt+n",
+    "command": "(corpus) alt+n b577",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (up) (emacs) (0) (self) (gold) (X)
+    "key": "alt+p",
+    "command": "(corpus) alt+p 21af",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (left) (emacs) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+b",
+    "command": "(corpus) ctrl+alt+b a67f",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (right) (emacs) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+f",
+    "command": "(corpus) ctrl+alt+f 378a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (left) (emacs) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+b",
+    "command": "(corpus) ctrl+alt+meta+b 38a6",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (right) (emacs) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+f",
+    "command": "(corpus) ctrl+alt+meta+f ca69",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (down) (emacs) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+n",
+    "command": "(corpus) ctrl+alt+meta+n 9129",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (up) (emacs) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+p",
+    "command": "(corpus) ctrl+alt+meta+p 78c3",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (down) (emacs) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+n",
+    "command": "(corpus) ctrl+alt+n b250",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (up) (emacs) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+p",
+    "command": "(corpus) ctrl+alt+p e7d9",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (left) (emacs)
+    "key": "ctrl+b",
+    "command": "(corpus) ctrl+b fb09",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (right) (emacs)
+    "key": "ctrl+f",
+    "command": "(corpus) ctrl+f 0062",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (down) (emacs)
+    "key": "ctrl+n",
+    "command": "(corpus) ctrl+n da0a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (up) (emacs)
+    "key": "ctrl+p",
+    "command": "(corpus) ctrl+p 02a0",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (left) (emacs) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+b",
+    "command": "(corpus) ctrl+shift+alt+b 3bc2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (right) (emacs) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+f",
+    "command": "(corpus) ctrl+shift+alt+f e693",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (left) (emacs)
+    "key": "ctrl+shift+alt+meta+b",
+    "command": "(corpus) ctrl+shift+alt+meta+b 1d8d",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (right) (emacs)
+    "key": "ctrl+shift+alt+meta+f",
+    "command": "(corpus) ctrl+shift+alt+meta+f 6b83",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (down) (emacs)
+    "key": "ctrl+shift+alt+meta+n",
+    "command": "(corpus) ctrl+shift+alt+meta+n 47a5",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (up) (emacs)
+    "key": "ctrl+shift+alt+meta+p",
+    "command": "(corpus) ctrl+shift+alt+meta+p 26f8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (down) (emacs) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+n",
+    "command": "(corpus) ctrl+shift+alt+n eecb",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (up) (emacs) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+p",
+    "command": "(corpus) ctrl+shift+alt+p 5212",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (left) (emacs) (move) (1) (red) (A)
+    "key": "shift+alt+b",
+    "command": "(corpus) shift+alt+b ab15",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (right) (emacs) (move) (1) (red) (A)
+    "key": "shift+alt+f",
+    "command": "(corpus) shift+alt+f 7151",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (left) (emacs)
+    "key": "shift+alt+meta+b",
+    "command": "(corpus) shift+alt+meta+b 478a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (right) (emacs)
+    "key": "shift+alt+meta+f",
+    "command": "(corpus) shift+alt+meta+f 33c6",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (down) (emacs)
+    "key": "shift+alt+meta+n",
+    "command": "(corpus) shift+alt+meta+n 956d",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (up) (emacs)
+    "key": "shift+alt+meta+p",
+    "command": "(corpus) shift+alt+meta+p 77a6",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (down) (emacs) (move) (1) (red) (A)
+    "key": "shift+alt+n",
+    "command": "(corpus) shift+alt+n f471",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (up) (emacs) (move) (1) (red) (A)
+    "key": "shift+alt+p",
+    "command": "(corpus) shift+alt+p 28b7",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs'"
+  },
+  {
+    // [keynav] (corpus) (emacs) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a",
+    "command": "(corpus) alt+a f153",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (emacs) (action) (chord)
+    "key": "ctrl+a",
+    "command": "(corpus) ctrl+a c2a6",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (emacs) (jump) (2) (blue) (B) (action) (chord)
+    "key": "ctrl+alt+a",
+    "command": "(corpus) ctrl+alt+a 8e63",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (emacs) (warp) (3) (black) (C) (action) (chord)
+    "key": "ctrl+alt+meta+a",
+    "command": "(corpus) ctrl+alt+meta+a 3533",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (emacs) (change) (!) (yellow) (+) (action) (chord)
+    "key": "ctrl+shift+alt+a",
+    "command": "(corpus) ctrl+shift+alt+a 0481",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (emacs) (action) (chord)
+    "key": "ctrl+shift+alt+meta+a",
+    "command": "(corpus) ctrl+shift+alt+meta+a dded",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (emacs) (move) (1) (red) (A) (action) (chord)
+    "key": "shift+alt+a",
+    "command": "(corpus) shift+alt+a d576",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (emacs) (action) (chord)
+    "key": "shift+alt+meta+a",
+    "command": "(corpus) shift+alt+meta+a cc97",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (emacs) (0) (self) (gold) (X) (debug) (chord)
+    "key": "alt+d",
+    "command": "(corpus) alt+d 3379",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (emacs) (jump) (2) (blue) (B) (debug) (chord)
+    "key": "ctrl+alt+d",
+    "command": "(corpus) ctrl+alt+d 57fa",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (emacs) (warp) (3) (black) (C) (debug) (chord)
+    "key": "ctrl+alt+meta+d",
+    "command": "(corpus) ctrl+alt+meta+d c73a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (emacs) (debug) (chord)
+    "key": "ctrl+d",
+    "command": "(corpus) ctrl+d d154",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (emacs) (change) (!) (yellow) (+) (debug) (chord)
+    "key": "ctrl+shift+alt+d",
+    "command": "(corpus) ctrl+shift+alt+d 2f2a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (emacs) (debug) (chord)
+    "key": "ctrl+shift+alt+meta+d",
+    "command": "(corpus) ctrl+shift+alt+meta+d 2e57",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (emacs) (move) (1) (red) (A) (debug) (chord)
+    "key": "shift+alt+d",
+    "command": "(corpus) shift+alt+d 391a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (emacs) (debug) (chord)
+    "key": "shift+alt+meta+d",
+    "command": "(corpus) shift+alt+meta+d 412a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (emacs) (0) (self) (gold) (X) (extension) (chord)
+    "key": "alt+x",
+    "command": "(corpus) alt+x ad46",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (emacs) (warp) (3) (black) (C) (extension) (chord)
+    "key": "ctrl+alt+meta+x",
+    "command": "(corpus) ctrl+alt+meta+x 5294",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (emacs) (jump) (2) (blue) (B) (extension) (chord)
+    "key": "ctrl+alt+x",
+    "command": "(corpus) ctrl+alt+x 7694",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (emacs) (extension) (chord)
+    "key": "ctrl+shift+alt+meta+x",
+    "command": "(corpus) ctrl+shift+alt+meta+x cf05",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (emacs) (change) (!) (yellow) (+) (extension) (chord)
+    "key": "ctrl+shift+alt+x",
+    "command": "(corpus) ctrl+shift+alt+x 12e9",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (emacs) (extension) (chord)
+    "key": "ctrl+x",
+    "command": "(corpus) ctrl+x c574",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (emacs) (extension) (chord)
+    "key": "shift+alt+meta+x",
+    "command": "(corpus) shift+alt+meta+x d57e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (emacs) (move) (1) (red) (A) (extension) (chord)
+    "key": "shift+alt+x",
+    "command": "(corpus) shift+alt+x a523",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'emacs' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (left) (kbm) (0) (self) (gold) (X)
+    "key": "alt+a",
+    "command": "(corpus) alt+a c88f",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (right) (kbm) (0) (self) (gold) (X)
+    "key": "alt+d",
+    "command": "(corpus) alt+d 84d4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (down) (kbm) (0) (self) (gold) (X)
+    "key": "alt+s",
+    "command": "(corpus) alt+s d197",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (up) (kbm) (0) (self) (gold) (X)
+    "key": "alt+w",
+    "command": "(corpus) alt+w 22be",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (left) (kbm)
+    "key": "ctrl+a",
+    "command": "(corpus) ctrl+a 7113",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (left) (kbm) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+a",
+    "command": "(corpus) ctrl+alt+a fcc6",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (right) (kbm) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+d",
+    "command": "(corpus) ctrl+alt+d 7673",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (left) (kbm) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+a",
+    "command": "(corpus) ctrl+alt+meta+a f482",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (right) (kbm) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+d",
+    "command": "(corpus) ctrl+alt+meta+d 7965",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (down) (kbm) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+s",
+    "command": "(corpus) ctrl+alt+meta+s 8a29",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (up) (kbm) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+w",
+    "command": "(corpus) ctrl+alt+meta+w 4a94",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (down) (kbm) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+s",
+    "command": "(corpus) ctrl+alt+s 5686",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (up) (kbm) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+w",
+    "command": "(corpus) ctrl+alt+w c9d6",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (right) (kbm)
+    "key": "ctrl+d",
+    "command": "(corpus) ctrl+d 9732",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (down) (kbm)
+    "key": "ctrl+s",
+    "command": "(corpus) ctrl+s bfb3",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (left) (kbm) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+a",
+    "command": "(corpus) ctrl+shift+alt+a 56fa",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (right) (kbm) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+d",
+    "command": "(corpus) ctrl+shift+alt+d a7a0",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (left) (kbm)
+    "key": "ctrl+shift+alt+meta+a",
+    "command": "(corpus) ctrl+shift+alt+meta+a a7be",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (right) (kbm)
+    "key": "ctrl+shift+alt+meta+d",
+    "command": "(corpus) ctrl+shift+alt+meta+d 0933",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (down) (kbm)
+    "key": "ctrl+shift+alt+meta+s",
+    "command": "(corpus) ctrl+shift+alt+meta+s 21d4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (up) (kbm)
+    "key": "ctrl+shift+alt+meta+w",
+    "command": "(corpus) ctrl+shift+alt+meta+w 2337",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (down) (kbm) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+s",
+    "command": "(corpus) ctrl+shift+alt+s 201e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (up) (kbm) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+w",
+    "command": "(corpus) ctrl+shift+alt+w a6b6",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (up) (kbm)
+    "key": "ctrl+w",
+    "command": "(corpus) ctrl+w 4285",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (left) (kbm) (move) (1) (red) (A)
+    "key": "shift+alt+a",
+    "command": "(corpus) shift+alt+a 89fc",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (right) (kbm) (move) (1) (red) (A)
+    "key": "shift+alt+d",
+    "command": "(corpus) shift+alt+d 42e6",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (left) (kbm)
+    "key": "shift+alt+meta+a",
+    "command": "(corpus) shift+alt+meta+a a52c",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (right) (kbm)
+    "key": "shift+alt+meta+d",
+    "command": "(corpus) shift+alt+meta+d 47a4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (down) (kbm)
+    "key": "shift+alt+meta+s",
+    "command": "(corpus) shift+alt+meta+s 70bd",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (up) (kbm)
+    "key": "shift+alt+meta+w",
+    "command": "(corpus) shift+alt+meta+w 8e73",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (down) (kbm) (move) (1) (red) (A)
+    "key": "shift+alt+s",
+    "command": "(corpus) shift+alt+s 7fdf",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (up) (kbm) (move) (1) (red) (A)
+    "key": "shift+alt+w",
+    "command": "(corpus) shift+alt+w ea18",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm'"
+  },
+  {
+    // [keynav] (corpus) (kbm) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+l",
+    "command": "(corpus) alt+l 97f5",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (kbm) (jump) (2) (blue) (B) (action) (chord)
+    "key": "ctrl+alt+l",
+    "command": "(corpus) ctrl+alt+l b4bd",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (kbm) (warp) (3) (black) (C) (action) (chord)
+    "key": "ctrl+alt+meta+l",
+    "command": "(corpus) ctrl+alt+meta+l 5115",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (kbm) (action) (chord)
+    "key": "ctrl+l",
+    "command": "(corpus) ctrl+l dd4a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (kbm) (change) (!) (yellow) (+) (action) (chord)
+    "key": "ctrl+shift+alt+l",
+    "command": "(corpus) ctrl+shift+alt+l 0eed",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (kbm) (action) (chord)
+    "key": "ctrl+shift+alt+meta+l",
+    "command": "(corpus) ctrl+shift+alt+meta+l 0ede",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (kbm) (move) (1) (red) (A) (action) (chord)
+    "key": "shift+alt+l",
+    "command": "(corpus) shift+alt+l 63d1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (kbm) (action) (chord)
+    "key": "shift+alt+meta+l",
+    "command": "(corpus) shift+alt+meta+l 80bd",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (kbm) (0) (self) (gold) (X) (debug) (chord)
+    "key": "alt+j",
+    "command": "(corpus) alt+j 7c12",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (kbm) (jump) (2) (blue) (B) (debug) (chord)
+    "key": "ctrl+alt+j",
+    "command": "(corpus) ctrl+alt+j 230d",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (kbm) (warp) (3) (black) (C) (debug) (chord)
+    "key": "ctrl+alt+meta+j",
+    "command": "(corpus) ctrl+alt+meta+j bba8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (kbm) (debug) (chord)
+    "key": "ctrl+j",
+    "command": "(corpus) ctrl+j a126",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (kbm) (change) (!) (yellow) (+) (debug) (chord)
+    "key": "ctrl+shift+alt+j",
+    "command": "(corpus) ctrl+shift+alt+j ea2e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (kbm) (debug) (chord)
+    "key": "ctrl+shift+alt+meta+j",
+    "command": "(corpus) ctrl+shift+alt+meta+j 9b02",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (kbm) (move) (1) (red) (A) (debug) (chord)
+    "key": "shift+alt+j",
+    "command": "(corpus) shift+alt+j 4f64",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (kbm) (debug) (chord)
+    "key": "shift+alt+meta+j",
+    "command": "(corpus) shift+alt+meta+j e5b1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (kbm) (0) (self) (gold) (X) (extension) (chord)
+    "key": "alt+x",
+    "command": "(corpus) alt+x 1e8b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (kbm) (warp) (3) (black) (C) (extension) (chord)
+    "key": "ctrl+alt+meta+x",
+    "command": "(corpus) ctrl+alt+meta+x 49e2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (kbm) (jump) (2) (blue) (B) (extension) (chord)
+    "key": "ctrl+alt+x",
+    "command": "(corpus) ctrl+alt+x 0ce9",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (kbm) (extension) (chord)
+    "key": "ctrl+shift+alt+meta+x",
+    "command": "(corpus) ctrl+shift+alt+meta+x 3289",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (kbm) (change) (!) (yellow) (+) (extension) (chord)
+    "key": "ctrl+shift+alt+x",
+    "command": "(corpus) ctrl+shift+alt+x 8cc5",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (kbm) (extension) (chord)
+    "key": "ctrl+x",
+    "command": "(corpus) ctrl+x 8ad1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (kbm) (extension) (chord)
+    "key": "shift+alt+meta+x",
+    "command": "(corpus) shift+alt+meta+x 8f25",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (kbm) (move) (1) (red) (A) (extension) (chord)
+    "key": "shift+alt+x",
+    "command": "(corpus) shift+alt+x 32c4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'kbm' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (left) (vi) (0) (self) (gold) (X)
+    "key": "alt+h",
+    "command": "(corpus) alt+h 9fa2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (down) (vi) (0) (self) (gold) (X)
+    "key": "alt+j",
+    "command": "(corpus) alt+j ccb3",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (up) (vi) (0) (self) (gold) (X)
+    "key": "alt+k",
+    "command": "(corpus) alt+k 1057",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (right) (vi) (0) (self) (gold) (X)
+    "key": "alt+l",
+    "command": "(corpus) alt+l f2e4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (left) (vi) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+h",
+    "command": "(corpus) ctrl+alt+h f46a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (down) (vi) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+j",
+    "command": "(corpus) ctrl+alt+j 255c",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (up) (vi) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+k",
+    "command": "(corpus) ctrl+alt+k 4fe4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (right) (vi) (jump) (2) (blue) (B)
+    "key": "ctrl+alt+l",
+    "command": "(corpus) ctrl+alt+l 4362",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (left) (vi) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+h",
+    "command": "(corpus) ctrl+alt+meta+h 72ca",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (down) (vi) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+j",
+    "command": "(corpus) ctrl+alt+meta+j 6763",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (up) (vi) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+k",
+    "command": "(corpus) ctrl+alt+meta+k bde2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (right) (vi) (warp) (3) (black) (C)
+    "key": "ctrl+alt+meta+l",
+    "command": "(corpus) ctrl+alt+meta+l 9cac",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (left) (vi)
+    "key": "ctrl+h",
+    "command": "(corpus) ctrl+h 96e5",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (down) (vi)
+    "key": "ctrl+j",
+    "command": "(corpus) ctrl+j 1b8f",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (up) (vi)
+    "key": "ctrl+k",
+    "command": "(corpus) ctrl+k 5580",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (right) (vi)
+    "key": "ctrl+l",
+    "command": "(corpus) ctrl+l c631",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (left) (vi) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+h",
+    "command": "(corpus) ctrl+shift+alt+h 04f4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (down) (vi) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+j",
+    "command": "(corpus) ctrl+shift+alt+j aae9",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (up) (vi) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+k",
+    "command": "(corpus) ctrl+shift+alt+k 269a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (right) (vi) (change) (!) (yellow) (+)
+    "key": "ctrl+shift+alt+l",
+    "command": "(corpus) ctrl+shift+alt+l 59fa",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (left) (vi)
+    "key": "ctrl+shift+alt+meta+h",
+    "command": "(corpus) ctrl+shift+alt+meta+h 09be",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (down) (vi)
+    "key": "ctrl+shift+alt+meta+j",
+    "command": "(corpus) ctrl+shift+alt+meta+j 5b8a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (up) (vi)
+    "key": "ctrl+shift+alt+meta+k",
+    "command": "(corpus) ctrl+shift+alt+meta+k 1cc1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (right) (vi)
+    "key": "ctrl+shift+alt+meta+l",
+    "command": "(corpus) ctrl+shift+alt+meta+l 3ddf",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (left) (vi) (move) (1) (red) (A)
+    "key": "shift+alt+h",
+    "command": "(corpus) shift+alt+h d2a3",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (down) (vi) (move) (1) (red) (A)
+    "key": "shift+alt+j",
+    "command": "(corpus) shift+alt+j 87ba",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (up) (vi) (move) (1) (red) (A)
+    "key": "shift+alt+k",
+    "command": "(corpus) shift+alt+k da58",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (right) (vi) (move) (1) (red) (A)
+    "key": "shift+alt+l",
+    "command": "(corpus) shift+alt+l e446",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (left) (vi)
+    "key": "shift+alt+meta+h",
+    "command": "(corpus) shift+alt+meta+h eeed",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (down) (vi)
+    "key": "shift+alt+meta+j",
+    "command": "(corpus) shift+alt+meta+j 39af",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (up) (vi)
+    "key": "shift+alt+meta+k",
+    "command": "(corpus) shift+alt+meta+k ef81",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (right) (vi)
+    "key": "shift+alt+meta+l",
+    "command": "(corpus) shift+alt+meta+l b218",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
+  },
+  {
+    // [keynav] (corpus) (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a",
+    "command": "(corpus) alt+a 6356",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (action) (chord)
+    "key": "ctrl+a",
+    "command": "(corpus) ctrl+a 54bd",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (jump) (2) (blue) (B) (action) (chord)
+    "key": "ctrl+alt+a",
+    "command": "(corpus) ctrl+alt+a 1d1b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (warp) (3) (black) (C) (action) (chord)
+    "key": "ctrl+alt+meta+a",
+    "command": "(corpus) ctrl+alt+meta+a 914e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (change) (!) (yellow) (+) (action) (chord)
+    "key": "ctrl+shift+alt+a",
+    "command": "(corpus) ctrl+shift+alt+a ed72",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (action) (chord)
+    "key": "ctrl+shift+alt+meta+a",
+    "command": "(corpus) ctrl+shift+alt+meta+a 4c8a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (move) (1) (red) (A) (action) (chord)
+    "key": "shift+alt+a",
+    "command": "(corpus) shift+alt+a 6dec",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (action) (chord)
+    "key": "shift+alt+meta+a",
+    "command": "(corpus) shift+alt+meta+a 99a4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (0) (self) (gold) (X) (debug) (chord)
+    "key": "alt+d",
+    "command": "(corpus) alt+d ef1f",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (jump) (2) (blue) (B) (debug) (chord)
+    "key": "ctrl+alt+d",
+    "command": "(corpus) ctrl+alt+d bc40",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (warp) (3) (black) (C) (debug) (chord)
+    "key": "ctrl+alt+meta+d",
+    "command": "(corpus) ctrl+alt+meta+d bf96",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (debug) (chord)
+    "key": "ctrl+d",
+    "command": "(corpus) ctrl+d 8975",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (change) (!) (yellow) (+) (debug) (chord)
+    "key": "ctrl+shift+alt+d",
+    "command": "(corpus) ctrl+shift+alt+d 3df1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (debug) (chord)
+    "key": "ctrl+shift+alt+meta+d",
+    "command": "(corpus) ctrl+shift+alt+meta+d 1c71",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (move) (1) (red) (A) (debug) (chord)
+    "key": "shift+alt+d",
+    "command": "(corpus) shift+alt+d 7eda",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (debug) (chord)
+    "key": "shift+alt+meta+d",
+    "command": "(corpus) shift+alt+meta+d ca36",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (0) (self) (gold) (X) (extension) (chord)
+    "key": "alt+x",
+    "command": "(corpus) alt+x 1f03",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (warp) (3) (black) (C) (extension) (chord)
+    "key": "ctrl+alt+meta+x",
+    "command": "(corpus) ctrl+alt+meta+x 83f5",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (jump) (2) (blue) (B) (extension) (chord)
+    "key": "ctrl+alt+x",
+    "command": "(corpus) ctrl+alt+x 636e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (extension) (chord)
+    "key": "ctrl+shift+alt+meta+x",
+    "command": "(corpus) ctrl+shift+alt+meta+x 382c",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (change) (!) (yellow) (+) (extension) (chord)
+    "key": "ctrl+shift+alt+x",
+    "command": "(corpus) ctrl+shift+alt+x cbfc",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (extension) (chord)
+    "key": "ctrl+x",
+    "command": "(corpus) ctrl+x 83a9",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (extension) (chord)
+    "key": "shift+alt+meta+x",
+    "command": "(corpus) shift+alt+meta+x eb6e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (move) (1) (red) (A) (extension) (chord)
+    "key": "shift+alt+x",
+    "command": "(corpus) shift+alt+x 9cd2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
   }
 ]
