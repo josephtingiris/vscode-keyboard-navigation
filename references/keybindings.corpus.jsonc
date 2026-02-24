@@ -5,7 +5,6 @@
     "command": "(corpus) alt+' 1c12",
     "when": "config.keyboardNavigation.enabled"
   },
-
   {
     // [keynav] (corpus) (vertical) (split) (0) (self) (gold) (X)
     "key": "alt++",
@@ -1337,11 +1336,11 @@
     "key": "ctrl+shift+alt+meta+}",
     "command": "(corpus) ctrl+shift+alt+meta+} a9ac",
     "when": "config.keyboardNavigation.enabled"
-  }
+  },
   {
     // [keynav] (corpus) (vertical) (split) (move) (1) (red) (A)
     "key": "shift+alt++",
     "command": "(corpus) shift+alt++ 7c16",
     "when": "config.keyboardNavigation.enabled"
-  },
+  }
 ]
