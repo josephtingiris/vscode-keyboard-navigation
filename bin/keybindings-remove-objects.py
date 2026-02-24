@@ -10,10 +10,13 @@ Usage:
 Examples:
     # remove objects where the 'command' contains 'example'
     python3 bin/keybindings-remove.py command example < keybindings.json > keybindings-noexample.json
+    # remove any object that contains the literal 'TODO' anywhere in the object
+    python3 bin/keybindings-remove.py any TODO < keybindings.json > keybindings-noTODO.json
 
 Behavior:
     - Removes matching objects and correctly handles trailing commas so the resulting JSONC remains syntactically valid.
     - Preserves comments and whitespace before the opening `[` and after the closing `]`, as well as comments inside and around each object.
+    - Special attribute: use `any` or `*` as the <attribute> to match the <search_string> anywhere inside the object's raw text (including attribute names, attribute values, and comments embedded inside the object). This check is a simple substring match (case-sensitive).
     - Prints the modified content to stdout; does not write files in-place.
     - Set `KEYBINDINGS_REMOVE_DEBUG=1` to enable debug logging to stderr when parsing or matching issues occur.
 
@@ -220,6 +223,10 @@ def should_remove(obj_text, attr, val):
     if not obj_match:
         return False
     obj_str = obj_match.group(0)
+    # If attr is 'any' (or '*'), treat the search as matching anywhere
+    # inside the object's raw text (attributes, values, or comments).
+    if attr in ('any', '*'):
+        return val in obj_str
     try:
         clean = strip_json_comments(obj_str)
         clean = strip_trailing_commas(clean)
@@ -244,7 +251,8 @@ def main(argv: list | None = None) -> int:
         description="Remove objects from a JSONC keybindings.json array by attribute match.",
         epilog="Example: %(prog)s command example < keybindings.json > keybindings-noexample.json",
     )
-    parser.add_argument('attribute', help="Attribute name to match (e.g., 'command')")
+    parser.add_argument('attribute', help="An attribute name to match (e.g., 'command'), or use 'any' to match the search string anywhere inside the object.")
+    parser.epilog = "Use attribute name 'any' or '*' to match the search string anywhere inside the object (attributes, values, or comments)."
     parser.add_argument('search_string', help='Substring to search for in the attribute value')
     # If invoked with no arguments, show full help (same as -h/--help) and exit success.
     if not argv:
