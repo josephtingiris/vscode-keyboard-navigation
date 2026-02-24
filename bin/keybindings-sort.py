@@ -15,7 +15,8 @@ Options:
     --primary, -p {key,when}                                               Primary sort field (default: key)
     --secondary, -s {key,when}                                             Secondary sort field (optional)
     --when-grouping, -w {none,config-first,focal-invariant}                When grouping mode: built-in group/rank modes for when tokens (default: none)
-    --group-sorting, -g {alpha,beta,natural,negative,positive}             Group sorting mode: how-to sort within the when token grouping(s) (default: alpha)
+    --group-sorting, -g {alpha,beta,natural,negative,negative-natural,positive,positive-natural}
+                                                                           Group sorting mode: how-to sort within the when token grouping(s) (default: alpha)
     -h, --help                                                             Show this usage message and exit
 
 Behavior:
@@ -62,7 +63,7 @@ from typing import List, Tuple
 DEFAULT_WHEN_PREFIXES = []
 
 FOCUS_TOKENS = [
-    'auxiliaryBarFocus',
+    'agentSessionsViewerFocused',
     'editorFocus',
     'editorTextFocus',
     'inputFocus',
@@ -72,6 +73,7 @@ FOCUS_TOKENS = [
     'sideBarFocus',
     'terminalFocus',
     'textInputFocus',
+    'auxiliaryBarFocus',
 ]
 
 # token groups used for when-grouping heuristics
@@ -591,6 +593,11 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
     focus_tokens = FOCUS_TOKENS
     positional_tokens = POSITIONAL_TOKENS
     visibility_tokens = VISIBILITY_TOKENS
+    # map focus token -> preferred rank (lower = earlier)
+    focus_order = {t: i for i, t in enumerate(focus_tokens)}
+    # maps for positional and visibility ordering
+    positional_order = {t: i for i, t in enumerate(positional_tokens)}
+    visibility_order = {t: i for i, t in enumerate(visibility_tokens)}
 
     def left_identifier(text: str) -> str:
         t = text.strip()
@@ -670,9 +677,13 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
         token = render_when_node(node)
         # strip leading '!' for ordering token but keep for grouping rank
         order_token = token[1:] if token.startswith('!') else token
+        # compute left identifier and a combined sub-rank preference
+        left_id = left_identifier(token)
+        # prefer focus_order, then positional_order, then visibility_order
+        sub_rank = focus_order.get(left_id, positional_order.get(left_id, visibility_order.get(left_id, 9999)))
         # default alpha behavior: preserve group_rank and use natural-sensitive ordering
         if negation_mode == 'alpha':
-            return (group_rank(token), natural_key_case_sensitive(order_token), idx)
+            return (group_rank(token), sub_rank, natural_key_case_sensitive(order_token), idx)
         # for other modes we'll not use this sort_key; they use alternate sorting below
         return (group_rank(token), natural_key_case_sensitive(order_token), idx)
 
@@ -731,8 +742,8 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                             picked.add(m[0])
 
             if negation_mode == 'beta':
-                # alias
-                nm = 'positive'
+                # alias: historical 'beta' wired to positive-natural
+                nm = 'positive-natural'
             else:
                 nm = negation_mode
 
@@ -760,21 +771,35 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                     base_key = natural_key(base)
                     # always preserve grouping as the primary key so sorting does not move operands between buckets.
                     grp = group_rank(tok)
+                    # compute a combined sub-rank if this token belongs to a known ordered identifier
+                    lid = _left_id_of(child)
+                    f_rank = focus_order.get(lid, positional_order.get(lid, visibility_order.get(lid, 9999)))
                     # natural mode: ignore negation and sort by group then base_key
                     if nm == 'natural':
                         items_with_keys.append(
-                            (idx, child, (grp, base_key, idx, tok)))
+                            (idx, child, (grp, f_rank, base_key, idx, tok)))
                         continue
-                    # positive/negative: prefer positives or negatives accordingly
+                    # positive-natural / negative-natural: existing "alpha/natural"-style
+                    if nm == 'positive-natural':
+                        neg_sort = 0 if not is_neg else 1
+                        items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key, idx, tok)))
+                        continue
+                    if nm == 'negative-natural':
+                        neg_sort = 0 if is_neg else 1
+                        items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key, idx, tok)))
+                        continue
+                    # positive / negative: preserve original list order within positive/negative groups
                     if nm == 'positive':
                         neg_sort = 0 if not is_neg else 1
-                    elif nm == 'negative':
+                        items_with_keys.append((idx, child, (grp, neg_sort, idx)))
+                        continue
+                    if nm == 'negative':
                         neg_sort = 0 if is_neg else 1
-                    else:
-                        neg_sort = 0
-                    # prioritize negation flag before base key
-                    items_with_keys.append(
-                        (idx, child, (grp, neg_sort, base_key, idx, tok)))
+                        items_with_keys.append((idx, child, (grp, neg_sort, idx)))
+                        continue
+                    # default fallback
+                    neg_sort = 0
+                    items_with_keys.append((idx, child, (grp, neg_sort, base_key, idx, tok)))
                 items_with_keys.sort(key=lambda t: t[2])
                 sorted_children = [it[1] for it in items_with_keys]
 
@@ -826,7 +851,42 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
             sort_and_nodes(node.child)
 
     ast = parse_when(when_val)
+    # Debug: dump top-level AND operand ordering before/after sort for inspection
+    try:
+        if when_val == TARGET_DEBUG_WHEN:
+            if isinstance(ast, WhenAnd):
+                for i, c in enumerate(ast.children):
+                    try:
+                        tok = render_when_node(c)
+                    except Exception:
+                        tok = str(c)
+                    print(f"DBG_CANON_PRE: idx={i} token={tok!r}", file=sys.stderr)
+            else:
+                try:
+                    print(f"DBG_CANON_PRE: node={render_when_node(ast)!r}", file=sys.stderr)
+                except Exception:
+                    print(f"DBG_CANON_PRE: node={ast!r}", file=sys.stderr)
+    except Exception:
+        pass
+
     sort_and_nodes(ast)
+
+    try:
+        if when_val == TARGET_DEBUG_WHEN:
+            if isinstance(ast, WhenAnd):
+                for i, c in enumerate(ast.children):
+                    try:
+                        tok = render_when_node(c)
+                    except Exception:
+                        tok = str(c)
+                    print(f"DBG_CANON_POST: idx={i} token={tok!r}", file=sys.stderr)
+            else:
+                try:
+                    print(f"DBG_CANON_POST: node={render_when_node(ast)!r}", file=sys.stderr)
+                except Exception:
+                    print(f"DBG_CANON_POST: node={ast!r}", file=sys.stderr)
+    except Exception:
+        pass
     # normalize parentheses: discard original syntactic parens and
     # render parentheses only where operator precedence requires them.
 
@@ -943,11 +1003,11 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                 elif negation_mode == 'natural':
                     base = sortable_when.lstrip('!')
                     tert = natural_key(base)
-                elif negation_mode in ('positive', 'beta'):
+                elif negation_mode in ('positive', 'beta', 'positive-natural'):
                     is_neg = 1 if sortable_when.startswith('!') else 0
                     base = sortable_when.lstrip('!')
                     tert = (is_neg, natural_key(base))
-                elif negation_mode == 'negative':
+                elif negation_mode in ('negative', 'negative-natural'):
                     is_neg = 0 if sortable_when.startswith('!') else 1
                     base = sortable_when.lstrip('!')
                     tert = (is_neg, natural_key(base))
@@ -1134,7 +1194,7 @@ def main(argv: List[str] | None = None) -> int:
     parser.add_argument('--secondary', '-s', choices=['key', 'when'], default=None,
                         help="Secondary sort field: 'key' or 'when' (optional)")
     parser.add_argument('--group-sorting', '-g', dest='group_sorting',
-                        choices=['alpha', 'beta', 'natural', 'negative', 'positive'], default='alpha',
+                        choices=['alpha', 'beta', 'natural', 'positive-natural', 'negative-natural', 'positive', 'negative'], default='alpha',
                         help="Group sorting mode: how to sort tokens within when groups (default: alpha)")
     parser.add_argument('--when-grouping', '-w', dest='when_grouping',
                         choices=['none', 'config-first', 'focal-invariant'], default='none',
@@ -1370,9 +1430,18 @@ def main(argv: List[str] | None = None) -> int:
                 j += 1
 
             if j - i > 1:
-                slice_pairs = sorted_groups[i:j]
-                slice_pairs.sort(key=lambda p: natural_key_case_sensitive(_pair_key_literal(p[1])))
-                sorted_groups[i:j] = slice_pairs
+                # If user requested stable-preserve group-sorting (positive/negative),
+                # do not enforce an alphabetical reorder here; preserve the existing
+                # relative order produced by canonicalization. For all other modes,
+                # maintain the existing natural-sensitive literal-key sort to
+                # stabilize output.
+                if negation_mode in ('positive', 'negative'):
+                    # preserve current order
+                    pass
+                else:
+                    slice_pairs = sorted_groups[i:j]
+                    slice_pairs.sort(key=lambda p: natural_key_case_sensitive(_pair_key_literal(p[1])))
+                    sorted_groups[i:j] = slice_pairs
             i = j
 
     # assemble into buffer for post-processing (e.g. remove blank lines)
@@ -1506,9 +1575,18 @@ def main(argv: List[str] | None = None) -> int:
                 j += 1
 
             if j - i > 1:
-                slice_pairs = groups_list[i:j]
-                slice_pairs.sort(key=lambda pair: natural_key_case_sensitive(_extract_raw_key(pair[1])))
-                groups_list[i:j] = slice_pairs
+                # Honor user's chosen group-sorting mode: if the user selected the
+                # stable-preserve modes ('positive' or 'negative'), do not enforce a
+                # forced alphabetical reorder by literal `key` here. For all other
+                # modes (alpha/natural/*-natural) perform the existing natural-sensitive
+                # literal-key sort to stabilize output.
+                if negation_mode in ('positive', 'negative'):
+                    # preserve original order
+                    pass
+                else:
+                    slice_pairs = groups_list[i:j]
+                    slice_pairs.sort(key=lambda pair: natural_key_case_sensitive(_extract_raw_key(pair[1])))
+                    groups_list[i:j] = slice_pairs
             i = j
 
         # Reconstruct array_text
