@@ -80,14 +80,15 @@ POSITIONAL_TOKENS = [
     'activeEditor',
     'activePanel',
     'activeViewlet',
+    'focusedView',
     'config.workbench.activityBar.location',
     'config.workbench.sideBar.location',
-    'focusedView',
     'panel.location',
     'panelPosition',
 ]
 
 VISIBILITY_TOKENS = [
+    'agentSessionsViewerVisible',
     'auxiliaryBarVisible',
     'editorVisible',
     'notificationCenterVisible',

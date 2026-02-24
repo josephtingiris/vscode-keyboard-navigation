@@ -2128,14 +2128,14 @@ Notes:
     "key": "alt+h",
     "command": "alt+j d3ea",
     // "command": "workbench.action.chat.focusAgentSessionsViewer",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '1' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerVisible && agentSessionsViewerOrientation == '1' && !auxiliaryBarMaximized"
   },
   {
     // [keynav] (down) (vi) (0) (self) (gold) (X)
     "key": "alt+j",
     "command": "alt+j d3eb",
     // "command": "workbench.action.chat.focusAgentSessionsViewer",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '1' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerVisible && agentSessionsViewerOrientation == '1' && !auxiliaryBarMaximized"
   },
   {
     // [keynav] (up) (vi) (0) (self) (gold) (X)
@@ -2143,8 +2143,8 @@ Notes:
     "command": "alt+k d9eb",
     // "command": "workbench.action.chat.focusAgentSessionsViewer", // YES!
     // "command": "agentSessions.hideAgentSessionsSidebar",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '1' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
-    // "when": "(agentSessionsViewerOrientation == '1' && agentSessionsViewerPosition == '2') || (agentSessionsViewerPosition == '2' && !agentSessionsViewerVisible)"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerVisible && agentSessionsViewerOrientation == '1' && !auxiliaryBarMaximized"
+    // "when": "(!agentSessionsViewerVisible && agentSessionsViewerPosition == '2') || (agentSessionsViewerOrientation == '1' && agentSessionsViewerPosition == '2')"
     // [note] ...Orientation == '2' is went the SESSIONS view is 'Stacked' (on top)
   },
   {
@@ -2152,35 +2152,35 @@ Notes:
     "key": "alt+l",
     "command": "alt+l d9ea",
     // "command": "workbench.action.chat.focusAgentSessionsViewer",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '1' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerVisible && agentSessionsViewerOrientation == '1' && !auxiliaryBarMaximized"
   },
   {
     // [keynav] (left) (vi) (0) (self) (gold) (X)
     "key": "alt+h",
     "command": "alt+h d8ea",
     // "command": "agentSessions.hideAgentSessionsSidebar",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '2' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerVisible && agentSessionsViewerOrientation == '2' && !auxiliaryBarMaximized"
   },
   {
     // [keynav] (down) (vi) (0) (self) (gold) (X)
     "key": "alt+j",
     "command": "alt+j a8ea",
     // "command": "agentSessions.hideAgentSessionsSidebar",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '2' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerVisible && agentSessionsViewerOrientation == '2' && !auxiliaryBarMaximized"
   },
   {
     // [keynav] (up) (vi) (0) (self) (gold) (X)
     "key": "alt+k",
     "command": "alt+k a7ea",
     // "command": "agentSessions.hideAgentSessionsSidebar",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '2' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerVisible && agentSessionsViewerOrientation == '2' && !auxiliaryBarMaximized"
   },
   {
     // [keynav] (right) (vi) (0) (self) (gold) (X)
     "key": "alt+l",
     "command": "alt+l d8eb",
     // "command": "agentSessions.hideAgentSessionsSidebar",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerOrientation == '2' && agentSessionsViewerVisible && !auxiliaryBarMaximized"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerVisible && agentSessionsViewerOrientation == '2' && !auxiliaryBarMaximized"
     // [note] ...Orientation == '2' is went the SESSIONS view is 'Side by Side' (on right)
   },
   {
