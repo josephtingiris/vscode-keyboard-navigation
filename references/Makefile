@@ -30,6 +30,7 @@ LETTER_NAV_GROUPS := emacs kbm vi
 MAP_MODIFIERS := alt,shift+alt,ctrl+alt,ctrl+alt+meta,ctrl+shift+alt
 PANEL_POSITIONS := top bottom left right
 SIDEBAR_LOCATIONS := left right
+KEYBINDINGS_SORT_ARGS := -p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters
 
 #
 # targets
@@ -53,15 +54,15 @@ corpora:
 	@echo
 
 	# none
-	@keybindings-corpus.py | keybindings-sort.py > keybindings.corpus.jsonc
+	@keybindings-corpus.py | keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) > keybindings.corpus.jsonc
 
 	# letter-key groups
 	@for lng in $(LETTER_NAV_GROUPS); do \
-		../bin/keybindings-corpus.py -n $$lng | keybindings-sort.py > keybindings.corpus.$$lng.jsonc; \
+		../bin/keybindings-corpus.py -n $$lng | keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) > keybindings.corpus.$$lng.jsonc; \
 	done
 
 	# all
-	@keybindings-corpus.py -n all | keybindings-sort.py > keybindings.corpus.all.jsonc
+	@keybindings-corpus.py -n all | keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) > keybindings.corpus.all.jsonc
 	@echo
 
 corpus: corpora
@@ -126,7 +127,7 @@ maps:
 			[ -f $${MAP_FILE}.sidebar.jsonc ] && rm -f $${MAP_FILE}.sidebar.jsonc; \
 		done; \
 		../bin/keybindings-corpus.py -c $${MAP_FILE} > $${MAP_FILE}.tmp.jsonc; \
-		../bin/keybindings-sort.py < $${MAP_FILE}.tmp.jsonc > $${MAP_FILE}; \
+		../bin/keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) < $${MAP_FILE}.tmp.jsonc > $${MAP_FILE}; \
 		sed -i '/enabledMap/s//enabled/g' $${MAP_FILE}; \
 		[ -f $${MAP_FILE}.tmp.jsonc ] && rm -f $${MAP_FILE}.tmp.jsonc; \
 	done
@@ -139,7 +140,7 @@ maps:
 		ls -l $${MAP_FILE}; \
 		[[ "$${MAP_FILE}" == *"all.jsonc" ]] && continue; \
 		../bin/keybindings-merge.py $${MAP_FILE} keybindings.map.all.jsonc --out keybindings.map.all.tmp.jsonc 1> /dev/null; \
-		../bin/keybindings-sort.py < keybindings.map.all.tmp.jsonc > keybindings.map.all.jsonc; \
+		../bin/keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) < keybindings.map.all.tmp.jsonc > keybindings.map.all.jsonc; \
 		[ -f keybindings.map.all.tmp.jsonc ] && rm -f  keybindings.map.all.tmp.jsonc ]; \
 	done
 	@echo
