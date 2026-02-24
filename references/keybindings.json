@@ -7223,7 +7223,7 @@ Notes:
     // [keynav] (vi) (action) (chord) (editor)
     "key": "alt+a alt+z",
     "command": "workbench.action.toggleZenMode",
-    // "command": "alt+a alt+p 4242",
+    // "command": "alt+a alt+z 4242",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus && config.keyboardNavigation.chords.action"
     // [note] alternative zen mode toggle chord
   },

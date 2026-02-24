@@ -135,7 +135,7 @@ main() {
     fi
 
     if [ "${KEYBINDINGS_SORT_ARGUMENTS}" ]; then
-        ansi_echo "Using provided ${YELLOW}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
+        ansi_echo "Using provided arguments: ${YELLOW}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     else
         if [ "${1}" == "1" ]; then
             KEYBINDINGS_SORT_ARGUMENTS="-p key -s when"
@@ -188,10 +188,10 @@ main() {
 
         if [ "${KEYBINDINGS_SORT_ARGUMENTS}" == "" ]; then
             KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant --when-regex config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters,config.keyboardNavigation"
+            KEYBINDINGS_SORT_ARGUMENTS="-p when -p key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
         fi
 
         ansi_echo "Using default arguments: ${GREEN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
-        ansi_echo "Using provided arguments: ${YELLOW}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     fi
     export KEYBINDINGS_SORT_ARGUMENTS
 
