@@ -187,7 +187,7 @@ main() {
         fi
 
         if [ "${KEYBINDINGS_SORT_ARGUMENTS}" == "" ]; then
-            KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant --when-regex config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters,config.keyboardNavigation"
+            # TODO: get, or sync this vale with the Makefile's
             KEYBINDINGS_SORT_ARGUMENTS="-p when -p key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
         fi
 
