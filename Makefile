@@ -16,6 +16,8 @@ help:
 	@echo "  maps                    - generate all map files in references/"
 	@echo "  map                     - alias for maps"
 	@echo "  extension               - make extension in extension/"
+	@echo "  surfaces                - generalte all surface files in references/"
+	@echo "  surface                 - alias for surfaces"
 	@echo "  tests                   - run all tests in tests/"
 	@echo "  test                    - alias for tests"
 	@echo
@@ -61,12 +63,12 @@ clean:
 	@echo
 	@echo "++ Repository clean complete."
 
-corpus:
-	@echo "++ Making corpus in references/ ..."
+corpora:
+	@echo "++ Making corpora in references/ ..."
 	@echo
-	$(MAKE) -C references corpus
+	$(MAKE) -C references corpora
 
-corpora: corpus
+corpus: corpora
 
 extension:
 	@echo "++ Making all in extension/ ..."
@@ -84,6 +86,13 @@ references:
 	@echo "++ Making all in references/ ..."
 	@echo
 	$(MAKE) -C references all
+
+surfaces:
+	@echo "++ Making surfaces in references/ ..."
+	@echo
+	$(MAKE) -C references surfaces
+
+surface: surfaces
 
 tests:
 	@echo "++ Running all tests/ ..."

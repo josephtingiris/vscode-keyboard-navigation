@@ -161,7 +161,7 @@ main() {
         if [ "${1}" == "4" ]; then
             KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
             if [ "${2}" == "w" ]; then
-                KEYBINDINGS_SORT_ARGUMENTS="-p when -p key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
+                KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
             fi
         fi
 
@@ -188,7 +188,7 @@ main() {
 
         if [ "${KEYBINDINGS_SORT_ARGUMENTS}" == "" ]; then
             # TODO: get, or sync this vale with the Makefile's
-            KEYBINDINGS_SORT_ARGUMENTS="-p when -p key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
+            KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
         fi
 
         ansi_echo "Using default arguments: ${GREEN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
