@@ -40,6 +40,30 @@ aborting() {
     exit 1
 }
 
+ansi_echo() {
+    local no_newline=0
+    if [ "${1:-}" = "-n" ]; then
+        no_newline=1
+        shift
+    fi
+
+    local text="$*"
+
+    if [[ "${text}" == *"${RESET}"* ]]; then
+        if [ "${no_newline}" -eq 1 ]; then
+            printf "%b" "${text}"
+        else
+            printf "%b\n" "${text}"
+        fi
+    else
+        if [ "${no_newline}" -eq 1 ]; then
+            printf "%b" "${text}${RESET}"
+        else
+            printf "%b\n" "${text}${RESET}"
+        fi
+    fi
+}
+
 usage() {
     echo
     echo "usage: ${0##*/} [-h|--help] [keybindings.json]"
@@ -111,10 +135,8 @@ main() {
     fi
 
     if [ "${KEYBINDINGS_SORT_ARGUMENTS}" ]; then
-        echo "Using provided KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
+        ansi_echo "Using provided ${YELLOW}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     else
-        echo "1=$1"
-
         if [ "${1}" == "1" ]; then
             KEYBINDINGS_SORT_ARGUMENTS="-p key -s when"
             if [ "${2}" == "w" ]; then
@@ -168,7 +190,8 @@ main() {
             KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant --when-regex config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters,config.keyboardNavigation"
         fi
 
-        echo "Using default KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
+        ansi_echo "Using default arguments: ${GREEN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
+        ansi_echo "Using provided arguments: ${YELLOW}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     fi
     export KEYBINDINGS_SORT_ARGUMENTS
 
@@ -180,6 +203,8 @@ main() {
         mv /tmp/keybindings-sorted.json.$$ "${keybindings_json}"
     fi
     echo "OK."
+
+    ansi_echo "Arguments used: ${CYAN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
 
     validate_json "${keybindings_json}"
 
@@ -199,5 +224,15 @@ for _arg in "$@"; do
             ;;
     esac
 done
+
+# ANSI color codes
+RESET='\033[0m'
+BOLD='\033[1m'
+RED='\033[31m'
+GREEN='\033[32m'
+YELLOW='\033[33m'
+BLUE='\033[34m'
+MAGENTA='\033[35m'
+CYAN='\033[36m'
 
 main "${@}"
