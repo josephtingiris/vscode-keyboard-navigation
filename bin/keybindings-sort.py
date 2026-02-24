@@ -1478,6 +1478,8 @@ def main(argv: List[str] | None = None) -> int:
                 obj_out, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
         except Exception:
             pass
+        # normalize trailing whitespace again after normalization
+        obj_out = obj_out.rstrip()
         key_val, when_val = extract_key_when(obj_out)
         canonical_when = canonicalize_when(
             when_val, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
@@ -1518,15 +1520,19 @@ def main(argv: List[str] | None = None) -> int:
     # rendering to ensure identical ASTs always produce identical strings.
     def _replace_when_literal(match):
         inner = match.group(2)
+        # Decode the JSON string literal safely using json.loads
         try:
-            unescaped = bytes(inner, 'utf-8').decode('unicode_escape')
+            unescaped = json.loads('"' + inner + '"')
         except Exception:
+            # Fallback: treat inner as-is but avoid interpreting escapes
             unescaped = inner
         canon = canonicalize_when(unescaped, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
         try:
             escaped = json.dumps(canon)[1:-1]
         except Exception:
             escaped = canon.replace('\\', '\\\\').replace('"', '\\"')
+        # Ensure we never insert actual newline characters into a JSON string
+        escaped = escaped.replace('\n', '\\n').replace('\r', '\\r')
         return match.group(1) + escaped + match.group(3)
 
     processed = re.sub(r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")', _replace_when_literal, processed)
@@ -1537,9 +1543,12 @@ def main(argv: List[str] | None = None) -> int:
     # `key` value using `natural_key_case_sensitive`.
     def _decode_json_string_literal(raw: str) -> str:
         try:
-            return bytes(raw, 'utf-8').decode('unicode_escape')
+            return json.loads('"' + raw + '"')
         except Exception:
-            return raw
+            try:
+                return bytes(raw, 'utf-8').decode('unicode_escape')
+            except Exception:
+                return raw
 
     def _extract_raw_when(obj_text: str) -> str:
         m = re.search(r'"when"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
@@ -1592,12 +1601,25 @@ def main(argv: List[str] | None = None) -> int:
         # Reconstruct array_text
         out = []
         for idx, (comments, obj) in enumerate(groups_list):
+            is_last = (idx == len(groups_list) - 1)
+            # normalize trailing characters after the closing '}' and strip newline
+            obj_out = obj
+            idx_r = obj_out.rfind('}')
+            if idx_r != -1:
+                after = obj_out[idx_r + 1:]
+                after_clean = re.sub(r'^\s*,+', '', after)
+                # remove any leading whitespace/newlines left after removing commas
+                after_clean = after_clean.lstrip()
+                obj_out = (obj_out[:idx_r + 1] + after_clean).rstrip()
             if comments:
+                comments = re.sub(r'(?m)^[ \t]*\n+', '', comments)
                 out.append(comments)
-            out.append(obj)
-            # avoid adding an extra blank line when `obj` already ends with a newline
-            if not obj.endswith('\n'):
-                out.append('\n')
+            # Build the object's output line and attach comma immediately when needed
+            line = obj_out.rstrip()
+            if not is_last and not object_has_trailing_comma(obj_out):
+                line = line + ','
+            line = line + '\n'
+            out.append(line)
         out.append(trailing)
 
         new_array = ''.join(out)
