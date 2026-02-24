@@ -1461,6 +1461,79 @@ def main(argv: List[str] | None = None) -> int:
 
     processed = re.sub(r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")', _replace_when_literal, processed)
 
+    # Final enforcement pass: parse the processed array and, for every
+    # contiguous run whose original (raw) `when` literal is identical
+    # (whitespace-normalized), sort that slice in-place by the literal
+    # `key` value using `natural_key_case_sensitive`.
+    def _decode_json_string_literal(raw: str) -> str:
+        try:
+            return bytes(raw, 'utf-8').decode('unicode_escape')
+        except Exception:
+            return raw
+
+    def _extract_raw_when(obj_text: str) -> str:
+        m = re.search(r'"when"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
+        if not m:
+            return ''
+        return _decode_json_string_literal(m.group(1))
+
+    def _extract_raw_key(obj_text: str) -> str:
+        m = re.search(r'"key"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
+        if not m:
+            return ''
+        return _decode_json_string_literal(m.group(1))
+
+    def _reorder_processed(processed_text: str) -> str:
+        pre, array_text, post = extract_preamble_postamble(processed_text)
+        if array_text is None:
+            return processed_text
+        groups_list, trailing = group_objects_with_comments(array_text)
+
+        def norm_ws(s: str) -> str:
+            return re.sub(r'\s+', ' ', (s or '')).strip()
+
+        i = 0
+        while i < len(groups_list):
+            # compute normalized raw when for start
+            raw_when = _extract_raw_when(groups_list[i][1]) or ''
+            norm_when = norm_ws(raw_when)
+            j = i + 1
+            while j < len(groups_list):
+                w2 = _extract_raw_when(groups_list[j][1]) or ''
+                if norm_ws(w2) != norm_when:
+                    break
+                j += 1
+
+            if j - i > 1:
+                slice_pairs = groups_list[i:j]
+                slice_pairs.sort(key=lambda pair: natural_key_case_sensitive(_extract_raw_key(pair[1])))
+                groups_list[i:j] = slice_pairs
+            i = j
+
+        # Reconstruct array_text
+        out = []
+        for idx, (comments, obj) in enumerate(groups_list):
+            if comments:
+                out.append(comments)
+            out.append(obj)
+            # avoid adding an extra blank line when `obj` already ends with a newline
+            if not obj.endswith('\n'):
+                out.append('\n')
+        out.append(trailing)
+
+        new_array = ''.join(out)
+        # remove any leading blank lines before the first object to avoid
+        # inserting an extra empty line after the opening '['
+        new_array = re.sub(r'^\n+', '', new_array)
+        # match earlier formatting: include opening bracket + newline and closing bracket
+        return pre + '[\n' + new_array + ']' + post
+
+    try:
+        processed = _reorder_processed(processed)
+    except Exception:
+        # best-effort only; if this fails, fall back to original processed text
+        pass
+
     sys.stdout.write(processed)
 
     return 0
