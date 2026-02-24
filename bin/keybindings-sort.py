@@ -51,14 +51,17 @@ Exit codes:
     1   Usage / bad args
     2   File read/write or other runtime error
 """
+
 import sys
+import os
 import re
 import json
 import argparse
 from typing import List, Tuple
 
-# canonical when-token classification sets
-FOCUS_TOKENS = {
+DEFAULT_WHEN_PREFIXES = []
+
+FOCUS_TOKENS = [
     'auxiliaryBarFocus',
     'editorFocus',
     'editorTextFocus',
@@ -69,8 +72,9 @@ FOCUS_TOKENS = {
     'sideBarFocus',
     'terminalFocus',
     'textInputFocus',
-}
+]
 
+# token groups used for when-grouping heuristics
 POSITIONAL_TOKENS = [
     'activeAuxiliary',
     'activeEditor',
@@ -83,7 +87,7 @@ POSITIONAL_TOKENS = [
     'panelPosition',
 ]
 
-VISIBILITY_TOKENS = {
+VISIBILITY_TOKENS = [
     'auxiliaryBarVisible',
     'editorVisible',
     'notificationCenterVisible',
@@ -96,10 +100,9 @@ VISIBILITY_TOKENS = {
     'timeline.visible',
     'view.<viewId>.visible',
     'webviewFindWidgetVisible',
-}
+]
 
-# default literal prefixes to prioritize (can be overridden via CLI)
-DEFAULT_WHEN_PREFIXES = []
+TARGET_DEBUG_WHEN = "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorTextFocus && panelPosition == 'bottom'"
 
 
 def extract_preamble_postamble(text):
@@ -349,7 +352,14 @@ class WhenAnd(WhenNode):
         self.children = children
 
     def to_str(self) -> str:
-        return ' && '.join([render_when_node(c) for c in self.children])
+        parts: list[str] = []
+        for c in self.children:
+            s = render_when_node(c)
+            # when an OR appears as an operand of an AND, it must be parenthesized
+            if isinstance(c, WhenOr):
+                s = f'({s})'
+            parts.append(s)
+        return ' && '.join(parts)
 
 
 class WhenOr(WhenNode):
@@ -358,7 +368,14 @@ class WhenOr(WhenNode):
         self.children = children
 
     def to_str(self) -> str:
-        return ' || '.join([render_when_node(c) for c in self.children])
+        parts: list[str] = []
+        for c in self.children:
+            s = render_when_node(c)
+            # when an AND appears as an operand of an OR, it must be parenthesized
+            if isinstance(c, WhenAnd):
+                s = f'({s})'
+            parts.append(s)
+        return ' || '.join(parts)
 
 
 def render_when_node(node: WhenNode) -> str:
@@ -662,7 +679,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
         if isinstance(node, WhenAnd):
             for child in node.children:
                 sort_and_nodes(child)
-            items = list(enumerate(node.children))
+            indexed = list(enumerate(node.children))
 
             # prioritize operands
             prioritized = []
@@ -676,7 +693,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
             if when_prefixes:
                 for pref in when_prefixes:
                     matches = []
-                    for idx, child in items:
+                    for idx, child in indexed:
                         if idx in picked:
                             continue
                         lid = _left_id_of(child)
@@ -692,7 +709,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
             if when_regexes:
                 for pat in when_regexes:
                     matches = []
-                    for idx, child in items:
+                    for idx, child in indexed:
                         if idx in picked:
                             continue
                         lid = _left_id_of(child)
@@ -720,8 +737,8 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
 
             if negation_mode == 'alpha':
                 # use existing group-aware sort_key
-                items.sort(key=sort_key)
-                sorted_children = [it[1] for it in items]
+                indexed.sort(key=sort_key)
+                sorted_children = [it[1] for it in indexed]
             else:
                 # for natural/positive/negative/beta: sort by rendered token base
                 def render_base_and_flag(child):
@@ -736,7 +753,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                     return base, is_neg, tok
 
                 items_with_keys = []
-                for idx, child in items:
+                for idx, child in indexed:
                     base, is_neg, tok = render_base_and_flag(child)
                     # natural-style comparison: use natural_key (case-insensitive)
                     base_key = natural_key(base)
@@ -777,13 +794,27 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                 unique.append(c)
             node.children = unique
         elif isinstance(node, WhenOr):
+            # recurse first
             for child in node.children:
                 sort_and_nodes(child)
 
-            # rrmove duplicate OR operands while preserving order
+            # flatten nested ORs (commutative) and collect items
+            items: list[WhenNode] = []
+            for c in node.children:
+                if isinstance(c, WhenOr):
+                    items.extend(c.children)
+                else:
+                    items.append(c)
+
+            # sort OR operands deterministically so equivalent ASTs render the same
+            indexed = list(enumerate(items))
+            indexed.sort(key=lambda it: (natural_key_case_sensitive(render_when_node(it[1])), it[0]))
+            sorted_children = [it[1] for it in indexed]
+
+            # remove duplicates while preserving sorted order
             unique: list[WhenNode] = []
             seen = set()
-            for c in node.children:
+            for c in sorted_children:
                 tok = render_when_node(c)
                 if tok in seen:
                     continue
@@ -795,6 +826,21 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
 
     ast = parse_when(when_val)
     sort_and_nodes(ast)
+    # normalize parentheses: discard original syntactic parens and
+    # render parentheses only where operator precedence requires them.
+
+    def _clear_parens(node: WhenNode):
+        node.parens = False
+        if isinstance(node, WhenLeaf):
+            return
+        if isinstance(node, WhenNot):
+            _clear_parens(node.child)
+            return
+        if isinstance(node, WhenAnd) or isinstance(node, WhenOr):
+            for c in node.children:
+                _clear_parens(c)
+
+    _clear_parens(ast)
     return render_when_node(ast)
 
 
@@ -963,17 +1009,82 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
 
 
 def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple[str, bool]:
-    pattern = re.compile(r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")')
-    match = pattern.search(obj_text)
-    if not match:
+    # Parse the object robustly (strip comments and trailing commas) so we
+    # can reliably extract the logical `when` value even when the source
+    # contains comments or unusual formatting. Then replace the original
+    # string literal with a properly escaped canonical value.
+    obj_match = re.search(r'\{.*\}', obj_text, re.DOTALL)
+    if not obj_match:
         return obj_text, False
-    original_when = match.group(2)
+    obj_str = obj_match.group(0)
+    try:
+        clean = strip_json_comments(obj_str)
+        clean = strip_trailing_commas(clean)
+        parsed = json.loads(clean)
+    except Exception:
+        return obj_text, False
+
+    when_val = parsed.get('when')
+    if not when_val:
+        return obj_text, False
 
     normalized = canonicalize_when(
-        original_when, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
-    if normalized == original_when:
+        str(when_val), mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+    if normalized == when_val:
         return obj_text, False
-    new_obj = obj_text[:match.start(2)] + normalized + obj_text[match.end(2):]
+
+    # Safely locate the string literal for the `when` value even if there
+    # are inline comments or whitespace, then replace its inner contents
+    # with a properly JSON-escaped canonical value.
+    idx = obj_text.find('"when"')
+    if idx == -1:
+        return obj_text, False
+    # find the colon after the key
+    colon = obj_text.find(':', idx)
+    if colon == -1:
+        return obj_text, False
+
+    i = colon + 1
+    n = len(obj_text)
+    # skip whitespace/comments to find opening quote
+    while i < n:
+        if obj_text.startswith('//', i):
+            i2 = obj_text.find('\n', i)
+            i = i2 + 1 if i2 != -1 else n
+            continue
+        if obj_text.startswith('/*', i):
+            i2 = obj_text.find('*/', i + 2)
+            i = (i2 + 2) if i2 != -1 else n
+            continue
+        if obj_text[i].isspace():
+            i += 1
+            continue
+        break
+
+    if i >= n or obj_text[i] != '"':
+        return obj_text, False
+
+    qstart = i
+    # find matching closing quote, honoring backslash escapes
+    j = qstart + 1
+    while j < n:
+        ch = obj_text[j]
+        if ch == '\\':
+            j += 2
+            continue
+        if ch == '"':
+            break
+        j += 1
+    if j >= n:
+        return obj_text, False
+
+    # build JSON-escaped inner string reliably
+    try:
+        escaped = json.dumps(normalized)[1:-1]
+    except Exception:
+        escaped = normalized.replace('\\', '\\\\').replace('"', '\\"')
+
+    new_obj = obj_text[:qstart + 1] + escaped + obj_text[j:]
     return new_obj, True
 
 
@@ -1196,12 +1307,72 @@ def main(argv: List[str] | None = None) -> int:
                 when_val = _pair_when_literal(pair[1])
             decorated.append((key_val, when_val, pair))
 
+        # Debug: print sort key components for entries matching the user's when clause
+        for key_val, when_val, _pair in decorated:
+            try:
+                canon = canonicalize_when(when_val, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+            except Exception:
+                canon = when_val
+            if canon == TARGET_DEBUG_WHEN or when_val == TARGET_DEBUG_WHEN:
+                norm = normalize_key_for_compare(key_val)
+                try:
+                    nk = natural_key(norm)
+                except Exception:
+                    nk = norm
+                print(f"DEBUG_SORT: raw_key={key_val!r} normalized={norm!r} natural_key={nk!r} when_raw={when_val!r} when_canonical={canon!r}", file=sys.stderr)
+
         # stable two-pass sort:
         #   1) key ascending (secondary within group)
         #   2) when ascending (final primary ordering)
-        decorated = sorted(decorated, key=lambda row: natural_key(row[0]))
-        decorated = sorted(decorated, key=lambda row: row[1])
+        # single-pass stable sort: primary by `when` then secondary by normalized `key`
+        # primary: canonical when, secondary: original when literal, tertiary: normalized key
+        # tie-break: prefer literal when equality then literal key alphabetical ordering
+        decorated.sort(key=lambda row: (
+            canonicalize_when(row[1], mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes),
+            row[1],
+            natural_key_case_sensitive(row[0])
+        ))
         sorted_groups = [row[2] for row in decorated]
+
+        # Debug: after sorting, emit the final ordering for the target when clause
+        for idx, pair in enumerate(sorted_groups):
+            k, w = extract_key_when(pair[1])
+            try:
+                canon_w = canonicalize_when(w, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+            except Exception:
+                canon_w = w
+            if canon_w == TARGET_DEBUG_WHEN:
+                norm = normalize_key_for_compare(k)
+                print(f"DEBUG_ORDERED: idx={idx} raw_key={k!r} normalized={norm!r}", file=sys.stderr)
+
+        # Final stabilization pass: within contiguous runs of identical original
+        # `when` literals, enforce alphabetical ordering by the literal `key` value.
+        i = 0
+        # normalize whitespace when comparing `when` literals so logically-identical
+        # strings that differ only in line-wrapping/spacing are considered equal.
+
+        def _norm_ws(s: str) -> str:
+            return re.sub(r'\s+', ' ', s).strip() if s else ''
+
+        while i < len(sorted_groups):
+            _, raw_when = extract_key_when(sorted_groups[i][1])
+            if not raw_when:
+                raw_when = _pair_when_literal(sorted_groups[i][1])
+            norm_when = _norm_ws(raw_when)
+            j = i + 1
+            while j < len(sorted_groups):
+                _, w2 = extract_key_when(sorted_groups[j][1])
+                if not w2:
+                    w2 = _pair_when_literal(sorted_groups[j][1])
+                if _norm_ws(w2) != norm_when:
+                    break
+                j += 1
+
+            if j - i > 1:
+                slice_pairs = sorted_groups[i:j]
+                slice_pairs.sort(key=lambda p: natural_key_case_sensitive(_pair_key_literal(p[1])))
+                sorted_groups[i:j] = slice_pairs
+            i = j
 
     # assemble into buffer for post-processing (e.g. remove blank lines)
     def post_process(text: str) -> str:
@@ -1231,6 +1402,12 @@ def main(argv: List[str] | None = None) -> int:
     for i, (comments, obj) in enumerate(sorted_groups):
         is_last = (i == len(sorted_groups) - 1)
         obj_out = obj.rstrip()
+        # ensure final output contains the canonical `when` string
+        try:
+            obj_out, _ = normalize_when_in_object(
+                obj_out, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+        except Exception:
+            pass
         key_val, when_val = extract_key_when(obj_out)
         canonical_when = canonicalize_when(
             when_val, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
@@ -1266,6 +1443,23 @@ def main(argv: List[str] | None = None) -> int:
     final_text = ''.join(out_parts)
 
     processed = post_process(final_text)
+
+    # final forced pass: replace every "when" literal with its canonicalized
+    # rendering to ensure identical ASTs always produce identical strings.
+    def _replace_when_literal(match):
+        inner = match.group(2)
+        try:
+            unescaped = bytes(inner, 'utf-8').decode('unicode_escape')
+        except Exception:
+            unescaped = inner
+        canon = canonicalize_when(unescaped, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+        try:
+            escaped = json.dumps(canon)[1:-1]
+        except Exception:
+            escaped = canon.replace('\\', '\\\\').replace('"', '\\"')
+        return match.group(1) + escaped + match.group(3)
+
+    processed = re.sub(r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")', _replace_when_literal, processed)
 
     sys.stdout.write(processed)
 
