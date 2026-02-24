@@ -62,36 +62,41 @@ from typing import List, Tuple
 
 DEFAULT_WHEN_PREFIXES = []
 
+# token groups used for when-grouping heuristics
+
 FOCUS_TOKENS = [
+    # primary (order matters!)
+    'auxiliaryBarFocus',
     'editorFocus',
     'panelFocus',
+    'sideBarFocus',
+    'terminalFocus',
+    # secondary
     'agentSessionsViewerFocused',
     'editorTextFocus',
     'inputFocus',
     'listFocus',
     'notificationFocus',
-    'sideBarFocus',
-    'terminalFocus',
     'textInputFocus',
-    'auxiliaryBarFocus',
 ]
 
-# token groups used for when-grouping heuristics
 POSITIONAL_TOKENS = [
+    # primary (order matters!)
+    'config.workbench.activityBar.location',
+    'config.workbench.sideBar.location',
+    'panel.location',
+    'panelPosition',
+    # secondary
     'activeAuxiliary',
     'activeEditor',
     'activePanel',
     'activeViewlet',
     'focusedView',
-    'config.workbench.activityBar.location',
-    'config.workbench.sideBar.location',
-    'panel.location',
-    'panelPosition',
 ]
 
 VISIBILITY_TOKENS = [
-    'agentSessionsViewerVisible',
     'auxiliaryBarVisible',
+    'agentSessionsViewerVisible',
     'editorVisible',
     'notificationCenterVisible',
     'notificationToastsVisible',
