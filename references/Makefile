@@ -31,7 +31,7 @@ LETTER_NAV_GROUPS := emacs kbm vi
 MAP_MODIFIERS := alt,shift+alt,ctrl+alt,ctrl+alt+meta,ctrl+shift+alt
 PANEL_POSITIONS := top bottom left right
 SIDEBAR_LOCATIONS := left right
-KEYBINDINGS_SORT_ARGS := -p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters
+KEYBINDINGS_SORT_ARGUMENTS := -p when -p key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters
 
 #
 # targets
@@ -55,15 +55,15 @@ corpora:
 	@echo
 
 	# none
-	@keybindings-corpus.py | keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) > keybindings.corpus.jsonc
+	@keybindings-corpus.py | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.jsonc
 
 	# letter-key groups
 	@for lng in $(LETTER_NAV_GROUPS); do \
-		../bin/keybindings-corpus.py -n $$lng | keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) > keybindings.corpus.$$lng.jsonc; \
+		../bin/keybindings-corpus.py -n $$lng | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.$$lng.jsonc; \
 	done
 
 	# all
-	@keybindings-corpus.py -n all | keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) > keybindings.corpus.all.jsonc
+	@keybindings-corpus.py -n all | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.all.jsonc
 	@echo
 
 corpus: corpora
@@ -110,7 +110,7 @@ maps:
 			done; \
 		done; \
 		../bin/keybindings-corpus.py -c $${MAP_FILE} > $${MAP_FILE}.tmp.jsonc; \
-		../bin/keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) < $${MAP_FILE}.tmp.jsonc > $${MAP_FILE}; \
+		../bin/keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) < $${MAP_FILE}.tmp.jsonc > $${MAP_FILE}; \
 		sed -i '/enabledMap/s//enabled/g' $${MAP_FILE}; \
 		[ -f $${MAP_FILE}.tmp.jsonc ] && rm -f $${MAP_FILE}.tmp.jsonc; \
 	done
@@ -123,7 +123,7 @@ maps:
 		ls -l $${MAP_FILE}; \
 		[[ "$${MAP_FILE}" == *"all.jsonc" ]] && continue; \
 		../bin/keybindings-merge.py $${MAP_FILE} keybindings.map.all.jsonc --out keybindings.map.all.tmp.jsonc 1> /dev/null; \
-		../bin/keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) < keybindings.map.all.tmp.jsonc > keybindings.map.all.jsonc; \
+		../bin/keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) < keybindings.map.all.tmp.jsonc > keybindings.map.all.jsonc; \
 		[ -f keybindings.map.all.tmp.jsonc ] && rm -f  keybindings.map.all.tmp.jsonc ]; \
 	done
 	@echo
@@ -136,19 +136,19 @@ surfaces:
 
 	# none
 	@../bin/keybindings-merge.py keybindings.corpus.jsonc keybindings.map.jsonc --prefer left --out keybindings.merged.surface.jsonc 1> /dev/null
-	@cat keybindings.merged.surface.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) > keybindings.surface.jsonc
+	@cat keybindings.merged.surface.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.jsonc
 	@rm -f keybindings.merged.surface.jsonc
 
 	# letter-key groups
 	@for lng in $(LETTER_NAV_GROUPS); do \
 		../bin/keybindings-merge.py keybindings.corpus.$$lng.jsonc keybindings.map.$$lng.jsonc --prefer left --out keybindings.merged.surface.$$lng.jsonc 1> /dev/null; \
-		cat keybindings.merged.surface.$$lng.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) > keybindings.surface.$$lng.jsonc; \
+		cat keybindings.merged.surface.$$lng.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.$$lng.jsonc; \
 		rm -f keybindings.merged.surface.$$lng.jsonc; \
 	done
 
 	# all
 	@../bin/keybindings-merge.py keybindings.corpus.all.jsonc keybindings.map.all.jsonc --prefer left --out keybindings.merged.surface.all.jsonc 1> /dev/null
-	@cat keybindings.merged.surface.all.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGS) > keybindings.surface.all.jsonc
+	@cat keybindings.merged.surface.all.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.all.jsonc
 	@rm -f keybindings.merged.surface.all.jsonc
 	@echo
 
