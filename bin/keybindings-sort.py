@@ -63,13 +63,13 @@ from typing import List, Tuple
 DEFAULT_WHEN_PREFIXES = []
 
 FOCUS_TOKENS = [
-    'agentSessionsViewerFocused',
     'editorFocus',
+    'panelFocus',
+    'agentSessionsViewerFocused',
     'editorTextFocus',
     'inputFocus',
     'listFocus',
     'notificationFocus',
-    'panelFocus',
     'sideBarFocus',
     'terminalFocus',
     'textInputFocus',
@@ -791,11 +791,16 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                     # positive / negative: preserve original list order within positive/negative groups
                     if nm == 'positive':
                         neg_sort = 0 if not is_neg else 1
-                        items_with_keys.append((idx, child, (grp, neg_sort, idx)))
+                        # use token-list ordering (focus/positional/visibility) as sub-rank
+                        f_rank = focus_order.get(lid, positional_order.get(lid, visibility_order.get(lid, 9999)))
+                        base_key_cs = natural_key_case_sensitive(base)
+                        items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
                         continue
                     if nm == 'negative':
                         neg_sort = 0 if is_neg else 1
-                        items_with_keys.append((idx, child, (grp, neg_sort, idx)))
+                        f_rank = focus_order.get(lid, positional_order.get(lid, visibility_order.get(lid, 9999)))
+                        base_key_cs = natural_key_case_sensitive(base)
+                        items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
                         continue
                     # default fallback
                     neg_sort = 0
@@ -1004,13 +1009,40 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                     base = sortable_when.lstrip('!')
                     tert = natural_key(base)
                 elif negation_mode in ('positive', 'beta', 'positive-natural'):
+                    # positive-natural: prefer non-negated then natural base ordering
                     is_neg = 1 if sortable_when.startswith('!') else 0
                     base = sortable_when.lstrip('!')
-                    tert = (is_neg, natural_key(base))
+                    if negation_mode == 'positive':
+                        # prioritize token-list ordering (FOCUS -> POSITIONAL -> VISIBILITY)
+                        # compute sub-rank based on the first_when_token
+                        lid = first_when_token
+                        if lid.startswith('(') and lid.endswith(')'):
+                            lid = lid[1:-1].strip()
+                        if lid.startswith('!'):
+                            lid = lid[1:].lstrip()
+                        focus_order = {t: i for i, t in enumerate(FOCUS_TOKENS)}
+                        positional_order = {t: i for i, t in enumerate(POSITIONAL_TOKENS)}
+                        visibility_order = {t: i for i, t in enumerate(VISIBILITY_TOKENS)}
+                        f_rank = focus_order.get(lid, positional_order.get(lid, visibility_order.get(lid, 9999)))
+                        tert = (is_neg, f_rank, natural_key_case_sensitive(base))
+                    else:
+                        tert = (is_neg, natural_key(base))
                 elif negation_mode in ('negative', 'negative-natural'):
                     is_neg = 0 if sortable_when.startswith('!') else 1
                     base = sortable_when.lstrip('!')
-                    tert = (is_neg, natural_key(base))
+                    if negation_mode == 'negative':
+                        lid = first_when_token
+                        if lid.startswith('(') and lid.endswith(')'):
+                            lid = lid[1:-1].strip()
+                        if lid.startswith('!'):
+                            lid = lid[1:].lstrip()
+                        focus_order = {t: i for i, t in enumerate(FOCUS_TOKENS)}
+                        positional_order = {t: i for i, t in enumerate(POSITIONAL_TOKENS)}
+                        visibility_order = {t: i for i, t in enumerate(VISIBILITY_TOKENS)}
+                        f_rank = focus_order.get(lid, positional_order.get(lid, visibility_order.get(lid, 9999)))
+                        tert = (is_neg, f_rank, natural_key_case_sensitive(base))
+                    else:
+                        tert = (is_neg, natural_key(base))
                 else:
                     tert = natural_key_case_sensitive(sortable_when)
 
