@@ -1,6 +1,6 @@
 
 .DEFAULT_GOAL := help
-.PHONY: help all build clean test tests corpus corpora map maps
+.PHONY: help all build clean test tests corpus corpora map maps surfaces surface
 
 # default: show help when `make` is run with no args
 help:
@@ -15,6 +15,8 @@ help:
 	@echo "  corpus                  - alias for corpora"
 	@echo "  maps                    - generate all map files"
 	@echo "  map                     - alias for maps"
+	@echo "  surfaces                - generate all surface files"
+	@echo "  surface                 - alias for surfaces"
 	@echo "  tests                   - run all tests in ../tests/"
 	@echo "  test                    - alias for tests"
 	@echo
@@ -31,7 +33,7 @@ LETTER_NAV_GROUPS := emacs kbm vi
 MAP_MODIFIERS := alt,shift+alt,ctrl+alt,ctrl+alt+meta,ctrl+shift+alt
 PANEL_POSITIONS := top bottom left right
 SIDEBAR_LOCATIONS := left right
-KEYBINDINGS_SORT_ARGUMENTS := -p when -p key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters
+KEYBINDINGS_SORT_ARGUMENTS := -p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters
 
 #
 # targets
