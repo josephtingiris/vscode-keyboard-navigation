@@ -60,9 +60,18 @@ import json
 import argparse
 from typing import List, Tuple
 
+# global memoization cache for canonicalized when results
+CANONICALIZE_WHEN_CACHE: dict = {}
+
+# when value to debug (if any) if none are given via cli
+DEBUG_TARGET_WHEN = ""
+
+# when prefixes (if any) to be added if none are given via the cli
 DEFAULT_WHEN_PREFIXES = []
 
+#
 # token groups used for when-grouping heuristics
+#
 
 FOCUS_TOKENS = [
     # primary (order matters!)
@@ -110,7 +119,6 @@ VISIBILITY_TOKENS = [
     'webviewFindWidgetVisible',
 ]
 
-TARGET_DEBUG_WHEN = "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorTextFocus && panelPosition == 'bottom'"
 
 
 def extract_preamble_postamble(text):
@@ -585,8 +593,23 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
     """
     if not when_val:
         return ''
+
+    # memoization: avoid repeated expensive parsing of identical inputs
+    cache_key = (
+        when_val,
+        mode,
+        negation_mode,
+        None if when_prefixes is None else tuple(when_prefixes),
+        None if when_regexes is None else tuple(when_regexes),
+    )
+
+    # key: (when_val, mode, negation_mode, when_prefixes_tuple_or_None, when_regexes_tuple_or_None)
+    cached = CANONICALIZE_WHEN_CACHE.get(cache_key)
+
+    if cached is not None:
+        return cached
     """
-        TBD: these need to be tested before being integrated, especially with the focal-invariant mode:
+        TBD: these need to be better tested before being fully integrated, especially with the focal-invariant mode:
         'view.',
         'view.<viewId>.visible',
         'view.container.',
@@ -866,9 +889,9 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
             sort_and_nodes(node.child)
 
     ast = parse_when(when_val)
-    # debug: dump top-level AND operand ordering before/after sort for inspection
     try:
-        if when_val == TARGET_DEBUG_WHEN:
+        # debug: dump top-level AND operand ordering before/after sort for inspection
+        if when_val == DEBUG_TARGET_WHEN:
             if isinstance(ast, WhenAnd):
                 for i, c in enumerate(ast.children):
                     try:
@@ -887,7 +910,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
     sort_and_nodes(ast)
 
     try:
-        if when_val == TARGET_DEBUG_WHEN:
+        if when_val == DEBUG_TARGET_WHEN:
             if isinstance(ast, WhenAnd):
                 for i, c in enumerate(ast.children):
                     try:
@@ -915,7 +938,14 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                 _clear_parens(c)
 
     _clear_parens(ast)
-    return render_when_node(ast)
+    result = render_when_node(ast)
+
+    try:
+        CANONICALIZE_WHEN_CACHE[cache_key] = result
+    except Exception:
+        pass
+
+    return result
 
 
 def sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
@@ -1492,13 +1522,14 @@ def main(argv: List[str] | None = None) -> int:
                 when_val = _pair_when_literal(pair[1])
             decorated.append((key_val, when_val, pair))
 
-        # debug: print sort key components for entries matching the user's when clause
         for key_val, when_val, _pair in decorated:
             try:
                 canon = canonicalize_when(when_val, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
             except Exception:
                 canon = when_val
-            if canon == TARGET_DEBUG_WHEN or when_val == TARGET_DEBUG_WHEN:
+
+            # debug: print sort key components for entries matching the user's when clause
+            if canon == DEBUG_TARGET_WHEN or when_val == DEBUG_TARGET_WHEN:
                 norm = normalize_key_for_compare(key_val)
                 try:
                     nk = natural_key(norm)
@@ -1558,14 +1589,15 @@ def main(argv: List[str] | None = None) -> int:
             decorated = non_focus_rows + focus_rows
         sorted_groups = [row[2] for row in decorated]
 
-        # debug: after sorting, emit the final ordering for the target when clause
         for idx, pair in enumerate(sorted_groups):
             k, w = extract_key_when(pair[1])
             try:
                 canon_w = canonicalize_when(w, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
             except Exception:
                 canon_w = w
-            if canon_w == TARGET_DEBUG_WHEN:
+
+            # debug: after sorting, emit the final ordering for the target when clause
+            if canon_w == DEBUG_TARGET_WHEN:
                 norm = normalize_key_for_compare(k)
                 print(f"DEBUG_ORDERED: idx={idx} raw_key={k!r} normalized={norm!r}", file=sys.stderr)
 
