@@ -34,7 +34,6 @@ Scope:
 Conventions:
 
   * treat 'up' or 'k' or 'right' or 'l' as 'next'
-    "when": "config.keyboardNavigation.enabled && editorFocus && !panelFocus && activeEditorGroupIndex > 0 && activeEditorIsFirstInGroup && activeeEditorGroupIndex < 2"
   * if there is a commented command in an object:
     - if it is ABOVE the active command:, then it is a potential future command that i have not yet implemented
     - if it is BELOW the active command:, then it is an old command that has been replaced but left for reference (lower is older)
@@ -1749,7 +1748,7 @@ Notes:
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
     "key": "alt+a t",
-    "command": "terminal.resetViewLocation",
+    "command": "workbench.action.terminal.toggleTerminal",
     // "command": "alt+a t 1120",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
     // [note] open and focus the (PANEL) TERMINAL viewlet
@@ -2085,8 +2084,8 @@ Notes:
   {
     // [keynav] (vi)
     "key": "ctrl+shift+t",
-    "command": "workbench.action.terminal.openNativeConsole",
-    // "command": "ctrl+shift+t f641",
+    "command": "ctrl+shift+t f641",
+    // "command": "workbench.action.terminal.openNativeConsole",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !terminalFocus"
     // [note] open native terminal when not in terminal
   },
