@@ -128,6 +128,11 @@ VISIBILITY_TOKENS = [
     'webviewFindWidgetVisible',
 ]
 
+# precomputed token ordering maps for performance
+FOCUS_TOKENS_MAP = {t: i for i, t in enumerate(FOCUS_TOKENS)}
+POSITIONAL_TOKENS_MAP = {t: i for i, t in enumerate(POSITIONAL_TOKENS)}
+VISIBILITY_TOKENS_MAP = {t: i for i, t in enumerate(VISIBILITY_TOKENS)}
+
 # profile defaults for `--when-grouping` values; arg values always override these
 WHEN_GROUPING_PROFILES = {
     'focal-invariant': {
@@ -444,10 +449,7 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                             lid = lid[1:-1].strip()
                         if lid.startswith('!'):
                             lid = lid[1:].lstrip()
-                        focus_order = {t: i for i, t in enumerate(FOCUS_TOKENS)}
-                        positional_order = {t: i for i, t in enumerate(POSITIONAL_TOKENS)}
-                        visibility_order = {t: i for i, t in enumerate(VISIBILITY_TOKENS)}
-                        f_rank = focus_order.get(lid, positional_order.get(lid, visibility_order.get(lid, 9999)))
+                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
                         grouping = (is_neg, f_rank, natural_key_case_sensitive(base))
                     else:
                         grouping = (is_neg, natural_key(base))
@@ -460,10 +462,7 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                             lid = lid[1:-1].strip()
                         if lid.startswith('!'):
                             lid = lid[1:].lstrip()
-                        focus_order = {t: i for i, t in enumerate(FOCUS_TOKENS)}
-                        positional_order = {t: i for i, t in enumerate(POSITIONAL_TOKENS)}
-                        visibility_order = {t: i for i, t in enumerate(VISIBILITY_TOKENS)}
-                        f_rank = focus_order.get(lid, positional_order.get(lid, visibility_order.get(lid, 9999)))
+                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
                         grouping = (is_neg, f_rank, natural_key_case_sensitive(base))
                     else:
                         grouping = (is_neg, natural_key(base))
@@ -1004,11 +1003,6 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
     positional_tokens = POSITIONAL_TOKENS
     visibility_tokens = VISIBILITY_TOKENS
 
-    # map focus token -> preferred rank (lower = earlier)
-    focus_order = {t: i for i, t in enumerate(focus_tokens)}
-    positional_order = {t: i for i, t in enumerate(positional_tokens)}
-    visibility_order = {t: i for i, t in enumerate(visibility_tokens)}
-
     def left_identifier(text: str) -> str:
         t = text.strip()
         while t.startswith('(') and t.endswith(')'):
@@ -1093,7 +1087,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
         left_id = left_identifier(token)
 
         # prefer focus_order, then positional_order, then visibility_order
-        sub_rank = focus_order.get(left_id, positional_order.get(left_id, visibility_order.get(left_id, 9999)))
+        sub_rank = FOCUS_TOKENS_MAP.get(left_id, POSITIONAL_TOKENS_MAP.get(left_id, VISIBILITY_TOKENS_MAP.get(left_id, 9999)))
 
         # default alpha behavior: preserve group_rank and use natural-sensitive ordering
         if negation_mode == 'alpha':
@@ -1190,7 +1184,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
 
                     # compute a combined sub-rank if this token belongs to a known ordered identifier
                     lid = _left_id_of(child)
-                    f_rank = focus_order.get(lid, positional_order.get(lid, visibility_order.get(lid, 9999)))
+                    f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
 
                     # natural mode: ignore negation and sort by group then base_key
                     if nm == 'natural':
@@ -1213,14 +1207,14 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                     if nm == 'positive':
                         neg_sort = 0 if not is_neg else 1
                         # use token-list ordering (focus/positional/visibility) as sub-rank
-                        f_rank = focus_order.get(lid, positional_order.get(lid, visibility_order.get(lid, 9999)))
+                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
                         base_key_cs = natural_key_case_sensitive(base)
                         items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
                         continue
 
                     if nm == 'negative':
                         neg_sort = 0 if is_neg else 1
-                        f_rank = focus_order.get(lid, positional_order.get(lid, visibility_order.get(lid, 9999)))
+                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
                         base_key_cs = natural_key_case_sensitive(base)
                         items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
                         continue
