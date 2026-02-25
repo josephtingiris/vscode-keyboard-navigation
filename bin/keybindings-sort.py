@@ -598,9 +598,9 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
     focus_tokens = FOCUS_TOKENS
     positional_tokens = POSITIONAL_TOKENS
     visibility_tokens = VISIBILITY_TOKENS
+
     # map focus token -> preferred rank (lower = earlier)
     focus_order = {t: i for i, t in enumerate(focus_tokens)}
-    # maps for positional and visibility ordering
     positional_order = {t: i for i, t in enumerate(positional_tokens)}
     visibility_order = {t: i for i, t in enumerate(visibility_tokens)}
 
@@ -644,13 +644,13 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                     if pat.search(left):
                         return 0
                 except Exception:
-                    # if user provided a string pattern that wasn't compiled,
-                    # fall back to a simple substring match.
+                    # if user provided a string pattern that wasn't compiled, fall back to a simple substring match.
                     try:
                         if re.search(pat, left):
                             return 0
                     except Exception:
                         continue
+
         # 'config-first' Group order: config.* -> positional prefixes -> focus -> visibility -> other
         # 'focal-invariant' Group order: focus -> visibility -> positional prefixes -> config.* -> other
         # 'none' disables grouping by returning the same rank for all tokens.
@@ -680,15 +680,20 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
     def sort_key(idx_and_node):
         idx, node = idx_and_node
         token = render_when_node(node)
+
         # strip leading '!' for ordering token but keep for grouping rank
         order_token = token[1:] if token.startswith('!') else token
+
         # compute left identifier and a combined sub-rank preference
         left_id = left_identifier(token)
+
         # prefer focus_order, then positional_order, then visibility_order
         sub_rank = focus_order.get(left_id, positional_order.get(left_id, visibility_order.get(left_id, 9999)))
+
         # default alpha behavior: preserve group_rank and use natural-sensitive ordering
         if negation_mode == 'alpha':
             return (group_rank(token), sub_rank, natural_key_case_sensitive(order_token), idx)
+
         # for other modes we'll not use this sort_key; they use alternate sorting below
         return (group_rank(token), natural_key_case_sensitive(order_token), idx)
 
@@ -747,7 +752,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                             picked.add(m[0])
 
             if negation_mode == 'beta':
-                # alias: historical 'beta' wired to positive-natural
+                # alias: 'beta' points to positive-natural
                 nm = 'positive-natural'
             else:
                 nm = negation_mode
@@ -861,7 +866,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
             sort_and_nodes(node.child)
 
     ast = parse_when(when_val)
-    # Debug: dump top-level AND operand ordering before/after sort for inspection
+    # debug: dump top-level AND operand ordering before/after sort for inspection
     try:
         if when_val == TARGET_DEBUG_WHEN:
             if isinstance(ast, WhenAnd):
@@ -897,8 +902,6 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                     print(f"DBG_CANON_POST: node={ast!r}", file=sys.stderr)
     except Exception:
         pass
-    # normalize parentheses: discard original syntactic parens and
-    # render parentheses only where operator precedence requires them.
 
     def _clear_parens(node: WhenNode):
         node.parens = False
@@ -951,9 +954,7 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                 if first_when_token.startswith('!'):
                     first_when_token = first_when_token[1:].lstrip()
 
-        # build a flexible sort tuple based on primary/secondary preferences.
-        # Special-case: when primary is key and secondary is when, ensure
-        # strict key-first ordering by returning a simple tuple: (rank, key, when_specificity, when_sortable)
+        # special-case: when primary is key and secondary is when, ensure strict key-first ordering by returning a simple tuple: (rank, key, when_specificity, when_sortable)
         if primary == 'key' and secondary == 'when':
             norm = normalize_key_for_compare(key_val)
             key_token = natural_key(norm)
@@ -1017,8 +1018,8 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                     # positive-natural: prefer non-negated then natural base ordering
                     is_neg = 1 if sortable_when.startswith('!') else 0
                     base = sortable_when.lstrip('!')
+                    # prioritize token-list ordering (FOCUS -> POSITIONAL -> VISIBILITY)
                     if negation_mode == 'positive':
-                        # prioritize token-list ordering (FOCUS -> POSITIONAL -> VISIBILITY)
                         # compute sub-rank based on the first_when_token
                         lid = first_when_token
                         if lid.startswith('(') and lid.endswith(')'):
@@ -1051,7 +1052,7 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                 else:
                     tert = natural_key_case_sensitive(sortable_when)
 
-                # (this makes matched groups easier to inspect).
+                # this makes matched groups easier to inspect
                 if match_rank != 9999:
                     # prefer normalized key ordering for stability: modifiers normalized
                     norm_key = normalize_key_for_compare(key_val)
@@ -1059,8 +1060,7 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                     tokens.append(spec_key)
                     tokens.append(tert)
                 else:
-                    # default behavior: include first_when token so grouping remains primary,
-                    # then specificity and tertiary ordering
+                    # default behavior: include first_when token so grouping remains primary, then specificity and tertiary ordering
                     tokens.append(first_key)
                     tokens.append(spec_key)
                     tokens.append(tert)
@@ -1107,10 +1107,6 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
 
 
 def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple[str, bool]:
-    # Parse the object robustly (strip comments and trailing commas) so we
-    # can reliably extract the logical `when` value even when the source
-    # contains comments or unusual formatting. Then replace the original
-    # string literal with a properly escaped canonical value.
     obj_match = re.search(r'\{.*\}', obj_text, re.DOTALL)
     if not obj_match:
         return obj_text, False
@@ -1131,9 +1127,7 @@ def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation
     if normalized == when_val:
         return obj_text, False
 
-    # Safely locate the string literal for the `when` value even if there
-    # are inline comments or whitespace, then replace its inner contents
-    # with a properly JSON-escaped canonical value.
+    # safely locate and replace the string literal for the `when` value
     idx = obj_text.find('"when"')
     if idx == -1:
         return obj_text, False
@@ -1144,6 +1138,7 @@ def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation
 
     i = colon + 1
     n = len(obj_text)
+
     # skip whitespace/comments to find opening quote
     while i < n:
         if obj_text.startswith('//', i):
@@ -1163,6 +1158,7 @@ def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation
         return obj_text, False
 
     qstart = i
+
     # find matching closing quote, honoring backslash escapes
     j = qstart + 1
     while j < n:
@@ -1243,6 +1239,46 @@ def main(argv: List[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
 
+    # profile defaults for `--when-grouping` values; arg values always override these
+    profiles = {
+        'focal-invariant': {
+            'primary': 'when',
+            'secondary': 'key',
+            'group_sorting': 'positive',
+            'when_prefix': 'config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters'
+        },
+        'config-first': {
+            # example defaults for config-first; keep conservative defaults
+            'primary': 'key',
+            'secondary': 'when',
+            'group_sorting': 'alpha',
+            'when_prefix': None,
+        }
+    }
+
+    def _flag_present(raw_argv: list[str], names: list[str]) -> bool:
+        for n in names:
+            if n in raw_argv:
+                return True
+        return False
+
+    # apply profile defaults
+    sel_profile = args.when_grouping
+    if sel_profile in profiles:
+        prof = profiles[sel_profile]
+        # primary
+        if not _flag_present(argv, ['-p', '--primary']) and prof.get('primary') is not None:
+            args.primary = prof['primary']
+        # secondary
+        if not _flag_present(argv, ['-s', '--secondary']):
+            args.secondary = prof.get('secondary')
+        # group sorting (maps to args.group_sorting)
+        if not _flag_present(argv, ['-g', '--group-sorting']) and prof.get('group_sorting') is not None:
+            args.group_sorting = prof['group_sorting']
+        # when-prefix
+        if not _flag_present(argv, ['-P', '--when-prefix']):
+            args.when_prefix = prof.get('when_prefix')
+
     primary_order = args.primary
     secondary_order = args.secondary
     tertiary_mode = args.when_grouping
@@ -1275,7 +1311,7 @@ def main(argv: List[str] | None = None) -> int:
                 compiled.append(p)
         when_regexes = compiled
 
-    # always normalize `when` clauses so sub-clauses are deduped and grouped consistently before any sorting.
+    # normalize `when` clauses so sub-clauses are deduped and grouped consistently before any sorting
     normalize_when = True
 
     raw = sys.stdin.read()
@@ -1374,9 +1410,7 @@ def main(argv: List[str] | None = None) -> int:
 
         sorted_groups = final_groups
 
-    # When using focal-invariant grouping, ensure final output places entries
-    # that contain focus tokens AFTER entries that do not. This is a stable
-    # partition that preserves the relative ordering produced above.
+    # ensure final output places entries that contain focus tokens AFTER entries that do not
     if tertiary_mode == 'focal-invariant':
         def _matches_entry(left: str, entry: str) -> bool:
             if entry.endswith('.'):
@@ -1458,7 +1492,7 @@ def main(argv: List[str] | None = None) -> int:
                 when_val = _pair_when_literal(pair[1])
             decorated.append((key_val, when_val, pair))
 
-        # Debug: print sort key components for entries matching the user's when clause
+        # debug: print sort key components for entries matching the user's when clause
         for key_val, when_val, _pair in decorated:
             try:
                 canon = canonicalize_when(when_val, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
@@ -1483,10 +1517,8 @@ def main(argv: List[str] | None = None) -> int:
             row[1],
             natural_key_case_sensitive(row[0])
         ))
-        # If using focal-invariant when-grouping, stable-partition the
-        # decorated rows so entries whose when contains a focus token
-        # are emitted after those that do not. This preserves the
-        # relative ordering produced by the sort above.
+
+        # preserve the relative ordering produced by the sort above
         if tertiary_mode == 'focal-invariant':
             def _matches_entry(left: str, entry: str) -> bool:
                 if entry.endswith('.'):
@@ -1526,7 +1558,7 @@ def main(argv: List[str] | None = None) -> int:
             decorated = non_focus_rows + focus_rows
         sorted_groups = [row[2] for row in decorated]
 
-        # Debug: after sorting, emit the final ordering for the target when clause
+        # debug: after sorting, emit the final ordering for the target when clause
         for idx, pair in enumerate(sorted_groups):
             k, w = extract_key_when(pair[1])
             try:
@@ -1537,11 +1569,12 @@ def main(argv: List[str] | None = None) -> int:
                 norm = normalize_key_for_compare(k)
                 print(f"DEBUG_ORDERED: idx={idx} raw_key={k!r} normalized={norm!r}", file=sys.stderr)
 
-        # Final stabilization pass: within contiguous runs of identical original
-        # `when` literals, enforce alphabetical ordering by the literal `key` value.
+        #
+        # final stabilization pass: within contiguous runs of identical original `when` literals
+        # enforce alphabetical ordering by the literal `key` value
+        #
+
         i = 0
-        # normalize whitespace when comparing `when` literals so logically-identical
-        # strings that differ only in line-wrapping/spacing are considered equal.
 
         def _norm_ws(s: str) -> str:
             return re.sub(r'\s+', ' ', s).strip() if s else ''
@@ -1561,11 +1594,6 @@ def main(argv: List[str] | None = None) -> int:
                 j += 1
 
             if j - i > 1:
-                # If user requested stable-preserve group-sorting (positive/negative),
-                # do not enforce an alphabetical reorder here; preserve the existing
-                # relative order produced by canonicalization. For all other modes,
-                # maintain the existing natural-sensitive literal-key sort to
-                # stabilize output.
                 if negation_mode in ('positive', 'negative'):
                     # preserve current order
                     pass
@@ -1609,6 +1637,7 @@ def main(argv: List[str] | None = None) -> int:
                 obj_out, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
         except Exception:
             pass
+
         # normalize trailing whitespace again after normalization
         obj_out = obj_out.rstrip()
         key_val, when_val = extract_key_when(obj_out)
@@ -1647,8 +1676,7 @@ def main(argv: List[str] | None = None) -> int:
 
     processed = post_process(final_text)
 
-    # final forced pass: replace every "when" literal with its canonicalized
-    # rendering to ensure identical ASTs always produce identical strings.
+    # replace every "when" literal with its canonicalized rendering
     def _replace_when_literal(match):
         inner = match.group(2)
         # Decode the JSON string literal safely using json.loads
@@ -1668,10 +1696,10 @@ def main(argv: List[str] | None = None) -> int:
 
     processed = re.sub(r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")', _replace_when_literal, processed)
 
-    # Final enforcement pass: parse the processed array and, for every
-    # contiguous run whose original (raw) `when` literal is identical
-    # (whitespace-normalized), sort that slice in-place by the literal
-    # `key` value using `natural_key_case_sensitive`.
+    #
+    # final enforcement pass
+    #
+
     def _decode_json_string_literal(raw: str) -> str:
         try:
             return json.loads('"' + raw + '"')
@@ -1715,11 +1743,6 @@ def main(argv: List[str] | None = None) -> int:
                 j += 1
 
             if j - i > 1:
-                # Honor user's chosen group-sorting mode: if the user selected the
-                # stable-preserve modes ('positive' or 'negative'), do not enforce a
-                # forced alphabetical reorder by literal `key` here. For all other
-                # modes (alpha/natural/*-natural) perform the existing natural-sensitive
-                # literal-key sort to stabilize output.
                 if negation_mode in ('positive', 'negative'):
                     # preserve original order
                     pass
@@ -1729,7 +1752,7 @@ def main(argv: List[str] | None = None) -> int:
                     groups_list[i:j] = slice_pairs
             i = j
 
-        # Reconstruct array_text
+        # reconstruct array text
         out = []
         for idx, (comments, obj) in enumerate(groups_list):
             is_last = (idx == len(groups_list) - 1)
@@ -1745,18 +1768,20 @@ def main(argv: List[str] | None = None) -> int:
             if comments:
                 comments = re.sub(r'(?m)^[ \t]*\n+', '', comments)
                 out.append(comments)
-            # Build the object's output line and attach comma immediately when needed
+
             line = obj_out.rstrip()
+
             if not is_last and not object_has_trailing_comma(obj_out):
                 line = line + ','
             line = line + '\n'
+
             out.append(line)
+
         out.append(trailing)
 
         new_array = ''.join(out)
-        # remove any leading blank lines before the first object to avoid
-        # inserting an extra empty line after the opening '['
         new_array = re.sub(r'^\n+', '', new_array)
+
         # match earlier formatting: include opening bracket + newline and closing bracket
         return pre + '[\n' + new_array + ']' + post
 
