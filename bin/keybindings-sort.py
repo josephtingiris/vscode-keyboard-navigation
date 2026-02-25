@@ -31,9 +31,10 @@ Examples
 
 Behavior
 
-- Parses and canonicalizes `when` expressions into an internal AST, deduplicates operands, groups tokens by semantic buckets, and re-renders a stable canonical form.
+- Memoizes canonicalization results to improve performance.
+- Parses and canonicalizes `when` expressions into an internal AST.
 - Attempts to preserve comments and trailing commas in the original JSONC input.
-- Memoizes canonicalization results in `CACHE_CANONICALIZE_WHEN` to improve performance when identical `when` strings recur.
+- Deduplicates operands, groups tokens by semantic buckets, and re-renders a stable canonical `when` form.
 - Debug messages are written to stderr via `debug_echo(...)` and are controlled by `--debug` and `--color`.
 
 Inputs / outputs
@@ -64,8 +65,20 @@ from typing import List, Tuple
 # global memoization cache for canonicalized when results
 CACHE_CANONICALIZE_WHEN: dict = {}
 
-# global object cache for parsed JSON objects (key: raw object string including braces)
+# global memoization object cache for parsed JSON objects (key: raw object string including braces)
 CACHE_JSON_OBJECT: dict = {}
+
+# global memoization cache for sortable when keys (key: when string, value: sortable key)
+CACHE_SORTABLE_WHEN: dict = {}
+
+# global memoization cache for when specificity (key: when string, value: specificity tuple)
+CACHE_WHEN_SPECIFICITY: dict = {}
+
+# global memoization cache for natural keys (key: string, value: list of string and int parts)
+CACHE_NATURAL_KEY: dict = {}
+
+# global memoization cache for case-sensitive natural keys (key: string, value: list of string and int parts)
+CACHE_NATURAL_KEY_CS: dict = {}
 
 # color default output value, options: 'auto'|'always'|'never'
 COLOR: str = 'auto'
@@ -75,11 +88,11 @@ DEBUG_LEVEL: int = 0  # off
 DEBUG_TARGET_CATEGORY: str | None = None  # set vial --debug target=['when', 'ordered', 'canonicalize', ...]
 DEBUG_TARGET_WHEN: str = ""  # set via --debug when=
 
-# when prefixes to be added to standard output, if none are given via the cli
+# default when prefixes to be added to standard output, if none are given via the cli
 DEFAULT_WHEN_PREFIXES = []
 
 #
-# token groups used for heuristics
+# global token groups used for heuristics
 #
 
 FOCUS_TOKENS = [
@@ -551,13 +564,31 @@ def group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]],
 
 
 def natural_key(s):
-    parts = NUMBER_SPLIT_RE.split(s)
-    return [int(text) if text.isdigit() else text.lower() for text in parts]
+    key = str(s)
+    cached = CACHE_NATURAL_KEY.get(key)
+    if cached is not None:
+        return cached
+    parts = NUMBER_SPLIT_RE.split(key)
+    out = [int(text) if text.isdigit() else text.lower() for text in parts]
+    try:
+        CACHE_NATURAL_KEY[key] = out
+    except Exception:
+        pass
+    return out
 
 
 def natural_key_case_sensitive(s):
-    parts = NUMBER_SPLIT_RE.split(s)
-    return [int(text) if text.isdigit() else text for text in parts]
+    key = str(s)
+    cached = CACHE_NATURAL_KEY_CS.get(key)
+    if cached is not None:
+        return cached
+    parts = NUMBER_SPLIT_RE.split(key)
+    out = [int(text) if text.isdigit() else text for text in parts]
+    try:
+        CACHE_NATURAL_KEY_CS[key] = out
+    except Exception:
+        pass
+    return out
 
 
 def normalize_key_for_compare(key_value):
@@ -681,11 +712,20 @@ def when_specificity(when_val: str) -> Tuple[int]:
     Returns a tuple to sort stably by:
         1) number of condition terms (split on && / ||)
     """
-    if not when_val:
-        return (0,)
-
-    term_count = len(WHEN_TERM_SPLIT_RE.split(when_val.strip()))
-    return (term_count,)
+    key = '' if when_val is None else str(when_val)
+    cached = CACHE_WHEN_SPECIFICITY.get(key)
+    if cached is not None:
+        return cached
+    if not key:
+        res = (0,)
+    else:
+        term_count = len(WHEN_TERM_SPLIT_RE.split(key.strip()))
+        res = (term_count,)
+    try:
+        CACHE_WHEN_SPECIFICITY[key] = res
+    except Exception:
+        pass
+    return res
 
 
 class WhenNode:
@@ -1355,8 +1395,28 @@ def sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: 
     if not when_val:
         return ''
 
-    # preserve negation for sorting to avoid unstable ordering when otherwise-identical clauses differ only by '!'.
-    return canonicalize_when(when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+    cache_key = (
+        when_val,
+        mode,
+        negation_mode,
+        None if when_prefixes is None else tuple(when_prefixes),
+        None if when_regexes is None else tuple(when_regexes),
+    )
+
+    cached = CACHE_SORTABLE_WHEN.get(cache_key)
+
+    if cached is not None:
+        return cached
+
+    # preserve negation for stable sorting
+    when = canonicalize_when(when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+
+    try:
+        CACHE_SORTABLE_WHEN[cache_key] = when
+    except Exception:
+        pass
+
+    return when
 
 #
 # main
