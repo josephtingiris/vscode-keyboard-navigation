@@ -5,15 +5,15 @@
 Generate a deterministic JSONC array of keybinding objects for keyboard navigation development, debugging, and testing.
 
 Usage
-    ./bin/keybindings-corpus.py [OPTIONS]
+    keybindings-corpus.py [OPTIONS]
 
 Options
     -n, --navigation-group {emacs,kbm,vi,none,all}  Select the active letter-key navigation group (default: none).
     -c, --comments FILE|none                        Inject canonical comments into an existing JSONC <FILE>, or use 'none' to emit a pure JSON corpus (no comments).
 
 Examples
-    ./bin/keybindings-corpus.py > references/keybindings-corpus.jsonc
-    ./bin/keybindings-corpus.py --navigation-group vi --comments references/keybindings-corpus-vi.jsonc
+    keybindings-corpus.py > references/keybindings-corpus.jsonc
+    keybindings-corpus.py --navigation-group vi --comments references/keybindings-corpus-vi.jsonc
 
 Behavior
     - Emits a comprehensive, canonical JSONC array of unique keybinding objects to stdout.

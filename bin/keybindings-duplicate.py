@@ -5,7 +5,7 @@
 Duplicate keys for and detect duplicates in VS Code keybindings.
 
 Usage
-    ./bin/keybindings-duplicate.py [INPUT] [OPTIONS]
+    keybindings-duplicate.py [INPUT] [OPTIONS]
 
 Options
     -f, --from-keys KEYS      Comma-separated source key literals.
@@ -19,10 +19,10 @@ Options
     -h, --help                Show usage/help and exit with code 99.
 
 Examples
-        ./bin/keybindings-duplicate.py -d < references/keybindings.json
-        ./bin/keybindings-duplicate.py -f h,j,k,l -t left,down,up,right -m alt,ctrl references/keybindings.json
-        ./bin/keybindings-duplicate.py -F vi -T arrows -m alt,ctrl -d
-        ./bin/keybindings-duplicate.py -f x,y,z -T vi,arrows
+        keybindings-duplicate.py -d < references/keybindings.json
+        keybindings-duplicate.py -f h,j,k,l -t left,down,up,right -m alt,ctrl references/keybindings.json
+        keybindings-duplicate.py -F vi -T arrows -m alt,ctrl -d
+        keybindings-duplicate.py -f x,y,z -T vi,arrows
 
 Behavior
     - Reads JSONC from INPUT or stdin when piped; input is optional for generation-only runs.

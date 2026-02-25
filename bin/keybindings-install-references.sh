@@ -14,11 +14,11 @@
 #   keybindings-install-references.sh [keybindings.json]
 #
 # Examples:
-#   ./bin/keybindings-install-references.sh references/keybindings.json
-#   ./bin/keybindings-install-references.sh references/keybindings.json
-#   while true; do KEYBINDINGS_SORT_ARGUMENTS="-p when" ./bin/watch-runner.sh ./references/keybindings.json ./bin/keybindings-install-references.sh; sleep 3; done
-#   while true; do KEYBINDINGS_SORT_ARGUMENTS="-p key -s when" ./bin/watch-runner.sh ./references/keybindings.json ./bin/keybindings-install-references.sh; sleep 3; done
-#   while true; do KEYBINDINGS_SORT_ARGUMENTS="-p when -w focal-invariant -g positive" ./bin/watch-runner.sh ./references/keybindings.json ./bin/keybindings-install-references.sh; sleep 3; done
+#   keybindings-install-references.sh references/keybindings.json
+#   keybindings-install-references.sh references/keybindings.json
+#   while true; do KEYBINDINGS_SORT_ARGUMENTS="-p when" watch-runner.sh ./references/keybindings.json keybindings-install-references.sh; sleep 3; done
+#   while true; do KEYBINDINGS_SORT_ARGUMENTS="-p key -s when" watch-runner.sh ./references/keybindings.json keybindings-install-references.sh; sleep 3; done
+#   while true; do KEYBINDINGS_SORT_ARGUMENTS="-p when -w focal-invariant -g positive" watch-runner.sh ./references/keybindings.json keybindings-install-references.sh; sleep 3; done
 #
 # Behavior:
 #   - Validates JSONC using `keybindings-remove-comments.py | jq` before installing.

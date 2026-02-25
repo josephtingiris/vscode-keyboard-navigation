@@ -5,10 +5,10 @@
 Remove comments from JSONC read from stdin and write strict JSON to stdout.
 
 Usage:
-    ./bin/keybindings-remove-comments.py < keybindings.json
+    keybindings-remove-comments.py < keybindings.json
 
 Examples:
-    ./bin/keybindings-remove-comments.py < references/keybindings.json > tmp.json
+    keybindings-remove-comments.py < references/keybindings.json > tmp.json
 
 Behavior:
     - Removes single-line `//` and block `/* ... */` comments while respecting quoted string literals.

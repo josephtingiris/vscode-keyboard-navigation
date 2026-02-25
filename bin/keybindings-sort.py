@@ -2,57 +2,58 @@
 """
 (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
 
-Sort VS Code `keybindings.json` (JSONC) while preserving comments.
+Sort and canonicalize VS Code keybindings.json (JSONC) while preserving comments.
 
-Usage:
-    python3 keybindings-sort.py [--primary {key,when}] [--secondary {key,when}] [--when-grouping {none,config-first,focal-invariant}] [--group-sorting {alpha,beta,natural,negative,positive}] < keybindings.json
+Usage
 
-Examples:
-    python3 bin/keybindings-sort.py < keybindings.json > keybindings.sorted.by_key.json
-    python3 bin/keybindings-sort.py --primary when < keybindings.json > keybindings.sorted.by_when.json
+```
+keybindings-sort.py [OPTIONS]
 
-Options:
-    --primary, -p {key,when}                                               Primary sort field (default: key)
-    --secondary, -s {key,when}                                             Secondary sort field (optional)
-    --when-grouping, -w {none,config-first,focal-invariant}                When grouping mode: built-in group/rank modes for when tokens (default: none)
-    --group-sorting, -g {alpha,beta,natural,negative,negative-natural,positive,positive-natural}
-                                                                           Group sorting mode: how-to sort within the when token grouping(s) (default: alpha)
-    -h, --help                                                             Show this usage message and exit
+# read from stdin and write sorted JSONC to stdout
+cat keybindings.json | keybindings-sort.py > keybindings.sorted.json
+```
 
-Behavior:
-    - Predictably and purposefully sorts entries in a VS Code `keybindings.json` while preserving comments and surrounding formatting.
+Options
 
-    Sorting Overview
-        - Default: Sort by `key` (natural, numeric-aware order).
-        - Primary `when`: Use `--primary when` to make `when` the primary sort key; objects are grouped by the first top-level token of the canonicalized `when` and then ordered by `when`-specificity and `key`.
-        - Group sorting option: `--group-sorting` controls token ordering inside canonicalized `when` clauses (modes: `alpha`, `natural`, `positive`, `negative`, `beta`).
+- `-h, --help` — show help and exit.
+- `--primary, -p` — primary sort field (`key` or `when`).
+- `--secondary, -s` — optional secondary sort field.
+- `--when-grouping, -w` — grouping mode (`none`, `config-first`, `focal-invariant`).
+- `--group-sorting, -g` — how to sort tokens inside a when-group (alpha, natural, positive, negative, ...).
+- `--color, -c` — control ANSI coloring of debug output: `auto` (default), `always`, `never`.
+- `--debug, -d` — repeatable flag to enable debug output and supply filters. Values may be a numeric level (e.g. `3`), `when=EXPR`, or `target=NAME`/`category=NAME`.
 
-    `when` Handling (High Level)
-        1) Canonicalize: Parse and normalize each `when` expression into an AST, flatten safe AND operands, and remove exact duplicate operands.
-        2) Group: Assign every operand to a stable semantic bucket according to `--when-grouping` (examples: `config.*`, positional, focus, visibility, other). Grouping decides which classes of tokens appear before others. Use `none` to disable grouping.
-        3) Sort within groups: Within each bucket, order operands using the comparator chosen by `--group-sorting`. Sorting only reorders operands inside their group and never moves an operand into a different group.
-        4) Render: Reassemble the canonical `when` string, preserving OR structure and parentheses.
+Examples
 
-    Trailing Commas & Duplicates
-        - Preserve commas: Attempts to preserve trailing commas where present.
-        - Annotate duplicates: Exact duplicate key/`when` pairs receive a trailing `// DUPLICATE` comment.
-        - Duplicate removal rule: Removes exact duplicate operands by rendered-string match; `a` and `!a` are treated as different tokens.
+- Minimal: `cat keybindings.json | keybindings-sort.py`
+- With grouping: `cat keybindings.json | keybindings-sort.py -w focal-invariant -p when -s key`
+- Enable debug level 2 for canonicalization: `--debug 2 --debug target=canonicalize`
 
-    Additional Details
-        - Stability: Grouping is stable; operands never move between groups during sorting.
-        - Duplicate semantics: Duplicates are determined by exact rendered-string equality.
-        - Formatting preservation: Preserves comments and surrounding formatting before/after the top-level array and inside each object.
+Behavior
 
-Inputs / Outputs:
-    stdin:  JSONC text (keybindings array)
-    stdout: Sorted JSONC text encoded as UTF-8
+- Parses and canonicalizes `when` expressions into an internal AST, deduplicates operands, groups tokens by semantic buckets, and re-renders a stable canonical form.
+- Attempts to preserve comments and trailing commas in the original JSONC input.
+- Memoizes canonicalization results in `CANONICALIZE_WHEN_CACHE` to improve performance when identical `when` strings recur.
+- Debug messages are written to stderr via `debug_echo(...)` and are controlled by `--debug` and `--color`.
 
-Exit codes:
-    0   Success
-    1   Usage / bad args
-    2   File read/write or other runtime error
+Inputs / outputs
+
+- stdin: JSONC text containing a top-level array of keybinding objects.
+- stdout: sorted JSONC text (UTF-8) with formatting and comments preserved where feasible.
+
+Important notes
+
+- Requires Python 3.10 or newer (uses modern typing syntax).
+- Canonicalization is the primary CPU hotspot; memoization significantly reduces repeated work for identical `when` strings.
+
+Exit codes
+
+```
+0   Success
+1   Usage / bad args
+2   File read/write or other runtime error
+```
 """
-
 import sys
 import os
 import re

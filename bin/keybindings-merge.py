@@ -5,11 +5,11 @@
 Merge two JSONC keybindings files while preserving comments and raw items.
 
 Usage:
-    python3 bin/keybindings-merge.py [--prefer {left,right}] [--base {left,right}] left.json right.json [--out merged.json]
+    keybindings-merge.py [--prefer {left,right}] [--base {left,right}] left.json right.json [--out merged.json]
 
 Examples:
-    python3 bin/keybindings-merge.py fileA.json fileB.json
-    python3 bin/keybindings-merge.py --prefer left --base right a.json b.json --out merged.json
+    keybindings-merge.py fileA.json fileB.json
+    keybindings-merge.py --prefer left --base right a.json b.json --out merged.json
 
 Behavior / Notes:
     - Requires Python 3.7 or newer.
@@ -63,7 +63,7 @@ def find_top_level_array_bounds(text: str) -> Tuple[int, int]:
 
     while i < n:
         ch = text[i]
-        next2 = text[i:i+2] if i+2 <= n else ''
+        next2 = text[i:i + 2] if i + 2 <= n else ''
         if in_line_comment:
             if ch == '\n':
                 in_line_comment = False
@@ -116,7 +116,7 @@ def find_top_level_array_bounds(text: str) -> Tuple[int, int]:
     # find matching ]
     while i < n:
         ch = text[i]
-        next2 = text[i:i+2] if i+2 <= n else ''
+        next2 = text[i:i + 2] if i + 2 <= n else ''
         if in_line_comment:
             if ch == '\n':
                 in_line_comment = False
@@ -181,7 +181,7 @@ def split_top_level_array_items(array_inner: str) -> List[str]:
 
     while i < n:
         ch = array_inner[i]
-        next2 = array_inner[i:i+2] if i+2 <= n else ''
+        next2 = array_inner[i:i + 2] if i + 2 <= n else ''
         if in_line_comment:
             if ch == '\n':
                 in_line_comment = False
@@ -230,7 +230,7 @@ def split_top_level_array_items(array_inner: str) -> List[str]:
             # top-level comma separating items
             item = array_inner[last_split:i]
             items.append(item)
-            last_split = i+1  # skip comma
+            last_split = i + 1  # skip comma
         i += 1
 
     # final piece
@@ -264,7 +264,7 @@ def remove_comments_from_string(s: str) -> str:
 
     while i < n:
         ch = s[i]
-        next2 = s[i:i+2] if i+2 <= n else ''
+        next2 = s[i:i + 2] if i + 2 <= n else ''
         if in_line_comment:
             if ch == '\n':
                 in_line_comment = False
@@ -398,12 +398,12 @@ def merge_keybinding_files(left_text: str, right_text: str, prefer: str, base: s
     left_l, left_r = find_top_level_array_bounds(left_text)
     right_l, right_r = find_top_level_array_bounds(right_text)
 
-    left_prefix = left_text[:left_l+1]   # include '['
-    left_inner = left_text[left_l+1:left_r]
+    left_prefix = left_text[:left_l + 1]   # include '['
+    left_inner = left_text[left_l + 1:left_r]
     left_suffix = left_text[left_r:]     # include ']' and rest
 
-    right_prefix = right_text[:right_l+1]
-    right_inner = right_text[right_l+1:right_r]
+    right_prefix = right_text[:right_l + 1]
+    right_inner = right_text[right_l + 1:right_r]
     right_suffix = right_text[right_r:]
 
     left_items_raw = split_top_level_array_items(left_inner)
