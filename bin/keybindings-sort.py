@@ -63,14 +63,19 @@ from typing import List, Tuple
 # global memoization cache for canonicalized when results
 CANONICALIZE_WHEN_CACHE: dict = {}
 
-# when value to debug (if any) if none are given via cli
-DEBUG_TARGET_WHEN = ""
+# color default output value, options: 'auto'|'always'|'never'
+COLOR: str = 'auto'
 
-# when prefixes (if any) to be added if none are given via the cli
+# debug defaults
+DEBUG_LEVEL: int = 0  # off
+DEBUG_TARGET_CATEGORY: str | None = None  # set vial --debug target=['when', 'ordered', 'canonicalize', ...]
+DEBUG_TARGET_WHEN: str = ""  # set via --debug when=
+
+# when prefixes to be added to standard output, if none are given via the cli
 DEFAULT_WHEN_PREFIXES = []
 
 #
-# token groups used for when-grouping heuristics
+# token groups used for heuristics
 #
 
 FOCUS_TOKENS = [
@@ -119,12 +124,81 @@ VISIBILITY_TOKENS = [
     'webviewFindWidgetVisible',
 ]
 
+# profile defaults for `--when-grouping` values; arg values always override these
+WHEN_GROUPING_PROFILES = {
+    'focal-invariant': {
+        'primary': 'when',
+        'secondary': 'key',
+        'group_sorting': 'positive',
+        'when_prefix': 'config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters'
+    },
+    'config-first': {
+        # example defaults for config-first
+        'primary': 'key',
+        'secondary': 'when',
+        'group_sorting': 'alpha',
+        'when_prefix': None,
+    }
+}
+
+
+def _color_enabled() -> bool:
+    if COLOR == 'never':
+        return False
+    if COLOR == 'always':
+        return True
+    try:
+        # auto (default)
+        return sys.stderr.isatty()
+    except Exception:
+        return False
+
+
+def debug_color(text: str, level: int) -> str:
+    if not _color_enabled():
+        return text
+
+    # simple level -> color mapping
+    colors = {
+        1: '\x1b[33m',
+        2: '\x1b[36m',
+        3: '\x1b[35m',
+        4: '\x1b[34m',
+    }
+
+    code = colors.get(level, '\x1b[37m')
+    return f"{code}{text}\x1b[0m"
+
+
+def debug_echo(level: int, category: str, when_val: str | None, msg: str) -> None:
+    """Emit a filtered, leveled debug message to stderr.
+
+    Messages are emitted when `level` <= `DEBUG_LEVEL` and category/when
+    filters (if set) match. Always writes to stderr.
+    """
+    if DEBUG_LEVEL <= 0:
+        return
+    if level > DEBUG_LEVEL:
+        return
+    if DEBUG_TARGET_CATEGORY and DEBUG_TARGET_CATEGORY != 'all' and category != DEBUG_TARGET_CATEGORY:
+        return
+    if DEBUG_TARGET_WHEN:
+        if not when_val:
+            return
+        if when_val != DEBUG_TARGET_WHEN:
+            return
+    out = f"[DEBUG:{level}:{category}] {msg}"
+    out = debug_color(out, level)
+    try:
+        sys.stderr.write(out + '\n')
+    except Exception:
+        pass
 
 
 def extract_preamble_postamble(text):
-    """
-    Find the top-level JSON array brackets, skipping any brackets that appear
-    inside comments or strings in the preamble/postamble.
+    """Find the top-level JSON array brackets.
+
+    Skip any brackets that appear inside comments or strings in the preamble/postamble.
     """
     i = 0
     n = len(text)
@@ -268,33 +342,16 @@ def group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]],
     return groups, trailing_comments
 
 
-def strip_json_comments(text):
-    def replacer(match):
-        s = match.group(0)
-        if s.startswith('/'):
-            return ''
-        return s
-    pattern = r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)'  # string or comment
-    return re.sub(pattern, replacer, text, flags=re.DOTALL | re.MULTILINE)
-
-
-def strip_trailing_commas(text):
-    text = re.sub(r',\s*([}\]])', r'\1', text)
-    return text
-
-
 def natural_key(s):
-    import re
     return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s)]
 
 
 def natural_key_case_sensitive(s):
-    import re
     return [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', s)]
 
 
 def normalize_key_for_compare(key_value):
-    """Lightweight normalization for key sorting used by this script.
+    """Lightweight normalization for key sorting.
 
     Lowercases, splits chord parts on spaces, orders modifiers alphabetically
     before the literal, and rejoins chords with spaces.
@@ -320,11 +377,26 @@ def normalize_key_for_compare(key_value):
     return " ".join(out_chords)
 
 
+def strip_trailing_commas(text):
+    text = re.sub(r',\s*([}\]])', r'\1', text)
+    return text
+
+
+def strip_json_comments(text):
+    def replacer(match):
+        s = match.group(0)
+        if s.startswith('/'):
+            return ''
+        return s
+    pattern = r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)'  # string or comment
+    return re.sub(pattern, replacer, text, flags=re.DOTALL | re.MULTILINE)
+
+
 def when_specificity(when_val: str) -> Tuple[int]:
-    """
-    Heuristic specificity score for a when clause. Lower is broader.
-        Returns a tuple so we can sort stably by:
-            1) number of condition terms (split on && / ||)
+    """Heuristic specificity scorer for a when clause. Lower is broader.
+
+    Returns a tuple to sort stably by:
+        1) number of condition terms (split on && / ||)
     """
     if not when_val:
         return (0,)
@@ -588,8 +660,10 @@ def parse_when(expr: str) -> WhenNode:
 
 
 def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
-    """
-    Produce a canonical string for a `when` clause by sorting operands inside every AND node according to project conventions. Preserves OR groupings and existing parentheses; does not reorder OR-level operands.
+    """Produce a canonical string for a `when` clause.
+
+    Sort operands inside every AND node according to project conventions.
+    Preserves OR groupings and existing parentheses; does not reorder OR-level operands.
     """
     if not when_val:
         return ''
@@ -667,7 +741,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                     if pat.search(left):
                         return 0
                 except Exception:
-                    # if user provided a string pattern that wasn't compiled, fall back to a simple substring match.
+                    # if a string pattern was provided that wasn't compiled, fall back to a simple substring match
                     try:
                         if re.search(pat, left):
                             return 0
@@ -717,7 +791,6 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
         if negation_mode == 'alpha':
             return (group_rank(token), sub_rank, natural_key_case_sensitive(order_token), idx)
 
-        # for other modes we'll not use this sort_key; they use alternate sorting below
         return (group_rank(token), natural_key_case_sensitive(order_token), idx)
 
     def sort_and_nodes(node: WhenNode):
@@ -800,27 +873,34 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                 items_with_keys = []
                 for idx, child in indexed:
                     base, is_neg, tok = render_base_and_flag(child)
+
                     # natural-style comparison: use natural_key (case-insensitive)
                     base_key = natural_key(base)
+
                     # always preserve grouping as the primary key so sorting does not move operands between buckets.
                     grp = group_rank(tok)
+
                     # compute a combined sub-rank if this token belongs to a known ordered identifier
                     lid = _left_id_of(child)
                     f_rank = focus_order.get(lid, positional_order.get(lid, visibility_order.get(lid, 9999)))
+
                     # natural mode: ignore negation and sort by group then base_key
                     if nm == 'natural':
                         items_with_keys.append(
                             (idx, child, (grp, f_rank, base_key, idx, tok)))
                         continue
+
                     # positive-natural / negative-natural: existing "alpha/natural"-style
                     if nm == 'positive-natural':
                         neg_sort = 0 if not is_neg else 1
                         items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key, idx, tok)))
                         continue
+
                     if nm == 'negative-natural':
                         neg_sort = 0 if is_neg else 1
                         items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key, idx, tok)))
                         continue
+
                     # positive / negative: preserve original list order within positive/negative groups
                     if nm == 'positive':
                         neg_sort = 0 if not is_neg else 1
@@ -829,15 +909,18 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                         base_key_cs = natural_key_case_sensitive(base)
                         items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
                         continue
+
                     if nm == 'negative':
                         neg_sort = 0 if is_neg else 1
                         f_rank = focus_order.get(lid, positional_order.get(lid, visibility_order.get(lid, 9999)))
                         base_key_cs = natural_key_case_sensitive(base)
                         items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
                         continue
+
                     # default fallback
                     neg_sort = 0
                     items_with_keys.append((idx, child, (grp, neg_sort, base_key, idx, tok)))
+
                 items_with_keys.sort(key=lambda t: t[2])
                 sorted_children = [it[1] for it in items_with_keys]
 
@@ -891,38 +974,38 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
     ast = parse_when(when_val)
     try:
         # debug: dump top-level AND operand ordering before/after sort for inspection
-        if when_val == DEBUG_TARGET_WHEN:
+        if DEBUG_LEVEL > 0:
             if isinstance(ast, WhenAnd):
                 for i, c in enumerate(ast.children):
                     try:
                         tok = render_when_node(c)
                     except Exception:
                         tok = str(c)
-                    print(f"DBG_CANON_PRE: idx={i} token={tok!r}", file=sys.stderr)
+                    debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: idx={i} token={tok!r}")
             else:
                 try:
-                    print(f"DBG_CANON_PRE: node={render_when_node(ast)!r}", file=sys.stderr)
+                    debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: node={render_when_node(ast)!r}")
                 except Exception:
-                    print(f"DBG_CANON_PRE: node={ast!r}", file=sys.stderr)
+                    debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: node={ast!r}")
     except Exception:
         pass
 
     sort_and_nodes(ast)
 
     try:
-        if when_val == DEBUG_TARGET_WHEN:
+        if DEBUG_LEVEL > 0:
             if isinstance(ast, WhenAnd):
                 for i, c in enumerate(ast.children):
                     try:
                         tok = render_when_node(c)
                     except Exception:
                         tok = str(c)
-                    print(f"DBG_CANON_POST: idx={i} token={tok!r}", file=sys.stderr)
+                    debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: idx={i} token={tok!r}")
             else:
                 try:
-                    print(f"DBG_CANON_POST: node={render_when_node(ast)!r}", file=sys.stderr)
+                    debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: node={render_when_node(ast)!r}")
                 except Exception:
-                    print(f"DBG_CANON_POST: node={ast!r}", file=sys.stderr)
+                    debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: node={ast!r}")
     except Exception:
         pass
 
@@ -998,7 +1081,7 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
             if primary == 'when':
                 first_key = natural_key_case_sensitive(first_when_token)
 
-                # compute an optional priority rank based on user-supplied when_prefixes
+                # compute an optional priority rank based on given when_prefixes
                 match_rank = 9999
                 left_id = first_when_token
                 if left_id.startswith('(') and left_id.endswith(')'):
@@ -1266,25 +1349,68 @@ def main(argv: List[str] | None = None) -> int:
                         help="Comma-separated literal when-prefixes to prioritize (exact match). Provide at least one when present.")
     parser.add_argument('--when-regex', '-R', dest='when_regex', default=None,
                         help="Comma-separated regexes to match when-identifiers to prioritize (order matters). Provide at least one when present.")
+    parser.add_argument('--color', '-c', dest='color', choices=['auto', 'always', 'never'], default='auto',
+                        help='Colorize output (auto|always|never)')
+
+    #
+    # debug: flexible single flag. each --debug may optionally take a single value
+    #
+    # --debug <values>:
+    #
+    #   - a positive integer: sets/updates the debug level (higher = more verbose)
+    #   - key=value: e.g. when=EXPR, target=NAME, level=N
+    #
+    # Use multiple --debug flags to combine filters and levels.
+    #
+    # Examples:
+    #   `--debug` # enable debug level 1 (default)
+    #   `--debug 3` # enable debug level 3
+    #   `--debug when=panelFocus` # enable debug level 1 and filter when
+    #   `--debug when="a && b" --debug level=3` # enable debug level 3 and filter when
+    #
+    # Notes:
+    #   - The following is NOT supported and will be parsed incorrectly: `--debug when=panelFocus 3`
+
+    parser.add_argument('--debug', '-d', nargs='?', const='1', action='append', dest='debug',
+                        help=("Enable debug. Per-flag spec: integer (level), or key=value like "
+                              "when=EXPR,target=NAME,level=N. Use multiple --debug flags to "
+                              "combine filters and levels. Invalid: '--debug when=foo 3'."))
 
     args = parser.parse_args(argv)
 
-    # profile defaults for `--when-grouping` values; arg values always override these
-    profiles = {
-        'focal-invariant': {
-            'primary': 'when',
-            'secondary': 'key',
-            'group_sorting': 'positive',
-            'when_prefix': 'config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters'
-        },
-        'config-first': {
-            # example defaults for config-first
-            'primary': 'key',
-            'secondary': 'when',
-            'group_sorting': 'alpha',
-            'when_prefix': None,
-        }
-    }
+    # update module globals with debug CLI argument values
+    global DEBUG_LEVEL, DEBUG_TARGET_WHEN, DEBUG_TARGET_CATEGORY, COLOR
+    COLOR = args.color
+    DEBUG_LEVEL = 0
+    if args.debug:
+        max_level = 0
+        for spec in args.debug:
+            if spec is None:
+                spec = '1'
+            spec = str(spec).strip()
+            # numeric spec
+            if re.fullmatch(r'\d+', spec):
+                max_level = max(max_level, int(spec))
+                continue
+            # key=value spec
+            if '=' in spec:
+                k, v = spec.split('=', 1)
+                k = k.strip().lower()
+                v = v.strip().strip('"').strip("'")
+                if k == 'when':
+                    DEBUG_TARGET_WHEN = v
+                elif k in ('target', 'category'):
+                    DEBUG_TARGET_CATEGORY = v
+                elif k == 'level':
+                    if re.fullmatch(r'\d+', v):
+                        max_level = max(max_level, int(v))
+                continue
+            # fallback: try parse as number
+            if re.fullmatch(r'\d+', spec):
+                max_level = max(max_level, int(spec))
+        if max_level == 0:
+            max_level = 1
+        DEBUG_LEVEL = max_level
 
     def _flag_present(raw_argv: list[str], names: list[str]) -> bool:
         for n in names:
@@ -1294,8 +1420,8 @@ def main(argv: List[str] | None = None) -> int:
 
     # apply profile defaults
     sel_profile = args.when_grouping
-    if sel_profile in profiles:
-        prof = profiles[sel_profile]
+    if sel_profile in WHEN_GROUPING_PROFILES:
+        prof = WHEN_GROUPING_PROFILES[sel_profile]
         # primary
         if not _flag_present(argv, ['-p', '--primary']) and prof.get('primary') is not None:
             args.primary = prof['primary']
@@ -1366,7 +1492,6 @@ def main(argv: List[str] | None = None) -> int:
 
     # partition results by the first top-level `when` token's semantic group and emit groups in reverse rank order so the most "focused" group (rank 1 under focal-invariant) ends up at the bottom of the file.
     def first_when_group_rank(obj_text: str, mode: str, when_prefixes: list | None = None, when_regexes: list | None = None) -> int:
-        # TODO: DRY; share the grouping logic used in `canonicalize_when`.
         when_key, when_val = extract_key_when(obj_text)
         canonical = canonicalize_when(
             when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
@@ -1440,16 +1565,8 @@ def main(argv: List[str] | None = None) -> int:
 
         sorted_groups = final_groups
 
-    # ensure final output places entries that contain focus tokens AFTER entries that do not
+    # FIN (--primary key)
     if tertiary_mode == 'focal-invariant':
-        def _matches_entry(left: str, entry: str) -> bool:
-            if entry.endswith('.'):
-                return left.startswith(entry)
-            if '<viewId>' in entry:
-                prefix, suffix = entry.split('<viewId>', 1)
-                return left.startswith(prefix) and left.endswith(suffix)
-            return left == entry
-
         def _contains_focus_token(obj_text: str) -> bool:
             # extract when value
             when_key, when_val = extract_key_when(obj_text)
@@ -1479,6 +1596,14 @@ def main(argv: List[str] | None = None) -> int:
                     return True
             return False
 
+        def _matches_entry(left: str, entry: str) -> bool:
+            if entry.endswith('.'):
+                return left.startswith(entry)
+            if '<viewId>' in entry:
+                prefix, suffix = entry.split('<viewId>', 1)
+                return left.startswith(prefix) and left.endswith(suffix)
+            return left == entry
+
         non_focus: list = []
         focus: list = []
         for pair in sorted_groups:
@@ -1493,6 +1618,9 @@ def main(argv: List[str] | None = None) -> int:
 
     # for primary `when` sorting (-p when), enforce canonical-when group order for the final output
     if primary_order == 'when':
+        def _norm_ws(s: str) -> str:
+            return re.sub(r'\s+', ' ', s).strip() if s else ''
+
         def _pair_key_literal(obj_text: str) -> str:
             m = re.search(r'"key"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
             if not m:
@@ -1528,28 +1656,31 @@ def main(argv: List[str] | None = None) -> int:
             except Exception:
                 canon = when_val
 
-            # debug: print sort key components for entries matching the user's when clause
-            if canon == DEBUG_TARGET_WHEN or when_val == DEBUG_TARGET_WHEN:
+            # debug: print sort key components for entries matching the given when clause
+            if DEBUG_LEVEL > 0:
                 norm = normalize_key_for_compare(key_val)
                 try:
                     nk = natural_key(norm)
                 except Exception:
                     nk = norm
-                print(f"DEBUG_SORT: raw_key={key_val!r} normalized={norm!r} natural_key={nk!r} when_raw={when_val!r} when_canonical={canon!r}", file=sys.stderr)
+                debug_echo(2, 'sort', when_val, f"DEBUG_SORT: raw_key={key_val!r} normalized={norm!r} natural_key={nk!r} when_raw={when_val!r} when_canonical={canon!r}")
 
         # stable two-pass sort:
+        #
         #   1) key ascending (secondary within group)
         #   2) when ascending (final primary ordering)
+        #
         # single-pass stable sort: primary by `when` then secondary by normalized `key`
         # primary: canonical when, secondary: original when literal, tertiary: normalized key
         # tie-break: prefer literal when equality then literal key alphabetical ordering
+
         decorated.sort(key=lambda row: (
             canonicalize_when(row[1], mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes),
             row[1],
             natural_key_case_sensitive(row[0])
         ))
 
-        # preserve the relative ordering produced by the sort above
+        # FIN (--primary when)
         if tertiary_mode == 'focal-invariant':
             def _matches_entry(left: str, entry: str) -> bool:
                 if entry.endswith('.'):
@@ -1597,19 +1728,15 @@ def main(argv: List[str] | None = None) -> int:
                 canon_w = w
 
             # debug: after sorting, emit the final ordering for the target when clause
-            if canon_w == DEBUG_TARGET_WHEN:
+            if DEBUG_LEVEL > 0:
                 norm = normalize_key_for_compare(k)
-                print(f"DEBUG_ORDERED: idx={idx} raw_key={k!r} normalized={norm!r}", file=sys.stderr)
+                debug_echo(1, 'ordered', canon_w, f"DEBUG_ORDERED: idx={idx} raw_key={k!r} normalized={norm!r}")
 
         #
-        # final stabilization pass: within contiguous runs of identical original `when` literals
-        # enforce alphabetical ordering by the literal `key` value
+        # final stabilization pass: enforce alphabetical ordering by the literal `key` value
         #
 
         i = 0
-
-        def _norm_ws(s: str) -> str:
-            return re.sub(r'\s+', ' ', s).strip() if s else ''
 
         while i < len(sorted_groups):
             _, raw_when = extract_key_when(sorted_groups[i][1])
@@ -1711,26 +1838,21 @@ def main(argv: List[str] | None = None) -> int:
     # replace every "when" literal with its canonicalized rendering
     def _replace_when_literal(match):
         inner = match.group(2)
-        # Decode the JSON string literal safely using json.loads
+
+        # safely decode the JSON string literal
         try:
             unescaped = json.loads('"' + inner + '"')
         except Exception:
-            # Fallback: treat inner as-is but avoid interpreting escapes
+            # fallback: treat inner as-is but avoid interpreting escapes
             unescaped = inner
         canon = canonicalize_when(unescaped, mode=tertiary_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
         try:
             escaped = json.dumps(canon)[1:-1]
         except Exception:
             escaped = canon.replace('\\', '\\\\').replace('"', '\\"')
-        # Ensure we never insert actual newline characters into a JSON string
+
         escaped = escaped.replace('\n', '\\n').replace('\r', '\\r')
         return match.group(1) + escaped + match.group(3)
-
-    processed = re.sub(r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")', _replace_when_literal, processed)
-
-    #
-    # final enforcement pass
-    #
 
     def _decode_json_string_literal(raw: str) -> str:
         try:
@@ -1741,14 +1863,14 @@ def main(argv: List[str] | None = None) -> int:
             except Exception:
                 return raw
 
-    def _extract_raw_when(obj_text: str) -> str:
-        m = re.search(r'"when"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
+    def _extract_raw_key(obj_text: str) -> str:
+        m = re.search(r'"key"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
         if not m:
             return ''
         return _decode_json_string_literal(m.group(1))
 
-    def _extract_raw_key(obj_text: str) -> str:
-        m = re.search(r'"key"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
+    def _extract_raw_when(obj_text: str) -> str:
+        m = re.search(r'"when"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
         if not m:
             return ''
         return _decode_json_string_literal(m.group(1))
@@ -1784,17 +1906,17 @@ def main(argv: List[str] | None = None) -> int:
                     groups_list[i:j] = slice_pairs
             i = j
 
-        # reconstruct array text
+        # reconstruct text
         out = []
         for idx, (comments, obj) in enumerate(groups_list):
             is_last = (idx == len(groups_list) - 1)
-            # normalize trailing characters after the closing '}' and strip newline
+
+            # normalize trailing characters
             obj_out = obj
             idx_r = obj_out.rfind('}')
             if idx_r != -1:
                 after = obj_out[idx_r + 1:]
                 after_clean = re.sub(r'^\s*,+', '', after)
-                # remove any leading whitespace/newlines left after removing commas
                 after_clean = after_clean.lstrip()
                 obj_out = (obj_out[:idx_r + 1] + after_clean).rstrip()
             if comments:
@@ -1816,6 +1938,8 @@ def main(argv: List[str] | None = None) -> int:
 
         # match earlier formatting: include opening bracket + newline and closing bracket
         return pre + '[\n' + new_array + ']' + post
+
+    processed = re.sub(r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")', _replace_when_literal, processed)
 
     try:
         processed = _reorder_processed(processed)
