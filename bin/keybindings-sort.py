@@ -312,7 +312,7 @@ def _assemble_sorted_output(
     out_parts.append(preamble)
     out_parts.append('[\n')
 
-    seen = set()
+    seen_pairs: dict[tuple[str, str], set[str]] = {}
     for i, (comments, obj) in enumerate(sorted_groups):
         is_last = (i == len(sorted_groups) - 1)
         obj_out = obj.rstrip()
@@ -338,9 +338,21 @@ def _assemble_sorted_output(
             when_regexes=when_regexes,
         )
         pair_id = (key_val, canonical_when)
-        if pair_id in seen and (key_val or canonical_when):
-            comments += f'// DUPLICATE key: {key_val!r} when: {canonical_when!r}\n'
-        seen.add(pair_id)
+        if key_val or canonical_when:
+            idx_r = obj_out.rfind('}')
+            if idx_r != -1:
+                obj_fingerprint = obj_out[:idx_r + 1].strip()
+            else:
+                obj_fingerprint = obj_out.strip()
+            seen_fingerprints = seen_pairs.get(pair_id)
+            if seen_fingerprints is None:
+                seen_pairs[pair_id] = {obj_fingerprint}
+            else:
+                duplicate_comment = f'// DUPLICATE key: {key_val!r} when: {canonical_when!r}'
+                if obj_fingerprint in seen_fingerprints:
+                    duplicate_comment += ' (exact object match)'
+                obj_out = _embed_duplicate_comment_in_object(obj_out, duplicate_comment)
+                seen_fingerprints.add(obj_fingerprint)
 
         if comments:
             comments = BLANK_LINES_RE.sub('', comments)
@@ -416,6 +428,48 @@ def _decode_json_string_literal(raw: str) -> str:
             return bytes(raw, 'utf-8').decode('unicode_escape')
         except Exception:
             return raw
+
+
+def _embed_duplicate_comment_in_object(obj_text: str, duplicate_comment: str) -> str:
+    if not duplicate_comment:
+        return obj_text
+
+    line_comment = duplicate_comment.strip()
+    if not line_comment:
+        return obj_text
+    if not line_comment.startswith('//'):
+        line_comment = f'// {line_comment}'
+
+    lines = obj_text.splitlines(keepends=True)
+    if not lines:
+        return obj_text
+
+    open_idx = -1
+    for idx, line in enumerate(lines):
+        if '{' in line:
+            open_idx = idx
+            break
+
+    if open_idx == -1:
+        return obj_text
+
+    indent = ''
+    for idx in range(open_idx + 1, len(lines)):
+        stripped = lines[idx].strip()
+        if not stripped:
+            continue
+        if stripped.startswith('}'):
+            break
+        indent = lines[idx][:len(lines[idx]) - len(lines[idx].lstrip(' \t'))]
+        break
+
+    if not indent:
+        opener = lines[open_idx]
+        base_indent = opener[:len(opener) - len(opener.lstrip(' \t'))]
+        indent = base_indent + '    '
+
+    lines.insert(open_idx + 1, f'{indent}{line_comment}\n')
+    return ''.join(lines)
 
 
 def _extract_literal_key_from_object(obj_text: str) -> str:
