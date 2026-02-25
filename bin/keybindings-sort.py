@@ -33,7 +33,7 @@ Behavior
 
 - Parses and canonicalizes `when` expressions into an internal AST, deduplicates operands, groups tokens by semantic buckets, and re-renders a stable canonical form.
 - Attempts to preserve comments and trailing commas in the original JSONC input.
-- Memoizes canonicalization results in `CANONICALIZE_WHEN_CACHE` to improve performance when identical `when` strings recur.
+- Memoizes canonicalization results in `CACHE_CANONICALIZE_WHEN` to improve performance when identical `when` strings recur.
 - Debug messages are written to stderr via `debug_echo(...)` and are controlled by `--debug` and `--color`.
 
 Inputs / outputs
@@ -62,7 +62,10 @@ import argparse
 from typing import List, Tuple
 
 # global memoization cache for canonicalized when results
-CANONICALIZE_WHEN_CACHE: dict = {}
+CACHE_CANONICALIZE_WHEN: dict = {}
+
+# global object cache for parsed JSON objects (key: raw object string including braces)
+CACHE_JSON_OBJECT: dict = {}
 
 # color default output value, options: 'auto'|'always'|'never'
 COLOR: str = 'auto'
@@ -197,16 +200,12 @@ def debug_echo(level: int, category: str, when_val: str | None, msg: str) -> Non
 
 
 def extract_key_when(obj_text: str) -> Tuple[str, str]:
-    obj_match = re.search(r'\{.*\}', obj_text, re.DOTALL)
-    if not obj_match:
+    parsed = parse_object_text(obj_text)
+    if not parsed:
         return ('', '')
-    obj_str = obj_match.group(0)
     try:
-        clean = strip_json_comments(obj_str)
-        clean = strip_trailing_commas(clean)
-        obj = json.loads(clean)
-        key_val = str(obj.get('key', ''))
-        when_val = str(obj.get('when', ''))
+        key_val = str(parsed.get('key', ''))
+        when_val = str(parsed.get('when', ''))
         return (key_val, when_val)
     except Exception:
         return ('', '')
@@ -333,16 +332,13 @@ def extract_preamble_postamble(text):
 
 
 def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None = None, grouping: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple:
-    obj_match = re.search(r'\{.*\}', obj_text, re.DOTALL)
-    if not obj_match:
-        return ([], '', '')
-    obj_str = obj_match.group(0)
+    parsed = parse_object_text(obj_text)
+    if not parsed:
+        # return a consistent fallback sort key (rank high so these sort last)
+        return (9999, [], (0,), [])
     try:
-        clean = strip_json_comments(obj_str)
-        clean = strip_trailing_commas(clean)
-        obj = json.loads(clean)
-        key_val = str(obj.get('key', ''))
-        when_val = str(obj.get('when', ''))
+        key_val = str(parsed.get('key', ''))
+        when_val = str(parsed.get('when', ''))
         canonical_when = canonicalize_when(
             when_val, mode=grouping, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
         sortable_when = sortable_when_key(
@@ -580,15 +576,8 @@ def normalize_operand(text: str) -> str:
 
 
 def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple[str, bool]:
-    obj_match = re.search(r'\{.*\}', obj_text, re.DOTALL)
-    if not obj_match:
-        return obj_text, False
-    obj_str = obj_match.group(0)
-    try:
-        clean = strip_json_comments(obj_str)
-        clean = strip_trailing_commas(clean)
-        parsed = json.loads(clean)
-    except Exception:
+    parsed = parse_object_text(obj_text)
+    if not parsed:
         return obj_text, False
 
     when_val = parsed.get('when')
@@ -864,6 +853,35 @@ def tokenize_when(expr: str):
     return tokens
 
 
+def parse_object_text(obj_text: str):
+    """Parse an object text (including braces) into a dict and cache the result.
+
+    Returns the parsed dict or None on failure.
+    """
+    if not obj_text:
+        return None
+
+    # use the raw object string (including comments) as cache key
+    m = re.search(r'\{.*\}', obj_text, re.DOTALL)
+    if not m:
+        return None
+
+    obj_str = m.group(0)
+    cached = CACHE_JSON_OBJECT.get(obj_str)
+
+    if cached is not None:
+        return cached
+
+    try:
+        clean = strip_json_comments(obj_str)
+        clean = strip_trailing_commas(clean)
+        parsed = json.loads(clean)
+        CACHE_JSON_OBJECT[obj_str] = parsed
+        return parsed
+    except Exception:
+        return None
+
+
 def parse_when(expr: str) -> WhenNode:
     tokens = tokenize_when(expr)
     idx = 0
@@ -951,7 +969,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
     )
 
     # key: (when_val, mode, negation_mode, when_prefixes_tuple_or_None, when_regexes_tuple_or_None)
-    cached = CANONICALIZE_WHEN_CACHE.get(cache_key)
+    cached = CACHE_CANONICALIZE_WHEN.get(cache_key)
 
     if cached is not None:
         return cached
@@ -1297,7 +1315,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
     result = render_when_node(ast)
 
     try:
-        CANONICALIZE_WHEN_CACHE[cache_key] = result
+        CACHE_CANONICALIZE_WHEN[cache_key] = result
     except Exception:
         pass
 
