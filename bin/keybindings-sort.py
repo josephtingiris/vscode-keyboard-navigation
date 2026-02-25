@@ -145,6 +145,22 @@ WHEN_GROUPING_PROFILES = {
     }
 }
 
+# precompiled regexes for performance
+COMMENT_RE = re.compile(r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)', re.DOTALL | re.MULTILINE)
+TRAILING_COMMA_RE = re.compile(r',\s*([}\]])')
+NUMBER_SPLIT_RE = re.compile(r'(\d+)')
+WHEN_TERM_SPLIT_RE = re.compile(r'\s*&&\s*|\s*\|\|\s*')
+OBJ_RE = re.compile(r'\{.*\}', re.DOTALL)
+WHEN_LITERAL_RE = re.compile(r'("when"\s*:\s*\")((?:\\.|[^"\\])*)(\")')
+KEY_EXTRACT_RE = re.compile(r'"key"\s*:\s*"((?:\\.|[^"\\])*)"')
+WHEN_EXTRACT_RE = re.compile(r'"when"\s*:\s*"((?:\\.|[^"\\])*)"')
+WHITESPACE_RE = re.compile(r'\s+')
+WHEN_SORTED_RE = re.compile(r'^\s*//\s*when-sorted:.*\n', re.MULTILINE)
+BLANK_LINES_RE = re.compile(r'(?m)^[ \t]*\n+')
+LEADING_COMMA_RE = re.compile(r'^\s*,+')
+STRIP_WS_RE = re.compile(r'^[ \t\r\n]+|[ \t\r\n]+$')
+LEADING_NEWLINES_RE = re.compile(r'^\n+')
+
 
 def _color_enabled() -> bool:
     if COLOR == 'never':
@@ -536,11 +552,13 @@ def group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]],
 
 
 def natural_key(s):
-    return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s)]
+    parts = NUMBER_SPLIT_RE.split(s)
+    return [int(text) if text.isdigit() else text.lower() for text in parts]
 
 
 def natural_key_case_sensitive(s):
-    return [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', s)]
+    parts = NUMBER_SPLIT_RE.split(s)
+    return [int(text) if text.isdigit() else text for text in parts]
 
 
 def normalize_key_for_compare(key_value):
@@ -571,7 +589,7 @@ def normalize_key_for_compare(key_value):
 
 
 def normalize_operand(text: str) -> str:
-    collapsed = re.sub(r'\s+', ' ', text).strip()
+    collapsed = WHITESPACE_RE.sub(' ', text).strip()
     return collapsed
 
 
@@ -650,12 +668,11 @@ def strip_json_comments(text):
         if s.startswith('/'):
             return ''
         return s
-    pattern = r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)'  # string or comment
-    return re.sub(pattern, replacer, text, flags=re.DOTALL | re.MULTILINE)
+    return COMMENT_RE.sub(replacer, text)
 
 
 def strip_trailing_commas(text):
-    text = re.sub(r',\s*([}\]])', r'\1', text)
+    text = TRAILING_COMMA_RE.sub(r'\1', text)
     return text
 
 
@@ -668,7 +685,7 @@ def when_specificity(when_val: str) -> Tuple[int]:
     if not when_val:
         return (0,)
 
-    term_count = len(re.split(r'\s*&&\s*|\s*\|\|\s*', when_val.strip()))
+    term_count = len(WHEN_TERM_SPLIT_RE.split(when_val.strip()))
     return (term_count,)
 
 
@@ -862,7 +879,7 @@ def parse_object_text(obj_text: str):
         return None
 
     # use the raw object string (including comments) as cache key
-    m = re.search(r'\{.*\}', obj_text, re.DOTALL)
+    m = OBJ_RE.search(obj_text)
     if not m:
         return None
 
@@ -1516,8 +1533,7 @@ def main(argv: List[str] | None = None) -> int:
             obj_out, when_changed = normalize_when_in_object(
                 obj_out, mode=grouping_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
             if when_changed:
-                comments = re.sub(r'^\s*//\s*when-sorted:.*\n',
-                                  '', comments, flags=re.MULTILINE)
+                comments = WHEN_SORTED_RE.sub('', comments)
         normalized_groups.append((comments, obj_out))
 
     # sort by chosen primary (natural), then the other field (natural), then by _comment
@@ -1653,7 +1669,7 @@ def main(argv: List[str] | None = None) -> int:
     # for primary `when` sorting (-p when), enforce canonical-when group order for the final output
     if primary_order == 'when':
         def _norm_ws(s: str) -> str:
-            return re.sub(r'\s+', ' ', s).strip() if s else ''
+            return WHITESPACE_RE.sub(' ', s).strip() if s else ''
 
         def _pair_key_literal(obj_text: str) -> str:
             m = re.search(r'"key"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
@@ -1843,12 +1859,12 @@ def main(argv: List[str] | None = None) -> int:
         seen.add(pair_id)
 
         if comments:
-            comments = re.sub(r'(?m)^[ \t]*\n+', '', comments)
+            comments = BLANK_LINES_RE.sub('', comments)
             out_parts.append(comments)
         idx = obj_out.rfind('}')
         if idx != -1:
             after = obj_out[idx + 1:]
-            after_clean = re.sub(r'^\s*,+', '', after)
+            after_clean = LEADING_COMMA_RE.sub('', after)
             obj_out = obj_out[:idx + 1] + after_clean
         out_parts.append(obj_out)
         if not is_last and not object_has_trailing_comma(obj_out):
@@ -1859,7 +1875,7 @@ def main(argv: List[str] | None = None) -> int:
     if trailing_comments and not trailing_comments.endswith('\n'):
         out_parts.append('\n')
 
-    postamble_trimmed = re.sub(r'^[ \t\r\n]+|[ \t\r\n]+$', '', postamble)
+    postamble_trimmed = STRIP_WS_RE.sub('', postamble)
     if postamble_trimmed:
         out_parts.append(']\n' + postamble_trimmed + '\n')
     else:
@@ -1916,7 +1932,7 @@ def main(argv: List[str] | None = None) -> int:
         groups_list, trailing = group_objects_with_comments(array_text)
 
         def norm_ws(s: str) -> str:
-            return re.sub(r'\s+', ' ', (s or '')).strip()
+            return WHITESPACE_RE.sub(' ', (s or '')).strip()
 
         i = 0
         while i < len(groups_list):
@@ -1950,11 +1966,11 @@ def main(argv: List[str] | None = None) -> int:
             idx_r = obj_out.rfind('}')
             if idx_r != -1:
                 after = obj_out[idx_r + 1:]
-                after_clean = re.sub(r'^\s*,+', '', after)
+                after_clean = LEADING_COMMA_RE.sub('', after)
                 after_clean = after_clean.lstrip()
                 obj_out = (obj_out[:idx_r + 1] + after_clean).rstrip()
             if comments:
-                comments = re.sub(r'(?m)^[ \t]*\n+', '', comments)
+                comments = BLANK_LINES_RE.sub('', comments)
                 out.append(comments)
 
             line = obj_out.rstrip()
@@ -1968,7 +1984,7 @@ def main(argv: List[str] | None = None) -> int:
         out.append(trailing)
 
         new_array = ''.join(out)
-        new_array = re.sub(r'^\n+', '', new_array)
+        new_array = LEADING_NEWLINES_RE.sub('', new_array)
 
         # match earlier formatting: include opening bracket + newline and closing bracket
         return pre + '[\n' + new_array + ']' + post
