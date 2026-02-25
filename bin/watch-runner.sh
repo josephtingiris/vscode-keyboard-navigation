@@ -82,7 +82,7 @@ main() {
     #while inotifywait -q -e modify "${WATCH_REAL}" > /dev/null 2>&1; do
     while inotifywait -q -e close_write "${WATCH_REAL}" > /dev/null 2>&1; do
         echo "---- RUN: $(date -u '+%Y-%m-%dT%H:%M:%SZ') ----"
-        "${RUNNER}" "${WATCH_REAL}"
+        time "${RUNNER}" "${WATCH_REAL}"
         runner_pid=$!
         wait ${runner_pid} &> /dev/null || aborting "pid ${runner_pid} exited with non-zero status"
         sleep 3 # debounce: wait a moment to avoid multiple rapid triggers
@@ -94,7 +94,7 @@ DIRNAME="$(dirname "$0")"
 # support -h|--help anywhere on the command line
 for _arg in "$@"; do
     case "${_arg}" in
-        -h|--help)
+        -h | --help)
             usage
             ;;
     esac
