@@ -20,6 +20,7 @@ Options
 - `--secondary, -s` — optional secondary sort field.
 - `--when-grouping, -w` — grouping mode (`none`, `config-first`, `focal-invariant`).
 - `--group-sorting, -g` — how to sort tokens inside a when-group (alpha, natural, positive, negative, ...).
+- `--object-clones, -o` — display perfectly identical duplicate objects (default: omitted/False, clone objects are hidden).
 - `--color, -c` — control ANSI coloring of debug output: `auto` (default), `always`, `never`.
 - `--debug, -d` — repeatable flag to enable debug output and supply filters. Values may be a numeric level (e.g. `3`), `when=EXPR`, or `target=NAME`/`category=NAME`.
 
@@ -35,6 +36,7 @@ Behavior
 - Parses and canonicalizes `when` expressions into an internal AST.
 - Attempts to preserve comments and trailing commas in the original JSONC input.
 - Deduplicates operands, groups tokens by semantic buckets, and re-renders a stable canonical `when` form.
+- Hides exact object clones by default; use `--object-clones` to keep them.
 - Debug messages are written to stderr via `debug_echo(...)` and are controlled by `--debug` and `--color`.
 
 Inputs / outputs
@@ -305,16 +307,17 @@ def _assemble_sorted_output(
     postamble: str,
     grouping_mode: str,
     negation_mode: str,
+    object_clones: bool = False,
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> str:
     out_parts: list[str] = []
     out_parts.append(preamble)
     out_parts.append('[\n')
+    rendered_groups: list[tuple[str, str]] = []
 
     seen_pairs: dict[tuple[str, str], set[str]] = {}
-    for i, (comments, obj) in enumerate(sorted_groups):
-        is_last = (i == len(sorted_groups) - 1)
+    for comments, obj in sorted_groups:
         obj_out = obj.rstrip()
 
         try:
@@ -344,16 +347,26 @@ def _assemble_sorted_output(
                 obj_fingerprint = obj_out[:idx_r + 1].strip()
             else:
                 obj_fingerprint = obj_out.strip()
+
             seen_fingerprints = seen_pairs.get(pair_id)
             if seen_fingerprints is None:
                 seen_pairs[pair_id] = {obj_fingerprint}
             else:
+                is_exact_object_clone = obj_fingerprint in seen_fingerprints
+                if is_exact_object_clone and not object_clones:
+                    seen_fingerprints.add(obj_fingerprint)
+                    continue
+
                 duplicate_comment = f'// DUPLICATE key: {key_val!r} when: {canonical_when!r}'
-                if obj_fingerprint in seen_fingerprints:
+                if is_exact_object_clone:
                     duplicate_comment += ' (exact object match)'
                 obj_out = _embed_duplicate_comment_in_object(obj_out, duplicate_comment)
                 seen_fingerprints.add(obj_fingerprint)
 
+        rendered_groups.append((comments, obj_out))
+
+    for i, (comments, obj_out) in enumerate(rendered_groups):
+        is_last = (i == len(rendered_groups) - 1)
         if comments:
             comments = BLANK_LINES_RE.sub('', comments)
             out_parts.append(comments)
@@ -2166,6 +2179,9 @@ def main(argv: List[str] | None = None) -> int:
     parser.add_argument('--when-regex', '-R', dest='when_regex', default=None,
                         help="Comma-separated list of regular expressions to match and move to the front of the when clause (order matters).")
 
+    parser.add_argument('--object-clones', '-o', action='store_true', default=False,
+                        help='Show exact duplicate objects (clones) in output (default: hidden).')
+
     parser.add_argument('--color', '-c', dest='color', choices=['auto', 'always', 'never'], default='auto',
                         help='Colorize output (auto|always|never)')
 
@@ -2254,6 +2270,7 @@ def main(argv: List[str] | None = None) -> int:
         postamble,
         grouping_mode,
         negation_mode,
+        object_clones=args.object_clones,
         when_prefixes=when_prefixes,
         when_regexes=when_regexes,
     )
