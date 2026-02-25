@@ -85,7 +85,7 @@ maps:
 			MAP_FILE="keybindings.map.jsonc"; \
 		fi; \
 		echo "# + $${MAP_FILE}"; \
-		echo "# + WHEN_PREFIX="$${WHEN_PREFIX}; \
+		#echo "# + WHEN_PREFIX="$${WHEN_PREFIX}; \
  \
 		echo '[]' > $${MAP_FILE}; \
 		if [ "$$lng" != "" ] && [ "$$lng" != "none" ]; then \

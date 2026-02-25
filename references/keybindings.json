@@ -13599,6 +13599,12 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
   },
   {
+    // [keynav] (down) (vi) (move) (1) (red) (A) (editor) (text)
+    "key": "shift+alt+j",
+    "command": "shift+alt+j 468e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.keyboardNavigation.terminal.enabled"
+  },
+  {
     // [keynav] (map) (right) (vi) (juke) (0) (self) (gold) (X) (editor) (text)
     "key": "alt+'",
     "command": "alt+' 623f",
