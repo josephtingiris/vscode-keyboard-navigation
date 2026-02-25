@@ -1800,8 +1800,8 @@ Notes:
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
     "key": "alt+a c",
-    "command": "workbench.action.closeAuxiliaryBar",
-    // "command": "alt+a c 6113",
+    // "command": "workbench.action.closeAuxiliaryBar",
+    "command": "alt+a c 6113",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && activeAuxiliary == 'workbench.panel.chat' && config.keyboardNavigation.chords.action"
     // [note] close and unfocus the (SECONDARY) CHAT viewlet
   },
@@ -7102,8 +7102,8 @@ Notes:
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
     "key": "alt+a c",
-    "command": "workbench.panel.chat.resetViewContainerLocation",
-    // "command": "alt+a c 1113",
+    "command": "alt+a c 1113",
+    // "command": "workbench.panel.chat.resetViewContainerLocation",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
     // [note] open and focus the (SECONDARY) CHAT viewlet
   },
