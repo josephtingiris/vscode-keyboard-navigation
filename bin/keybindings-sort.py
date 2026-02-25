@@ -1248,7 +1248,7 @@ def main(argv: List[str] | None = None) -> int:
             'when_prefix': 'config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters'
         },
         'config-first': {
-            # example defaults for config-first; keep conservative defaults
+            # example defaults for config-first
             'primary': 'key',
             'secondary': 'when',
             'group_sorting': 'alpha',
