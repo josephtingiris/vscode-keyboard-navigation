@@ -1668,6 +1668,299 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
   },
   {
+    // [keynav] (corpus) (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a",
+    "command": "(corpus) alt+a 6356",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a c",
+    "command": "workbench.panel.chat.resetViewContainerLocation",
+    // "command": "alt+a c 1113",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+    // [note] open and focus the (SECONDARY) CHAT viewlet
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a d",
+    "command": "workbench.panel.repl.resetViewContainerLocation",
+    // "command": "alt+a d 1104",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+    // [note] open and focus the (PANEL) DEBUG viewlet
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a e",
+    "command": "workbench.explorer.openEditorsView.resetViewLocation",
+    // "command": "alt+a e 19b7",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+    // [note] open and focus the (EXPLORER) OPEN EDITORS viewlet
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a g",
+    "command": "workbench.view.scm.resetViewContainerLocation",
+    // "command": "alt+a 53a7",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+    // [note] open and focus the (EXPLORER) SCM (git) viewlet
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a k",
+    "command": "workbench.action.focusActiveEditorGroup",
+    // "command": "alt+a k 1108",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+    // [note] open and focus the (EDITOR) ACTIVE GROUP
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a o",
+    "command": "workbench.panel.output.resetViewContainerLocation",
+    // "command": "alt+a o 1115",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+    // [note] open and focus the (PANEL) OUTPUT viewlet
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a p",
+    "command": "workbench.panel.markers.resetViewContainerLocation",
+    // "command": "alt+a p 1116",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+    // [note] open and focus the (PANEL) PROBLEMS viewlet
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a r",
+    "command": "workbench.view.remote.resetViewContainerLocation",
+    // "command": "alt+a r 9f45",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+    // [note] open and focus the (PRIMARY) REMOTE EXPLORER viewlet
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a s",
+    "command": "workbench.view.search.resetViewContainerLocation",
+    // "command": "workbench.action.findInFiles",
+    // "command": "alt+a s 58a7",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+    // [note] open and focus the (PRIMARY) SEARCH viewlet
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a t",
+    "command": "terminal.resetViewLocation",
+    // "command": "alt+a t 1120",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+    // [note] open and focus the (PANEL) TERMINAL viewlet
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a x",
+    "command": "workbench.view.extensions",
+    // "command": "alt+a 19a7",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+    // [note] open and focus the (PRIMARY) EXTENSIONS viewlet
+  },
+  {
+    // [keynav] (corpus) (vi) (action) (chord)
+    "key": "ctrl+a",
+    "command": "(corpus) ctrl+a 54bd",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (jump) (2) (blue) (B) (action) (chord)
+    "key": "ctrl+alt+a",
+    "command": "(corpus) ctrl+alt+a 1d1b",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (warp) (3) (black) (C) (action) (chord)
+    "key": "ctrl+alt+meta+a",
+    "command": "(corpus) ctrl+alt+meta+a 914e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (change) (!) (yellow) (+) (action) (chord)
+    "key": "ctrl+shift+alt+a",
+    "command": "(corpus) ctrl+shift+alt+a ed72",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (action) (chord)
+    "key": "ctrl+shift+alt+meta+a",
+    "command": "(corpus) ctrl+shift+alt+meta+a 4c8a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (move) (1) (red) (A) (action) (chord)
+    "key": "shift+alt+a",
+    "command": "(corpus) shift+alt+a 6dec",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (action) (chord)
+    "key": "shift+alt+meta+a",
+    "command": "(corpus) shift+alt+meta+a 99a4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+  },
+  {
+    // [keynav] (corpus) (vi) (0) (self) (gold) (X) (debug) (chord)
+    "key": "alt+d",
+    "command": "(corpus) alt+d ef1f",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (left) (vi) (debug) (chord)
+    "key": "alt+d alt+h",
+    "command": "workbench.action.inspectContextKeys",
+    // "command": "alt+d alt+h 3f0c"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (down) (vi) (debug) (chord)
+    "key": "alt+d alt+j",
+    "command": "workbench.action.inspectContextKeys",
+    // "command": "alt+d alt+j 8bad"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (up) (vi) (debug) (chord)
+    "key": "alt+d alt+k",
+    "command": "workbench.action.inspectContextKeys",
+    // "command": "alt+d alt+k 9912",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (right) (vi) (debug) (chord)
+    "key": "alt+d alt+l",
+    "command": "workbench.action.toggleKeybindingsLog",
+    // "command": "alt+d alt+l 9913",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (vi) (debug) (chord)
+    "key": "alt+d alt+r",
+    "command": "workbench.action.reloadWindow",
+    // "command": "alt+d 9914",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (jump) (2) (blue) (B) (debug) (chord)
+    "key": "ctrl+alt+d",
+    "command": "(corpus) ctrl+alt+d bc40",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (warp) (3) (black) (C) (debug) (chord)
+    "key": "ctrl+alt+meta+d",
+    "command": "(corpus) ctrl+alt+meta+d bf96",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (debug) (chord)
+    "key": "ctrl+d",
+    "command": "(corpus) ctrl+d 8975",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (change) (!) (yellow) (+) (debug) (chord)
+    "key": "ctrl+shift+alt+d",
+    "command": "(corpus) ctrl+shift+alt+d 3df1",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (debug) (chord)
+    "key": "ctrl+shift+alt+meta+d",
+    "command": "(corpus) ctrl+shift+alt+meta+d 1c71",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (move) (1) (red) (A) (debug) (chord)
+    "key": "shift+alt+d",
+    "command": "(corpus) shift+alt+d 7eda",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (debug) (chord)
+    "key": "shift+alt+meta+d",
+    "command": "(corpus) shift+alt+meta+d ca36",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    // [keynav] (corpus) (vi) (0) (self) (gold) (X) (extension) (chord)
+    "key": "alt+x",
+    "command": "(corpus) alt+x 1f03",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (warp) (3) (black) (C) (extension) (chord)
+    "key": "ctrl+alt+meta+x",
+    "command": "(corpus) ctrl+alt+meta+x 83f5",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (jump) (2) (blue) (B) (extension) (chord)
+    "key": "ctrl+alt+x",
+    "command": "(corpus) ctrl+alt+x 636e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (extension) (chord)
+    "key": "ctrl+shift+alt+meta+x",
+    "command": "(corpus) ctrl+shift+alt+meta+x 382c",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (change) (!) (yellow) (+) (extension) (chord)
+    "key": "ctrl+shift+alt+x",
+    "command": "(corpus) ctrl+shift+alt+x cbfc",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (extension) (chord)
+    "key": "ctrl+x",
+    "command": "(corpus) ctrl+x 83a9",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (extension) (chord)
+    "key": "shift+alt+meta+x",
+    "command": "(corpus) shift+alt+meta+x eb6e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (corpus) (vi) (move) (1) (red) (A) (extension) (chord)
+    "key": "shift+alt+x",
+    "command": "(corpus) shift+alt+x 9cd2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X) (extension) (chord) (neovim)
+    "key": "alt+x r",
+    "command": "vscode-neovim.restart",
+    // "command": "alt+x 419e",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension && neovim.init"
+    // [note] restart (only) the neovim extension
+  },
+  {
+    // (down) (juke)
+    // [keynav] (vi) (juke) (0) (self) (gold) (X)
+    "key": "alt+pagedown",
+    "command": "workbench.action.navigateBack",
+    // "command": "alt+pagedown df43",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.juke"
+  },
+  {
+    // (up) (juke)
+    // [keynav] (vi) (juke) (0) (self) (gold) (X)
+    "key": "alt+pageup",
+    "command": "workbench.action.navigateForward",
+    // "command": "alt+pageup df44",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.juke"
+    // [note] moves/replaces vscode alt+right
+  },
+  {
     // [keynav] (left) (vi) (juke) (0) (self) (gold) (X) (immutable)
     "key": "alt+,",
     "command": "workbench.action.previousEditor",
@@ -1800,8 +2093,8 @@ Notes:
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
     "key": "alt+a c",
-    // "command": "workbench.action.closeAuxiliaryBar",
-    "command": "alt+a c 6113",
+    "command": "workbench.action.closeAuxiliaryBar",
+    // "command": "alt+a c 6113",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && activeAuxiliary == 'workbench.panel.chat' && config.keyboardNavigation.chords.action"
     // [note] close and unfocus the (SECONDARY) CHAT viewlet
   },
@@ -7092,299 +7385,6 @@ Notes:
     "key": "shift+alt+|",
     "command": "shift+alt+| dc57",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'right' && panelPosition == 'top'"
-  },
-  {
-    // [keynav] (corpus) (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a",
-    "command": "(corpus) alt+a 6356",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a c",
-    "command": "alt+a c 1113",
-    // "command": "workbench.panel.chat.resetViewContainerLocation",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-    // [note] open and focus the (SECONDARY) CHAT viewlet
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a d",
-    "command": "workbench.panel.repl.resetViewContainerLocation",
-    // "command": "alt+a d 1104",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-    // [note] open and focus the (PANEL) DEBUG viewlet
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a e",
-    "command": "workbench.explorer.openEditorsView.resetViewLocation",
-    // "command": "alt+a e 19b7",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-    // [note] open and focus the (EXPLORER) OPEN EDITORS viewlet
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a g",
-    "command": "workbench.view.scm.resetViewContainerLocation",
-    // "command": "alt+a 53a7",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-    // [note] open and focus the (EXPLORER) SCM (git) viewlet
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a k",
-    "command": "workbench.action.focusActiveEditorGroup",
-    // "command": "alt+a k 1108",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-    // [note] open and focus the (EDITOR) ACTIVE GROUP
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a o",
-    "command": "workbench.panel.output.resetViewContainerLocation",
-    // "command": "alt+a o 1115",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-    // [note] open and focus the (PANEL) OUTPUT viewlet
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a p",
-    "command": "workbench.panel.markers.resetViewContainerLocation",
-    // "command": "alt+a p 1116",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-    // [note] open and focus the (PANEL) PROBLEMS viewlet
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a r",
-    "command": "workbench.view.remote.resetViewContainerLocation",
-    // "command": "alt+a r 9f45",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-    // [note] open and focus the (PRIMARY) REMOTE EXPLORER viewlet
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a s",
-    "command": "workbench.view.search.resetViewContainerLocation",
-    // "command": "workbench.action.findInFiles",
-    // "command": "alt+a s 58a7",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-    // [note] open and focus the (PRIMARY) SEARCH viewlet
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a t",
-    "command": "terminal.resetViewLocation",
-    // "command": "alt+a t 1120",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-    // [note] open and focus the (PANEL) TERMINAL viewlet
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a x",
-    "command": "workbench.view.extensions",
-    // "command": "alt+a 19a7",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-    // [note] open and focus the (PRIMARY) EXTENSIONS viewlet
-  },
-  {
-    // [keynav] (corpus) (vi) (action) (chord)
-    "key": "ctrl+a",
-    "command": "(corpus) ctrl+a 54bd",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-  },
-  {
-    // [keynav] (corpus) (vi) (jump) (2) (blue) (B) (action) (chord)
-    "key": "ctrl+alt+a",
-    "command": "(corpus) ctrl+alt+a 1d1b",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-  },
-  {
-    // [keynav] (corpus) (vi) (warp) (3) (black) (C) (action) (chord)
-    "key": "ctrl+alt+meta+a",
-    "command": "(corpus) ctrl+alt+meta+a 914e",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-  },
-  {
-    // [keynav] (corpus) (vi) (change) (!) (yellow) (+) (action) (chord)
-    "key": "ctrl+shift+alt+a",
-    "command": "(corpus) ctrl+shift+alt+a ed72",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-  },
-  {
-    // [keynav] (corpus) (vi) (action) (chord)
-    "key": "ctrl+shift+alt+meta+a",
-    "command": "(corpus) ctrl+shift+alt+meta+a 4c8a",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-  },
-  {
-    // [keynav] (corpus) (vi) (move) (1) (red) (A) (action) (chord)
-    "key": "shift+alt+a",
-    "command": "(corpus) shift+alt+a 6dec",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-  },
-  {
-    // [keynav] (corpus) (vi) (action) (chord)
-    "key": "shift+alt+meta+a",
-    "command": "(corpus) shift+alt+meta+a 99a4",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-  },
-  {
-    // [keynav] (corpus) (vi) (0) (self) (gold) (X) (debug) (chord)
-    "key": "alt+d",
-    "command": "(corpus) alt+d ef1f",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
-  },
-  {
-    // [keynav] (left) (vi) (debug) (chord)
-    "key": "alt+d alt+h",
-    "command": "workbench.action.inspectContextKeys",
-    // "command": "alt+d alt+h 3f0c"
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
-  },
-  {
-    // [keynav] (down) (vi) (debug) (chord)
-    "key": "alt+d alt+j",
-    "command": "workbench.action.inspectContextKeys",
-    // "command": "alt+d alt+j 8bad"
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
-  },
-  {
-    // [keynav] (up) (vi) (debug) (chord)
-    "key": "alt+d alt+k",
-    "command": "workbench.action.inspectContextKeys",
-    // "command": "alt+d alt+k 9912",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
-  },
-  {
-    // [keynav] (right) (vi) (debug) (chord)
-    "key": "alt+d alt+l",
-    "command": "workbench.action.toggleKeybindingsLog",
-    // "command": "alt+d alt+l 9913",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
-  },
-  {
-    // [keynav] (vi) (debug) (chord)
-    "key": "alt+d alt+r",
-    "command": "workbench.action.reloadWindow",
-    // "command": "alt+d 9914",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
-  },
-  {
-    // [keynav] (corpus) (vi) (jump) (2) (blue) (B) (debug) (chord)
-    "key": "ctrl+alt+d",
-    "command": "(corpus) ctrl+alt+d bc40",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
-  },
-  {
-    // [keynav] (corpus) (vi) (warp) (3) (black) (C) (debug) (chord)
-    "key": "ctrl+alt+meta+d",
-    "command": "(corpus) ctrl+alt+meta+d bf96",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
-  },
-  {
-    // [keynav] (corpus) (vi) (debug) (chord)
-    "key": "ctrl+d",
-    "command": "(corpus) ctrl+d 8975",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
-  },
-  {
-    // [keynav] (corpus) (vi) (change) (!) (yellow) (+) (debug) (chord)
-    "key": "ctrl+shift+alt+d",
-    "command": "(corpus) ctrl+shift+alt+d 3df1",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
-  },
-  {
-    // [keynav] (corpus) (vi) (debug) (chord)
-    "key": "ctrl+shift+alt+meta+d",
-    "command": "(corpus) ctrl+shift+alt+meta+d 1c71",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
-  },
-  {
-    // [keynav] (corpus) (vi) (move) (1) (red) (A) (debug) (chord)
-    "key": "shift+alt+d",
-    "command": "(corpus) shift+alt+d 7eda",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
-  },
-  {
-    // [keynav] (corpus) (vi) (debug) (chord)
-    "key": "shift+alt+meta+d",
-    "command": "(corpus) shift+alt+meta+d ca36",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
-  },
-  {
-    // [keynav] (corpus) (vi) (0) (self) (gold) (X) (extension) (chord)
-    "key": "alt+x",
-    "command": "(corpus) alt+x 1f03",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
-  },
-  {
-    // [keynav] (corpus) (vi) (warp) (3) (black) (C) (extension) (chord)
-    "key": "ctrl+alt+meta+x",
-    "command": "(corpus) ctrl+alt+meta+x 83f5",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
-  },
-  {
-    // [keynav] (corpus) (vi) (jump) (2) (blue) (B) (extension) (chord)
-    "key": "ctrl+alt+x",
-    "command": "(corpus) ctrl+alt+x 636e",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
-  },
-  {
-    // [keynav] (corpus) (vi) (extension) (chord)
-    "key": "ctrl+shift+alt+meta+x",
-    "command": "(corpus) ctrl+shift+alt+meta+x 382c",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
-  },
-  {
-    // [keynav] (corpus) (vi) (change) (!) (yellow) (+) (extension) (chord)
-    "key": "ctrl+shift+alt+x",
-    "command": "(corpus) ctrl+shift+alt+x cbfc",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
-  },
-  {
-    // [keynav] (corpus) (vi) (extension) (chord)
-    "key": "ctrl+x",
-    "command": "(corpus) ctrl+x 83a9",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
-  },
-  {
-    // [keynav] (corpus) (vi) (extension) (chord)
-    "key": "shift+alt+meta+x",
-    "command": "(corpus) shift+alt+meta+x eb6e",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
-  },
-  {
-    // [keynav] (corpus) (vi) (move) (1) (red) (A) (extension) (chord)
-    "key": "shift+alt+x",
-    "command": "(corpus) shift+alt+x 9cd2",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension"
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (extension) (chord) (neovim)
-    "key": "alt+x r",
-    "command": "vscode-neovim.restart",
-    // "command": "alt+x 419e",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.extension && neovim.init"
-    // [note] restart (only) the neovim extension
-  },
-  {
-    // (down) (juke)
-    // [keynav] (vi) (juke) (0) (self) (gold) (X)
-    "key": "alt+pagedown",
-    "command": "workbench.action.navigateBack",
-    // "command": "alt+pagedown df43",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.juke"
-  },
-  {
-    // (up) (juke)
-    // [keynav] (vi) (juke) (0) (self) (gold) (X)
-    "key": "alt+pageup",
-    "command": "workbench.action.navigateForward",
-    // "command": "alt+pageup df44",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.juke"
-    // [note] moves/replaces vscode alt+right
   },
   {
     // [keynav] (vi) (editor) (pass)
