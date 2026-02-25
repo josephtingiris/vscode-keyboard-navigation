@@ -1,12 +1,4 @@
 {
-  "python.analysis.exclude": [
-    "tmp/**"
-  ],
-  "files.exclude": {
-    "tmp": true
-  }
-}
-{
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
@@ -33,7 +25,8 @@
   },
   "files.exclude": {
     "**/.venv": true,
-    "**/node_modules": true
+    "**/node_modules": true,
+    "tmp": true
   },
   "makefile.configureOnOpen": false,
   "search.exclude": {
