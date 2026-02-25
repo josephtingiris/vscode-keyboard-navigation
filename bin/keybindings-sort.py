@@ -1374,6 +1374,59 @@ def main(argv: List[str] | None = None) -> int:
 
         sorted_groups = final_groups
 
+    # When using focal-invariant grouping, ensure final output places entries
+    # that contain focus tokens AFTER entries that do not. This is a stable
+    # partition that preserves the relative ordering produced above.
+    if tertiary_mode == 'focal-invariant':
+        def _matches_entry(left: str, entry: str) -> bool:
+            if entry.endswith('.'):
+                return left.startswith(entry)
+            if '<viewId>' in entry:
+                prefix, suffix = entry.split('<viewId>', 1)
+                return left.startswith(prefix) and left.endswith(suffix)
+            return left == entry
+
+        def _contains_focus_token(obj_text: str) -> bool:
+            # extract when value
+            when_key, when_val = extract_key_when(obj_text)
+            raw = when_val
+            if not raw:
+                m = re.search(r'"when"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
+                if m:
+                    try:
+                        raw = bytes(m.group(1), 'utf-8').decode('unicode_escape')
+                    except Exception:
+                        raw = m.group(1)
+            if not raw:
+                return False
+            parts = re.split(r'\s*&&\s*|\s*\|\|\s*', raw)
+            for part in parts:
+                t = part.strip()
+                while t.startswith('(') and t.endswith(')'):
+                    t = t[1:-1].strip()
+                if not t:
+                    continue
+                if t.startswith('!'):
+                    left = t[1:].lstrip()
+                else:
+                    left = t
+                left_id = left.split()[0] if left else ''
+                if any(_matches_entry(left_id, entry) for entry in FOCUS_TOKENS):
+                    return True
+            return False
+
+        non_focus: list = []
+        focus: list = []
+        for pair in sorted_groups:
+            try:
+                if _contains_focus_token(pair[1]):
+                    focus.append(pair)
+                else:
+                    non_focus.append(pair)
+            except Exception:
+                non_focus.append(pair)
+        sorted_groups = non_focus + focus
+
     # for primary `when` sorting (-p when), enforce canonical-when group order for the final output
     if primary_order == 'when':
         def _pair_key_literal(obj_text: str) -> str:
@@ -1430,6 +1483,47 @@ def main(argv: List[str] | None = None) -> int:
             row[1],
             natural_key_case_sensitive(row[0])
         ))
+        # If using focal-invariant when-grouping, stable-partition the
+        # decorated rows so entries whose when contains a focus token
+        # are emitted after those that do not. This preserves the
+        # relative ordering produced by the sort above.
+        if tertiary_mode == 'focal-invariant':
+            def _matches_entry(left: str, entry: str) -> bool:
+                if entry.endswith('.'):
+                    return left.startswith(entry)
+                if '<viewId>' in entry:
+                    prefix, suffix = entry.split('<viewId>', 1)
+                    return left.startswith(prefix) and left.endswith(suffix)
+                return left == entry
+
+            non_focus_rows = []
+            focus_rows = []
+            for row in decorated:
+                when_val = row[1] or ''
+                try:
+                    parts = re.split(r'\s*&&\s*|\s*\|\|\s*', when_val.strip()) if when_val else []
+                    found_focus = False
+                    for part in parts:
+                        t = part.strip()
+                        while t.startswith('(') and t.endswith(')'):
+                            t = t[1:-1].strip()
+                        if not t:
+                            continue
+                        if t.startswith('!'):
+                            left = t[1:].lstrip()
+                        else:
+                            left = t
+                        left_id = left.split()[0] if left else ''
+                        if any(_matches_entry(left_id, entry) for entry in FOCUS_TOKENS):
+                            found_focus = True
+                            break
+                    if found_focus:
+                        focus_rows.append(row)
+                    else:
+                        non_focus_rows.append(row)
+                except Exception:
+                    non_focus_rows.append(row)
+            decorated = non_focus_rows + focus_rows
         sorted_groups = [row[2] for row in decorated]
 
         # Debug: after sorting, emit the final ordering for the target when clause
