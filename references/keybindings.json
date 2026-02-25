@@ -74,7 +74,8 @@ Notes:
   * I'm aware of numerous conflicts with the vs code multiple cursor feature, and will circle back to resolve them later (once I learn to use it better).
 
 */
-[  {
+[
+  {
     // [keynav] (corpus) (right) (juke) (0) (self) (gold) (X)
     "key": "alt+'",
     "command": "(corpus) alt+' 1c12",
@@ -1467,13 +1468,6 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.arrows"
   },
   {
-    // [keynav] (vi) (0) (self) (gold) (X)
-    "key": "alt+`",
-    "command": "workbench.action.terminal.toggleTerminal",
-    // "command": "alt+` 0138",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
-  },
-  {
     // [keynav] (corpus) (left) (vi) (0) (self) (gold) (X)
     "key": "alt+h",
     "command": "(corpus) alt+h 9fa2",
@@ -1957,6 +1951,14 @@ Notes:
     // "command": "alt+pageup df44",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.juke"
     // [note] moves/replaces vscode alt+right
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X)
+    "key": "alt+`",
+    "command": "workbench.action.terminal.toggleTerminal",
+    // "command": "alt+` 0138",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.terminal.enabled"
+    // [note] 0.0.3
   },
   {
     // [keynav] (left) (vi) (juke) (0) (self) (gold) (X) (immutable)
@@ -7385,17 +7387,6 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'right' && panelPosition == 'top'"
   },
   {
-    // [keynav] (vi) (editor) (pass)
-    "key": "ctrl+a",
-    "command": "-noop",
-    // "command": "ctrl+a b6f8",
-    // "command": "editor.action.selectAll",
-    // "command": "ctrl+a 8526",
-    // "command": "ctrl+a b9f8",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus"
-    // [note] If this keybinding (ctrl+a) is a chord then selectAll will NOT work.
-  },
-  {
     // [keynav] (horizontal) (vi) (split) (move) (1) (red) (A) (editor)
     "key": "shift+alt+-",
     "command": "workbench.action.splitEditorDown",
@@ -7599,6 +7590,17 @@ Notes:
     "command": "workbench.action.closeActiveEditor",
     // "command": "ctrl+d 2bcb",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !terminalFocus && !editorTextFocus && neovim.mode != 'cmdline' && !filesExplorerFocus && !searchViewletFocus"
+  },
+  {
+    // [keynav] (vi) (editor) (pass)
+    "key": "ctrl+a",
+    // "command": "-noop",
+    "command": "ctrl+a b6f8",
+    // "command": "editor.action.selectAll",
+    // "command": "ctrl+a 8526",
+    // "command": "ctrl+a b9f8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && config.keyboardNavigation.chords.action"
+    // [note] If this keybinding (ctrl+a) is a chord then selectAll will NOT work.
   },
   {
     // [keynav] (arrow) (vi) (juke) (editor)
@@ -22260,6 +22262,12 @@ Notes:
     "key": "alt+pageup",
     "command": "alt+pageup 9c86",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && panelFocus && config.workbench.sideBar.location == 'right' && panelPosition == 'right'"
+  },
+  {
+    // [keynav] (up) (vi) (move) (1) (red) (A)
+    "key": "shift+alt+k",
+    "command": "shift+alt+k da59",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus"
   }
 ]
 // ^.*\"key.*alt+h",
