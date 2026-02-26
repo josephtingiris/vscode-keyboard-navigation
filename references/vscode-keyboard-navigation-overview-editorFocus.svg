@@ -22,7 +22,7 @@ Variables (adjust these values near top if needed):
    style="display:block"
    version="1.1"
    id="svg15"
-   sodipodi:docname="vscode-keyboard-navigation-0.0.1.svg"
+   sodipodi:docname="vscode-keyboard-navigation-overview-editorFocus.svg"
    inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -40,15 +40,15 @@ Variables (adjust these values near top if needed):
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="0.6060606"
-     inkscape:cx="722.70001"
-     inkscape:cy="321.75"
+     inkscape:zoom="1.2121212"
+     inkscape:cx="431.475"
+     inkscape:cy="605.55001"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
-     inkscape:window-x="3832"
+     inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="ring-x" />
+     inkscape:current-layer="svg15" />
   <title
      id="svgTitle">VS Code Workbench Keyboard Navigation Target Diagram</title>
   <desc
@@ -569,11 +569,20 @@ Variables (adjust these values near top if needed):
              id="rect15" />
           <text
              class="meta"
-             x="104"
+             x="104.19043"
              y="30"
              text-anchor="middle"
              id="text15"
-             inkscape:label="title">0.0.1</text>
+             inkscape:label="title"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif;-inkscape-font-specification:'Segoe UI, Roboto, Helvetica, Arial, sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-anchor:middle;fill:#111111"><tspan
+               sodipodi:role="line"
+               id="tspan2"
+               x="104.19043"
+               y="30">0.0.3</tspan><tspan
+               sodipodi:role="line"
+               id="tspan3"
+               x="104.19043"
+               y="45">FIN</tspan></text>
         </g>
       </g>
     </g>
