@@ -1951,31 +1951,12 @@ Notes:
     // [note] restart (only) the neovim extension
   },
   {
-    // (down) (juke)
-    // [keynav] (vi) (juke) (0) (self) (gold) (X)
-    "key": "alt+pagedown",
-    "command": "workbench.action.navigateBack",
-    // "command": "alt+pagedown df43",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.juke"
-  },
-  {
-    // (up) (juke)
-    // [keynav] (vi) (juke) (0) (self) (gold) (X)
-    "key": "alt+pageup",
-    "command": "workbench.action.navigateForward",
-    // "command": "alt+pageup df44",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.juke"
-    // [note] moves/replaces vscode alt+right
-  },
-  {
-    // [keynav] (vi) (juke) (0) (self) (gold) (X)
     "key": "alt+pagedown",
     "command": "workbench.action.navigateBack",
     // "command": "alt+pagedown df43",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.juke.enabled"
   },
   {
-    // [keynav] (vi) (juke) (0) (self) (gold) (X)
     "key": "alt+pageup",
     "command": "workbench.action.navigateForward",
     // "command": "alt+pageup df44",
@@ -2109,7 +2090,13 @@ Notes:
     "command": "workbench.action.previousEditor",
     // "command": "alt+, 4dab",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && editorIsOpen"
-    // [note] only editor focus??
+    // [note] settings editor, keyboard shortcuts, et al
+  },
+  {
+    "key": "ctrl+d",
+    "command": "workbench.action.closeActiveEditor",
+    // "command": "ctrl+d 2bc8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && editorIsOpen"
     // [note] settings editor, keyboard shortcuts, et al
   },
   {
@@ -2118,7 +2105,6 @@ Notes:
     "command": "workbench.action.previousEditor",
     // "command": "alt+, 0aab",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
-    // [note] only editor focus??
     // [note] settings editor, keyboard shortcuts, et al
   },
   {
@@ -2127,16 +2113,7 @@ Notes:
     "command": "workbench.action.nextEditor",
     // "command": "alt+. 3aac",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
-    // [note] only editor focus??
     // [note] settings editor, keyboard shortcuts, et al
-  },
-  {
-    // [keynav] (vi)
-    "key": "ctrl+shift+t",
-    "command": "workbench.action.terminal.openNativeConsole",
-    // "command": "ctrl+shift+t f641",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !terminalFocus"
-    // [note] open native terminal when not in terminal
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
@@ -7648,8 +7625,8 @@ Notes:
   {
     // [keynav] (vi) (editor)
     "key": "ctrl+d",
-    "command": "workbench.action.closeActiveEditor",
-    // "command": "ctrl+d 2bcb",
+    "command": "ctrl+d 2bcb",
+    // "command": "workbench.action.closeActiveEditor",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !terminalFocus && !editorTextFocus && neovim.mode != 'cmdline' && !filesExplorerFocus && !searchViewletFocus"
   },
   {
@@ -18276,9 +18253,9 @@ Notes:
   {
     // [keynav] (vi) (editor)
     "key": "ctrl+d",
-    "command": "workbench.action.closeActiveEditor",
-    // "command": "ctrl+d 2b8c",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && neovim.mode != 'cmdline'"
+    "command": "ctrl+d 2b8c",
+    // "command": "workbench.action.closeActiveEditor",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && neovim.mode != 'cmdline'"
   },
   {
     // [keynav] (map) (right) (vi) (juke) (0) (self) (gold) (X) (panel) (editor)
@@ -44844,8 +44821,8 @@ Notes:
   {
     // [keynav] (vi) (terminal) (pass)
     "key": "ctrl+d",
-    "command": "-noop",
-    // "command": "ctrl+d 1ad4",
+    "command": "ctrl+d 1ad4",
+    // "command": "-noop",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.keyboardNavigation.terminal.enabled"
   },
   {
