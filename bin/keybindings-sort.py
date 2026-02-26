@@ -515,11 +515,6 @@ def _finalize_processed_output(
         when_regexes=when_regexes,
     )
 
-    try:
-        processed = _reorder_processed_by_when(processed, negation_mode)
-    except Exception:
-        pass
-
     return processed
 
 
@@ -666,6 +661,33 @@ def _remove_blank_lines(text: str) -> str:
         out_lines.append(line)
 
     return ''.join(out_lines)
+
+
+def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode: str) -> list[tuple[str, str]]:
+    if negation_mode in ('positive', 'negative'):
+        return sorted_groups
+
+    groups_list = list(sorted_groups)
+    i = 0
+    while i < len(groups_list):
+        raw_when = _extract_literal_when_from_object(groups_list[i][1]) or ''
+        norm_when = _normalize_whitespace(raw_when)
+        j = i + 1
+
+        while j < len(groups_list):
+            next_when = _extract_literal_when_from_object(groups_list[j][1]) or ''
+            if _normalize_whitespace(next_when) != norm_when:
+                break
+            j += 1
+
+        if j - i > 1:
+            slice_pairs = groups_list[i:j]
+            slice_pairs.sort(key=lambda pair: natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
+            groups_list[i:j] = slice_pairs
+
+        i = j
+
+    return groups_list
 
 
 def _reorder_processed_by_when(processed_text: str, negation_mode: str) -> str:
@@ -2262,6 +2284,8 @@ def main(argv: List[str] | None = None) -> int:
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         )
+
+    sorted_groups = _reorder_groups_by_when(sorted_groups, negation_mode)
 
     final_text = _assemble_sorted_output(
         preamble,
