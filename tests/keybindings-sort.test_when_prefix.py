@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
+Test --when-prefix functionality in `bin/keybindings-sort.py`.
+"""
 import json
 import subprocess
 import sys

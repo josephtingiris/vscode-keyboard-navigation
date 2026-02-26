@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Integration tests for v0.0.2 corpus files against bin/keybindings-sort.py
+"""
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
+Integration tests for v0.0.2 corpus files against bin/keybindings-sort.py
 
 These are lightweight checks intended to run under `make test` quickly.
 """
