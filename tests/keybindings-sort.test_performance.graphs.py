@@ -133,7 +133,11 @@ def main() -> int:
     try:
         import matplotlib  # noqa: F401
     except ImportError:
-        print("error: matplotlib is required. install with '.venv/bin/pip install matplotlib'", file=sys.stderr)
+        print(
+            "error: matplotlib is required. install in your active Python environment, "
+            "or use 'python3 -m pip install --user matplotlib'",
+            file=sys.stderr,
+        )
         return 2
 
     out_dir.mkdir(parents=True, exist_ok=True)

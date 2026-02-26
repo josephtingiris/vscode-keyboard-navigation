@@ -1,8 +1,9 @@
 
 .DEFAULT_GOAL := help
-.PHONY: help all build clean gate test tests regression quick perf perf-quick perf-small perf-full $(TARGETS)
+.PHONY: help all build clean gate test tests regression quick perf perf-quick perf-small perf-full graphs $(TARGETS)
 
 GATE_MAX_OVERALL_MEDIAN_MS ?= 1500
+PYTHON ?= python3
 
 # default: show help when `make` is run with no args
 help:
@@ -14,6 +15,7 @@ help:
 	@echo "  build                   - run tests/ build"
 	@echo "  clean                   - clean tests/ artifacts"
 	@echo "  gate                    - run preflight pass/fail checks (regression + perf budget)"
+	@echo "  graphs                  - generate PNG graphs from full perf CSV in tests/data/"
 	@echo "  perf                    - run quick performance gauge"
 	@echo "  perf-full               - run full 252 performance matrix (writes tests/data/)"
 	@echo "  perf-quick              - run quick performance gauge"
@@ -83,6 +85,14 @@ gate:
 	@echo
 
 perf: perf-quick
+
+graphs:
+	@echo "++ Generating performance graphs ..."
+	@echo --cut--
+	@command -v $(PYTHON) >/dev/null 2>&1 || { echo "error: $(PYTHON) not found in PATH"; exit 2; }
+	@$(PYTHON) ./keybindings-sort.test_performance.graphs.py --input tests/data/perf-keybindings-sort.full.csv --out-dir tests/data
+	@echo --cut--
+	@echo
 
 perf-full:
 	@echo "++ Running full 252 performance matrix ..."
