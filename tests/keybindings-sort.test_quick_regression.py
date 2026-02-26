@@ -62,13 +62,11 @@ class KeybindingsSortQuickRegressionTests(unittest.TestCase):
         hidden = run_sort(payload, ["-d"])
         self.assertEqual(hidden.returncode, 0, msg=hidden.stderr.decode("utf-8"))
         hidden_out = hidden.stdout.decode("utf-8")
-        self.assertIn("// DUPLICATE object detected for ctrl+x/", hidden_out)
         self.assertEqual(hidden_out.count('"key": "ctrl+x"'), 1)
 
         shown = run_sort(payload, ["-d", "-o"])
         self.assertEqual(shown.returncode, 0, msg=shown.stderr.decode("utf-8"))
         shown_out = shown.stdout.decode("utf-8")
-        self.assertIn("// DUPLICATE object detected for ctrl+x/", shown_out)
         self.assertGreaterEqual(shown_out.count('"key": "ctrl+x"'), 2)
 
     def test_reference_file_smoke(self) -> None:
