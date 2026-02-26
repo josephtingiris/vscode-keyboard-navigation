@@ -369,6 +369,7 @@ def _assemble_sorted_output(
         is_last = (i == len(rendered_groups) - 1)
         if comments:
             comments = BLANK_LINES_RE.sub('', comments)
+            comments = LEADING_COMMA_RE.sub('', comments)
             out_parts.append(comments)
 
         idx = obj_out.rfind('}')
@@ -382,6 +383,7 @@ def _assemble_sorted_output(
             out_parts.append(',')
         out_parts.append('\n')
 
+    trailing_comments = LEADING_COMMA_RE.sub('', trailing_comments)
     out_parts.append(trailing_comments)
     if trailing_comments and not trailing_comments.endswith('\n'):
         out_parts.append('\n')
@@ -1715,29 +1717,86 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
 
 
 def group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]], str]:
-    groups = []
+    groups: list[tuple[str, str]] = []
     comments = ''
-    buf = ''
+
+    n = len(array_text)
+    i = 0
+    comments_start = 0
+    obj_start: int | None = None
     depth = 0
-    in_obj = False
-    for line in array_text.splitlines(keepends=True):
-        stripped = line.strip()
-        if not in_obj:
-            if '{' in stripped:
-                in_obj = True
-                depth = stripped.count('{') - stripped.count('}')
-                buf = line
+
+    in_string = False
+    string_char = ''
+    esc = False
+    in_line_comment = False
+    in_block_comment = False
+
+    while i < n:
+        ch = array_text[i]
+        next2 = array_text[i:i + 2] if i + 2 <= n else ''
+
+        if in_line_comment:
+            if ch == '\n':
+                in_line_comment = False
+            i += 1
+            continue
+
+        if in_block_comment:
+            if next2 == '*/':
+                in_block_comment = False
+                i += 2
             else:
-                comments += line
-        else:
-            buf += line
-            depth += line.count('{') - line.count('}')
+                i += 1
+            continue
+
+        if in_string:
+            if esc:
+                esc = False
+            elif ch == '\\':
+                esc = True
+            elif ch == string_char:
+                in_string = False
+            i += 1
+            continue
+
+        if next2 == '//':
+            in_line_comment = True
+            i += 2
+            continue
+
+        if next2 == '/*':
+            in_block_comment = True
+            i += 2
+            continue
+
+        if ch == '"' or ch == "'":
+            in_string = True
+            string_char = ch
+            i += 1
+            continue
+
+        if obj_start is None:
+            if ch == '{':
+                comments = array_text[comments_start:i]
+                obj_start = i
+                depth = 1
+            i += 1
+            continue
+
+        if ch == '{':
+            depth += 1
+        elif ch == '}':
+            depth -= 1
             if depth == 0:
-                groups.append((comments, buf))
-                comments = ''
-                buf = ''
-                in_obj = False
-    trailing_comments = comments
+                obj_end = i + 1
+                obj_text = array_text[obj_start:obj_end]
+                groups.append((comments, obj_text))
+                obj_start = None
+                comments_start = obj_end
+        i += 1
+
+    trailing_comments = array_text[comments_start:]
     return groups, trailing_comments
 
 
