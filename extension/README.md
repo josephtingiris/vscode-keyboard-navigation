@@ -1,11 +1,11 @@
 # VS Code Keyboard Navigation
 
 The VS Code Keyboard Navigation extension provides an opinionated modal keyboard grammar that focuses on speedrunning the Workbench UI.
-It is designed to build upon and complement vi/vim/neovim muscle memory by including alt+hjkl alongside alt+arrow key navigation throughout
-the VS Code WorkBench UI components (editor groups, side bars, panel, and terminals).
+It is designed to build upon and complement letter-key muscle memory (i.e. emacs, vi/vim/neovim) by including `alt+<letter-key>` alongside `alt+<arrow>` key navigation throughout the VS Code WorkBench UI components (editor groups, side bars, panel, and terminals).
 
 Why use it
 - Keeps your hands on the keyboard.
+- You already have the muscle memories.
 - Fluid spatial navigation throughout workbench components.
 - Navigate faster and more accurately, without the need to remember a million shortcuts.
 - Optional (but useful!) visual highlights for when your fingers are moving faster than your eyes (or when an observer is trying to keep up).
