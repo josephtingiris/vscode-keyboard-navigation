@@ -53,6 +53,8 @@ QUICK_CASES: list[tuple[str, str | None, str, str, bool]] = [
 
 SMALL_GROUP_SORTING_VALS = ["alpha", "natural", "positive-natural", "negative-natural"]
 SMALL_WHEN_GROUPING_VALS = ["none", "focal-invariant"]
+DEFAULT_INPUT_QUICK_SMALL = "references/keybindings.surface.vi.jsonc"
+DEFAULT_INPUT_FULL = "references/keybindings.surface.all.jsonc"
 
 
 def build_combos(mode: str) -> list[tuple[str, str | None, str, str, bool]]:
@@ -218,8 +220,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--input",
-        default="references/keybindings.json",
-        help="input keybindings file path",
+        default=None,
+        help="input keybindings file path (default: vi for quick/small, all for full)",
     )
     parser.add_argument(
         "--out-prefix",
@@ -235,13 +237,21 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def resolve_input_path(root: Path, mode: str, input_arg: str | None) -> Path:
+    """Resolve input path using mode-aware defaults unless explicitly overridden."""
+    if input_arg:
+        return (root / input_arg).resolve()
+    default_input = DEFAULT_INPUT_FULL if mode == "full" else DEFAULT_INPUT_QUICK_SMALL
+    return (root / default_input).resolve()
+
+
 def main() -> int:
     """Run selected benchmark mode and print summary."""
     args = parse_args()
 
     root = Path(__file__).resolve().parent.parent
     script = root / "bin" / "keybindings-sort.py"
-    input_path = (root / args.input).resolve()
+    input_path = resolve_input_path(root, args.mode, args.input)
 
     if not script.exists():
         print(f"error: missing script: {script}", file=sys.stderr)

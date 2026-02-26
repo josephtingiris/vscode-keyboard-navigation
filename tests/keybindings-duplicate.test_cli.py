@@ -81,7 +81,7 @@ class KeybindingsDuplicateCliTests(unittest.TestCase):
 
     def test_reference_inputs_smoke(self) -> None:
         files = [
-            "references/keybindings.json",
+            "references/keybindings.surface.vi.jsonc",
             "references/keybindings.corpus.jsonc",
             "references/keybindings.corpus.emacs.jsonc",
             "references/keybindings.corpus.kbm.jsonc",

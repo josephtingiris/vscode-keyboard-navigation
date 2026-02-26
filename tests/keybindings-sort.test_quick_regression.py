@@ -18,7 +18,7 @@ from textwrap import dedent
 
 REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 SCRIPT = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
-REFERENCE_INPUT = os.path.join(REPO_ROOT, "references", "keybindings.json")
+REFERENCE_INPUT = os.path.join(REPO_ROOT, "references", "keybindings.surface.vi.jsonc")
 
 
 def run_sort(input_text: str, args: list[str] | None = None) -> subprocess.CompletedProcess[bytes]:
