@@ -87,6 +87,8 @@ validate_json() {
     rm -f "${tempfile}" &> /dev/null
     echo "OK."
 
+    echo
+
     if ! cat "${file}" | keybindings-remove-comments.py | jq . > /dev/null 2>&1; then
         aborting "'${file}' is not valid JSON"
     fi
@@ -122,7 +124,7 @@ main() {
         aborting "file '${keybindings_json}' does not exist"
     fi
 
-    validate_json "${keybindings_json}"
+    #validate_json "${keybindings_json}"
 
     local user_keybindings_json
     if [ -d "${VSCODE_USER_DIR}" ]; then
@@ -135,7 +137,7 @@ main() {
     fi
 
     if [ "${KEYBINDINGS_SORT_ARGUMENTS}" ]; then
-        ansi_echo "Using provided arguments: ${YELLOW}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
+        ansi_echo "Sorting JSON with provided arguments: ${YELLOW}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     else
         if [ "${1}" == "1" ]; then
             KEYBINDINGS_SORT_ARGUMENTS="-p key -s when"
@@ -191,7 +193,7 @@ main() {
             KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
         fi
 
-        ansi_echo "Using default arguments: ${GREEN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
+        ansi_echo "Sorting JSON with default arguments: ${GREEN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     fi
     export KEYBINDINGS_SORT_ARGUMENTS
 
@@ -204,7 +206,7 @@ main() {
     fi
     echo "OK."
 
-    ansi_echo "Arguments used: ${CYAN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
+    ansi_echo "Sorted JSON with arguments: ${CYAN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
 
     validate_json "${keybindings_json}"
 

@@ -81,10 +81,11 @@ main() {
     #while inotifywait -q -e close_write,modify,move,create "${WATCH_REAL}" > /dev/null 2>&1; do
     #while inotifywait -q -e modify "${WATCH_REAL}" > /dev/null 2>&1; do
     while inotifywait -q -e close_write "${WATCH_REAL}" > /dev/null 2>&1; do
-        echo "---- RUN: $(date -u '+%Y-%m-%dT%H:%M:%SZ') ----"
+        echo "---- RUN started at $(date -u '+%Y-%m-%dT%H:%M:%SZ') ----"
         time "${RUNNER}" "${WATCH_REAL}"
         runner_pid=$!
         wait ${runner_pid} &> /dev/null || aborting "pid ${runner_pid} exited with non-zero status"
+        echo "---- RUN finished at $(date -u '+%Y-%m-%dT%H:%M:%SZ') ----"
         sleep 3 # debounce: wait a moment to avoid multiple rapid triggers
     done
 }
