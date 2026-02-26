@@ -418,7 +418,7 @@ def _contains_focus_token_in_object(obj_text: str) -> bool:
     if not raw:
         return False
 
-    parts = re.split(r'\s*&&\s*|\s*\|\|\s*', raw)
+    parts = WHEN_TERM_SPLIT_RE.split(raw)
     for part in parts:
         token = part.strip()
         while token.startswith('(') and token.endswith(')'):
@@ -529,7 +529,7 @@ def _first_when_group_rank(
     if not canonical:
         return 5
 
-    parts = re.split(r'\s*&&\s*|\s*\|\|\s*', canonical.strip())
+    parts = WHEN_TERM_SPLIT_RE.split(canonical.strip())
     if not parts:
         return 5
 
@@ -794,7 +794,7 @@ def _sort_groups_for_primary_when(
         for row in decorated:
             when_val = row[1] or ''
             try:
-                parts = re.split(r'\s*&&\s*|\s*\|\|\s*', when_val.strip()) if when_val else []
+                parts = WHEN_TERM_SPLIT_RE.split(when_val.strip()) if when_val else []
                 found_focus = False
                 for part in parts:
                     token = part.strip()
@@ -1496,7 +1496,7 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         # derive the first top-level when token for grouping when primary sorting
         first_when_token = ''
         if canonical_when:
-            parts = re.split(r'\s*&&\s*|\s*\|\|\s*', canonical_when.strip())
+            parts = WHEN_TERM_SPLIT_RE.split(canonical_when.strip())
             if parts:
                 first_when_token = parts[0].strip()
                 # remove surrounding parentheses and leading negation for grouping
