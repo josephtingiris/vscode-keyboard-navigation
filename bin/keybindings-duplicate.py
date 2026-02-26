@@ -192,6 +192,7 @@ class WhenOr(WhenNode):
 
 def render_when_node(node: WhenNode) -> str:
     """Render an AST node back to string form."""
+
     inner = node.to_str()
     if node.parens:
         return f"({inner})"
@@ -200,11 +201,13 @@ def render_when_node(node: WhenNode) -> str:
 
 def normalize_operand(text: str) -> str:
     """Normalize whitespace within one when operand."""
+
     return re.sub(r"\s+", " ", text).strip()
 
 
 def tokenize_when(expr: str) -> list[tuple[str, str]]:
     """Tokenize a VS Code when expression while preserving strings/regex."""
+
     tokens: list[tuple[str, str]] = []
     buf = ""
     i = 0
@@ -319,6 +322,7 @@ def tokenize_when(expr: str) -> list[tuple[str, str]]:
 
 def parse_when(expr: str) -> WhenNode:
     """Parse a when expression into a small AST."""
+
     tokens = tokenize_when(expr)
     idx = 0
 
@@ -388,6 +392,7 @@ def parse_when(expr: str) -> WhenNode:
 
 def canonicalize_when(when_val: str) -> str:
     """Canonicalize when by flattening AND terms and deduping exact operands."""
+
     if not when_val:
         return ""
 
@@ -438,6 +443,7 @@ def canonicalize_when(when_val: str) -> str:
 
 def natural_key(text: str) -> list[object]:
     """Natural sort helper."""
+
     parts = re.split(r"(\d+)", text)
     result: list[object] = []
     for part in parts:
@@ -463,11 +469,13 @@ def strip_json_comments(text: str) -> str:
 
 def strip_trailing_commas(text: str) -> str:
     """Remove trailing commas before object/array endings."""
+
     return re.sub(r",\s*([}\]])", r"\1", text)
 
 
 def extract_preamble_postamble(text: str) -> tuple[str, str, str]:
     """Extract preamble, array-body, and postamble around top-level array."""
+
     i = 0
     n = len(text)
     in_string = False
@@ -592,6 +600,7 @@ def extract_preamble_postamble(text: str) -> tuple[str, str, str]:
 
 def group_objects_with_comments(array_text: str) -> tuple[list[tuple[str, str]], str]:
     """Split array body into (leading_comments, object_text) groups."""
+
     groups: list[tuple[str, str]] = []
     comments = ""
     buf = ""
@@ -619,12 +628,14 @@ def group_objects_with_comments(array_text: str) -> tuple[list[tuple[str, str]],
 
 def parse_comma_list(value: str) -> list[str]:
     """Split a comma list into trimmed, non-empty values."""
+
     parts = [part.strip() for part in value.split(",")]
     return [part for part in parts if part]
 
 
 def parse_comma_list_chunks(values: list[str]) -> list[str]:
     """Parse repeated comma-list arguments while preserving option order."""
+
     parsed: list[str] = []
     for value in values:
         parsed.extend(parse_comma_list(value))
@@ -633,6 +644,7 @@ def parse_comma_list_chunks(values: list[str]) -> list[str]:
 
 def expand_group_names(names: list[str], parser: argparse.ArgumentParser, flag_name: str) -> list[str]:
     """Expand group names to ordered key literals."""
+
     expanded: list[str] = []
     for raw_name in names:
         group_name = raw_name.strip().lower()
@@ -647,6 +659,7 @@ def expand_group_names(names: list[str], parser: argparse.ArgumentParser, flag_n
 
 def build_mapping_pairs(from_keys: list[str], to_keys: list[str]) -> list[tuple[str, str]]:
     """Create source-major ordered source->target pairs."""
+
     if not from_keys:
         return []
     if not to_keys:
@@ -715,16 +728,19 @@ def parse_jsonc_object(obj_text: str) -> Any:
 
 def remove_trailing_object_comma(obj_text: str) -> str:
     """Remove a final comma after the object body if present."""
+
     return re.sub(r",\s*$", "", obj_text, count=1)
 
 
 def normalize_modifier(modifier: str) -> str:
     """Normalize one modifier token."""
+
     return modifier.strip().lower()
 
 
 def normalize_key_for_compare(key_value: str) -> str:
     """Normalize key text for duplicate comparisons."""
+
     key_value = key_value.strip().lower()
     if not key_value:
         return ""
@@ -767,6 +783,7 @@ def normalize_key_for_compare(key_value: str) -> str:
 
 def key_tail_literal(key_value: str) -> str:
     """Extract final literal key token (without modifiers) from key text."""
+
     cleaned = key_value.strip().lower()
     if not cleaned:
         return ""
@@ -779,6 +796,7 @@ def key_tail_literal(key_value: str) -> str:
 
 def combine_modifier_and_key(modifier: str, key_literal: str) -> str:
     """Build a full key value from modifier and key literal."""
+
     modifier = modifier.strip().lower()
     key_literal = key_literal.strip().lower()
     if not modifier:
@@ -788,6 +806,7 @@ def combine_modifier_and_key(modifier: str, key_literal: str) -> str:
 
 def merge_when_clause(existing: str, extra: str) -> str:
     """Merge existing and extra when-clause strings without duplicates."""
+
     existing = (existing or "").strip()
     extra = (extra or "").strip()
     if not existing:
@@ -808,6 +827,7 @@ def insert_comments_inside_object(obj_text: str, comments: list[str]) -> str:
     If a closing brace can't be found, falls back to appending comments after the
     object text.
     """
+
     s = obj_text.rstrip()
     # find last closing brace
     idx = s.rfind("}")
@@ -835,6 +855,7 @@ def insert_comments_inside_object(obj_text: str, comments: list[str]) -> str:
 
 def extract_command_id(command_value: str) -> str | None:
     """Extract preferred 4-hex id from command string."""
+
     if not command_value:
         return None
     match = re.search(r"\b([0-9a-fA-F]{4})\b", command_value)
@@ -845,6 +866,7 @@ def extract_command_id(command_value: str) -> str | None:
 
 def extract_comment_id(comment_text: str) -> str | None:
     """Extract fallback 4-5 char id from leading comments."""
+
     if not comment_text:
         return None
     match = re.search(r"\b([0-9a-fA-F]{4}|[A-Za-z0-9]{5})\b", comment_text)
@@ -855,6 +877,7 @@ def extract_comment_id(comment_text: str) -> str | None:
 
 def extract_commented_command_id(text: str | None) -> str | None:
     """Extract a 4-hex id from a commented or uncommented command inside text."""
+
     if not text:
         return None
     # look for patterns like: "command": "(...) 1a2b"
@@ -869,6 +892,7 @@ def extract_commented_command_id(text: str | None) -> str | None:
 
 def extract_any_id(parsed_obj: dict | None, leading_comments: str, object_text: str | None = None) -> str | None:
     """Extract id from command first, then commented command inside object, then leading comments."""
+
     if parsed_obj is not None:
         command_value = str(parsed_obj.get("command", ""))
         cmd_id = extract_command_id(command_value)
@@ -890,6 +914,7 @@ def generate_unique_hex_id(used_ids: set[str], rng: random.Random, seed: str | N
     the seed (e.g. key+when) and taking slices of the hex digest. Fall
     back to random generation if deterministic attempts collide.
     """
+
     if seed:
         hexdigest = hashlib.sha256(seed.encode("utf-8")).hexdigest()
         # try deterministic 4-char slices first, then 5-char slices.
@@ -913,6 +938,7 @@ def generate_unique_hex_id(used_ids: set[str], rng: random.Random, seed: str | N
 
 def make_generated_object_text(key_value: str, when_value: str, command_value: str) -> str:
     """Render a generated keybinding object as JSONC text."""
+
     lines = [
         "  {",
         f'    "key": {json.dumps(key_value)},',
@@ -925,6 +951,7 @@ def make_generated_object_text(key_value: str, when_value: str, command_value: s
 
 def load_records(array_text: str) -> tuple[list[ObjectRecord], str]:
     """Load grouped records from array text."""
+
     groups, trailing_comments = group_objects_with_comments(array_text)
     records: list[ObjectRecord] = []
 
@@ -961,6 +988,7 @@ def build_emitted_objects(
     rng: random.Random,
 ) -> list[EmittedObject]:
     """Build output objects list including generated mappings."""
+
     used_ids: set[str] = set()
     for record in records:
         found_id = extract_any_id(record.parsed_obj, record.leading_comments, record.object_text)
@@ -1090,6 +1118,7 @@ def build_emitted_objects(
 
 def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, detect: bool) -> str:
     """Annotate and return final array-body text."""
+
     seen_pairs: set[tuple[str, str]] = set()
     seen_ids: dict[str, tuple[str, str]] = {}
     # collect ids already present in the emitted set (including generated ones)
@@ -1170,6 +1199,7 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, de
 
 def parse_args(argv: list[str], parser: argparse.ArgumentParser) -> argparse.Namespace:
     """Parse CLI arguments using the provided parser instance."""
+
     args = parser.parse_args(argv)
 
     from_key_tokens = parse_comma_list_chunks(args.from_keys)
@@ -1194,6 +1224,7 @@ def parse_args(argv: list[str], parser: argparse.ArgumentParser) -> argparse.Nam
 
 def read_input_text(path: str | None) -> str | None:
     """Read input from file, piped stdin, or return None when absent."""
+
     if path:
         with open(path, "r", encoding="utf-8") as handle:
             return handle.read()
@@ -1204,6 +1235,7 @@ def read_input_text(path: str | None) -> str | None:
 
 def main(argv: List[str] | None = None) -> int:
     """CLI entrypoint."""
+
     argv = sys.argv[1:] if argv is None else argv
 
     default_modifiers = parse_comma_list(DEFAULT_MODIFIERS)

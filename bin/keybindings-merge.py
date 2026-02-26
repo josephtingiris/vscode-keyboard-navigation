@@ -28,6 +28,7 @@ Exit codes:
     1   Usage / bad args
     2   File read/write or other runtime error
 """
+
 from __future__ import annotations
 import argparse
 import json
@@ -51,6 +52,7 @@ def find_top_level_array_bounds(text: str) -> Tuple[int, int]:
     Returns (index_of_open_bracket, index_of_matching_close_bracket).
     Raises ValueError if not found.
     """
+
     i = 0
     n = len(text)
     in_string = False
@@ -167,6 +169,7 @@ def split_top_level_array_items(array_inner: str) -> List[str]:
     Given the string inside the top-level [ ... ] (excluding the brackets),
     split into item raw text pieces, preserving comments and spacing around items.
     """
+
     items: List[str] = []
     i = 0
     n = len(array_inner)
@@ -253,6 +256,7 @@ def split_top_level_array_items(array_inner: str) -> List[str]:
 
 def remove_comments_from_string(s: str) -> str:
     """Remove // and /* */ comments while respecting quoted strings."""
+
     out_chars: List[str] = []
     i = 0
     n = len(s)
@@ -313,6 +317,7 @@ def remove_trailing_commas(s: str) -> str:
     Remove trailing commas before } or ] at the same syntactic level.
     This works with the assumption that comments have already been removed.
     """
+
     out_chars: List[str] = []
     i = 0
     n = len(s)
@@ -367,6 +372,7 @@ def parse_item_to_object(item_raw: str) -> Any:
     Try to parse an item (which is raw JSONC text for an object).
     Returns the parsed object on success, raises ValueError on parse failure.
     """
+
     cleaned = remove_comments_from_string(item_raw)
     cleaned = remove_trailing_commas(cleaned)
     # Strip leading/trailing whitespace so json.loads doesn't choke if there's surrounding newlines
@@ -394,6 +400,7 @@ def merge_keybinding_files(left_text: str, right_text: str, prefer: str, base: s
     base: 'left' or 'right'   (which file provides the wrapper/prefix/suffix)
     Returns (merged_text, warnings)
     """
+
     # find array bounds in both files
     left_l, left_r = find_top_level_array_bounds(left_text)
     right_l, right_r = find_top_level_array_bounds(right_text)

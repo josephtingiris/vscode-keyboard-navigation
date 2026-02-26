@@ -57,6 +57,7 @@ Exit codes
 2   File read/write or other runtime error
 ```
 """
+
 import sys
 import re
 import json
@@ -946,6 +947,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
     Sort operands inside every AND node according to project conventions.
     Preserves OR groupings and existing parentheses; does not reorder OR-level operands.
     """
+
     if not when_val:
         return ''
 
@@ -963,6 +965,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
 
     if cached is not None:
         return cached
+
     """
         TBD: these need to be better tested before being fully integrated, especially with the focal-invariant mode:
         'view.',
@@ -973,6 +976,7 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
         'workbench.view.',
     ]
     """
+
     focus_tokens = FOCUS_TOKENS
     positional_tokens = POSITIONAL_TOKENS
     visibility_tokens = VISIBILITY_TOKENS
@@ -1329,6 +1333,7 @@ def debug_echo(level: int, category: str, when_val: str | None, msg: str) -> Non
     Messages are emitted when `level` <= `DEBUG_LEVEL` and category/when
     filters (if set) match. Always writes to stderr.
     """
+
     if DEBUG_LEVEL <= 0:
         return
     if level > DEBUG_LEVEL:
@@ -1365,6 +1370,7 @@ def extract_preamble_postamble(text):
 
     Skip any brackets that appear inside comments or strings in the preamble/postamble.
     """
+
     i = 0
     n = len(text)
     in_string = False
@@ -1770,6 +1776,7 @@ def normalize_key_for_compare(key_value):
     Lowercases, splits chord parts on spaces, orders modifiers alphabetically
     before the literal, and rejoins chords with spaces.
     """
+
     if not key_value:
         return ""
     key_value = str(key_value).strip().lower()
@@ -1888,6 +1895,7 @@ def parse_object_text(obj_text: str):
 
     Returns the parsed dict or None on failure.
     """
+
     if not obj_text:
         return None
 
@@ -2148,6 +2156,7 @@ def when_specificity(when_val: str) -> Tuple[int]:
     Returns a tuple to sort stably by:
         1) number of condition terms (split on && / ||)
     """
+
     key = '' if when_val is None else str(when_val)
     cached = CACHE_WHEN_SPECIFICITY.get(key)
     if cached is not None:

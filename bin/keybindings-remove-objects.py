@@ -29,6 +29,7 @@ Exit codes:
     1   Usage / bad args
     2   File read/write or other runtime error
 """
+
 import sys
 import os
 import re
@@ -41,6 +42,7 @@ def extract_preamble_postamble(text):
     Find the top-level JSON array brackets, skipping any brackets that appear
     inside comments or strings in the preamble/postamble.
     """
+
     i = 0
     n = len(text)
     in_string = False

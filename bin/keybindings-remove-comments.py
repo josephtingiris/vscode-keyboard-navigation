@@ -24,6 +24,7 @@ Exit codes:
     1   Usage / bad args
     2   File read/write or other runtime error
 """
+
 from __future__ import annotations
 
 import re

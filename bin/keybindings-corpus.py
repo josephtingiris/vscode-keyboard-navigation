@@ -29,6 +29,7 @@ Exit codes
     1   Usage / bad args
     2   File read/write or other runtime error
 """
+
 from __future__ import annotations
 
 import json
@@ -221,6 +222,7 @@ def init_directional_groups(selected: str, letter_groups: dict) -> None:
     navigation group (if any). This centralizes startup mutation so
     subordinates can continue to read globals.
     """
+
     direction_to_var = {
         "left": "LEFT_GROUP",
         "down": "DOWN_GROUP",
