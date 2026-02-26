@@ -1978,8 +1978,8 @@ Notes:
   {
     // [keynav] (left) (vi) (juke) (0) (self) (gold) (X) (immutable)
     "key": "alt+,",
-    "command": "workbench.action.previousEditor",
-    // "command": "alt+, 03ab",
+    "command": "alt+, 03ab",
+    // "command": "workbench.action.previousEditor",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
     // [note] settings editor, keyboard shortcuts, et al
   },
@@ -1994,8 +1994,8 @@ Notes:
   {
     // [keynav] (right) (vi) (juke) (0) (self) (gold) (X) (immutable)
     "key": "alt+.",
-    "command": "workbench.action.nextEditor",
-    // "command": "alt+. 03ac",
+    "command": "alt+. 03ac",
+    // "command": "workbench.action.nextEditor",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
     // [note] settings editor, keyboard shortcuts, et al
   },
@@ -2065,16 +2065,16 @@ Notes:
   {
     // [keynav] (left) (vi) (juke) (0) (self) (gold) (X)
     "key": "alt+,",
-    "command": "workbench.action.previousEditor",
-    // "command": "alt+, 0abc",
+    "command": "alt+, 0abc",
+    // "command": "workbench.action.previousEditor",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && editorIsOpen"
     // [note] file not found, ... this is the one
   },
   {
     // [keynav] (right) (vi) (juke) (0) (self) (gold) (X)
     "key": "alt+.",
-    "command": "workbench.action.nextEditor",
-    // "command": "alt+. 0acc",
+    "command": "alt+. 0acc",
+    // "command": "workbench.action.nextEditor",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && editorIsOpen"
     // [note] only editor focus??
     // [note] file not found, ... this is the one
@@ -2082,8 +2082,8 @@ Notes:
   {
     // [keynav] (left) (vi) (juke) (0) (self) (gold) (X) (immutable)
     "key": "alt+,",
-    "command": "workbench.action.previousEditor",
-    // "command": "alt+, 0aab",
+    "command": "alt+, 0aab",
+    // "command": "workbench.action.previousEditor",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
     // [note] only editor focus??
     // [note] settings editor, keyboard shortcuts, et al
@@ -2091,8 +2091,7 @@ Notes:
   {
     // [keynav] (right) (vi) (juke) (0) (self) (gold) (X) (immutable)
     "key": "alt+.",
-    "command": "workbench.action.nextEditor",
-    // "command": "alt+. 3aac",
+    "command": "alt+. 3aac",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
     // [note] only editor focus??
     // [note] settings editor, keyboard shortcuts, et al
@@ -2108,8 +2107,8 @@ Notes:
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
     "key": "alt+a z",
-    "command": "workbench.action.toggleMaximizedAuxiliaryBar",
-    // "command": "alt+a z af39",
+    "command": "alt+a z af39",
+    // "command": "workbench.action.toggleMaximizedAuxiliaryBar",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.keyboardNavigation.chords.action"
     // [note]  toggle secondary side bar
   },
@@ -7487,8 +7486,8 @@ Notes:
   {
     // [keynav] (left) (vi) (juke) (0) (self) (gold) (X) (editor)
     "key": "alt+,",
-    "command": "workbench.action.previousEditor",
-    // "command": "alt+, de62",
+    "command": "alt+, de62",
+    // "command": "workbench.action.previousEditor",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus"
   },
   {
@@ -7501,8 +7500,8 @@ Notes:
   {
     // [keynav] (right) (vi) (juke) (0) (self) (gold) (X) (editor)
     "key": "alt+.",
-    "command": "workbench.action.nextEditor",
-    // "command": "alt., de63",
+    "command": "alt., de63",
+    // "command": "workbench.action.nextEditor",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus"
   },
   {
@@ -12927,16 +12926,16 @@ Notes:
   {
     // [keynav] (left) (vi) (juke) (0) (self) (gold) (X) (editor) (text)
     "key": "alt+,",
-    "command": "workbench.action.previousEditor",
-    // "command": "alt+, 64a0",
+    "command": "alt+, 64a0",
+    // "command": "workbench.action.previousEditor",
     // "command": "workbench.action.focusOtherSide",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && !panelFocus && !activeEditorCanSplitInGroup"
   },
   {
     // [keynav] (right) (vi) (juke) (0) (self) (gold) (X) (editor) (text)
     "key": "alt+.",
-    "command": "workbench.action.nextEditor",
-    // "command": "alt+. 65a0",
+    "command": "alt+. 65a0",
+    // "command": "workbench.action.nextEditor",
     // "command": "workbench.action.focusOtherSide",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && !panelFocus && !activeEditorCanSplitInGroup"
   },
@@ -12955,7 +12954,8 @@ Notes:
   {
     // [keynav] (map) (left) (vi) (juke) (0) (self) (gold) (X) (editor) (text)
     "key": "alt+,",
-    "command": "alt+, a889",
+    "command": "workbench.action.previousEditor",
+    // "command": "alt+, a889",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
   },
   {
@@ -12967,7 +12967,8 @@ Notes:
   {
     // [keynav] (map) (right) (vi) (juke) (0) (self) (gold) (X) (editor) (text)
     "key": "alt+.",
-    "command": "alt+. c3f5",
+    "command": "workbench.action.nextEditor",
+    // "command": "alt+. c3f5",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
   },
   {
