@@ -488,14 +488,14 @@ def _embed_duplicate_comment_in_object(obj_text: str, duplicate_comment: str) ->
 
 
 def _extract_literal_key_from_object(obj_text: str) -> str:
-    match = re.search(r'"key"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
+    match = KEY_EXTRACT_RE.search(obj_text)
     if not match:
         return ''
     return _decode_json_string_literal(match.group(1))
 
 
 def _extract_literal_when_from_object(obj_text: str) -> str:
-    match = re.search(r'"when"\s*:\s*"((?:\\.|[^"\\])*)"', obj_text)
+    match = WHEN_EXTRACT_RE.search(obj_text)
     if not match:
         return ''
     return _decode_json_string_literal(match.group(1))
