@@ -4,8 +4,7 @@
 
 Quick regression checks for `bin/keybindings-sort.py`.
 
-This test focuses on fast, high-signal checks that run in seconds and can be
-used between larger benchmark runs.
+This test focuses on fast, high-signal checks that run in seconds and can be used between larger benchmark runs.
 """
 
 import os

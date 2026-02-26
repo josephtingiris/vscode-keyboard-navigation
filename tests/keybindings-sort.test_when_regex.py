@@ -4,6 +4,7 @@
 
 Test --when-regex functionality in `bin/keybindings-sort.py`.
 """
+
 import json
 import subprocess
 import sys

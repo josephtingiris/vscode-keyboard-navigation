@@ -5,9 +5,9 @@
 Performance harness for `bin/keybindings-sort.py` with three run profiles.
 
 Usage:
-    ./tests/keybindings-sort.test_performance.py --mode quick
-    ./tests/keybindings-sort.test_performance.py --mode small
-    ./tests/keybindings-sort.test_performance.py --mode full
+    keybindings-sort.test_performance.py --mode quick
+    keybindings-sort.test_performance.py --mode small
+    keybindings-sort.test_performance.py --mode full
 
 Profiles:
 - quick: small perf gauge for rapid feedback
