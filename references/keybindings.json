@@ -30421,7 +30421,7 @@ Notes:
   {
     // [keynav] (map) (left) (vi) (warp) (3) (black) (C) (primary) (panel)
     "key": "ctrl+alt+meta+h",
-    "command": "ctrl+alt+meta+h 90c4",
+    "command": "ctrl+alt+meta+h 60c4",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && sideBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'right'"
   },
   {
@@ -34687,13 +34687,15 @@ Notes:
   {
     // [keynav] (map) (down) (vi) (move) (1) (red) (A) (panel) (terminal)
     "key": "shift+alt+j",
-    "command": "shift+alt+j 9120",
+    "command": "workbench.action.terminal.toggleTerminal",
+    // "command": "shift+alt+j 9120",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
   },
   {
     // [keynav] (map) (up) (vi) (move) (1) (red) (A) (panel) (terminal)
     "key": "shift+alt+k",
-    "command": "shift+alt+k 90c4",
+    "command": "workbench.action.focusActiveEditorGroup",
+    // "command": "shift+alt+k 70c4",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
   },
   {
