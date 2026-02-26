@@ -507,16 +507,7 @@ def _finalize_processed_output(
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> str:
-    processed = _remove_blank_lines(text)
-    processed = _replace_when_literals(
-        processed,
-        grouping_mode,
-        negation_mode,
-        when_prefixes=when_prefixes,
-        when_regexes=when_regexes,
-    )
-
-    return processed
+    return _remove_blank_lines(text)
 
 
 def _first_when_group_rank(
