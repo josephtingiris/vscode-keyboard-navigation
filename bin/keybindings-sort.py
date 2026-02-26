@@ -58,7 +58,6 @@ Exit codes
 ```
 """
 import sys
-import os
 import re
 import json
 import argparse
@@ -690,60 +689,6 @@ def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode:
         i = j
 
     return groups_list
-
-
-def _reorder_processed_by_when(processed_text: str, negation_mode: str) -> str:
-    preamble, array_text, postamble = extract_preamble_postamble(processed_text)
-    if array_text is None:
-        return processed_text
-
-    groups_list, trailing = group_objects_with_comments(array_text)
-
-    i = 0
-    while i < len(groups_list):
-        raw_when = _extract_literal_when_from_object(groups_list[i][1]) or ''
-        norm_when = _normalize_whitespace(raw_when)
-        j = i + 1
-
-        while j < len(groups_list):
-            next_when = _extract_literal_when_from_object(groups_list[j][1]) or ''
-            if _normalize_whitespace(next_when) != norm_when:
-                break
-            j += 1
-
-        if j - i > 1 and negation_mode not in ('positive', 'negative'):
-            slice_pairs = groups_list[i:j]
-            slice_pairs.sort(key=lambda pair: natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
-            groups_list[i:j] = slice_pairs
-
-        i = j
-
-    out: list[str] = []
-    for idx, (comments, obj) in enumerate(groups_list):
-        is_last = idx == len(groups_list) - 1
-        obj_out = obj
-
-        idx_r = obj_out.rfind('}')
-        if idx_r != -1:
-            after = obj_out[idx_r + 1:]
-            after_clean = LEADING_COMMA_RE.sub('', after)
-            after_clean = after_clean.lstrip()
-            obj_out = (obj_out[:idx_r + 1] + after_clean).rstrip()
-
-        if comments:
-            comments = BLANK_LINES_RE.sub('', comments)
-            out.append(comments)
-
-        line = obj_out.rstrip()
-        if not is_last and not object_has_trailing_comma(obj_out):
-            line += ','
-        out.append(line + '\n')
-
-    out.append(trailing)
-    new_array = ''.join(out)
-    new_array = LEADING_NEWLINES_RE.sub('', new_array)
-
-    return preamble + '[\n' + new_array + ']' + postamble
 
 
 def _replace_when_literal_match(
