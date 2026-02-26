@@ -2716,7 +2716,8 @@ Notes:
   {
     // [keynav] (map) (left) (vi) (move) (1) (red) (A)
     "key": "shift+alt+h",
-    "command": "shift+alt+h 1129",
+    "command": "workbench.action.focusActiveEditorGroup",
+    // "command": "shift+alt+h 1129",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
   },
   {
@@ -2740,7 +2741,8 @@ Notes:
   {
     // [keynav] (map) (right) (vi) (move) (1) (red) (A)
     "key": "shift+alt+l",
-    "command": "shift+alt+l 97ce",
+    "command": "workbench.action.closeAuxiliaryBar",
+    //"command": "shift+alt+l 97ce",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
   },
   {
@@ -13541,7 +13543,8 @@ Notes:
   {
     // [keynav] (map) (left) (vi) (move) (1) (red) (A) (editor) (text)
     "key": "shift+alt+h",
-    "command": "shift+alt+h efe1",
+    "command": "workbench.action.toggleSidebarVisibility",
+    // "command": "shift+alt+h efe1",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
   },
   {
@@ -13565,7 +13568,9 @@ Notes:
   {
     // [keynav] (map) (right) (vi) (move) (1) (red) (A) (editor) (text)
     "key": "shift+alt+l",
-    "command": "shift+alt+l f8bf",
+    "command": "workbench.action.focusAuxiliaryBar",
+    // "command": "shift+alt+l f8bf",
+    // "command": "workbench.action.toggleAuxiliaryBar",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
   },
   {
@@ -34701,7 +34706,8 @@ Notes:
   {
     // [keynav] (map) (right) (vi) (move) (1) (red) (A) (panel) (terminal)
     "key": "shift+alt+l",
-    "command": "shift+alt+l 2571",
+    "command": "workbench.action.toggleAuxiliaryBar",
+    // "command": "shift+alt+l 2572",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
   },
   {
