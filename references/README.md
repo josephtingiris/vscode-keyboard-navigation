@@ -1,5 +1,7 @@
 # VS Code Keyboard Navigation
 
+![Editor Focus overview](vscode-keyboard-navigation-overview-editorFocus.svg)
+
 This directory contains reference datasets and docs used by tests and tooling.
 
 ## keybindings data groups
