@@ -3,6 +3,7 @@
 This directory contains reference datasets and docs used by tests and tooling.
 
 <img align="left" src="vscode-keyboard-navigation-overview-editorFocus.svg" alt="vscode fin overview" width="512" height="512" />
+<br />
 
 ## keybindings data groups
 
