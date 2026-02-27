@@ -210,6 +210,27 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
+    "key": "alt+x escape",
+    // "command": "alt+x escape 420e",
+    "command": "keyboardNavigation.resetLayout",
+    "when": "config.keyboardNavigation.enabled"
+    // [note] 0.0.2
+  },
+  {
+    "key": "alt+x h",
+    // "command": "alt+x h 420f",
+    "command": "keyboardNavigation.toggleVisualHighlights",
+    "when": "config.keyboardNavigation.enabled"
+    // [note] 0.0.2
+  },
+  {
+    "key": "alt+x v",
+    // "command": "alt+x v 420d",
+    "command": "keyboardNavigation.applyVisualHighlights",
+    "when": "config.keyboardNavigation.enabled"
+    // [note] 0.0.2
+  },
+  {
     // [keynav] (corpus) (left) (juke) (0) (self) (gold) (X)
     "key": "alt+{",
     "command": "(corpus) alt+{ 7fa2",
@@ -2052,76 +2073,44 @@ Notes:
     // [note] settings editor, keyboard shortcuts, et al
   },
   {
-    // [keynav] (left) (vi) (juke) (move) (1) (red) (A) (immutable)
-    "key": "shift+alt+,",
-    "command": "workbench.action.previousEditor",
-    // "command": "shift+alt+, 4823",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
-    // [note] settings editor, keyboard shortcuts, et al
-  },
-  {
-    // [keynav] (horizontal) (vi) (split) (move) (1) (red) (A) (immutable)
-    "key": "shift+alt+-",
-    "command": "workbench.action.splitEditorDown",
-    // "command": "shift+alt+- 83be",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
-    // [note] settings editor, keyboard shortcuts, et al
-  },
-  {
-    // [keynav] (vertical) (vi) (split) (move) (1) (red) (A) (immutable)
-    "key": "shift+alt+=",
-    "command": "workbench.action.splitEditor",
-    // "command": "shift+alt+= 83bf",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
-    // [note] settings editor, keyboard shortcuts, et al
-  },
-  {
-    // [keynav] (vi) (juke) (immutable)
-    "key": "shift+alt+meta+end",
-    "command": "workbench.action.moveEditorToEnd",
-    // "command": "shift+alt+meta+end e107",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
-    // [note] settings editor, keyboard shortcuts, et al
-  },
-  {
-    // [keynav] (vi) (juke) (immutable)
-    "key": "shift+alt+meta+home",
-    "command": "workbench.action.moveEditorToStart",
-    // "command": "shift+alt+meta+home ee07",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
-    // [note] settings editor, keyboard shortcuts, et al
-  },
-  {
-    // [keynav] (down) (vi) (immutable)
-    "key": "shift+alt+meta+j",
-    "command": "workbench.action.moveEditorToBelowGroup",
-    // "command": "shift+alt+meta+j 5350",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
-    // [note] settings editor, keyboard shortcuts, et al
-  },
-  {
-    // [keynav] (up) (vi) (immutable)
-    "key": "shift+alt+meta+k",
-    "command": "workbench.action.moveEditorToAboveGroup",
-    // "command": "shift+alt+meta+j 5360",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
-  },
-  {
     // [keynav] (left) (vi) (juke) (0) (self) (gold) (X)
     "key": "alt+,",
     "command": "alt+, 0abc",
     // "command": "workbench.action.previousEditor",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && editorIsOpen"
-    // [note] file not found, ... this is the one
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && !activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+    // [note] file not found?
   },
   {
-    // [keynav] (right) (vi) (juke) (0) (self) (gold) (X)
+    "key": "alt+-",
+    "command": "alt+- 0a8c",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && !activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+    // [note] file not found?
+  },
+  {
     "key": "alt+.",
     "command": "alt+. 0acc",
     // "command": "workbench.action.nextEditor",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && activeEditor != '' && focusedView == '' && editorIsOpen"
-    // [note] only editor focus??
-    // [note] file not found, ... this is the one
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && !activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+    // [note] file not found?
+  },
+  {
+    "key": "alt+=",
+    "command": "alt+= 078c",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && !activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+    // [note] file not found?
+  },
+  {
+    // [keynav] (left) (vi) (juke) (0) (self) (gold) (X)
+    "key": "alt+,",
+    "command": "workbench.action.previousEditor",
+    // "command": "alt+, 4dab",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+    // [node] 0.0.3
   },
   {
     // [keynav] (right) (vi) (juke) (0) (self) (gold) (X) (immutable)
@@ -2129,39 +2118,92 @@ Notes:
     "command": "workbench.action.nextEditor",
     // "command": "alt+. 4dac",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
-    // [note] only editor focus??
     // [note] settings editor, keyboard shortcuts, et al
-  },
-  {
-    // [keynav] (left) (vi) (juke) (0) (self) (gold) (X)
-    "key": "alt+,",
-    "command": "alt+, 4dab",
-    // "command": "workbench.action.previousEditor",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && editorIsOpen"
-    // [note] settings editor, keyboard shortcuts, et al
+    // [node] 0.0.3
   },
   {
     // [keynav] (vi)
     "key": "ctrl+d",
     "command": "workbench.action.closeActiveEditor",
     // "command": "ctrl+d 2bc8",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && editorIsOpen"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+    // [node] 0.0.3
+  },
+  {
+    "key": "ctrl+shift+alt+end",
+    "command": "workbench.action.moveEditorToEnd",
+    // "command": "ctrl+shift+alta+end e107",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
     // [note] settings editor, keyboard shortcuts, et al
   },
   {
-    // [keynav] (left) (vi) (juke) (0) (self) (gold) (X) (immutable)
-    "key": "alt+,",
-    "command": "alt+, 0aab",
-    // "command": "workbench.action.previousEditor",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
+    "key": "ctrl+shift+alt+home",
+    "command": "workbench.action.moveEditorToStart",
+    // "command": "ctrl+shift+alta+home ee07",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
     // [note] settings editor, keyboard shortcuts, et al
   },
   {
-    // [keynav] (right) (vi) (juke) (0) (self) (gold) (X) (immutable)
-    "key": "alt+.",
-    "command": "workbench.action.nextEditor",
-    // "command": "alt+. 3aac",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
+    "key": "ctrl+shift+alt+j",
+    "command": "workbench.action.moveEditorToBelowGroup",
+    // "command": "ctrl+shift+alt+j 5350",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+  },
+  {
+    "key": "ctrl+shift+alt+k",
+    "command": "workbench.action.moveEditorToAboveGroup",
+    // "command": "ctrl+shift+alt+j 5360",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+  },
+  {
+    // [keynav] (left) (vi) (juke) (move) (1) (red) (A) (immutable)
+    "key": "shift+alt+,",
+    "command": "workbench.action.previousEditor",
+    // "command": "shift+alt+, 4823",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+  },
+  {
+    // [keynav] (horizontal) (vi) (split) (move) (1) (red) (A) (immutable)
+    "key": "shift+alt+-",
+    "command": "shift+alt+- 83be",
+    // "command": "workbench.action.splitEditorDown",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+  },
+  {
+    // [keynav] (vertical) (vi) (split) (move) (1) (red) (A) (immutable)
+    "key": "shift+alt+=",
+    "command": "shift+alt+= 83bf",
+    // "command": "workbench.action.splitEditor",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+  },
+  {
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 17ba",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+  },
+  {
+    "key": "shift+alt+j",
+    "command": "shift+alt+j 27ba",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+  },
+  {
+    "key": "shift+alt+k",
+    "command": "shift+alt+k 37ba",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
+    // [note] settings editor, keyboard shortcuts, et al
+  },
+  {
+    "key": "shift+alt+l",
+    "command": "shift+alt+l 77ba",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
     // [note] settings editor, keyboard shortcuts, et al
   },
   {
@@ -7514,48 +7556,6 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus"
   },
   {
-    // [keynav] (left) (vi) (juke) (editor)
-    "key": "shift+alt+meta+,",
-    "command": "workbench.action.moveEditorLeftInGroup",
-    // "command": "shift+alt+meta+, 9940",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus"
-  },
-  {
-    // [keynav] (right) (vi) (juke) (editor)
-    "key": "shift+alt+meta+.",
-    "command": "workbench.action.moveEditorRightInGroup",
-    // "command": "shift+alt+meta+. 00f8",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus"
-  },
-  {
-    // [keynav] (left) (vi) (editor)
-    "key": "shift+alt+meta+h",
-    "command": "workbench.action.moveEditorToLeftGroup",
-    // "command": "shift+alt+meta+h 25e4",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus"
-  },
-  {
-    // [keynav] (down) (vi) (editor)
-    "key": "shift+alt+meta+j",
-    "command": "workbench.action.moveEditorToBelowGroup",
-    // "command": "shift+alt+meta+j 5349",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus"
-  },
-  {
-    // [keynav] (up) (vi) (editor)
-    "key": "shift+alt+meta+k",
-    "command": "workbench.action.moveEditorToAboveGroup",
-    // "command": "shift+alt+meta+k 55e2",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus"
-  },
-  {
-    // [keynav] (right) (vi) (editor)
-    "key": "shift+alt+meta+l",
-    "command": "workbench.action.moveEditorToRightGroup",
-    // "command": "shift+alt+meta+k 25e3",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus"
-  },
-  {
     // [keynav] (left) (vi) (juke) (0) (self) (gold) (X) (editor)
     "key": "alt+,",
     "command": "alt+, de62",
@@ -7601,6 +7601,42 @@ Notes:
     "args": {
       "to": "nextBlankLine"
     },
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus"
+  },
+  {
+    "key": "ctrl+shift+alt+,",
+    "command": "workbench.action.moveEditorLeftInGroup",
+    // "command": "ctrl+shift+alt+, 9940",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus"
+  },
+  {
+    "key": "ctrl+shift+alt+.",
+    "command": "workbench.action.moveEditorRightInGroup",
+    // "command": "ctrl+shift+alt+. 00f8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus"
+  },
+  {
+    "key": "ctrl+shift+alt+h",
+    "command": "workbench.action.moveEditorToLeftGroup",
+    // "command": "ctrl+shift+alt+h 25e4",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus"
+  },
+  {
+    "key": "ctrl+shift+alt+j",
+    "command": "workbench.action.moveEditorToBelowGroup",
+    // "command": "ctrl+shift+alt+j 5349",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus"
+  },
+  {
+    "key": "ctrl+shift+alt+k",
+    "command": "workbench.action.moveEditorToAboveGroup",
+    // "command": "ctrl+shift+alt+k 55e2",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus"
+  },
+  {
+    "key": "ctrl+shift+alt+l",
+    "command": "workbench.action.moveEditorToRightGroup",
+    // "command": "ctrl+shift+alt+l 25e3",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus"
   },
   {
