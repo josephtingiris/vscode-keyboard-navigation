@@ -64,9 +64,15 @@ ansi_echo() {
     fi
 }
 
+unlock() {
+    flock -u 9 2> /dev/null || true
+    rm -f "${LOCKFILE}" 2> /dev/null || true
+    exec 9>&- 2> /dev/null || true
+}
+
 usage() {
     echo
-    echo "usage: ${0##*/} [-h|--help] [keybindings.json]"
+    echo "usage: ${0##*/} [-h|--help] [-v|--validate] [keybindings.json]"
     echo
     exit 2
 }
@@ -204,7 +210,9 @@ main() {
     fi
     echo "OK."
 
-    validate_json "${keybindings_json}"
+    if [ "${VALIDATE_JSON}" == "1" ]; then
+        validate_json "${keybindings_json}"
+    fi
 
     echo -n "# Installing 'references/$(basename "${keybindings_json}")' to '$(vscode_user_home)' ... "
     cp "${keybindings_json}" "${user_keybindings_json}"
@@ -214,14 +222,30 @@ main() {
 }
 
 DIRNAME="$(dirname "$0")"
+VALIDATE_JSON=1 # true
 
 for _arg in "$@"; do
     case "${_arg}" in
         -h | --help)
             usage
             ;;
+        -s | --skip-validation)
+            VALIDATE_JSON=0
+            ;;
     esac
 done
+
+# lock is held on file descriptor 9 for the lifetime of the script
+LOCKFILE="/tmp/$(basename "$0").lock"
+exec 9> "${LOCKFILE}" || aborting "cannot create lockfile '${LOCKFILE}'"
+if ! flock -n 9; then
+    aborting "another instance of '$(basename "$0")' is already running (lock: ${LOCKFILE})"
+fi
+
+# print pid for diagnostics
+printf "%s\n" "$$" >&9
+
+trap 'unlock' EXIT INT TERM
 
 # ANSI color codes
 RESET='\033[0m'
