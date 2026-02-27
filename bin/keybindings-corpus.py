@@ -469,43 +469,63 @@ def main(argv: List[str] | None = None) -> int:
                 i += 1
             return None
 
-        def _group_objects_with_comments(array_text: str):
+        def _group_objects_with_comments(array_text: str, base_line: int = 1):
             groups = []
             comments_buf = ''
             obj_buf = ''
             depth = 0
             in_obj = False
+            obj_start_line = base_line
+            current_line = base_line
             for line in array_text.splitlines(keepends=True):
                 stripped = line.strip()
                 if not in_obj:
                     if stripped.startswith('//') or stripped.startswith('/*'):
                         comments_buf += line
+                        current_line += line.count('\n')
                         continue
                     if '{' in line:
                         in_obj = True
+                        obj_start_line = current_line
                         obj_buf = line
                         # if line contains '}' too, handle short objects
                         if '}' in line and line.index('}') > line.index('{'):
-                            groups.append((comments_buf, obj_buf))
+                            groups.append((comments_buf, obj_buf, obj_start_line))
                             comments_buf = ''
                             obj_buf = ''
                             in_obj = False
+                        current_line += line.count('\n')
                         continue
                     # ignore blank or comma lines
                     if stripped == '' or stripped == ',':
+                        current_line += line.count('\n')
                         continue
                     # fallback: accumulate as comments
                     comments_buf += line
+                    current_line += line.count('\n')
                 else:
                     obj_buf += line
                     if '}' in line:
                         # crude close detection; rely on JSON parse later for exactness
-                        groups.append((comments_buf, obj_buf))
+                        groups.append((comments_buf, obj_buf, obj_start_line))
                         comments_buf = ''
                         obj_buf = ''
                         in_obj = False
+                    current_line += line.count('\n')
             trailing = comments_buf
             return groups, trailing
+
+        def _preview_for_error(obj, src_text: str | None = None, max_len: int = 1000) -> str:
+            if src_text:
+                text = src_text.strip()
+            else:
+                try:
+                    text = json.dumps(obj, ensure_ascii=False)
+                except Exception:
+                    text = repr(obj)
+            if len(text) > max_len:
+                return text[:max_len] + "...<truncated>"
+            return text
 
         ACTION_GROUP_ORIG = set(ACTION_GROUP)
         DEBUG_GROUP_ORIG = set(DEBUG_GROUP)
@@ -536,7 +556,8 @@ def main(argv: List[str] | None = None) -> int:
                 f"error: could not locate top-level array in '{fname}'", file=sys.stderr)
             return 2
         preamble, array_text, postamble = preamble_res
-        groups, trailing_comments = _group_objects_with_comments(array_text)
+        array_start_line = preamble.count('\n') + 1
+        groups, trailing_comments = _group_objects_with_comments(array_text, base_line=array_start_line)
         if len(groups) != len(parsed):
             print(
                 f"error: mismatch between parsed array length ({len(parsed)}) and detected object groups ({len(groups)}) in '{fname}'", file=sys.stderr)
@@ -545,15 +566,29 @@ def main(argv: List[str] | None = None) -> int:
         # compute comment lines for each object
         comments_lines = []
         for idx, obj in enumerate(parsed):
+            src_line = groups[idx][2] if idx < len(groups) else None
+            src_obj_text = groups[idx][1] if idx < len(groups) else None
+
             if not isinstance(obj, dict):
+                line_suffix = f" at line {src_line}" if src_line is not None else ""
+                preview = _preview_for_error(obj, src_obj_text)
                 print(
-                    f"error: array element {idx} in '{fname}' is not an object", file=sys.stderr)
+                    f"error: array element {idx}{line_suffix} in '{fname}' is not an object\n"
+                    f"offending value: {preview}",
+                    file=sys.stderr,
+                )
                 return 2
+
             key_val = obj.get('key')
             when_val = obj.get('when')
             if not isinstance(key_val, str) or not isinstance(when_val, str):
+                line_suffix = f" at line {src_line}" if src_line is not None else ""
+                preview = _preview_for_error(obj, src_obj_text)
                 print(
-                    f"error: object at index {idx} missing 'key' or 'when' (or not strings) in '{fname}'", file=sys.stderr)
+                    f"error: object at index {idx}{line_suffix} missing 'key' or 'when' (or not strings) in '{fname}'\n"
+                    f"offending object: {preview}",
+                    file=sys.stderr,
+                )
                 return 2
 
             try:
@@ -590,7 +625,7 @@ def main(argv: List[str] | None = None) -> int:
             globals()["EXTENSION_GROUP"] = {_select_adaptive_key_local(EXTENSION_GROUP_ORIG, ALTERNATE_EXTENSION_KEY)}
 
             if idx < len(groups):
-                lead_comments, obj_text = groups[idx]
+                lead_comments, obj_text, _obj_line = groups[idx]
                 existing_comments_blob = (lead_comments or "") + "\n" + (obj_text or "")
             else:
                 existing_comments_blob = None
@@ -611,7 +646,7 @@ def main(argv: List[str] | None = None) -> int:
         out_text = original_text
         offset = 0
         search_pos = original_text.find('[')
-        for (comments_blob, obj_text), comment_line, obj in zip(groups, comments_lines, parsed):
+        for (_comments_blob, obj_text, _obj_line), comment_line, obj in zip(groups, comments_lines, parsed):
             if not comment_line:
                 continue
 
