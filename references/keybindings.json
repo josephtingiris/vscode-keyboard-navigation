@@ -76,7 +76,8 @@ Notes:
 */
 // ^.*\"key.*alt+h",
 // ^.*\"key.*+h",
-[  {
+[
+  {
     // [keynav] (corpus) (right) (juke) (0) (self) (gold) (X)
     "key": "alt+'",
     "command": "(corpus) alt+' 1c12",
