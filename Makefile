@@ -54,11 +54,10 @@ clean:
 		$(MAKE) -C $$d clean || true; \
 	done
 
-	# remove .pytest_cache
-	-@rm -rf .pytest_cache
-
-	# remove any other temporary files
-	-@rm -rf node_modules .cache tmp
+	# remove temporary directories and files
+	@for r in .cache .pytest_cache .venv node_modules tmp; do \
+		rm -rf $$r; \
+	done
 
 	@echo
 	@echo "++ Repository clean complete."
