@@ -44,7 +44,7 @@ aborting() {
 
 usage() {
     echo
-    echo "usage: ${0##*/} [-h|--help] <file-to-watch> <runner-executable>"
+    echo "usage: ${0##*/} [-h|--help] <file-to-watch> <runner-executable> [runner-args...]"
     echo
     exit 2
 }
@@ -59,10 +59,12 @@ validate_requirements() {
 }
 
 main() {
-    [ "$#" -ne 2 ] && usage
+    [ "$#" -lt 2 ] && usage
 
     WATCH="$1"
     RUNNER="$2"
+    # All remaining arguments (if any) are passed to the runner executable
+    RUNNER_ARGS=("${@:3}")
 
     validate_requirements
 
@@ -80,7 +82,7 @@ main() {
     # watch loop: quiet while waiting, print a delimiter then execute runner
     while inotifywait -q -e close_write "${WATCH_REAL}" > /dev/null 2>&1; do
         echo "---- RUN started at $(date -u '+%Y-%m-%dT%H:%M:%SZ') ----"
-        time "${RUNNER}" "${WATCH_REAL}"
+        time "${RUNNER}" "${WATCH_REAL}" "${RUNNER_ARGS[@]}"
         runner_pid=$!
         wait ${runner_pid} &> /dev/null || aborting "pid ${runner_pid} exited with non-zero status"
         echo "---- RUN finished at $(date -u '+%Y-%m-%dT%H:%M:%SZ') ----"
