@@ -10,6 +10,7 @@ This file consolidates VS Code version 1.109.0 'when' contexts into a line-orien
 
 ## Workbench & Workspace contexts
 
+```
 workbenchState — kind of workspace opened ('empty', 'folder', 'workspace')
 workspaceFolderCount — number of root folders in the workspace
 openFolderWorkspaceSupport — whether open-folder workspaces are supported
@@ -29,9 +30,11 @@ isAuxiliaryWindowFocusedContext — whether an auxiliary window is focused
 isWindowAlwaysOnTop — whether window is always on top
 isAuxiliaryWindow — window is an auxiliary window
 isFullscreen — True when window is in fullscreen (duplicated entry)
+```
 
 ## Editor & Text contexts
 
+```
 editorFocus — An editor has focus (either the text or a widget)
 editorTextFocus — The text in an editor has focus (cursor is blinking)
 textInputFocus — Any editor has focus (regular editor, debug REPL, etc.)
@@ -54,9 +57,11 @@ activeEditorIsLastInGroup — whether active editor is last in its group
 activeEditorAvailableEditorIds — available editor identifiers usable for the active editor
 editorPartMultipleEditorGroups — whether editor part has multiple editor groups
 editorPartMaximizedEditorGroup — whether editor part has a maximized group
+```
 
 ## Editor Group & Tabs
 
+```
 groupEditorsCount — number of opened editors in the group
 activeEditorGroupEmpty — whether the active editor group is empty
 activeEditorGroupIndex — index of the active editor group
@@ -70,9 +75,11 @@ activeEditorCanSplitInGroup — whether the active editor can be split in group
 activeEditorCanToggleReadonly — whether active editor can toggle readonly/writeable
 activeEditorCanRevert — whether the active editor can revert
 activeCompareEditorCanSwap — whether the active compare editor can swap sides
+```
 
 ## Global Editor UI & Views
 
+```
 textCompareEditorVisible — whether a text compare editor is visible
 textCompareEditorActive — whether a text compare editor is active
 sideBySideEditorActive — whether a side-by-side editor is active
@@ -87,9 +94,11 @@ activeAuxiliary — identifier of the active auxiliary panel
 auxiliaryBarFocus — whether the auxiliary bar has keyboard focus
 auxiliaryBarVisible — whether the auxiliary bar is visible
 auxiliaryBarMaximized — whether the auxiliary bar is maximized
+```
 
 ## Global UI contexts
 
+```
 notificationFocus — Notification has keyboard focus
 notificationCenterVisible — Notification Center is visible
 notificationToastsVisible — Notification toast is visible
@@ -109,30 +118,38 @@ canNavigateBack — navigation availability flag
 canNavigateForward — navigation availability flag
 canNavigateToLastEditLocation — navigation availability flag
 isWindowAlwaysOnTop — whether window is always on top (duplicated entry)
+```
 
 ## OS & Platform contexts
 
+```
 isLinux — True when the OS is Linux
 isMac — True when the OS is macOS
 isWindows — True when the OS is Windows
 isWeb — True when accessing the editor from the Web
+```
 
 ## Lists & Selection contexts
 
+```
 listFocus — A list has focus
 listSupportsMultiselect — A list supports multi select
 listHasSelectionOrFocus — A list has selection or focus
 listDoubleSelection — A list has a selection of 2 elements
 listMultiSelection — A list has a selection of multiple elements
+```
 
 ## Mode contexts
 
+```
 inSnippetMode — The editor is in snippet mode
 inQuickOpen — The Quick Open dropdown has focus
 inDebugMode — A debug session is running (also listed under Debugger contexts)
+```
 
 ## Resource & File contexts
 
+```
 resourceScheme — scheme of the resource (e.g. resourceScheme == file)
 resourceFilename — filename of the resource (e.g. resourceFilename == gulpfile.js)
 resourceExtname — extension name of the resource (e.g. resourceExtname == .js)
@@ -143,17 +160,21 @@ resource — full URI (scheme + path) of the resource
 resourceSet — whether a resource is present
 isFileSystemResource — whether the resource is backed by a file system provider
 isFileSystemResource — True when the file is a filesystem resource handled by a provider (duplicate phrasing merged)
+```
 
 ## Explorer contexts
 
+```
 explorerViewletVisible — Explorer view is visible
 explorerViewletFocus — Explorer view has keyboard focus
 filesExplorerFocus — File Explorer section has keyboard focus
 openEditorsFocus — OPEN EDITORS section has keyboard focus
 explorerResourceIsFolder — A folder is selected in the Explorer
+```
 
 ## Editor widget contexts
 
+```
 findWidgetVisible — Editor Find widget is visible
 suggestWidgetVisible — Suggestion widget (IntelliSense) is visible
 suggestWidgetMultipleSuggestions — Multiple suggestions are displayed
@@ -164,28 +185,105 @@ config.editor.stablePeek — Keep peek editors open (editor.stablePeek setting)
 codeActionMenuVisible — Code Action menu is visible
 parameterHintsVisible — Parameter hints are visible (editor.parameterHints.enabled)
 parameterHintsMultipleSignatures — Multiple parameter hints are displayed
+```
 
 ## Debugger contexts
 
+```
 debuggersAvailable — An appropriate debugger extension is available
 inDebugMode — A debug session is running
 debugState — Active debugger state (inactive, initializing, stopped, running)
 debugType — True when debug type matches (e.g. debugType == 'node')
 inDebugRepl — Focus is in the Debug Console REPL
+```
 
 ## Integrated terminal contexts
 
+```
 terminalFocus — An integrated terminal has focus
 terminalIsOpen — An integrated terminal is opened
+```
 
 ## Timeline view contexts
 
+```
 timelineFollowActiveEditor — Timeline view is following the active editor
 timelineItem — Timeline item's context value matches (e.g. timelineItem =~ /git:file:commit\\b/)
+```
 
 ## Extension & Configuration contexts
 
+```
 extension — True when the extension's ID matches (e.g. extension == eamodio.gitlens)
 extensionStatus — True when the extension is installed (e.g. extensionStatus == installed)
 extensionHasConfiguration — True if the extension has configuration
 config.editor.minimap.enabled — True when the setting editor.minimap.enabled is true
+```
+
+## Commonly used keyboard navigation contexts
+
+```
+!activeEditorCanSplitInGroup
+!activeEditorIsReadonly
+!auxiliaryBarFocus
+!auxiliaryBarVisible
+!editorFocus
+!editorReadonly
+!editorTextFocus
+!filesExplorerFocus
+!inCompositeEditor
+!neovim.init
+!notebookEditorFocused
+!panelFocus
+!panelVisible
+!searchViewletFocus
+!sideBarFocus
+!sideBarVisible
+!terminalFocus
+(auxiliaryBarVisible || panelVisible || sideBarVisible)
+activeAuxiliary == 'workbench.panel.chat'
+activeEditor != ''
+activeEditorCanSplitInGroup
+activeEditorIsReadonly
+activePanel == 'workbench.panel.markers'
+activePanel == 'workbench.panel.output'
+activePanel == 'workbench.panel.repl'
+activeViewlet == 'workbench.view.explorer'
+activeViewlet == 'workbench.view.remote'
+activeViewlet == 'workbench.view.scm'
+activeViewlet == 'workbench.view.search'
+auxiliaryBarFocus
+breadcrumbsActive
+config.keyboardNavigation.chords.action
+config.keyboardNavigation.chords.debug
+config.keyboardNavigation.chords.extension
+config.keyboardNavigation.enabled
+config.keyboardNavigation.keys.arrows
+config.keyboardNavigation.keys.letters == 'emacs'
+config.keyboardNavigation.keys.letters == 'kbm'
+config.keyboardNavigation.keys.letters == 'vi'
+config.keyboardNavigation.terminal.enabled
+config.keyboardNavigation.wrap
+config.workbench.sideBar.location == 'left'
+config.workbench.sideBar.location == 'right'
+editorFocus
+editorHasDocumentFormattingProvider
+editorIsOpen
+editorLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/
+editorTextFocus
+focusedView == ''
+focusedView == 'workbench.explorer.openEditorsView'
+inQuickInput
+neovim.init
+neovim.mode != 'cmdline'
+panelFocus
+panelPosition == 'bottom'
+panelPosition == 'left'
+panelPosition == 'right'
+panelPosition == 'top'
+sideBarFocus
+statusBarFocused
+terminalCount > 1
+terminalFocus
+terminalSplitPaneActive
+```
