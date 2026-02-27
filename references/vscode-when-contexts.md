@@ -254,6 +254,7 @@ config.editor.minimap.enabled — True when the setting editor.minimap.enabled i
 && activeViewlet == 'workbench.view.search'
 && auxiliaryBarFocus
 && breadcrumbsActive
+&& config.breadcrumbs.enabled
 && config.keyboardNavigation.chords.action
 && config.keyboardNavigation.chords.debug
 && config.keyboardNavigation.chords.extension
