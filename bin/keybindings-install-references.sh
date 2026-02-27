@@ -204,8 +204,6 @@ main() {
     fi
     echo "OK."
 
-    ansi_echo "# Sorted JSON with arguments: ${CYAN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'${RESET} ... OK."
-
     validate_json "${keybindings_json}"
 
     echo -n "# Installing 'references/$(basename "${keybindings_json}")' to '$(vscode_user_home)' ... "
