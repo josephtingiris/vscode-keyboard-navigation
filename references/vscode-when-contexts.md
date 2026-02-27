@@ -223,67 +223,71 @@ config.editor.minimap.enabled — True when the setting editor.minimap.enabled i
 ## Commonly used keyboard navigation contexts
 
 ```
-!activeEditorCanSplitInGroup
-!activeEditorIsReadonly
-!auxiliaryBarFocus
-!auxiliaryBarVisible
-!editorFocus
-!editorReadonly
-!editorTextFocus
-!filesExplorerFocus
-!inCompositeEditor
-!neovim.init
-!notebookEditorFocused
-!panelFocus
-!panelVisible
-!searchViewletFocus
-!sideBarFocus
-!sideBarVisible
-!terminalFocus
-(auxiliaryBarVisible || panelVisible || sideBarVisible)
-activeAuxiliary == 'workbench.panel.chat'
-activeEditor != ''
-activeEditorCanSplitInGroup
-activeEditorIsReadonly
-activePanel == 'workbench.panel.markers'
-activePanel == 'workbench.panel.output'
-activePanel == 'workbench.panel.repl'
-activeViewlet == 'workbench.view.explorer'
-activeViewlet == 'workbench.view.remote'
-activeViewlet == 'workbench.view.scm'
-activeViewlet == 'workbench.view.search'
-auxiliaryBarFocus
-breadcrumbsActive
-config.keyboardNavigation.chords.action
-config.keyboardNavigation.chords.debug
-config.keyboardNavigation.chords.extension
-config.keyboardNavigation.enabled
-config.keyboardNavigation.keys.arrows
-config.keyboardNavigation.keys.letters == 'emacs'
-config.keyboardNavigation.keys.letters == 'kbm'
-config.keyboardNavigation.keys.letters == 'vi'
-config.keyboardNavigation.terminal.enabled
-config.keyboardNavigation.wrap
-config.workbench.sideBar.location == 'left'
-config.workbench.sideBar.location == 'right'
-editorFocus
-editorHasDocumentFormattingProvider
-editorIsOpen
-editorLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/
-editorTextFocus
-focusedView == ''
-focusedView == 'workbench.explorer.openEditorsView'
-inQuickInput
-neovim.init
-neovim.mode != 'cmdline'
-panelFocus
-panelPosition == 'bottom'
-panelPosition == 'left'
-panelPosition == 'right'
-panelPosition == 'top'
-sideBarFocus
-statusBarFocused
-terminalCount > 1
-terminalFocus
-terminalSplitPaneActive
+&& !activeEditorCanSplitInGroup
+&& !activeEditorIsReadonly
+&& !auxiliaryBarFocus
+&& !auxiliaryBarVisible
+&& !editorFocus
+&& !editorReadonly
+&& !editorTextFocus
+&& !filesExplorerFocus
+&& !inCompositeEditor
+&& !neovim.init
+&& !notebookEditorFocused
+&& !panelFocus
+&& !panelVisible
+&& !searchViewletFocus
+&& !sideBarFocus
+&& !sideBarVisible
+&& !terminalFocus
+&& (auxiliaryBarVisible || panelVisible || sideBarVisible)
+&& activeAuxiliary == 'workbench.panel.chat'
+&& activeEditor != ''
+&& activeEditorCanSplitInGroup
+&& activeEditorIsReadonly
+&& activePanel == 'workbench.panel.markers'
+&& activePanel == 'workbench.panel.output'
+&& activePanel == 'workbench.panel.repl'
+&& activeViewlet == 'workbench.view.explorer'
+&& activeViewlet == 'workbench.view.remote'
+&& activeViewlet == 'workbench.view.scm'
+&& activeViewlet == 'workbench.view.search'
+&& auxiliaryBarFocus
+&& breadcrumbsActive
+&& config.keyboardNavigation.chords.action
+&& config.keyboardNavigation.chords.debug
+&& config.keyboardNavigation.chords.extension
+&& config.keyboardNavigation.enabled
+&& config.keyboardNavigation.keys.arrows
+&& config.keyboardNavigation.keys.letters == 'emacs'
+&& config.keyboardNavigation.keys.letters == 'kbm'
+&& config.keyboardNavigation.keys.letters == 'vi'
+&& config.keyboardNavigation.terminal.enabled
+&& config.keyboardNavigation.wrap
+&& config.workbench.sideBar.location == 'left'
+&& config.workbench.sideBar.location == 'right'
+&& editorFocus
+&& editorHasDocumentFormattingProvider
+&& editorIsOpen
+&& editorLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/
+&& editorTextFocus
+&& focusedView == ''
+&& focusedView == 'workbench.explorer.openEditorsView'
+&& inQuickInput
+&& neovim.init
+&& neovim.mode != 'cmdline'
+&& panelFocus
+&& panelPosition == 'bottom'
+&& panelPosition == 'left'
+&& panelPosition == 'right'
+&& panelPosition == 'top'
+&& sideBarFocus
+&& statusBarFocused
+&& terminalCount > 1
+&& terminalFocus
+&& terminalSplitPaneActive
+&& config.workbench.activityBar.location == 'bottom'
+&& config.workbench.activityBar.location == 'default'
+&& config.workbench.activityBar.location == 'hide'
+&& config.workbench.activityBar.location == 'top'
 ```
