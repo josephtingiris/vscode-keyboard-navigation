@@ -1983,12 +1983,27 @@ Notes:
     // [note] moves/replaces vscode alt+right
   },
   {
+    "key": "shift+alt+h",
+    "command": "shift+alt+h 5c07",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && breadcrumbsActive"
+  },
+  {
+    "key": "shift+alt+j",
+    "command": "shift+alt+j a063",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && breadcrumbsActive"
+  },
+  {
     // [keynav] (map) (up) (vi) (move) (1) (red) (A) (editor) (text)
     "key": "shift+alt+k",
     "command": "shift+alt+k 6727",
     // "command": "workbench.action.toggleMenuBar",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && breadcrumbsActive"
     // [note] 0.0.3
+  },
+  {
+    "key": "shift+alt+l",
+    "command": "shift+alt+l cf74",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && breadcrumbsActive"
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X)
@@ -36091,7 +36106,7 @@ Notes:
   {
     // [keynav] (map) (horizontal) (vi) (split) (move) (1) (red) (A) (panel) (terminal)
     "key": "shift+alt+-",
-    "command": "shift+alt+- a063",
+    "command": "shift+alt+- a163",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'right'"
   },
   {
