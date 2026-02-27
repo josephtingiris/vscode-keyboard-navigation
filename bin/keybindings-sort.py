@@ -108,6 +108,7 @@ FOCUS_TOKENS = [
     'agentSessionsViewerFocused',
     'editorTextFocus',
     'inputFocus',
+    'inQuickInput',
     'listFocus',
     'notificationFocus',
     'textInputFocus',
@@ -115,6 +116,8 @@ FOCUS_TOKENS = [
 
 POSITIONAL_TOKENS = [
     # primary (order matters!)
+    'breadcrumbsActive',
+    'breadcrumbsPossible',
     'config.workbench.activityBar.location',
     'config.workbench.sideBar.location',
     'panel.location',
@@ -124,7 +127,6 @@ POSITIONAL_TOKENS = [
     'activeEditor',
     'activePanel',
     'activeViewlet',
-    'breadcrumbsActive',
     'focusedView',
 ]
 
