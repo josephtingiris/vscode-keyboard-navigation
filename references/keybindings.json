@@ -2143,7 +2143,7 @@ Notes:
   },
   {
     // [keynav] (left) (vi) (juke) (0) (self) (gold) (X) (immutable)
-    // "key": "alt+,",
+    "key": "alt+,",
     "command": "alt+, 0aab",
     // "command": "workbench.action.previousEditor",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && focusedView == '' && activeEditorIsReadonly && editorIsOpen"
