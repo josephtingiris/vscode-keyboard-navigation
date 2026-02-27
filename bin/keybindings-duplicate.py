@@ -848,6 +848,9 @@ def insert_comments_inside_object(obj_text: str, comments: list[str]) -> str:
 
     before = s[:idx]
     after = s[idx:]
+
+    before = re.sub(r"(?:\n\s*)+\Z", "\n", before)
+
     if not before.endswith("\n"):
         before = before + "\n"
     return before + comment_block + "\n" + after
