@@ -124,6 +124,7 @@ POSITIONAL_TOKENS = [
     'activeEditor',
     'activePanel',
     'activeViewlet',
+    'breadcrumbsActive',
     'focusedView',
 ]
 
