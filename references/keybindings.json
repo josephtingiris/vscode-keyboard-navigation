@@ -1677,6 +1677,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'"
   },
   {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
     "key": "alt+a z",
     "command": "runCommands",
     // "command": "alt+a z 348a",
@@ -1970,12 +1971,14 @@ Notes:
     // [note] 0.0.3
   },
   {
+    // [keynav] (vi) (juke) (0) (self) (gold) (X)
     "key": "alt+pagedown",
     "command": "workbench.action.navigateBack",
     // "command": "alt+pagedown df43",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.juke.enabled"
   },
   {
+    // [keynav] (vi) (juke) (0) (self) (gold) (X)
     "key": "alt+pageup",
     "command": "workbench.action.navigateForward",
     // "command": "alt+pageup df44",
@@ -1983,17 +1986,19 @@ Notes:
     // [note] moves/replaces vscode alt+right
   },
   {
+    // [keynav] (left) (vi) (move) (1) (red) (A)
     "key": "shift+alt+h",
     "command": "shift+alt+h 5c07",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && breadcrumbsActive"
   },
   {
+    // [keynav] (down) (vi) (move) (1) (red) (A)
     "key": "shift+alt+j",
     "command": "shift+alt+j a063",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && breadcrumbsActive"
   },
   {
-    // [keynav] (map) (up) (vi) (move) (1) (red) (A) (editor) (text)
+    // [keynav] (map) (up) (vi) (move) (1) (red) (A)
     "key": "shift+alt+k",
     "command": "shift+alt+k 6727",
     // "command": "workbench.action.toggleMenuBar",
@@ -2001,12 +2006,13 @@ Notes:
     // [note] 0.0.3
   },
   {
+    // [keynav] (right) (vi) (move) (1) (red) (A)
     "key": "shift+alt+l",
     "command": "shift+alt+l cf74",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && breadcrumbsActive"
   },
   {
-    // [keynav] (vi) (0) (self) (gold) (X)
+    // [keynav] (0) (self) (gold) (X) (terminal)
     "key": "alt+`",
     "command": "workbench.action.terminal.toggleTerminal",
     // "command": "alt+` 0138",
@@ -2127,14 +2133,15 @@ Notes:
     // [note] settings editor, keyboard shortcuts, et al
   },
   {
-    // [keynav] (left) (vi) (juke) (0) (self) (gold) (X) (immutable)
+    // [keynav] (left) (vi) (juke) (0) (self) (gold) (X)
     "key": "alt+,",
-    // "command": "workbench.action.previousEditor",
     "command": "alt+, 4dab",
+    // "command": "workbench.action.previousEditor",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !editorFocus && !panelFocus && !sideBarFocus && !terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && editorIsOpen"
     // [note] settings editor, keyboard shortcuts, et al
   },
   {
+    // [keynav] (vi)
     "key": "ctrl+d",
     "command": "workbench.action.closeActiveEditor",
     // "command": "ctrl+d 2bc8",
@@ -7597,6 +7604,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !panelFocus"
   },
   {
+    // [keynav] (vi) (editor)
     "key": "ctrl+shift+t",
     "command": "ctrl+shift+t 7c33",
     // "command": "workbench.action.reopenClosedEditor",
@@ -7604,6 +7612,7 @@ Notes:
     // [note] reopen closed editor when editor is focused
   },
   {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (editor)
     "key": "alt+a z",
     "command": "runCommands",
     // "command": "alt+a z 348b",
@@ -7658,14 +7667,14 @@ Notes:
     // [note] wrap around to the panel on the bottom
   },
   {
-    // [keynav] (vi) (editor)
+    // [keynav] (vi) (editor) (neovim)
     "key": "ctrl+d",
     "command": "ctrl+d 2bcb",
     // "command": "workbench.action.closeActiveEditor",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && !terminalFocus && !editorTextFocus && neovim.init && neovim.mode != 'cmdline' && !filesExplorerFocus && !searchViewletFocus"
   },
   {
-    // [keynav] (vi) (editor) (pass)
+    // [keynav] (vi) (action) (chord) (editor)
     "key": "ctrl+a",
     // "command": "-noop",
     "command": "ctrl+a b6f8",
@@ -13660,7 +13669,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
   },
   {
-    // [keynav] (down) (vi) (move) (1) (red) (A) (editor) (text)
+    // [keynav] (down) (vi) (move) (1) (red) (A) (editor) (terminal) (text)
     "key": "shift+alt+j",
     "command": "workbench.action.terminal.toggleTerminal",
     // "command": "shift+alt+j 468e",
@@ -18289,6 +18298,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.workbench.sideBar.location == 'right' && panelPosition == 'top'"
   },
   {
+    // [keynav] (vi) (editor) (text) (neovim)
     "key": "ctrl+d",
     "command": "workbench.action.closeActiveEditor",
     // "command": "ctrl+d 2b8c",
@@ -28918,7 +28928,7 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && config.workbench.sideBar.location == 'right' && panelPosition == 'top'"
   },
   {
-    // [keynav] (vi) (action) (chord)
+    // [keynav] (vi) (action) (chord) (panel)
     "key": "alt+a alt+p",
     "command": "workbench.action.positionPanelLeft",
     // "command": "alt+a alt+p 77a1",
@@ -28926,7 +28936,7 @@ Notes:
     // [note] rotate clockwise
   },
   {
-    // [keynav] (vi) (action) (chord)
+    // [keynav] (vi) (action) (chord) (panel)
     "key": "alt+a alt+p",
     "command": "workbench.action.positionPanelTop",
     // "command": "alt+a alt+p 77a2",
@@ -28934,7 +28944,7 @@ Notes:
     // [note] rotate clockwise
   },
   {
-    // [keynav] (vi) (action) (chord)
+    // [keynav] (vi) (action) (chord) (panel)
     "key": "alt+a alt+p",
     "command": "workbench.action.positionPanelBottom",
     // "command": "alt+a alt+p 77a3",
@@ -28942,7 +28952,7 @@ Notes:
     // [note] rotate clockwise
   },
   {
-    // [keynav] (vi) (action) (chord)
+    // [keynav] (vi) (action) (chord) (panel)
     "key": "alt+a alt+p",
     "command": "workbench.action.positionPanelRight",
     // "command": "alt+a alt+p 77a4",
@@ -44867,7 +44877,7 @@ Notes:
     // [note] terminal only splits one way, depending on where it's docked
   },
   {
-    // [keynav] (vi) (terminal) (pass)
+    // [keynav] (vi) (terminal)
     "key": "ctrl+d",
     "command": "ctrl+d 1ad4",
     // "command": "-noop",
