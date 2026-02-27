@@ -1,0 +1,8 @@
+alias kb-corpus=keybindings-corpus.py
+alias kb-duplicate=keybindings-duplicate.py
+alias kb-install='keybindings-install-references'
+alias kb-install-references=keybindings-install-references.sh
+alias kb-merge=keybindings-merge.py
+alias kb-remove-comments=keybindings-remove-comments.py
+alias kb-remove-objects=keybindings-remove-objects.py
+alias kb-sort=keybindings-sort.py
