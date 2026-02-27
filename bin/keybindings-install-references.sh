@@ -78,7 +78,7 @@ validate_json() {
 
     cat "${file}" | keybindings-remove-comments.py > "${tempfile}"
     echo >> "${tempfile}" # ensure file ends with newline for jq
-    echo -n "Validating JSON '$(basename "${file}")' ... "
+    echo -n "# Validating JSON '$(basename "${file}")' ... "
     if ! jq . "${tempfile}" > /dev/null 2>&1; then
         jq . "${tempfile}"
         rm -f "${tempfile}" &> /dev/null
@@ -86,8 +86,6 @@ validate_json() {
     fi
     rm -f "${tempfile}" &> /dev/null
     echo "OK."
-
-    echo
 
     if ! cat "${file}" | keybindings-remove-comments.py | jq . > /dev/null 2>&1; then
         aborting "'${file}' is not valid JSON"
@@ -137,7 +135,7 @@ main() {
     fi
 
     if [ "${KEYBINDINGS_SORT_ARGUMENTS}" ]; then
-        ansi_echo "Sorting JSON with provided arguments: ${YELLOW}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
+        ansi_echo "# Sorting JSON with provided arguments: ${YELLOW}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     else
         if [ "${1}" == "1" ]; then
             KEYBINDINGS_SORT_ARGUMENTS="-p key -s when"
@@ -193,11 +191,11 @@ main() {
             KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
         fi
 
-        ansi_echo "Sorting JSON with default arguments: ${GREEN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
+        ansi_echo "# Sorting JSON with default arguments: ${GREEN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
     fi
     export KEYBINDINGS_SORT_ARGUMENTS
 
-    echo -n "Sorting JSON '$(basename "${keybindings_json}")' ... "
+    echo -n "# Sorting JSON '$(basename "${keybindings_json}")' ... "
     if type -p keybindings-sort.py > /dev/null 2>&1; then
         #echo "keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} < \"${keybindings_json}\" > /tmp/keybindings-sorted.json.$$"
         keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} < "${keybindings_json}" > /tmp/keybindings-sorted.json.$$
@@ -206,11 +204,11 @@ main() {
     fi
     echo "OK."
 
-    ansi_echo "Sorted JSON with arguments: ${CYAN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"
+    ansi_echo "# Sorted JSON with arguments: ${CYAN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'${RESET} ... OK."
 
     validate_json "${keybindings_json}"
 
-    echo -n "Installing 'references/$(basename "${keybindings_json}")' to '$(vscode_user_home)' ... "
+    echo -n "# Installing 'references/$(basename "${keybindings_json}")' to '$(vscode_user_home)' ... "
     cp "${keybindings_json}" "${user_keybindings_json}"
     echo "Done."
 
