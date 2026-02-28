@@ -7600,7 +7600,6 @@ Notes:
     // [keynav] (vi) (editor) (pass)
     "key": "ctrl+a",
     "command": "-noop",
-    // "command": "ctrl+a b6f8",
     // "command": "editor.action.selectAll",
     // "command": "ctrl+a 8526",
     // "command": "ctrl+a b9f8",
@@ -7642,16 +7641,6 @@ Notes:
       "select": true
     },
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus"
-  },
-  {
-    "key": "ctrl+a",
-    // "command": "-noop",
-    "command": "ctrl+a b6f8",
-    // "command": "editor.action.selectAll",
-    // "command": "ctrl+a 8526",
-    // "command": "ctrl+a b9f8",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && config.keyboardNavigation.chords.action"
-    // [note] If this keybinding (ctrl+a) is a chord then selectAll will NOT work.
   },
   {
     // [keynav] (right) (vi) (juke) (fold) (jump) (2) (blue) (B) (editor)
@@ -13157,6 +13146,13 @@ Notes:
     // "command": "shift+alt+k 6726",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && breadcrumbsActive && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.breadcrumbs.enabled"
     // "0.0.3": "breadcrumbs.focusAndSelect",
+  },
+  {
+    "key": "ctrl+a",
+    "command": "editor.action.selectAll",
+    // "command": "ctrl+a b6f8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.keyboardNavigation.chords.action"
+    // [note] If this keybinding (ctrl+a) is a chord then selectAll will NOT work.
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (editor) (text)
