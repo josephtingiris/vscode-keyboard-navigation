@@ -35,6 +35,16 @@ import os
 import re
 import json
 import argparse
+from typing import Any
+
+
+# prefer json5 libraries
+_json5 = None
+try:
+    import json5 as _json5  # type: ignore
+    JSON_FLAVOR = "JSON5"
+except Exception:
+    JSON_FLAVOR = "JSONC"
 
 
 def extract_preamble_postamble(text):
@@ -52,7 +62,6 @@ def extract_preamble_postamble(text):
     in_block_comment = False
     start = -1
 
-    # Find opening bracket, skipping comments and strings
     while i < n:
         ch = text[i]
         next2 = text[i:i + 2] if i + 2 <= n else ''
@@ -79,7 +88,6 @@ def extract_preamble_postamble(text):
             i += 1
             continue
 
-        # Not in string/comment
         if next2 == '//':
             in_line_comment = True
             i += 2
@@ -101,7 +109,6 @@ def extract_preamble_postamble(text):
     if start == -1:
         return '', '', text
 
-    # Find matching closing bracket
     depth = 1
     i = start + 1
     in_string = False
@@ -137,7 +144,6 @@ def extract_preamble_postamble(text):
             i += 1
             continue
 
-        # Not in string/comment
         if next2 == '//':
             in_line_comment = True
             i += 2
@@ -170,42 +176,166 @@ def extract_preamble_postamble(text):
 
 
 def split_units(array_text: str):
-    # Each unit: (comments/whitespace before, object, trailing comma, whitespace)
     units = []
-    lines = array_text.splitlines(keepends=True)
+    n = len(array_text)
     i = 0
-    n = len(lines)
-    while i < n:
-        comments = ''
-        # Gather comments/whitespace before object
-        while i < n and '{' not in lines[i]:
-            comments += lines[i]
-            i += 1
-        if i >= n:
+
+    def consume_ws_comments(pos: int) -> int:
+        while pos < n:
+            if array_text[pos].isspace():
+                pos += 1
+                continue
+            if array_text.startswith('//', pos):
+                nl = array_text.find('\n', pos)
+                if nl == -1:
+                    return n
+                pos = nl + 1
+                continue
+            if array_text.startswith('/*', pos):
+                end = array_text.find('*/', pos + 2)
+                if end == -1:
+                    return n
+                pos = end + 2
+                continue
             break
-        # Gather object
-        obj_lines = ''
-        depth = 0
-        started = False
+        return pos
+
+    while i < n:
+        lead_start = i
+
+        in_string = False
+        string_char = ''
+        esc = False
+        in_line_comment = False
+        in_block_comment = False
+        obj_start = -1
         while i < n:
-            line = lines[i]
-            if '{' in line:
-                started = True
-                depth += line.count('{')
-            if started:
-                obj_lines += line
-            if '}' in line:
-                depth -= line.count('}')
+            ch = array_text[i]
+            next2 = array_text[i:i + 2] if i + 2 <= n else ''
+
+            if in_line_comment:
+                if ch == '\n':
+                    in_line_comment = False
+                i += 1
+                continue
+            if in_block_comment:
+                if next2 == '*/':
+                    in_block_comment = False
+                    i += 2
+                else:
+                    i += 1
+                continue
+            if in_string:
+                if esc:
+                    esc = False
+                elif ch == '\\':
+                    esc = True
+                elif ch == string_char:
+                    in_string = False
+                i += 1
+                continue
+
+            if next2 == '//':
+                in_line_comment = True
+                i += 2
+                continue
+            if next2 == '/*':
+                in_block_comment = True
+                i += 2
+                continue
+            if ch == '"' or ch == "'":
+                in_string = True
+                string_char = ch
+                i += 1
+                continue
+            if ch == '{':
+                obj_start = i
+                break
+            i += 1
+
+        if obj_start == -1:
+            break
+
+        leading = array_text[lead_start:obj_start]
+
+        depth = 1
+        i = obj_start + 1
+        in_string = False
+        string_char = ''
+        esc = False
+        in_line_comment = False
+        in_block_comment = False
+        obj_end = -1
+        while i < n:
+            ch = array_text[i]
+            next2 = array_text[i:i + 2] if i + 2 <= n else ''
+
+            if in_line_comment:
+                if ch == '\n':
+                    in_line_comment = False
+                i += 1
+                continue
+            if in_block_comment:
+                if next2 == '*/':
+                    in_block_comment = False
+                    i += 2
+                else:
+                    i += 1
+                continue
+            if in_string:
+                if esc:
+                    esc = False
+                elif ch == '\\':
+                    esc = True
+                elif ch == string_char:
+                    in_string = False
+                i += 1
+                continue
+
+            if next2 == '//':
+                in_line_comment = True
+                i += 2
+                continue
+            if next2 == '/*':
+                in_block_comment = True
+                i += 2
+                continue
+            if ch == '"' or ch == "'":
+                in_string = True
+                string_char = ch
+                i += 1
+                continue
+
+            if ch == '{':
+                depth += 1
+            elif ch == '}':
+                depth -= 1
                 if depth == 0:
+                    obj_end = i
                     i += 1
                     break
             i += 1
-        # Gather trailing comma and whitespace
-        trailing = ''
-        while i < n and (lines[i].strip().startswith(',') or lines[i].strip() == '' or lines[i].strip().startswith('//') or lines[i].strip().startswith('/*')):
-            trailing += lines[i]
+
+        if obj_end == -1:
+            break
+
+        obj_text = array_text[obj_start:obj_end + 1]
+
+        trivia_before_start = i
+        i = consume_ws_comments(i)
+        trivia_before = array_text[trivia_before_start:i]
+
+        if i < n and array_text[i] == ',':
             i += 1
-        units.append((comments, obj_lines, trailing))
+
+        trivia_after_start = i
+        i = consume_ws_comments(i)
+        trivia_after = array_text[trivia_after_start:i]
+
+        trailing = trivia_before + trivia_after
+
+        units.append((leading, obj_text, trailing))
+
     return units
 
 
@@ -224,30 +354,43 @@ def strip_trailing_commas(text):
     return text
 
 
-def should_remove(obj_text, attr, val):
-    # non-greedy match to extract the JSON object body
-    obj_match = re.search(r'\{[\s\S]*?\}', obj_text)
-    if not obj_match:
-        return False
-    obj_str = obj_match.group(0)
-    # If attr is 'any' (or '*'), treat the search as matching anywhere
-    # inside the object's raw text (attributes, values, or comments).
-    if attr in ('any', '*'):
-        return val in obj_str
-    try:
+def parse_object_text(obj_str: str) -> dict[str, Any]:
+    parsed: Any
+    if _json5 is not None:
+        parsed = _json5.loads(obj_str)
+    else:
         clean = strip_json_comments(obj_str)
         clean = strip_trailing_commas(clean)
-        obj = json.loads(clean)
-        # perform substring check (case-sensitive)
+        parsed = json.loads(clean)
+
+    if not isinstance(parsed, dict):
+        raise ValueError("object text did not parse to a JSON object")
+    return parsed
+
+
+def should_remove(obj_text, attr, val, unit_text=None):
+    if attr in ('any', '*'):
+        haystack = unit_text if unit_text is not None else obj_text
+        return val in haystack
+
+    start = obj_text.find('{')
+    end = obj_text.rfind('}')
+    if start == -1 or end == -1 or end < start:
+        return False
+    obj_str = obj_text[start:end + 1]
+    try:
+        obj = parse_object_text(obj_str)
+
         attr_val = obj.get(attr, '')
         contains = val in str(attr_val)
+
         # debug output to stderr when KEYBINDINGS_REMOVE_DEBUG env var set
         if os.environ.get('KEYBINDINGS_REMOVE_DEBUG'):
             print('DEBUG: obj=', obj, file=sys.stderr)
             print(f"DEBUG: attr={attr!r} attr_val={attr_val!r} contains={contains}", file=sys.stderr)
         return contains
     except Exception:
-        # Debug info when parsing fails
+        # debug info when parsing fails
         if os.environ.get('KEYBINDINGS_REMOVE_DEBUG'):
             print(f"DEBUG: failed to parse object text: {obj_str}", file=sys.stderr)
         return False
@@ -262,7 +405,7 @@ def main(argv: list | None = None) -> int:
     parser.add_argument('attribute', help="An attribute name to match (e.g., 'command'), or use 'any' to match the search string anywhere inside the object.")
     parser.epilog = "Use attribute name 'any' or '*' to match the search string anywhere inside the object (attributes, values, or comments)."
     parser.add_argument('search_string', help='Substring to search for in the attribute value')
-    # If invoked with no arguments, show full help (same as -h/--help) and exit success.
+
     if not argv:
         parser.print_help()
         return 0
@@ -272,14 +415,21 @@ def main(argv: list | None = None) -> int:
     raw = sys.stdin.read()
     preamble, array_text, postamble = extract_preamble_postamble(raw)
     units = split_units(array_text)
-    # Output
+
     sys.stdout.write(preamble)
     sys.stdout.write('[')
+    kept_units = []
     for comments, obj, trailing in units:
-        if should_remove(obj, attr, val):
+        unit_text = comments + obj
+        if should_remove(obj, attr, val, unit_text=unit_text):
             continue
+        kept_units.append((comments, obj, trailing))
+
+    for idx, (comments, obj, trailing) in enumerate(kept_units):
         sys.stdout.write(comments)
         sys.stdout.write(obj)
+        if idx < len(kept_units) - 1:
+            sys.stdout.write(',')
         sys.stdout.write(trailing)
     sys.stdout.write(']')
     sys.stdout.write(postamble)
