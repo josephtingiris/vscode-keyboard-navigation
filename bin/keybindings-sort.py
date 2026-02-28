@@ -100,10 +100,10 @@ DEFAULT_WHEN_PREFIXES = []
 FOCUS_TOKENS = [
     # primary (order matters!)
     'auxiliaryBarFocus',
-    'editorFocus',
-    'panelFocus',
-    'sideBarFocus',
     'terminalFocus',
+    'sideBarFocus',
+    'panelFocus',
+    'editorFocus',
     # secondary
     'agentSessionsViewerFocused',
     'editorTextFocus',
