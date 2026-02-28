@@ -2,6 +2,7 @@ alias kb-corpus=keybindings-corpus.py
 alias kb-duplicate=keybindings-duplicate.py
 alias kb-install=kb-install-references
 alias kb-install-references=keybindings-install-references.sh
+alias kb-map=keybindings_map
 alias kb-merge=keybindings-merge.py
 alias kb-remove-comments=keybindings-remove-comments.py
 alias kb-remove-objects=keybindings-remove-objects.py
