@@ -102,6 +102,7 @@ FOCUS_TOKENS = [
     'auxiliaryBarFocus',
     'terminalFocus',
     'sideBarFocus',
+    'statusBarFocused',
     'panelFocus',
     'editorFocus',
     # secondary
