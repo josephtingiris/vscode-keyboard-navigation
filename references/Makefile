@@ -25,15 +25,18 @@ help:
 # init
 #
 
-# auxiliaryBarFocus editorFocus editorTextFocus filesExplorerFocus inDebugRepl inQuickOpen listFocus listHasSelectionOrFocus notificationFocus panelFocus sideBarFocus terminalFocus
-# auxiliaryBarFocus editorFocus editorTextFocus panelFocus sideBarFocus terminalFocus
-FOCUS_COMPONENTS := auxiliaryBarFocus editorFocus 'editorFocus && editorTextFocus' 'editorFocus && panelFocus' panelFocus 'panelFocus && sideBarFocus' 'panelFocus && terminalFocus' sideBarFocus
-LETTER_NAV_GROUPS := emacs kbm vi
+LETTER_NAV_GROUPS ?= emacs kbm vi
 #LETTER_NAV_GROUPS := vi
-MAP_MODIFIERS := alt,shift+alt,ctrl+alt,ctrl+alt+meta,ctrl+shift+alt
-PANEL_POSITIONS := top bottom left right
-SIDEBAR_LOCATIONS := left right
-KEYBINDINGS_SORT_ARGUMENTS := -p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters
+
+# map defaults; can be overridden via environment variables.
+# NOTE: env overrides may be shell-escaped word lists (for example values
+# exported from Bash arrays in etc/bash.d/keybindings-map.sh).
+KEYBINDINGS_MAP_FOCI ?= auxiliaryBarFocus editorFocus 'editorFocus && editorTextFocus' 'editorFocus && panelFocus' panelFocus 'panelFocus && sideBarFocus' 'panelFocus && terminalFocus' statusBarFocused terminalFocus
+KEYBINDINGS_MAP_MODIFIERS ?= alt,shift+alt,ctrl+alt,ctrl+alt+meta,ctrl+shift+alt
+KEYBINDINGS_MAP_PANEL_POSITIONS ?= top bottom left right
+KEYBINDINGS_MAP_SIDEBAR_LOCATIONS ?= left right
+
+KEYBINDINGS_SORT_ARGUMENTS ?= -p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters
 
 #
 # targets
@@ -95,15 +98,15 @@ maps:
 			echo "# + juke & split panel & sidebar locations"; \
 		fi; \
  \
-		for pp in $(PANEL_POSITIONS); do \
-			for sl in $(SIDEBAR_LOCATIONS); do \
-				for fc in $(FOCUS_COMPONENTS); do \
+		for pp in $(KEYBINDINGS_MAP_PANEL_POSITIONS); do \
+			for sl in $(KEYBINDINGS_MAP_SIDEBAR_LOCATIONS); do \
+				for fc in $(KEYBINDINGS_MAP_FOCI); do \
 					#echo "# + $$lng $$sl $$fc"; \
 					if [ "$$lng" != "" ] && [ "$$lng" != "none" ]; then \
-						../bin/keybindings-duplicate.py -F juke,split,$$lng -m $(MAP_MODIFIERS) -w "$${WHEN_PREFIX} && config.workbench.sideBar.location == '$$sl' && panelPosition == '$$pp' && $$fc" > $${MAP_FILE}.psf.jsonc; \
+						../bin/keybindings-duplicate.py -F juke,split,$$lng -m $(KEYBINDINGS_MAP_MODIFIERS) -w "$${WHEN_PREFIX} && config.workbench.sideBar.location == '$$sl' && panelPosition == '$$pp' && $$fc" > $${MAP_FILE}.psf.jsonc; \
 					else \
 						# none; \
-						../bin/keybindings-duplicate.py -F juke,split -m $(MAP_MODIFIERS) -w "$${WHEN_PREFIX} && config.workbench.sideBar.location == '$$sl' && panelPosition == '$$pp' && $$fc" > $${MAP_FILE}.psf.jsonc; \
+						../bin/keybindings-duplicate.py -F juke,split -m $(KEYBINDINGS_MAP_MODIFIERS) -w "$${WHEN_PREFIX} && config.workbench.sideBar.location == '$$sl' && panelPosition == '$$pp' && $$fc" > $${MAP_FILE}.psf.jsonc; \
 					fi; \
 					../bin/keybindings-merge.py $${MAP_FILE}.psf.jsonc $${MAP_FILE} --out $${MAP_FILE}.merged.jsonc 1> /dev/null; \
 					mv -f $${MAP_FILE}.merged.jsonc $${MAP_FILE}; \
