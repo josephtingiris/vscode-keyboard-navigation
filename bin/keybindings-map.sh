@@ -7,13 +7,26 @@
 
 # globals (exports)
 
-# authoritative defaults; these are exported as shell-escaped scalar strings (below)
-#
-A_KEYBINDINGS_MAP_FOCI=(auxiliaryBarFocus editorFocus 'editorFocus && editorTextFocus' 'editorFocus && panelFocus' panelFocus 'panelFocus && sideBarFocus' 'panelFocus && terminalFocus' statusBarFocused terminalFocus)
+# authoritative defaults; these are exported if sourced
+
+export A_KEYBINDINGS_MAP_FOCI=(auxiliaryBarFocus editorFocus 'editorFocus && editorTextFocus' 'editorFocus && panelFocus' panelFocus 'panelFocus && sideBarFocus' 'panelFocus && terminalFocus' statusBarFocused terminalFocus)
+if [ "${KEYBINDINGS_MAP_FOCUS}" != "" ]; then
+    export A_KEYBINDINGS_MAP_FOCI=("${KEYBINDINGS_MAP_FOCUS}")
+fi
+
+if [ "${0}" != "${BASH_SOURCE}" ] || [ "${KEYBINDINGS_MAP_MODIFIERS}" == "" ]; then
+    export KEYBINDINGS_MAP_MODIFIERS="alt,shift+alt,ctrl+alt,ctrl+alt+meta,ctrl+shift+alt"
+fi
+export KEYBINDINGS_MAP_MODIFIERS="${KEYBINDINGS_MAP_MODIFIERS}"
+
+if [ "${0}" != "${BASH_SOURCE}" ] || [ "${KEYBINDINGS_SORT_ARGUMENTS}" == "" ]; then
+    export KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
+fi
+export KEYBINDINGS_SORT_ARGUMENTS="${KEYBINDINGS_SORT_ARGUMENTS}"
+
+# immutable
 A_KEYBINDINGS_MAP_PANEL_POSITIONS=(top bottom left right)
 A_KEYBINDINGS_MAP_SIDEBAR_LOCATIONS=(left right)
-
-export KEYBINDINGS_MAP_MODIFIERS="alt,shift+alt,ctrl+alt,ctrl+alt+meta,ctrl+shift+alt"
 
 # functions
 
@@ -36,59 +49,93 @@ keybindings_map() {
 
     local keybindings_map_lang keybindings_map_langs="${1//,/ }"
 
-    [ "${keybindings_map_langs}" == 'none' ] && keybindings_map_langs=''
-
     local epoch="$(date +%s)"
 
     local map_file="keybindings_map.${epoch}"
 
-    local when_prefix="config.keyboardNavigation.enabled"
+    local when_prefix
 
-    local pp fl fc
+    local pp fl fc m1 m2
 
-    for keybindings_map_lang in none ${keybindings_map_langs}; do
+    for keybindings_map_lang in ${keybindings_map_langs}; do
+        if [ ${make_mode} -eq 1 ]; then
+            echo "make map lang=${keybindings_map_lang}"
+        fi
+
+        if [ "${WHEN_PREFIX}" == "" ]; then
+            when_prefix="config.keyboardNavigation.enabledMap"
+            if [ "${keybindings_map_lang}" != "" ] && [ "${keybindings_map_lang}" != "none" ]; then
+                when_prefix+=" && config.keyboardNavigation.keys.letters == '${keybindings_map_lang}'"
+            fi
+        else
+            when_prefix="${WHEN_PREFIX}"
+        fi
+
+        if [ ${make_mode} -eq 0 ]; then
+            echo "// ${when_prefix}"
+        fi
+
         for pp in "${A_KEYBINDINGS_MAP_PANEL_POSITIONS[@]}"; do
+            #echo "make map lang=${keybindings_map_lang} pp=$pp"
+
             for sl in "${A_KEYBINDINGS_MAP_SIDEBAR_LOCATIONS[@]}"; do
+                #echo "make map lang=${keybindings_map_lang} pp=$pp, sl=$sl"
+
                 for fc in "${A_KEYBINDINGS_MAP_FOCI[@]}"; do
-                    #echo "lang=${keybindings_map_lang} pp=$pp, sl=$sl, fc=$fc"
+                    #echo "make map lang=${keybindings_map_lang} pp=$pp, sl=$sl, fc=$fc"
+
+                    touch ${map_file}.${keybindings_map_lang}.jsonc
 
                     if [ "${keybindings_map_lang}" != "" ] && [ "${keybindings_map_lang}" != "none" ]; then
-                        keybindings-duplicate.py -F juke,split,${keybindings_map_lang} -m ${KEYBINDINGS_MAP_MODIFIERS} -w "${when_prefix} && config.workbench.sideBar.location == '${sl}' && panelPosition == '${pp}' && ${fc}" > ${map_file}.${keybindings_map_lang}.jsonc
+                        keybindings-duplicate.py -F juke,split,${keybindings_map_lang} -m ${KEYBINDINGS_MAP_MODIFIERS} -w "${when_prefix} && config.workbench.sideBar.location == '${sl}' && panelPosition == '${pp}' && ${fc}" > ${map_file}.${keybindings_map_lang}.m1.jsonc
                     else
-                        keybindings-duplicate.py -F juke,split -m ${KEYBINDINGS_MAP_MODIFIERS} -w "${when_prefix} && config.workbench.sideBar.location == '${sl}' && panelPosition == '${pp}' && ${fc}" > ${map_file}.${keybindings_map_lang}.jsonc
+                        keybindings-duplicate.py -F juke,split -m ${KEYBINDINGS_MAP_MODIFIERS} -w "${when_prefix} && config.workbench.sideBar.location == '${sl}' && panelPosition == '${pp}' && ${fc}" > ${map_file}.${keybindings_map_lang}.m1.jsonc
                     fi
+
+                    keybindings_merge ${map_file}.${keybindings_map_lang}.jsonc ${map_file}.${keybindings_map_lang}.m1.jsonc > ${map_file}.${keybindings_map_lang}.m2.jsonc
+
+                    mv -f ${map_file}.${keybindings_map_lang}.m2.jsonc ${map_file}.${keybindings_map_lang}.m1.jsonc
+                    mv -f ${map_file}.${keybindings_map_lang}.m1.jsonc ${map_file}.${keybindings_map_lang}.jsonc
                 done
+
             done
         done
     done
 
-    keybindings_merge ${map_file}*
+    local mf mfs dmf
 
-    local mf dmf
-
+    let mfs=0
     for mf in ${map_file}.*; do
         if [ -f "${mf}" ]; then
-            dmf="${mf//${epoch}./}"
-            dmf="${dmf//.none.jsonc/.jsonc}"
-            dmf="${dmf//keybindings_map/keybindings.map}"
-            if [ -f "${dmf}" ]; then
-                echo "dmf = ${dmf}"
+            let mfs=${mfs}+1
 
-                if [ ${make_mode} -eq 1 ]; then
-                    mv -f "${mf}" "${dmf}"
-                    # create a normalized, sorted map using corpus conversion then sort
-                    local sort_args
-                    sort_args="${KEYBINDINGS_SORT_ARGUMENTS:- -p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters}"
-                    keybindings-corpus.py -c "${dmf}" > "${dmf}.tmp.jsonc"
-                    keybindings-sort.py ${sort_args} < "${dmf}.tmp.jsonc" > "${dmf}"
-                    sed -i '/enabledMap/s//enabled/g' "${dmf}"
-                    [ -f "${dmf}.tmp.jsonc" ] && rm -f "${dmf}.tmp.jsonc"
-                    ls -l "${dmf}"
+            # add corpus comments
+            keybindings-corpus.py -c "${mf}" > "${mf}.coco" && mv -f "${mf}.coco" "${mf}"
+            sed -e '/enabledMap/s//enabled/g' "${mf}" -i
+
+            if [ ${make_mode} -eq 1 ]; then
+                dmf="${mf//${epoch}./}"
+                dmf="${dmf//.none.jsonc/.jsonc}"
+                dmf="${dmf//keybindings_map/keybindings.map}"
+                if [ -f "${dmf}" ]; then
+                    echo "make dmf = ${dmf}"
+
+                    keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} < "${mf}" > "${dmf}"
                 else
-                    ls -l "${mf}" && rm -f "${mf}"
+                    if [ -f "references/${dmf}" ]; then
+                        echo "make dmf = references/${dmf}"
+
+                        keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} < "${mf}" > references/"${dmf}"
+                    fi
                 fi
 
+                rm -f "${mf}" 2> /dev/null
+                continue
             fi
+
+            #echo keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS}
+            keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} < "${mf}"
+            rm -f "${mf}" 2> /dev/null
         fi
     done
 
@@ -147,7 +194,7 @@ keybindings_merge() {
         if [ ${use_jq} -eq 1 ]; then
             # echo they are pure json, use jq
             # jq -s 'add' file1.json file2.json ...
-            jq -s 'add ' ${@} | keybindings-sort.py | jq -r .
+            jq -s 'add ' ${@} | keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} | jq -r .
             return $?
         fi
     fi
@@ -158,11 +205,31 @@ keybindings_merge() {
         printf "\nERROR: to merge, at least two input files are required\n\n" && return 3
     else
         if [ ${merge_files} -eq 2 ]; then
-            keybindings-merge.py "${1}" "${2}" --out keybindings_merge.jsonc &> /dev/null && cat keybindings_merge.jsonc | keybindings-sort.py && rm -f keybindings_merge.jsonc
+            keybindings-merge.py "${1}" "${2}" --out keybindings_merge.jsonc &> /dev/null && cat keybindings_merge.jsonc | keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} && rm -f keybindings_merge.jsonc
         else
             printf "\nERROR: to merge, exactly two input files are required\n\n" && return 3
         fi
     fi
+}
+
+usage() {
+    printf "\nusage: $(basename "$0") [--make] <lang|none>\n\n"
+
+    echo "options:"
+    echo
+    echo " - KEYBINDINGS_MAP_FOCUS"
+    echo " - KEYBINDINGS_MAP_MODIFIERS"
+    echo " - KEYBINDINGS_SORT_ARGUMENTS"
+    echo
+
+    echo "examples:"
+    echo
+    echo "KEYBINDINGS_MAP_FOCUS=\"inQuickEdit && editorFocus\" $(basename $0) vi"
+    echo "KEYBINDINGS_MAP_MODIFIERS=shift+alt KEYBINDINGS_MAP_FOCUS=\"inQuickEdit\" $(basename $0) vi"
+    echo "WHEN_PREFIX=\"config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'\" KEYBINDINGS_MAP_MODIFIERS=alt,shift+alt KEYBINDINGS_MAP_FOCUS=\"inQuickEdit\" $(basename $0) vi"
+    echo
+
+    exit 99
 }
 
 # main
@@ -174,5 +241,7 @@ export KEYBINDINGS_MAP_SIDEBAR_LOCATIONS="$(keybindings_map_array "${A_KEYBINDIN
 [ "${0}" != "${BASH_SOURCE}" ] && return # if it was sourced
 
 # execute
+
+[ "${1}" == "" ] && usage
 
 keybindings_map ${@}
