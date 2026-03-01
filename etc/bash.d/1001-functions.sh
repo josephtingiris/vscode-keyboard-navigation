@@ -1,15 +1,6 @@
-#
-# (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+[ "${0}" == "${BASH_SOURCE}" ] && printf "\nERROR: do not execute this! (instead, use 'source ${0}')\n\n" && exit 1
+[ ! -f "${BASH_SOURCE%/*}/../../.bash_profile" ] && [ $(wc -l 2> /dev/null < "${BASH_SOURCE}") -gt 2 ] && bd_ansi fg_red "Loading -> ${BASH_SOURCE} ... from ${PWD}" && echo
+
 #
 # reusable functions
 #
-
-_keynav_array_to_string() {
-    local encoded_words=()
-    local item=""
-    for item in "$@"; do
-        encoded_words+=("$(printf '%q' "$item")")
-    done
-
-    printf '%s' "${encoded_words[*]}"
-}

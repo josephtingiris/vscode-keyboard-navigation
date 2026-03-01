@@ -79,45 +79,7 @@ maps:
 
 	# none & letter-key groups
 	@for lng in none $(LETTER_NAV_GROUPS); do \
-		WHEN_PREFIX="config.keyboardNavigation.enabledMap"; \
-		if [ "$$lng" != "" ] && [ "$$lng" != "none" ]; then \
-			WHEN_PREFIX+=" && config.keyboardNavigation.keys.letters == '$$lng'"; \
-			MAP_FILE="keybindings.map.$$lng.jsonc"; \
-		else \
-			# none; \
-			MAP_FILE="keybindings.map.jsonc"; \
-		fi; \
-		echo "# + $${MAP_FILE}"; \
-		#echo "# + WHEN_PREFIX="$${WHEN_PREFIX}; \
- \
-		echo '[]' > $${MAP_FILE}; \
-		if [ "$$lng" != "" ] && [ "$$lng" != "none" ]; then \
-			echo "# + $$lng panel & sidebar locations"; \
-		else \
-			# none; \
-			echo "# + juke & split panel & sidebar locations"; \
-		fi; \
- \
-		for pp in $(KEYBINDINGS_MAP_PANEL_POSITIONS); do \
-			for sl in $(KEYBINDINGS_MAP_SIDEBAR_LOCATIONS); do \
-				for fc in $(KEYBINDINGS_MAP_FOCI); do \
-					#echo "# + $$lng $$sl $$fc"; \
-					if [ "$$lng" != "" ] && [ "$$lng" != "none" ]; then \
-						../bin/keybindings-duplicate.py -F juke,split,$$lng -m $(KEYBINDINGS_MAP_MODIFIERS) -w "$${WHEN_PREFIX} && config.workbench.sideBar.location == '$$sl' && panelPosition == '$$pp' && $$fc" > $${MAP_FILE}.psf.jsonc; \
-					else \
-						# none; \
-						../bin/keybindings-duplicate.py -F juke,split -m $(KEYBINDINGS_MAP_MODIFIERS) -w "$${WHEN_PREFIX} && config.workbench.sideBar.location == '$$sl' && panelPosition == '$$pp' && $$fc" > $${MAP_FILE}.psf.jsonc; \
-					fi; \
-					../bin/keybindings-merge.py $${MAP_FILE}.psf.jsonc $${MAP_FILE} --out $${MAP_FILE}.merged.jsonc 1> /dev/null; \
-					mv -f $${MAP_FILE}.merged.jsonc $${MAP_FILE}; \
-				done; \
-			[ -f $${MAP_FILE}.psf.jsonc ] && rm -f $${MAP_FILE}.psf.jsonc; \
-			done; \
-		done; \
-		../bin/keybindings-corpus.py -c $${MAP_FILE} > $${MAP_FILE}.tmp.jsonc; \
-		../bin/keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) < $${MAP_FILE}.tmp.jsonc > $${MAP_FILE}; \
-		sed -i '/enabledMap/s//enabled/g' $${MAP_FILE}; \
-		[ -f $${MAP_FILE}.tmp.jsonc ] && rm -f $${MAP_FILE}.tmp.jsonc; \
+		../bin/keybindings-map.sh --make $$lng; \
 	done
 
 	# all
@@ -125,7 +87,7 @@ maps:
 	echo '[]' > keybindings.map.all.jsonc; \
 	for mf in keybindings.map.*jsonc; do \
 		MAP_FILE="$$mf"; \
-		ls -l $${MAP_FILE}; \
+		ls -lh $${MAP_FILE}; \
 		[[ "$${MAP_FILE}" == *"all.jsonc" ]] && continue; \
 		../bin/keybindings-merge.py $${MAP_FILE} keybindings.map.all.jsonc --out keybindings.map.all.tmp.jsonc 1> /dev/null; \
 		../bin/keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) < keybindings.map.all.tmp.jsonc > keybindings.map.all.jsonc; \

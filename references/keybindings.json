@@ -45924,6 +45924,30 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.keyboardNavigation.terminal.enabled"
   },
   {
+    "key": "alt+h",
+    "command": "workbench.action.terminal.focusPreviousPane",
+    // "command": "alt+h 1c9d",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.keyboardNavigation.terminal.enabled && terminalCount > 1 && terminalSplitPaneActive"
+  },
+  {
+    "key": "alt+j",
+    "command": "workbench.action.terminal.focusPreviousPane",
+    // "command": "alt+j 2c9d",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.keyboardNavigation.terminal.enabled && terminalCount > 1 && terminalSplitPaneActive"
+  },
+  {
+    "key": "alt+k",
+    "command": "workbench.action.terminal.focusNextPane",
+    // "command": "alt+k 2e9d",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.keyboardNavigation.terminal.enabled && terminalCount > 1 && terminalSplitPaneActive"
+  },
+  {
+    "key": "alt+l",
+    "command": "workbench.action.terminal.focusNextPane",
+    // "command": "alt+l 0b9d",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.keyboardNavigation.terminal.enabled && terminalCount > 1 && terminalSplitPaneActive"
+  },
+  {
     // [keynav] (map) (right) (vi) (juke) (0) (self) (gold) (X) (terminal)
     "key": "alt+'",
     "command": "alt+' 8256",
