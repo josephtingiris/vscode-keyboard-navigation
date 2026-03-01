@@ -1760,9 +1760,10 @@ Notes:
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
     "key": "alt+a c",
-    "command": "workbench.panel.chat.resetViewContainerLocation",
+    "command": "workbench.action.focusAuxiliaryBar",
     // "command": "alt+a c 1113",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
+    // "0.0.3": "workbench.action.focusAuxiliaryBar",
     // [note] open and focus the (SECONDARY) CHAT viewlet
   },
   {
@@ -2075,8 +2076,8 @@ Notes:
   {
     // [keynav] (vertical) (vi) (split) (0) (self) (gold) (X) (immutable)
     "key": "alt+=",
-    "command": "workbench.action.splitEditor",
-    // "command": "alt+= 83bc",
+    "command": "alt+= 83bc",
+    // "command": "workbench.action.splitEditor",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && activeEditor != '' && focusedView == '' && activeEditorIsReadonly && config.keyboardNavigation.terminal.enabled && editorIsOpen"
     // [note] settings editor, keyboard shortcuts, et al
   },
@@ -2271,12 +2272,38 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus"
   },
   {
+    "key": "alt+-",
+    "command": "alt+= 7844",
+    // "command": "agentSessions.showAgentSessionsSidebar",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && !agentSessionsViewerVisible && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
+    // [WIP]
+  },
+  {
+    "key": "alt+=",
+    "command": "agentSessions.showAgentSessionsSidebar",
+    // "command": "alt+= 7842",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && !agentSessionsViewerVisible && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
+    // [WIP]
+  },
+  {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
     "key": "alt+a c",
     "command": "workbench.action.closeAuxiliaryBar",
     // "command": "alt+a c 6113",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && activeAuxiliary == 'workbench.panel.chat' && config.keyboardNavigation.chords.action"
     // [note] close and unfocus the (SECONDARY) CHAT viewlet
+  },
+  {
+    "key": "alt+-",
+    "command": "alt+= 7845",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerVisible && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
+    // [WIP]
+  },
+  {
+    "key": "alt+=",
+    "command": "alt+= 7841",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerVisible && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
+    // [WIP]
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
