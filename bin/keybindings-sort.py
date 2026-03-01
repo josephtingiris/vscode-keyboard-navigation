@@ -551,9 +551,9 @@ def _first_when_group_rank(
     if mode == 'focal-invariant':
         if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
             return 1
-        if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
-            return 2
         if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
+            return 2
+        if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
             return 3
         if left_id.startswith('config.'):
             return 4
@@ -561,9 +561,9 @@ def _first_when_group_rank(
 
     if left_id.startswith('config.'):
         return 1
-    if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
-        return 2
     if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
+        return 2
+    if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
         return 3
     if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
         return 4
@@ -1033,16 +1033,16 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                         continue
 
         # 'config-first' Group order: config.* -> positional prefixes -> focus -> visibility -> other
-        # 'focal-invariant' Group order: focus -> visibility -> positional prefixes -> config.* -> other
+        # 'focal-invariant' Group order: focus -> positional prefixes -> visibility -> config.* -> other
         # 'none' disables grouping by returning the same rank for all tokens.
         if mode == 'none':
             return 1
         if mode == 'focal-invariant':
             if _is_focus(left):
                 return 1
-            if _is_visibility(left):
-                return 2
             if any(left.startswith(p) for p in positional_tokens):
+                return 2
+            if _is_visibility(left):
                 return 3
             if left.startswith('config.'):
                 return 4

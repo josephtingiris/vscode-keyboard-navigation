@@ -2272,38 +2272,12 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus"
   },
   {
-    "key": "alt+-",
-    "command": "alt+= 7844",
-    // "command": "agentSessions.showAgentSessionsSidebar",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && !agentSessionsViewerVisible && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
-    // [WIP]
-  },
-  {
-    "key": "alt+=",
-    "command": "agentSessions.showAgentSessionsSidebar",
-    // "command": "alt+= 7842",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && !agentSessionsViewerVisible && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
-    // [WIP]
-  },
-  {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
     "key": "alt+a c",
     "command": "workbench.action.closeAuxiliaryBar",
     // "command": "alt+a c 6113",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && activeAuxiliary == 'workbench.panel.chat' && config.keyboardNavigation.chords.action"
     // [note] close and unfocus the (SECONDARY) CHAT viewlet
-  },
-  {
-    "key": "alt+-",
-    "command": "alt+= 7845",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerVisible && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
-    // [WIP]
-  },
-  {
-    "key": "alt+=",
-    "command": "alt+= 7841",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && agentSessionsViewerVisible && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
-    // [WIP]
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
@@ -2980,6 +2954,32 @@ Notes:
     "key": "shift+alt+}",
     "command": "shift+alt+} 9b93",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
+  },
+  {
+    "key": "alt+-",
+    "command": "alt+= 7844",
+    // "command": "agentSessions.showAgentSessionsSidebar",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && !agentSessionsViewerVisible"
+    // [WIP]
+  },
+  {
+    "key": "alt+=",
+    "command": "agentSessions.showAgentSessionsSidebar",
+    // "command": "alt+= 7842",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && !agentSessionsViewerVisible"
+    // [WIP]
+  },
+  {
+    "key": "alt+-",
+    "command": "alt+= 7845",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && agentSessionsViewerVisible"
+    // [WIP]
+  },
+  {
+    "key": "alt+=",
+    "command": "alt+= 7841",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && agentSessionsViewerVisible"
+    // [WIP]
   },
   {
     // [keynav] (map) (right) (vi) (juke) (0) (self) (gold) (X)
