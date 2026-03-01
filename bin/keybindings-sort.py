@@ -124,6 +124,7 @@ POSITIONAL_TOKENS = [
     'panel.location',
     'panelPosition',
     # secondary
+    'config.chat.agent.enabled',
     'activeAuxiliary',
     'activeEditor',
     'activePanel',

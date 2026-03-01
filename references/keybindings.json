@@ -1759,15 +1759,6 @@ Notes:
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a c",
-    "command": "workbench.action.focusAuxiliaryBar",
-    // "command": "alt+a c 1113",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
-    // "0.0.3": "workbench.action.focusAuxiliaryBar",
-    // [note] open and focus the (SECONDARY) CHAT viewlet
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
     "key": "alt+a d",
     "command": "workbench.panel.repl.resetViewContainerLocation",
     // "command": "alt+a d 1104",
@@ -2043,6 +2034,15 @@ Notes:
     // [note] moves/replaces vscode alt+right
   },
   {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a c",
+    "command": "workbench.action.focusAuxiliaryBar",
+    // "command": "alt+a c 1113",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.chat.agent.enabled && config.keyboardNavigation.chords.action"
+    // "0.0.3": "workbench.action.focusAuxiliaryBar",
+    // [note] open and focus the (SECONDARY) CHAT viewlet
+  },
+  {
     "key": "alt+`",
     "command": "workbench.action.terminal.toggleTerminal",
     // "command": "alt+` 0138",
@@ -2270,14 +2270,6 @@ Notes:
     "key": "shift+alt+l",
     "command": "shift+alt+l 6db2",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus"
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a c",
-    "command": "workbench.action.closeAuxiliaryBar",
-    // "command": "alt+a c 6113",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && activeAuxiliary == 'workbench.panel.chat' && config.keyboardNavigation.chords.action"
-    // [note] close and unfocus the (SECONDARY) CHAT viewlet
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
@@ -2957,34 +2949,73 @@ Notes:
   },
   {
     "key": "alt+-",
-    "command": "alt+= 7844",
+    "command": "alt+= 7841",
     // "command": "agentSessions.showAgentSessionsSidebar",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && !agentSessionsViewerVisible"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.chat.agent.enabled && activeAuxiliary == 'workbench.panel.chat' && !agentSessionsViewerVisible && agentSessionsViewerOrientation == '1'"
     // [WIP]
   },
   {
     "key": "alt+=",
     "command": "agentSessions.showAgentSessionsSidebar",
     // "command": "alt+= 7842",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && !agentSessionsViewerVisible"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.chat.agent.enabled && activeAuxiliary == 'workbench.panel.chat' && !agentSessionsViewerVisible && agentSessionsViewerOrientation == '1'"
     // [WIP]
   },
   {
     "key": "alt+-",
-    "command": "alt+= 7845",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && agentSessionsViewerVisible"
+    "command": "alt+= 7851",
+    // "command": "agentSessions.showAgentSessionsSidebar",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.chat.agent.enabled && activeAuxiliary == 'workbench.panel.chat' && !agentSessionsViewerVisible && agentSessionsViewerOrientation == '2'"
     // [WIP]
   },
   {
     "key": "alt+=",
-    "command": "alt+= 7841",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && agentSessionsViewerVisible"
+    // "command": "agentSessions.showAgentSessionsSidebar",
+    "command": "alt+= 7862",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.chat.agent.enabled && activeAuxiliary == 'workbench.panel.chat' && !agentSessionsViewerVisible && agentSessionsViewerOrientation == '2'"
     // [WIP]
+  },
+  {
+    "key": "alt+-",
+    // "command": "agentSessions.hideAgentSessionsSidebar",
+    "command": "alt+= 7843",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.chat.agent.enabled && activeAuxiliary == 'workbench.panel.chat' && agentSessionsViewerVisible && agentSessionsViewerOrientation == '1'"
+    // [WIP] stop, it's already 'split' horizontally
+  },
+  {
+    "key": "alt+=",
+    "command": "agentSessions.showAgentSessionsSidebar",
+    // "command": "alt+= 7844",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.chat.agent.enabled && activeAuxiliary == 'workbench.panel.chat' && agentSessionsViewerVisible && agentSessionsViewerOrientation == '1'"
+    // [WIP]
+  },
+  {
+    "key": "alt+-",
+    "command": "runCommands",
+    // "command": "alt+= 7873",
+    "args": {
+      "commands": ["agentSessions.hideAgentSessionsSidebar"]
+    },
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.chat.agent.enabled && activeAuxiliary == 'workbench.panel.chat' && agentSessionsViewerVisible && agentSessionsViewerOrientation == '2'"
+    // [WIP]
+  },
+  {
+    "key": "alt+=",
+    // "command": "agentSessions.hideAgentSessionsSidebar",
+    "command": "alt+= 7846",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.chat.agent.enabled && activeAuxiliary == 'workbench.panel.chat' && agentSessionsViewerVisible && agentSessionsViewerOrientation == '2'"
+    // [WIP] stop, it's already 'split' vertically
+  },
+  {
+    "key": "alt+a c",
+    "command": "workbench.action.closeAuxiliaryBar",
+    // "command": "alt+a c 6113",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.chat.agent.enabled && activeAuxiliary == 'workbench.panel.chat' && config.keyboardNavigation.chords.action"
   },
   {
     // [keynav] (map) (right) (vi) (juke) (0) (self) (gold) (X)
     "key": "alt+'",
-    "command": "alt+' 7482",
+    "command": "alt+' 7772",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'left'"
   },
   {
@@ -13099,7 +13130,8 @@ Notes:
       "commands": [
         "workbench.action.closeAuxiliaryBar",
         "workbench.action.closePanel",
-        "workbench.action.closeSidebar"
+        "workbench.action.closeSidebar",
+        "workbench.action.focusActiveEditorGroup"
       ]
     },
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && !panelFocus && (auxiliaryBarVisible || panelVisible || sideBarVisible) && config.keyboardNavigation.chords.action"
@@ -13110,8 +13142,8 @@ Notes:
   {
     // [keynav] (vertical) (vi) (split) (0) (self) (gold) (X) (editor)
     "key": "alt+=",
-    "command": "markdown.showPreview",
-    // "command": "alt+a 50a9",
+    // "command": "markdown.showPreview",
+    "command": "alt+a 50a9",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && !panelFocus && activeEditorCanSplitInGroup && editorLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/ && !notebookEditorFocused"
     // [note] open markdown preview editor to the side (maybe move this to alt+=)
   },

@@ -252,9 +252,12 @@ config.editor.minimap.enabled — True when the setting editor.minimap.enabled i
 && activeViewlet == 'workbench.view.remote'
 && activeViewlet == 'workbench.view.scm'
 && activeViewlet == 'workbench.view.search'
+&& agentSessionsViewerVisible
+&& agentSessionsViewerOrientation == '1'
 && auxiliaryBarFocus
 && breadcrumbsActive
 && config.breadcrumbs.enabled
+&& config.chat.agent.enabled
 && config.keyboardNavigation.chords.action
 && config.keyboardNavigation.chords.debug
 && config.keyboardNavigation.chords.extension
