@@ -119,8 +119,6 @@ POSITIONAL_TOKENS = [
     # primary (order matters!)
     'breadcrumbsActive',
     'breadcrumbsPossible',
-    'config.workbench.activityBar.location',
-    'config.workbench.sideBar.location',
     'panel.location',
     'panelPosition',
     # secondary
@@ -132,6 +130,8 @@ POSITIONAL_TOKENS = [
 ]
 
 VISIBILITY_TOKENS = [
+    'config.workbench.activityBar.location',
+    'config.workbench.sideBar.location',
     'auxiliaryBarVisible',
     'agentSessionsViewerVisible',
     'editorVisible',
@@ -550,14 +550,14 @@ def _first_when_group_rank(
 
     if mode == 'focal-invariant':
         if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
-            return 1
-        if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
-            return 2
+            return 4
         if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
             return 3
+        if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
+            return 2
         if left_id.startswith('config.'):
-            return 4
-        return 5
+            return 1
+        return 0
 
     if left_id.startswith('config.'):
         return 1
@@ -632,7 +632,7 @@ def _partition_focus_groups_to_end(sorted_groups: list[tuple[str, str]]) -> list
         except Exception:
             non_focus.append(pair)
 
-    return non_focus + focus
+    return focus + non_focus
 
 
 def _remove_blank_lines(text: str) -> str:
@@ -820,7 +820,7 @@ def _sort_groups_for_primary_when(
                     non_focus_rows.append(row)
             except Exception:
                 non_focus_rows.append(row)
-        decorated = non_focus_rows + focus_rows
+        decorated = focus_rows + non_focus_rows
 
     sorted_groups = [row[2] for row in decorated]
 
@@ -1033,16 +1033,16 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                         continue
 
         # 'config-first' Group order: config.* -> positional prefixes -> focus -> visibility -> other
-        # 'focal-invariant' Group order: focus -> visibility -> positional prefixes -> config.* -> other
+        # 'focal-invariant' Group order: focus -> positional prefixes -> visibility -> config.* -> other
         # 'none' disables grouping by returning the same rank for all tokens.
         if mode == 'none':
             return 1
         if mode == 'focal-invariant':
             if _is_focus(left):
                 return 1
-            if _is_visibility(left):
-                return 2
             if any(left.startswith(p) for p in positional_tokens):
+                return 2
+            if _is_visibility(left):
                 return 3
             if left.startswith('config.'):
                 return 4
