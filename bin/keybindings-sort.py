@@ -117,12 +117,12 @@ FOCUS_TOKENS = [
 
 POSITIONAL_TOKENS = [
     # primary (order matters!)
-    'breadcrumbsActive',
-    'breadcrumbsPossible',
     'config.workbench.activityBar.location',
     'config.workbench.sideBar.location',
     'panel.location',
     'panelPosition',
+    'breadcrumbsActive',
+    'breadcrumbsPossible',
     # secondary
     'config.chat.agent.enabled',
     'config.keyboardNavigation.terminal.enabled',
