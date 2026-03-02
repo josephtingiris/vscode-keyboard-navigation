@@ -25,8 +25,8 @@ help:
 # init
 #
 
-LETTER_NAV_GROUPS ?= emacs kbm vi
-#LETTER_NAV_GROUPS := vi
+LETTER_KEY_GROUPS ?= emacs kbm vi
+#LETTER_KEY_GROUPS := vi
 
 # map defaults; can be overridden via environment variables.
 # NOTE: env overrides may be shell-escaped word lists (for example values
@@ -63,8 +63,8 @@ corpora:
 	@keybindings-corpus.py | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.jsonc
 
 	# letter-key groups
-	@for lng in $(LETTER_NAV_GROUPS); do \
-		../bin/keybindings-corpus.py -n $$lng | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.$$lng.jsonc; \
+	@for lkg in $(LETTER_KEY_GROUPS); do \
+		../bin/keybindings-corpus.py -n $$lkg | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.$$lkg.jsonc; \
 	done
 
 	# all
@@ -78,8 +78,8 @@ maps:
 	@echo
 
 	# none & letter-key groups
-	@for lng in none $(LETTER_NAV_GROUPS); do \
-		../bin/keybindings-map.sh --make $$lng; \
+	@for lkg in none $(LETTER_KEY_GROUPS); do \
+		../bin/keybindings-map.sh --make $$lkg; \
 	done
 
 	# all
@@ -107,10 +107,10 @@ surfaces:
 	@rm -f keybindings.merged.surface.jsonc
 
 	# letter-key groups
-	@for lng in $(LETTER_NAV_GROUPS); do \
-		../bin/keybindings-merge.py keybindings.corpus.$$lng.jsonc keybindings.map.$$lng.jsonc --prefer left --out keybindings.merged.surface.$$lng.jsonc 1> /dev/null; \
-		cat keybindings.merged.surface.$$lng.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.$$lng.jsonc; \
-		rm -f keybindings.merged.surface.$$lng.jsonc; \
+	@for lkg in $(LETTER_KEY_GROUPS); do \
+		../bin/keybindings-merge.py keybindings.corpus.$$lkg.jsonc keybindings.map.$$lkg.jsonc --prefer left --out keybindings.merged.surface.$$lkg.jsonc 1> /dev/null; \
+		cat keybindings.merged.surface.$$lkg.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.$$lkg.jsonc; \
+		rm -f keybindings.merged.surface.$$lkg.jsonc; \
 	done
 
 	# all

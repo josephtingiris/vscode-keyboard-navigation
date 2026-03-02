@@ -45,9 +45,9 @@ keybindings_map() {
         esac
     done
 
-    [ "${1}" == "" ] && printf "\nusage: keybindings_map [--make] <lang|none>\n\n" && return 1
+    [ "${1}" == "" ] && printf "\nusage: keybindings_map [--make] <letter-key group name(s)|none>\n\n" && return 1
 
-    local keybindings_map_lang keybindings_map_langs="${1//,/ }"
+    local keybindings_map_letter_key_group keybindings_map_letter_key_groups="${1//,/ }"
 
     local epoch="$(date +%s)"
 
@@ -57,15 +57,15 @@ keybindings_map() {
 
     local pp fl fc m1 m2
 
-    for keybindings_map_lang in ${keybindings_map_langs}; do
+    for keybindings_map_letter_key_group in ${keybindings_map_letter_key_groups}; do
         if [ ${make_mode} -eq 1 ]; then
-            echo "make map lang=${keybindings_map_lang}"
+            echo "make map letter_key_group=${keybindings_map_letter_key_group}"
         fi
 
         if [ "${WHEN_PREFIX}" == "" ]; then
             when_prefix="config.keyboardNavigation.enabledMap"
-            if [ "${keybindings_map_lang}" != "" ] && [ "${keybindings_map_lang}" != "none" ]; then
-                when_prefix+=" && config.keyboardNavigation.keys.letters == '${keybindings_map_lang}'"
+            if [ "${keybindings_map_letter_key_group}" != "" ] && [ "${keybindings_map_letter_key_group}" != "none" ]; then
+                when_prefix+=" && config.keyboardNavigation.keys.letters == '${keybindings_map_letter_key_group}'"
             fi
         else
             when_prefix="${WHEN_PREFIX}"
@@ -76,26 +76,26 @@ keybindings_map() {
         fi
 
         for pp in "${A_KEYBINDINGS_MAP_PANEL_POSITIONS[@]}"; do
-            #echo "make map lang=${keybindings_map_lang} pp=$pp"
+            #echo "make map letter_key_group=${keybindings_map_letter_key_group} pp=$pp"
 
             for sl in "${A_KEYBINDINGS_MAP_SIDEBAR_LOCATIONS[@]}"; do
-                #echo "make map lang=${keybindings_map_lang} pp=$pp, sl=$sl"
+                #echo "make map letter_key_group=${keybindings_map_letter_key_group} pp=$pp, sl=$sl"
 
                 for fc in "${A_KEYBINDINGS_MAP_FOCI[@]}"; do
-                    #echo "make map lang=${keybindings_map_lang} pp=$pp, sl=$sl, fc=$fc"
+                    #echo "make map letter_key_group=${keybindings_map_letter_key_group} pp=$pp, sl=$sl, fc=$fc"
 
-                    touch ${map_file}.${keybindings_map_lang}.jsonc
+                    touch ${map_file}.${keybindings_map_letter_key_group}.jsonc
 
-                    if [ "${keybindings_map_lang}" != "" ] && [ "${keybindings_map_lang}" != "none" ]; then
-                        keybindings-duplicate.py -F juke,split,${keybindings_map_lang} -m ${KEYBINDINGS_MAP_MODIFIERS} -w "${when_prefix} && config.workbench.sideBar.location == '${sl}' && panelPosition == '${pp}' && ${fc}" > ${map_file}.${keybindings_map_lang}.m1.jsonc
+                    if [ "${keybindings_map_letter_key_group}" != "" ] && [ "${keybindings_map_letter_key_group}" != "none" ]; then
+                        keybindings-duplicate.py -F juke,split,${keybindings_map_letter_key_group} -m ${KEYBINDINGS_MAP_MODIFIERS} -w "${when_prefix} && config.workbench.sideBar.location == '${sl}' && panelPosition == '${pp}' && ${fc}" > ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc
                     else
-                        keybindings-duplicate.py -F juke,split -m ${KEYBINDINGS_MAP_MODIFIERS} -w "${when_prefix} && config.workbench.sideBar.location == '${sl}' && panelPosition == '${pp}' && ${fc}" > ${map_file}.${keybindings_map_lang}.m1.jsonc
+                        keybindings-duplicate.py -F juke,split -m ${KEYBINDINGS_MAP_MODIFIERS} -w "${when_prefix} && config.workbench.sideBar.location == '${sl}' && panelPosition == '${pp}' && ${fc}" > ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc
                     fi
 
-                    keybindings_merge ${map_file}.${keybindings_map_lang}.jsonc ${map_file}.${keybindings_map_lang}.m1.jsonc > ${map_file}.${keybindings_map_lang}.m2.jsonc
+                    keybindings_merge ${map_file}.${keybindings_map_letter_key_group}.jsonc ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc > ${map_file}.${keybindings_map_letter_key_group}.m2.jsonc
 
-                    mv -f ${map_file}.${keybindings_map_lang}.m2.jsonc ${map_file}.${keybindings_map_lang}.m1.jsonc
-                    mv -f ${map_file}.${keybindings_map_lang}.m1.jsonc ${map_file}.${keybindings_map_lang}.jsonc
+                    mv -f ${map_file}.${keybindings_map_letter_key_group}.m2.jsonc ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc
+                    mv -f ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc ${map_file}.${keybindings_map_letter_key_group}.jsonc
                 done
 
             done
@@ -213,7 +213,7 @@ keybindings_merge() {
 }
 
 usage() {
-    printf "\nusage: $(basename "$0") [--make] <lang|none>\n\n"
+    printf "\nusage: $(basename "$0") [--make] <letter-key group name(s)|none>\n\n"
 
     echo "options:"
     echo
