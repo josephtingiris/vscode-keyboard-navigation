@@ -600,30 +600,110 @@ def extract_preamble_postamble(text: str) -> tuple[str, str, str]:
 
 def group_objects_with_comments(array_text: str) -> tuple[list[tuple[str, str]], str]:
     """Split array body into (leading_comments, object_text) groups."""
-
     groups: list[tuple[str, str]] = []
-    comments = ""
-    buf = ""
-    depth = 0
-    in_obj = False
-    for line in array_text.splitlines(keepends=True):
-        stripped = line.strip()
-        if not in_obj:
-            if "{" in stripped:
-                in_obj = True
-                depth = stripped.count("{") - stripped.count("}")
-                buf = line
-            else:
-                comments += line
+    i = 0
+    n = len(array_text)
+    leading_start = 0
+
+    def skip_whitespace_and_collect_leading(start: int) -> int:
+        # returns index of first non-leading char (start of object) and
+        # leaves leading comments as array_text[leading_start:that_index]
+        idx = start
+        while idx < n:
+            ch = array_text[idx]
+            # start of object
+            if ch == "{":
+                return idx
+            idx += 1
+        return idx
+
+    while i < n:
+        # find next object start
+        start = None
+        # collect leading comments up to next '{'
+        j = i
+        while j < n:
+            ch = array_text[j]
+            if ch == '{':
+                start = j
+                break
+            j += 1
+
+        if start is None:
+            # no more objects
+            break
+
+        leading = array_text[i:start]
+
+        # now find matching closing '}' handling strings and comments
+        idx = start
+        depth = 0
+        in_string = False
+        string_char = ''
+        esc = False
+        in_line_comment = False
+        in_block_comment = False
+
+        while idx < n:
+            ch = array_text[idx]
+            next2 = array_text[idx: idx + 2] if idx + 2 <= n else ''
+
+            if in_line_comment:
+                if ch == '\n':
+                    in_line_comment = False
+                idx += 1
+                continue
+            if in_block_comment:
+                if next2 == '*/':
+                    in_block_comment = False
+                    idx += 2
+                    continue
+                idx += 1
+                continue
+            if in_string:
+                if esc:
+                    esc = False
+                elif ch == '\\':
+                    esc = True
+                elif ch == string_char:
+                    in_string = False
+                idx += 1
+                continue
+
+            if next2 == '//':
+                in_line_comment = True
+                idx += 2
+                continue
+            if next2 == '/*':
+                in_block_comment = True
+                idx += 2
+                continue
+            if ch in ('"', "'"):
+                in_string = True
+                string_char = ch
+                idx += 1
+                continue
+
+            if ch == '{':
+                depth += 1
+            elif ch == '}':
+                depth -= 1
+                if depth == 0:
+                    # include up to and including this closing brace
+                    end = idx
+                    obj_text = array_text[start: end + 1]
+                    groups.append((leading, obj_text))
+                    i = end + 1
+                    break
+            idx += 1
         else:
-            buf += line
-            depth += line.count("{") - line.count("}")
-            if depth == 0:
-                groups.append((comments, buf))
-                comments = ""
-                buf = ""
-                in_obj = False
-    return groups, comments
+            # unterminated object; treat rest as trailing comments
+            i = n
+            break
+
+    # any trailing text after last object
+    trailing = array_text[i:]
+    return groups, trailing
 
 
 def parse_comma_list(value: str) -> list[str]:
