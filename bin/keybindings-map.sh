@@ -11,7 +11,7 @@
 
 export A_KEYBINDINGS_MAP_FOCI=(auxiliaryBarFocus editorFocus 'editorFocus && editorTextFocus' 'editorFocus && panelFocus' panelFocus 'panelFocus && sideBarFocus' 'panelFocus && terminalFocus' statusBarFocused terminalFocus)
 if [ "${KEYBINDINGS_MAP_FOCUS}" != "" ]; then
-    export A_KEYBINDINGS_MAP_FOCI=("${KEYBINDINGS_MAP_FOCUS}")
+    export A_KEYBINDINGS_MAP_FOCI=("${KEYBINDINGS_MAP_FOCUS//\\/}")
 fi
 
 if [ "${0}" != "${BASH_SOURCE}" ] || [ "${KEYBINDINGS_MAP_MODIFIERS}" == "" ]; then
