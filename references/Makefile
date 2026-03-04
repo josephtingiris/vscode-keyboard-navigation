@@ -36,7 +36,7 @@ KEYBINDINGS_MAP_MODIFIERS ?= alt,shift+alt,ctrl+alt,ctrl+alt+meta,ctrl+shift+alt
 KEYBINDINGS_MAP_PANEL_POSITIONS ?= top bottom left right
 KEYBINDINGS_MAP_SIDEBAR_LOCATIONS ?= left right
 
-KEYBINDINGS_SORT_ARGUMENTS ?= -p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters
+KEYBINDINGS_SORT_ARGUMENTS ?= -p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters --when-regex config.keyboardNavigation.chords
 
 #
 # targets

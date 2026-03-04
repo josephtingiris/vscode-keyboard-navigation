@@ -179,9 +179,9 @@ main() {
         fi
 
         if [ "${1}" == "6" ]; then
-            KEYBINDINGS_SORT_ARGUMENTS="-p key -s when"
+            KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters --when-regex config.keyboardNavigation.chords"
             if [ "${2}" == "w" ]; then
-                KEYBINDINGS_SORT_ARGUMENTS="-p when -s key"
+                KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters --when-regex config.keyboardNavigation.chords"
             fi
         fi
 
@@ -194,7 +194,7 @@ main() {
 
         if [ "${KEYBINDINGS_SORT_ARGUMENTS}" == "" ]; then
             # TODO: get, or sync this vale with the Makefile's
-            KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters"
+            KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters --when-regex config.keyboardNavigation.chords"
         fi
 
         ansi_echo "# Sorting JSON with default arguments: ${GREEN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"

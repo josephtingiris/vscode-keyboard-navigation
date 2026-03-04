@@ -121,26 +121,27 @@ POSITIONAL_TOKENS = [
     'config.workbench.sideBar.location',
     'panel.location',
     'panelPosition',
-    'breadcrumbsActive',
-    'breadcrumbsPossible',
     # secondary
-    'config.chat.agent.enabled',
-    'config.keyboardNavigation.terminal.enabled',
     'activeAuxiliary',
     'activeEditor',
     'activePanel',
     'activeViewlet',
     'focusedView',
+    'breadcrumbsActive',
+    'breadcrumbsPossible',
+    'config.keyboardNavigation.terminal.enabled',
 ]
 
 VISIBILITY_TOKENS = [
+    'chatIsEnabled',
     'auxiliaryBarVisible',
-    'agentSessionsViewerVisible',
     'editorVisible',
+    'panelVisible',
+    # secondary
+    'agentSessionsViewerVisible',
     'notificationCenterVisible',
     'notificationToastsVisible',
     'outline.visible',
-    'panelVisible',
     'searchViewletVisible',
     'sideBarVisible',
     'terminalVisible',
@@ -160,7 +161,8 @@ WHEN_GROUPING_PROFILES = {
         'primary': 'when',
         'secondary': 'key',
         'group_sorting': 'positive',
-        'when_prefix': 'config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters'
+        'when_prefix': 'config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters',
+        'when_regex': 'config.keyboardNavigation.chords'
     },
     'config-first': {
         # example defaults for config-first
@@ -540,6 +542,33 @@ def _first_when_group_rank(
     if not parts:
         return 5
 
+    # ensure related contexts are grouped together
+    if when_prefixes or when_regexes:
+        for part in parts:
+            token = part.strip()
+            while token.startswith('(') and token.endswith(')'):
+                token = token[1:-1].strip()
+            if not token:
+                continue
+            left = token[1:].lstrip() if token.startswith('!') else token
+            left_id = left.split()[0] if left else ''
+            if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
+                debug_echo(1, 'group', canonical, f"matched when_prefix in operand: {left_id}")
+                return 6
+            if when_regexes:
+                for rx in when_regexes:
+                    try:
+                        if hasattr(rx, 'search'):
+                            if rx.search(left_id):
+                                debug_echo(1, 'group', canonical, f"matched when_regex in operand: {left_id} (pattern={rx.pattern if hasattr(rx, 'pattern') else rx})")
+                                return 6
+                        else:
+                            if str(rx) in left_id:
+                                debug_echo(1, 'group', canonical, f"matched when_regex string in operand: {left_id} (pattern={rx})")
+                                return 6
+                    except Exception:
+                        continue
+
     first = parts[0].strip()
     while first.startswith('(') and first.endswith(')'):
         first = first[1:-1].strip()
@@ -843,6 +872,74 @@ def _sort_groups_for_primary_when(
             normalized = normalize_key_for_compare(key_val)
             debug_echo(1, 'ordered', canonical, f"DEBUG_ORDERED: idx={idx} raw_key={key_val!r} normalized={normalized!r}")
 
+    # stable-partition when prefixes and/or regexes into three contiguous regions,
+    # following this order:
+    #  1. clauses matching any when_prefix (any operand),
+    #  2. clauses matching any when_regex (any operand) but not matching prefixes,
+    #  3. all remaining clauses.
+
+    if when_prefixes or when_regexes:
+        matched_prefix: list[tuple[str, str]] = []
+        matched_regex: list[tuple[str, str]] = []
+        others: list[tuple[str, str]] = []
+        for pair in sorted_groups:
+            _, when_val = extract_key_when(pair[1])
+            if not when_val:
+                when_val = _extract_literal_when_from_object(pair[1])
+            found_prefix = False
+            found_regex = False
+            try:
+                parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
+                for part in parts:
+                    token = part.strip()
+                    while token.startswith('(') and token.endswith(')'):
+                        token = token[1:-1].strip()
+                    if not token:
+                        continue
+
+                    left = token[1:].lstrip() if token.startswith('!') else token
+                    left_id = left.split()[0] if left else ''
+
+                    if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
+                        found_prefix = True
+                        break
+
+                    if when_regexes:
+                        for rx in when_regexes:
+                            try:
+                                if hasattr(rx, 'search'):
+                                    if rx.search(left_id):
+                                        found_regex = True
+                                        break
+                                else:
+                                    if str(rx) in left_id:
+                                        found_regex = True
+                                        break
+                            except Exception:
+                                continue
+                        if found_regex:
+                            # keep scanning to detect any prefix match first
+                            continue
+            except Exception:
+                found_prefix = False
+                found_regex = False
+
+            if found_prefix:
+                matched_prefix.append(pair)
+            elif found_regex:
+                matched_regex.append(pair)
+            else:
+                others.append(pair)
+
+        if matched_prefix or matched_regex:
+            debug_echo(
+                1,
+                'group',
+                None,
+                f"partitioned primary-when: prefix={len(matched_prefix)} regex={len(matched_regex)} others={len(others)}",
+            )
+            sorted_groups = matched_prefix + matched_regex + others
+
     i = 0
     while i < len(sorted_groups):
         _, raw_when = extract_key_when(sorted_groups[i][1])
@@ -867,6 +964,7 @@ def _sort_groups_for_primary_when(
         i = j
 
     return sorted_groups
+
 
 
 def _sort_groups_initial(
@@ -2294,6 +2392,92 @@ def main(argv: List[str] | None = None) -> int:
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         )
+
+    # explicit when-prefix and/or when-regex matches must remain contiguous in the final ordering
+
+    # last-step stable partition. perform two-stage partition: prefixes first, then regexes.
+    if when_prefixes or when_regexes:
+        prefix_only = []
+        prefix_and_regex = []
+        regex_only = []
+        others = []
+        for pair in sorted_groups:
+            _, when_val = extract_key_when(pair[1])
+            if not when_val:
+                when_val = _extract_literal_when_from_object(pair[1])
+            found_prefix = False
+            found_regex = False
+            try:
+                parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
+                for part in parts:
+                    token = part.strip()
+                    while token.startswith('(') and token.endswith(')'):
+                        token = token[1:-1].strip()
+                    if not token:
+                        continue
+                    left = token[1:].lstrip() if token.startswith('!') else token
+                    left_id = left.split()[0] if left else ''
+                    if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
+                        found_prefix = True
+                    if when_regexes:
+                        for rx in when_regexes:
+                            try:
+                                if hasattr(rx, 'search'):
+                                    if rx.search(left_id):
+                                        found_regex = True
+                                        break
+                                else:
+                                    if str(rx) in left_id:
+                                        found_regex = True
+                                        break
+                            except Exception:
+                                continue
+                    if found_prefix and found_regex:
+                        break
+            except Exception:
+                found_prefix = False
+                found_regex = False
+
+            if found_prefix and found_regex:
+                prefix_and_regex.append(pair)
+            elif found_prefix:
+                prefix_only.append(pair)
+            elif found_regex:
+                regex_only.append(pair)
+            else:
+                others.append(pair)
+
+        if prefix_only or prefix_and_regex or regex_only:
+            debug_echo(
+                1,
+                'group',
+                None,
+                f"final partition: prefix_only={len(prefix_only)} prefix_and_regex={len(prefix_and_regex)} regex_only={len(regex_only)} others={len(others)}",
+            )
+
+            # secondary ordering
+            def _sort_block(block: list[tuple[str, str]]) -> list[tuple[str, str]]:
+                try:
+                    return sorted(
+                        block,
+                        key=lambda pair: (
+                            canonicalize_when(
+                                extract_key_when(pair[1])[1] or _extract_literal_when_from_object(pair[1]),
+                                mode=grouping_mode,
+                                negation_mode=negation_mode,
+                                when_prefixes=when_prefixes,
+                                when_regexes=when_regexes,
+                            ),
+                            natural_key_case_sensitive(normalize_key_for_compare(extract_key_when(pair[1])[0])),
+                        ),
+                    )
+                except Exception:
+                    return block
+
+            prefix_and_regex = _sort_block(prefix_and_regex)
+            regex_only = _sort_block(regex_only)
+
+            sorted_groups = prefix_only + prefix_and_regex + regex_only + others
 
     sorted_groups = _reorder_groups_by_when(sorted_groups, negation_mode)
 
