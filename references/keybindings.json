@@ -68967,8 +68967,10 @@ Notes:
   {
     // [keynav] (corpus) (vi) (debug) (chord)
     "key": "ctrl+d",
-    "command": "(corpus) ctrl+d 8975",
+    "command": "-noop",
+    // "command": "(corpus) ctrl+d 8975",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+    // "0.0.3": "-noop",
   },
   {
     // [keynav] (vi) (debug) (chord) (neovim)
