@@ -90,6 +90,12 @@ DEBUG_LEVEL: int = 0  # off
 DEBUG_TARGET_CATEGORY: str | None = None  # set vial --debug target=['when', 'ordered', 'canonicalize', ...]
 DEBUG_TARGET_WHEN: str = ""  # set via --debug when=
 
+# avoid repeatedly hashing compound cache keys and redoing canonicalize
+RUN_CACHE_CONTEXT = None
+RUN_CANONICAL_CACHE: dict = {}
+RUN_SORTABLE_CACHE: dict = {}
+RUN_OBJ_INFO_CACHE: dict = {}
+
 # default when prefixes to be added to standard output, if none are given via the cli
 DEFAULT_WHEN_PREFIXES = []
 
@@ -650,6 +656,24 @@ def _parse_when_regexes(parser: argparse.ArgumentParser, raw_regexes: str | None
     return compiled
 
 
+def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
+    """Initialize/clear per-run caches for the current run parameter context.
+
+    This allows fast path lookups inside `canonicalize_when` and
+    `sortable_when_key` using only the raw when string.
+    """
+    global RUN_CACHE_CONTEXT, RUN_CANONICAL_CACHE, RUN_SORTABLE_CACHE
+    RUN_CACHE_CONTEXT = (
+        mode,
+        negation_mode,
+        None if when_prefixes is None else tuple(when_prefixes),
+        None if when_regexes is None else tuple(when_regexes),
+    )
+    # clear per-run caches
+    RUN_CANONICAL_CACHE = {}
+    RUN_SORTABLE_CACHE = {}
+
+
 def _partition_focus_groups_to_end(sorted_groups: list[tuple[str, str]]) -> list[tuple[str, str]]:
     non_focus: list[tuple[str, str]] = []
     focus: list[tuple[str, str]] = []
@@ -1042,6 +1066,13 @@ def _with_normalized_when_groups(
         )
         comments = _strip_when_sorted_comment(comments, when_changed)
         normalized_groups.append((comments, obj_out))
+
+        # warm the parsed-object cache
+        try:
+            _ = parse_object_text(obj_out)
+        except Exception:
+            pass
+
     return normalized_groups
 
 
@@ -1069,6 +1100,16 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
 
     if cached is not None:
         return cached
+
+    # fast per-run cache
+    try:
+        run_key = (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes))
+        if RUN_CACHE_CONTEXT == run_key:
+            cached_run = RUN_CANONICAL_CACHE.get(when_val)
+            if cached_run is not None:
+                return cached_run
+    except Exception:
+        pass
 
     """
         TBD: these need to be better tested before being fully integrated, especially with the focal-invariant mode:
@@ -1412,6 +1453,13 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
     except Exception:
         pass
 
+    # populate per-run cache when applicable
+    try:
+        if RUN_CACHE_CONTEXT == (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes)):
+            RUN_CANONICAL_CACHE[when_val] = result
+    except Exception:
+        pass
+
     return result
 
 
@@ -1458,6 +1506,11 @@ def debug_echo(level: int, category: str, when_val: str | None, msg: str) -> Non
 
 
 def extract_key_when(obj_text: str) -> Tuple[str, str]:
+    # fast-path: check per-run object info cache populated during normalization
+    info = RUN_OBJ_INFO_CACHE.get(obj_text)
+    if info is not None:
+        return (info.get('key', ''), info.get('when', ''))
+
     parsed = parse_object_text(obj_text)
     if not parsed:
         return ('', '')
@@ -1591,18 +1644,30 @@ def extract_preamble_postamble(text):
 
 
 def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None = None, grouping: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple:
-    parsed = parse_object_text(obj_text)
-    if not parsed:
-        # return a consistent fallback sort key (rank high so these sort last)
-        return (9999, [], (0,), [])
-    try:
-        key_val = str(parsed.get('key', ''))
-        when_val = str(parsed.get('when', ''))
-        canonical_when = canonicalize_when(
-            when_val, mode=grouping, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
-        sortable_when = sortable_when_key(
-            when_val, mode=grouping, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+    # obtain key/when/canonical/sortable values either from cache or by parsing
+    info = RUN_OBJ_INFO_CACHE.get(obj_text)
+    if info is not None:
+        key_val = info.get('key', '')
+        when_val = info.get('when', '')
+        canonical_when = info.get('canonical', '')
+        sortable_when = info.get('sortable', '')
+    else:
+        parsed = parse_object_text(obj_text)
+        if not parsed:
+            # return a consistent fallback sort key (rank high so these sort last)
+            return (9999, [], (0,), [])
+        try:
+            key_val = str(parsed.get('key', ''))
+            when_val = str(parsed.get('when', ''))
+            canonical_when = canonicalize_when(
+                when_val, mode=grouping, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+            sortable_when = sortable_when_key(
+                when_val, mode=grouping, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+        except Exception:
+            return (9999, [], (0,), [])
 
+    # main token-building logic (covering both cache and parsed paths)
+    try:
         # derive the first top-level when token for grouping when primary sorting
         first_when_token = ''
         if canonical_when:
@@ -1756,6 +1821,7 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
                     tokens.insert(0, 0)
                 else:
                     tokens.insert(0, 9999)
+
         return tuple(tokens)
     except Exception:
         # return a key with the same structural types as a normal sort key: (int rank, list key, tuple specificity, list grouping)
@@ -2116,11 +2182,27 @@ def sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: 
     if cached is not None:
         return cached
 
+    # per-run fast path
+    try:
+        run_key = (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes))
+        if RUN_CACHE_CONTEXT == run_key:
+            srun = RUN_SORTABLE_CACHE.get(when_val)
+            if srun is not None:
+                return srun
+    except Exception:
+        pass
+
     # preserve negation for stable sorting
     when = canonicalize_when(when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
 
     try:
         CACHE_SORTABLE_WHEN[cache_key] = when
+    except Exception:
+        pass
+
+    try:
+        if RUN_CACHE_CONTEXT == (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes)):
+            RUN_SORTABLE_CACHE[when_val] = when
     except Exception:
         pass
 
@@ -2350,6 +2432,10 @@ def main(argv: List[str] | None = None) -> int:
 
     when_prefixes = _parse_when_prefixes(parser, args.when_prefix)
     when_regexes = _parse_when_regexes(parser, args.when_regex)
+
+    # initialize per-run caches keyed by raw when strings for this run's
+    # CLI parameter context (mode/negation/when-prefix/when-regex)
+    _set_run_cache_context(grouping_mode, negation_mode, when_prefixes, when_regexes)
 
     raw = sys.stdin.read()
     preamble, array_text, postamble = extract_preamble_postamble(raw)
