@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.3",
   "name": "keyboard-navigation",
   "description": "An opinionated keyboard grammar extension that focuses on navigating the workbench UI",
   "displayName": "Keyboard Navigation",
@@ -102,6 +102,11 @@
           "pattern": "^#([A-Fa-f0-9]{6})$",
           "errorMessage": "Enter a hex color like #FF0000",
           "description": "Preferred color for visual highlights, e.g. borders, cursors, et al; enter a hex color value."
+        },
+        "keyboardNavigation.juke.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable juke keys."
         },
         "keyboardNavigation.preferences.orientation": {
           "type": "string",

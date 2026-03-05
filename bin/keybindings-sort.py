@@ -135,6 +135,7 @@ POSITIONAL_TOKENS = [
     'focusedView',
     'breadcrumbsActive',
     'breadcrumbsPossible',
+    'config.keyboardNavigation.juke.enabled',
     'config.keyboardNavigation.terminal.enabled',
 ]
 
@@ -170,6 +171,7 @@ WHEN_GROUPING_PROFILES = {
         'when_prefix': 'config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters',
         'when_regex': 'config.keyboardNavigation.terminal,config.keyboardNavigation.chords'
     },
+        #'when_regex': 'config.keyboardNavigation.juke,config.keyboardNavigation.terminal,config.keyboardNavigation.chords'
     'config-first': {
         # example defaults for config-first
         'primary': 'key',
