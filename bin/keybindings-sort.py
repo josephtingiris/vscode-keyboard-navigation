@@ -313,6 +313,9 @@ def _apply_when_grouping_profile(args: argparse.Namespace, raw_argv: list[str]) 
     if not _flag_present(raw_argv, ['-P', '--when-prefix']):
         args.when_prefix = profile.get('when_prefix')
 
+    if not _flag_present(raw_argv, ['-R', '--when-regex']):
+        args.when_regex = profile.get('when_regex')
+
 
 def _assemble_sorted_output(
     preamble: str,
