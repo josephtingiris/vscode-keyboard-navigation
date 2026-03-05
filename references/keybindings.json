@@ -17919,21 +17919,6 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && auxiliaryBarFocus && config.workbench.sideBar.location == 'right' && panelPosition == 'top'"
   },
   {
-    // [keynav] (vi) (juke) (0) (self) (gold) (X)
-    "key": "alt+pagedown",
-    "command": "alt+pagedown df43",
-    // "command": "workbench.action.navigateBack",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.juke.enabled"
-  },
-  {
-    // [keynav] (vi) (juke) (0) (self) (gold) (X)
-    "key": "alt+pageup",
-    "command": "alt+pageup df44",
-    // "command": "workbench.action.navigateForward",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.juke.enabled"
-    // [note] moves/replaces vscode alt+right
-  },
-  {
     // [keynav] (left) (vi) (juke) (0) (self) (gold) (X) (editor)
     "key": "alt+,",
     "command": "workbench.action.previousEditor",
@@ -57820,6 +57805,21 @@ Notes:
     "key": "shift+alt++",
     "command": "shift+alt++ 937f",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && statusBarFocused && config.workbench.sideBar.location == 'right' && panelPosition == 'top'"
+  },
+  {
+    // [keynav] (vi) (juke) (0) (self) (gold) (X)
+    "key": "alt+pagedown",
+    "command": "alt+pagedown df43",
+    // "command": "workbench.action.navigateBack",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.juke.enabled"
+  },
+  {
+    // [keynav] (vi) (juke) (0) (self) (gold) (X)
+    "key": "alt+pageup",
+    "command": "alt+pageup df44",
+    // "command": "workbench.action.navigateForward",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.juke.enabled"
+    // [note] moves/replaces vscode alt+right
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (terminal)
