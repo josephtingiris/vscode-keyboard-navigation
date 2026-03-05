@@ -87,8 +87,12 @@ COLOR: str = 'auto'
 
 # debug defaults
 DEBUG_LEVEL: int = 0  # off
-DEBUG_TARGET_CATEGORY: str | None = None  # set vial --debug target=['when', 'ordered', 'canonicalize', ...]
+DEBUG_TARGET_CATEGORY: str | None = None  # legacy single-category holder
+DEBUG_TARGET_CATEGORIES: set[str] | None = None  # updated: allow multiple categories
 DEBUG_TARGET_WHEN: str = ""  # set via --debug when=
+
+# legacy investigatory hook (unused) — prefer `--debug` filters instead
+DEBUG_CLASSIFY_WHEN_SUBSTR: str | None = None
 
 # avoid repeatedly hashing compound cache keys and redoing canonicalize
 RUN_CACHE_CONTEXT = None
@@ -135,8 +139,6 @@ POSITIONAL_TOKENS = [
     'focusedView',
     'breadcrumbsActive',
     'breadcrumbsPossible',
-    'config.keyboardNavigation.juke.enabled',
-    'config.keyboardNavigation.highlights.enabled',
     'config.keyboardNavigation.terminal.enabled',
 ]
 
@@ -170,7 +172,7 @@ WHEN_GROUPING_PROFILES = {
         'secondary': 'key',
         'group_sorting': 'positive',
         'when_prefix': 'config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters',
-        'when_regex': 'config.keyboardNavigation.(.*).enabled,config.keyboardNavigation.chords'
+        'when_regex': 'config.keyboardNavigation.chords'
     },
     'config-first': {
         # example defaults for config-first
@@ -261,7 +263,9 @@ class WhenOr(WhenNode):
 
 def _apply_debug_settings(debug_specs: list[str] | None, color: str) -> None:
     global DEBUG_LEVEL, DEBUG_TARGET_WHEN, DEBUG_TARGET_CATEGORY, COLOR
-
+    global DEBUG_TARGET_CATEGORIES
+    DEBUG_TARGET_CATEGORY = None
+    DEBUG_TARGET_CATEGORIES = None
     COLOR = color
     DEBUG_LEVEL = 0
     DEBUG_TARGET_WHEN = ''
@@ -287,6 +291,11 @@ def _apply_debug_settings(debug_specs: list[str] | None, color: str) -> None:
             if key == 'when':
                 DEBUG_TARGET_WHEN = value
             elif key in ('target', 'category'):
+                # allow multiple categories; store in a set
+                if DEBUG_TARGET_CATEGORIES is None:
+                    DEBUG_TARGET_CATEGORIES = set()
+                DEBUG_TARGET_CATEGORIES.add(value)
+                # maintain legacy single-value for compatibility
                 DEBUG_TARGET_CATEGORY = value
             elif key == 'level' and re.fullmatch(r'\d+', value):
                 max_level = max(max_level, int(value))
@@ -314,9 +323,6 @@ def _apply_when_grouping_profile(args: argparse.Namespace, raw_argv: list[str]) 
 
     if not _flag_present(raw_argv, ['-P', '--when-prefix']):
         args.when_prefix = profile.get('when_prefix')
-
-    if not _flag_present(raw_argv, ['-R', '--when-regex']):
-        args.when_regex = profile.get('when_regex')
 
 
 def _assemble_sorted_output(
@@ -538,12 +544,11 @@ def _first_when_group_rank(
     when_regexes: list | None = None,
 ) -> int:
     when_key, when_val = extract_key_when(obj_text)
+
     canonical = canonicalize_when(
         when_val,
         mode=mode,
         negation_mode=negation_mode,
-        when_prefixes=when_prefixes,
-        when_regexes=when_regexes,
     )
 
     if not canonical:
@@ -816,12 +821,11 @@ def _sort_groups_for_primary_when(
 
     for key_val, when_val, _pair in decorated:
         try:
+            # compute canonical when for sorting
             canonical = canonicalize_when(
                 when_val,
                 mode=grouping_mode,
                 negation_mode=negation_mode,
-                when_prefixes=when_prefixes,
-                when_regexes=when_regexes,
             )
         except Exception:
             canonical = when_val
@@ -845,8 +849,6 @@ def _sort_groups_for_primary_when(
                 row[1],
                 mode=grouping_mode,
                 negation_mode=negation_mode,
-                when_prefixes=when_prefixes,
-                when_regexes=when_regexes,
             ),
             row[1],
             natural_key_case_sensitive(row[0]),
@@ -870,13 +872,6 @@ def _sort_groups_for_primary_when(
 
                     left = token[1:].lstrip() if token.startswith('!') else token
                     left_id = left.split()[0] if left else ''
-
-                    # debug: trace terminal/keyboardNavigation related operands to diagnose grouping
-                    try:
-                        if 'terminal' in left_id or 'keyboardNavigation' in left_id:
-                            debug_echo(1, 'group', when_val, f"SIG_PART: left_id={left_id!r} token={token!r}")
-                    except Exception:
-                        pass
                     if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
                         found_focus = True
                         break
@@ -894,12 +889,11 @@ def _sort_groups_for_primary_when(
     for idx, pair in enumerate(sorted_groups):
         key_val, when_val = extract_key_when(pair[1])
         try:
+            # compute canonical when for reporting
             canonical = canonicalize_when(
                 when_val,
                 mode=grouping_mode,
                 negation_mode=negation_mode,
-                when_prefixes=when_prefixes,
-                when_regexes=when_regexes,
             )
         except Exception:
             canonical = when_val
@@ -919,11 +913,13 @@ def _sort_groups_for_primary_when(
         matched_regex: list[tuple[str, str]] = []
         others: list[tuple[str, str]] = []
         for pair in sorted_groups:
-            _, when_val = extract_key_when(pair[1])
+            key_val, when_val = extract_key_when(pair[1])
             if not when_val:
                 when_val = _extract_literal_when_from_object(pair[1])
             found_prefix = False
             found_regex = False
+            parts = []
+            left_ids = []
             try:
                 parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
                 for part in parts:
@@ -935,8 +931,12 @@ def _sort_groups_for_primary_when(
 
                     left = token[1:].lstrip() if token.startswith('!') else token
                     left_id = left.split()[0] if left else ''
+                    left_ids.append(left_id)
 
-                    # check regexes first and record matches
+                    if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
+                        found_prefix = True
+                        break
+
                     if when_regexes:
                         for rx in when_regexes:
                             try:
@@ -951,21 +951,65 @@ def _sort_groups_for_primary_when(
                             except Exception:
                                 continue
                         if found_regex:
-                            # when a regex matches, prefer regex grouping regardless of prefix
-                            break
-
-                    if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
-                        found_prefix = True
-                        # continue scanning to detect possible matches in other operands but do not break here; a regex match anywhere should win
-                        continue
+                            # keep scanning to detect any prefix match first
+                            continue
             except Exception:
                 found_prefix = False
                 found_regex = False
 
-            if found_regex:
-                matched_regex.append(pair)
-            elif found_prefix:
+            if not (found_prefix or found_regex):
+                try:
+                    canon = canonicalize_when(when_val, mode=grouping_mode, negation_mode=negation_mode)
+                    cparts = WHEN_TERM_SPLIT_RE.split(str(canon).strip()) if canon else []
+                    for part in cparts:
+                        token = part.strip()
+                        while token.startswith('(') and token.endswith(')'):
+                            token = token[1:-1].strip()
+                        if not token:
+                            continue
+
+                        left = token[1:].lstrip() if token.startswith('!') else token
+                        left_id = left.split()[0] if left else ''
+                        # extend left_ids for better debug reporting
+                        left_ids.append(left_id)
+
+                        if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
+                            found_prefix = True
+                            break
+
+                        if when_regexes:
+                            for rx in when_regexes:
+                                try:
+                                    if hasattr(rx, 'search'):
+                                        if rx.search(left_id):
+                                            found_regex = True
+                                            break
+                                    else:
+                                        if str(rx) in left_id:
+                                            found_regex = True
+                                            break
+                                except Exception:
+                                    continue
+                            if found_regex:
+                                # keep scanning to detect any prefix match first
+                                continue
+                except Exception:
+                    pass
+
+            # emit classification debug via the standard debug_echo() so messages respect --debug level/target/when filters
+            try:
+                debug_echo(1, 'classify', when_val, f"CLASSIFY: raw_obj={pair[1]!r}")
+                debug_echo(1, 'classify', when_val, f"CLASSIFY: extract_key_when -> key={key_val!r} when={when_val!r}")
+                debug_echo(1, 'classify', when_val, f"CLASSIFY: tokens={parts!r}")
+                debug_echo(1, 'classify', when_val, f"CLASSIFY: left_ids={left_ids!r}")
+                debug_echo(1, 'classify', when_val, f"CLASSIFY: found_prefix={found_prefix} found_regex={found_regex}")
+            except Exception:
+                pass
+
+            if found_prefix:
                 matched_prefix.append(pair)
+            elif found_regex:
+                matched_regex.append(pair)
             else:
                 others.append(pair)
 
@@ -1004,7 +1048,6 @@ def _sort_groups_for_primary_when(
     return sorted_groups
 
 
-
 def _sort_groups_initial(
     normalized_groups: list[tuple[str, str]],
     primary_order: str,
@@ -1021,8 +1064,7 @@ def _sort_groups_initial(
             primary=primary_order,
             secondary=secondary_order,
             grouping=grouping_mode,
-            negation_mode=negation_mode,
-            when_prefixes=when_prefixes,
+            negation_mode=negation_mode, when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         ),
     )
@@ -1504,8 +1546,13 @@ def debug_echo(level: int, category: str, when_val: str | None, msg: str) -> Non
         return
     if level > DEBUG_LEVEL:
         return
-    if DEBUG_TARGET_CATEGORY and DEBUG_TARGET_CATEGORY != 'all' and category != DEBUG_TARGET_CATEGORY:
-        return
+    # support multiple category filters via DEBUG_TARGET_CATEGORIES
+    try:
+        if DEBUG_TARGET_CATEGORIES and 'all' not in DEBUG_TARGET_CATEGORIES and category not in DEBUG_TARGET_CATEGORIES:
+            return
+    except Exception:
+        if DEBUG_TARGET_CATEGORY and DEBUG_TARGET_CATEGORY != 'all' and category != DEBUG_TARGET_CATEGORY:
+            return
     if DEBUG_TARGET_WHEN:
         if not when_val:
             return
@@ -1673,10 +1720,12 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         try:
             key_val = str(parsed.get('key', ''))
             when_val = str(parsed.get('when', ''))
+            # produce canonical/sortable forms used for ordering but do not
+            # let the CLI prefix/regex filters influence the operand ordering.
             canonical_when = canonicalize_when(
-                when_val, mode=grouping, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+                when_val, mode=grouping, negation_mode=negation_mode)
             sortable_when = sortable_when_key(
-                when_val, mode=grouping, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+                when_val, mode=grouping, negation_mode=negation_mode)
         except Exception:
             return (9999, [], (0,), [])
 
@@ -1995,6 +2044,14 @@ def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation
     when_val = parsed.get('when')
     if not when_val:
         return obj_text, False
+
+    # emit normalization debug via debug_echo so it obeys --debug filters
+    try:
+        tokens = WHEN_TERM_SPLIT_RE.split(str(when_val)) if when_val else []
+        debug_echo(1, 'normalize', str(when_val), f"DBG_NORM: obj_text_snippet={obj_text[:300]!r}")
+        debug_echo(1, 'normalize', str(when_val), f"DBG_NORM: parsed_when={when_val!r} tokens={tokens!r}")
+    except Exception:
+        pass
 
     normalized = canonicalize_when(
         str(when_val), mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
@@ -2447,6 +2504,7 @@ def main(argv: List[str] | None = None) -> int:
     when_prefixes = _parse_when_prefixes(parser, args.when_prefix)
     when_regexes = _parse_when_regexes(parser, args.when_regex)
 
+    # initialize per-run caches
     _set_run_cache_context(grouping_mode, negation_mode, when_prefixes, when_regexes)
 
     raw = sys.stdin.read()
@@ -2491,23 +2549,20 @@ def main(argv: List[str] | None = None) -> int:
             when_regexes=when_regexes,
         )
 
-    # last-step stable partition. desired order:
-    #  1. objects with no prefix and no regex (others)
-    #  2. objects grouped by prefix combinations (ordered by smallest prefix index, then by fewer prefixes first),
-    #     and within each prefix-group emit items without regex first, then with regex combinations ordered by fewest regexes.
-    #  3. objects with no prefix but with regex(es) (regex-only)
+    # explicit when-prefix and/or when-regex matches must remain contiguous in the final ordering
 
-    # produce a deterministic ordering by prefix/regex combination signature. 
+    # last-step stable partition. perform two-stage partition: prefixes first, then regexes.
     if when_prefixes or when_regexes:
-        # helper: compute matched prefix indices and regex indices for an object
-        def _match_signature(pair: tuple[str, str]):
+        prefix_only = []
+        prefix_and_regex = []
+        regex_only = []
+        others = []
+        for pair in sorted_groups:
             _, when_val = extract_key_when(pair[1])
             if not when_val:
                 when_val = _extract_literal_when_from_object(pair[1])
-
-            prefix_idxs: list[int] = []
-            regex_idxs: list[int] = []
-
+            found_prefix = False
+            found_regex = False
             try:
                 parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
                 for part in parts:
@@ -2518,189 +2573,211 @@ def main(argv: List[str] | None = None) -> int:
                         continue
                     left = token[1:].lstrip() if token.startswith('!') else token
                     left_id = left.split()[0] if left else ''
-
-                    if when_prefixes:
-                        for idx, prefix in enumerate(when_prefixes):
-                            try:
-                                if left_id.startswith(prefix):
-                                    if idx not in prefix_idxs:
-                                        prefix_idxs.append(idx)
-                            except Exception:
-                                continue
-
+                    if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
+                        found_prefix = True
                     if when_regexes:
-                        for idx, rx in enumerate(when_regexes):
+                        for rx in when_regexes:
                             try:
                                 if hasattr(rx, 'search'):
                                     if rx.search(left_id):
-                                        if idx not in regex_idxs:
-                                            regex_idxs.append(idx)
+                                        found_regex = True
+                                        break
                                 else:
                                     if str(rx) in left_id:
-                                        if idx not in regex_idxs:
-                                            regex_idxs.append(idx)
+                                        found_regex = True
+                                        break
                             except Exception:
                                 continue
+                    if found_prefix and found_regex:
+                        break
+            except Exception:
+                found_prefix = False
+                found_regex = False
+
+            # fall-back
+            if not (found_prefix or found_regex):
+                try:
+                    canon = canonicalize_when(when_val, mode=grouping_mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+                    if canon:
+                        cparts = WHEN_TERM_SPLIT_RE.split(str(canon).strip())
+                        for part in cparts:
+                            token = part.strip()
+                            while token.startswith('(') and token.endswith(')'):
+                                token = token[1:-1].strip()
+                            if not token:
+                                continue
+                            left = token[1:].lstrip() if token.startswith('!') else token
+                            left_id = left.split()[0] if left else ''
+                            if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
+                                found_prefix = True
+                                break
+                            if when_regexes:
+                                for rx in when_regexes:
+                                    try:
+                                        if hasattr(rx, 'search'):
+                                            if rx.search(left_id):
+                                                found_regex = True
+                                                break
+                                        else:
+                                            if str(rx) in left_id:
+                                                found_regex = True
+                                                break
+                                    except Exception:
+                                        continue
+                                if found_regex:
+                                    break
+                except Exception:
+                    pass
+
+            if not (found_prefix or found_regex) and when_val:
+                try:
+                    wstr = str(when_val)
+                    if when_prefixes and any(p in wstr for p in when_prefixes):
+                        found_prefix = True
+                    if when_regexes:
+                        for rx in when_regexes:
+                            try:
+                                if hasattr(rx, 'search'):
+                                    if rx.search(wstr):
+                                        found_regex = True
+                                        break
+                                else:
+                                    if str(rx) in wstr:
+                                        found_regex = True
+                                        break
+                            except Exception:
+                                continue
+                except Exception:
+                    pass
+
+            # check the canonical form as an additional fallback; catch speical cases and keep matching clauses contiguous
+            if not (found_prefix or found_regex) and when_val:
+                try:
+                    canon_str = canonicalize_when(when_val, mode=grouping_mode, negation_mode=negation_mode)
+                    if canon_str:
+                        if when_prefixes and any(p in canon_str for p in when_prefixes):
+                            found_prefix = True
+                        if when_regexes:
+                            for rx in when_regexes:
+                                try:
+                                    if hasattr(rx, 'search'):
+                                        if rx.search(canon_str):
+                                            found_regex = True
+                                            break
+                                    else:
+                                        if str(rx) in canon_str:
+                                            found_regex = True
+                                            break
+                                except Exception:
+                                    continue
+                except Exception:
+                    pass
+
+            # log classification for targeted when expressions
+            try:
+                wcheck = str(when_val or '')
+            except Exception:
+                wcheck = ''
+
+            # emit group-debug classification via debug_echo so it obeys --debug
+            try:
+                bucket = 'others'
+                if found_prefix and found_regex:
+                    bucket = 'prefix_and_regex'
+                elif found_prefix:
+                    bucket = 'prefix_only'
+                elif found_regex:
+                    bucket = 'regex_only'
+                debug_echo(1, 'group-debug', when_val, f"CLASSIFY: found_prefix={found_prefix} found_regex={found_regex} -> {bucket}")
             except Exception:
                 pass
 
-            prefix_idxs.sort()
-            regex_idxs.sort()
-            return tuple(prefix_idxs), tuple(regex_idxs)
+            if found_prefix and found_regex:
+                prefix_and_regex.append(pair)
+            elif found_prefix:
+                prefix_only.append(pair)
+            elif found_regex:
+                regex_only.append(pair)
+            else:
+                others.append(pair)
 
-        # build nested mapping: prefix_tuple -> regex_tuple -> list[pairs]
-        buckets: dict[tuple[int, ...], dict[tuple[int, ...], list[tuple[str, str]]]] = {}
-        # signature map for quick lookup: pair -> (prefix_tuple, regex_tuple)
-        sig_map: dict[tuple[str, str], tuple[tuple[int, ...], tuple[int, ...]]] = {}
+        if prefix_only or prefix_and_regex or regex_only:
+            debug_echo(
+                1,
+                'group',
+                None,
+                f"final partition: prefix_only={len(prefix_only)} prefix_and_regex={len(prefix_and_regex)} regex_only={len(regex_only)} others={len(others)}",
+            )
 
-        for pair in sorted_groups:
-            p_sig, r_sig = _match_signature(pair)
-            buckets.setdefault(p_sig, {}).setdefault(r_sig, []).append(pair)
-            sig_map[pair] = (p_sig, r_sig)
-
-        # debug: summary counts per regex index and sample terminal entries
-        try:
-            if when_regexes:
-                per_idx = [0] * len(when_regexes)
-                for p, sig in sig_map.items():
-                    _, r_sig = sig
-                    for r in r_sig:
-                        if 0 <= r < len(per_idx):
-                            per_idx[r] += 1
-                debug_echo(1, 'group', None, f"REGEX_COUNTS: {per_idx}")
-
-                sample_count = 0
-                for pair, sig in sig_map.items():
-                    _, r_sig = sig
-                    _, when_val = extract_key_when(pair[1])
-                    if not when_val:
-                        when_val = _extract_literal_when_from_object(pair[1])
-                    if when_val and 'terminal' in when_val:
-                        debug_echo(1, 'group', when_val, f"REGEX_SAMPLE: p_sig={sig[0]} r_sig={r_sig} key={extract_key_when(pair[1])[0]!r}")
-                        sample_count += 1
-                        if sample_count >= 10:
-                            break
-        except Exception:
-            pass
-
-        # sort helper for prefix keys: prefer smaller min-index, then fewer prefixes, then lexicographic
-        def _prefix_key(t: tuple[int, ...]):
-            if not t:
-                return (9999, 9999, ())
-            return (min(t), len(t), t)
-
-        # sort helper for regex keys: prefer fewer regexes then lexicographic
-        def _regex_key(t: tuple[int, ...]):
-            return (0 if not t else 1, len(t), t)
-
-        # stable secondary ordering for each concrete bucket
-        def _sort_block(block: list[tuple[str, str]]) -> list[tuple[str, str]]:
-            try:
-                return sorted(
-                    block,
-                    key=lambda pair: (
-                        canonicalize_when(
-                            extract_key_when(pair[1])[1] or _extract_literal_when_from_object(pair[1]),
-                            mode=grouping_mode,
-                            negation_mode=negation_mode,
-                            when_prefixes=when_prefixes,
-                            when_regexes=when_regexes,
+            # secondary ordering
+            def _sort_block(block: list[tuple[str, str]]) -> list[tuple[str, str]]:
+                try:
+                    return sorted(
+                        block,
+                        key=lambda pair: (
+                            canonicalize_when(
+                                extract_key_when(pair[1])[1] or _extract_literal_when_from_object(pair[1]),
+                                mode=grouping_mode,
+                                negation_mode=negation_mode,
+                                when_prefixes=when_prefixes,
+                                when_regexes=when_regexes,
+                            ),
+                            natural_key_case_sensitive(normalize_key_for_compare(extract_key_when(pair[1])[0])),
                         ),
-                        natural_key_case_sensitive(normalize_key_for_compare(extract_key_when(pair[1])[0])),
-                    ),
-                )
+                    )
+                except Exception:
+                    return block
+
+            prefix_and_regex = _sort_block(prefix_and_regex)
+            regex_only = _sort_block(regex_only)
+
+            # merge prefix and regex matched groups into a single contiguous block
+            merged = prefix_only + prefix_and_regex + regex_only
+            sorted_groups = merged + others
+
+    # only reorder when no explicit prefix/regex partitioning was requested.
+    if not (when_prefixes or when_regexes):
+        sorted_groups = _reorder_groups_by_when(sorted_groups, negation_mode)
+
+    # ensure all clauses that match any provided when-prefix or when-regex are placed into a single contiguous block
+    if when_prefixes or when_regexes:
+        matched: list[tuple[str, str]] = []
+        others: list[tuple[str, str]] = []
+        for pair in sorted_groups:
+            _, when_val = extract_key_when(pair[1])
+            if not when_val:
+                when_val = _extract_literal_when_from_object(pair[1])
+
+            is_match = False
+            try:
+                wstr = str(when_val or '')
+                canon = canonicalize_when(wstr, mode=grouping_mode, negation_mode=negation_mode) if wstr else ''
+                # check raw and canonical forms for any prefix substring
+                if when_prefixes and any(p in wstr or p in canon for p in when_prefixes):
+                    is_match = True
+                if not is_match and when_regexes:
+                    for rx in when_regexes:
+                        try:
+                            if hasattr(rx, 'search'):
+                                if rx.search(wstr) or rx.search(canon):
+                                    is_match = True
+                                    break
+                            else:
+                                if str(rx) in wstr or str(rx) in canon:
+                                    is_match = True
+                                    break
+                        except Exception:
+                            continue
             except Exception:
-                return block
+                is_match = False
 
-        # assemble final ordered list using cumulative prefix and cumulative regex ordering
+            if is_match:
+                matched.append(pair)
+            else:
+                others.append(pair)
 
-        # 1. others: prefix==() and regex==()
-        final_list: list[tuple[str, str]] = []
-        emitted: set[tuple[str, str]] = set()
-        others = buckets.get((), {}).get((), [])
-        if others:
-            for p in _sort_block(others):
-                if p not in emitted:
-                    final_list.append(p)
-                    emitted.add(p)
-
-        # 2. cumulative prefix groups: p1, p1+p2, p1+p2+p3, ...
-        num_prefixes = 0 if not when_prefixes else len(when_prefixes)
-        num_regexes = 0 if not when_regexes else len(when_regexes)
-
-        for p_len in range(1, num_prefixes + 1):
-            p_key = tuple(range(0, p_len))
-            regex_map = buckets.get(p_key, {})
-            prefix_only_list = regex_map.get((), [])
-            if prefix_only_list:
-                filtered = [p for p in prefix_only_list if not sig_map.get(p, ((), ())) [1]]
-                if filtered:
-                    final_list.extend(_sort_block(filtered))
-
-        if when_regexes:
-            for r_idx in range(0, len(when_regexes)):
-                matches = [p for p in sorted_groups if (r_idx in sig_map.get(p, ((), ())) [1] and p not in emitted)]
-                if matches:
-                    for p in _sort_block(matches):
-                        if p not in emitted:
-                            final_list.append(p)
-                            emitted.add(p)
-
-        # 3. regex-only cumulative groups (no prefix but regex present)
-        regex_only_map = buckets.get((), {})
-        for r_len in range(1, (0 if not when_regexes else len(when_regexes)) + 1):
-            r_key = tuple(range(0, r_len))
-            final_list.extend(_sort_block(regex_only_map.get(r_key, [])))
-
-        # 4. any remaining buckets (non-cumulative combinations); append in stable order
-        handled_prefixes: set[tuple[int, ...]] = set()
-
-        handled_prefixes.add(())
-        for p_len in range(1, num_prefixes + 1):
-            handled_prefixes.add(tuple(range(0, p_len)))
-
-        remaining_keys = [k for k in buckets.keys() if k not in handled_prefixes]
-        for k in sorted(remaining_keys, key=_prefix_key):
-            regex_map = buckets.get(k, {})
-            for rk in sorted(regex_map.keys(), key=_regex_key):
-                final_list.extend(_sort_block(regex_map.get(rk, [])))
-
-        # sanity: ensure we didn't accidentally drop any items during bucket assembly
-        orig_count = len(sorted_groups)
-        if len(final_list) != orig_count:
-            existing = {pair[1] for pair in final_list}
-            missing = [p for p in sorted_groups if p[1] not in existing]
-            if missing:
-                debug_echo(1, 'group', None, f"WARNING: bucket assembly dropped {len(missing)} items; appending missing items back")
-                # append missing items in original order to preserve stability
-                final_list.extend(missing)
-
-        # debug: compute contiguous runs for each regex index in the assembled final_list
-        try:
-            if when_regexes:
-                for r_idx in range(0, len(when_regexes)):
-                    runs = 0
-                    prev_in = False
-                    for pair in final_list:
-                        r_sig = sig_map.get(pair, ((), ())) [1]
-                        in_here = r_idx in r_sig
-                        if in_here and not prev_in:
-                            runs += 1
-                        prev_in = in_here
-                    debug_echo(1, 'group', None, f"REGEX_RUNS idx={r_idx} runs={runs}")
-        except Exception:
-            pass
-
-        debug_echo(
-            1,
-            'group',
-            None,
-            f"final partition: buckets={len(buckets)} final={len(final_list)}",
-        )
-
-        sorted_groups = final_list
-
-    sorted_groups = _reorder_groups_by_when(sorted_groups, negation_mode)
+        if matched:
+            sorted_groups = matched + others
 
     final_text = _assemble_sorted_output(
         preamble,
@@ -2713,6 +2790,50 @@ def main(argv: List[str] | None = None) -> int:
         when_prefixes=when_prefixes,
         when_regexes=when_regexes,
     )
+
+    # reorder at the rendered-text level; re-partition objects so configured when-prefixes/when-regexes are contiguous
+    if when_prefixes or when_regexes:
+        try:
+            pre, arr_text, post = extract_preamble_postamble(final_text)
+            if arr_text is not None:
+                groups2, trailing2 = group_objects_with_comments(arr_text)
+                # stable partition groups2 into matched/others using same
+                # matching heuristics (check raw and canonical forms)
+                matched = []
+                others = []
+                for comments, obj in groups2:
+                    when_val = _extract_literal_when_from_object(obj) or ''
+                    is_match = False
+                    try:
+                        wstr = str(when_val or '')
+                        canon = canonicalize_when(wstr, mode=grouping_mode, negation_mode=negation_mode) if wstr else ''
+                        if when_prefixes and any(p in wstr or p in canon for p in when_prefixes):
+                            is_match = True
+                        if not is_match and when_regexes:
+                            for rx in when_regexes:
+                                try:
+                                    if hasattr(rx, 'search'):
+                                        if rx.search(wstr) or rx.search(canon):
+                                            is_match = True
+                                            break
+                                    else:
+                                        if str(rx) in wstr or str(rx) in canon:
+                                            is_match = True
+                                            break
+                                except Exception:
+                                    continue
+                    except Exception:
+                        is_match = False
+
+                    if is_match:
+                        matched.append((comments, obj))
+                    else:
+                        others.append((comments, obj))
+
+                if matched:
+                    final_text = _assemble_sorted_output(pre, matched + others, trailing2, post, grouping_mode, negation_mode, object_clones=args.object_clones, when_prefixes=when_prefixes, when_regexes=when_regexes)
+        except Exception:
+            pass
 
     processed = _finalize_processed_output(
         final_text,
