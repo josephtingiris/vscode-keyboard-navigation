@@ -13174,7 +13174,7 @@ Notes:
   },
   {
     "key": "alt+=",
-    "command": "runCommands",
+    // "command": "runCommands",
     // "command": "agentSessions.toggleAgentSessionsSidebar",
     // "command": "workbench.action.chat.focusAgentSessionsViewer",
     "command": "alt+= 7842",
@@ -13228,7 +13228,7 @@ Notes:
   {
     // [keynav] (horizontal) (vi) (split) (0) (self) (gold) (X)
     "key": "alt+-",
-    "command": "runCommands",
+    // "command": "runCommands",
     "command": "alt+= 7873",
     "args": {
       "commands": ["agentSessions.hideAgentSessionsSidebar", "workbench.action.chat.focusInput"]
