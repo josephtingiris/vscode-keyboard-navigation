@@ -71869,10 +71869,39 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && activeAuxiliary == 'workbench.panel.chat' && chatIsEnabled"
   },
   {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (editor) (text)
+    "key": "alt+a c",
+    "command": "workbench.action.chat.focusInput",
+    // "command": "alt+a c e113",
+    // "command": "workbench.action.chat.focusAgentSessionsViewer",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && chatIsEnabled"
+    // "0.0.3": "workbench.action.focusAuxiliaryBar",
+    // [note] open and focus the (SECONDARY) CHAT viewlet
+  },
+  {
     // [keynav] (vi) (action) (chord) (editor) (text)
     "key": "ctrl+a",
     "command": "editor.action.selectAll",
     // "command": "ctrl+a b6f8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && editorFocus && editorTextFocus"
+  },
+  {
+    "key": "ctrl+c",
+    "command": "editor.action.clipboardCopyAction",
+    // "command": "ctrl+c a6f8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && editorFocus && editorTextFocus"
+  },
+  {
+    "key": "ctrl+v",
+    "command": "editor.action.clipboardPasteAction",
+    // "command": "editor.action.pasteAsText",
+    // "command": "ctrl+v a7f8",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && editorFocus && editorTextFocus"
+  },
+  {
+    "key": "ctrl+x",
+    "command": "editor.action.clipboardCutAction",
+    // "command": "ctrl+x a7f7",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && editorFocus && editorTextFocus"
   },
   {
@@ -71910,15 +71939,6 @@ Notes:
     // "0.0.3": "runCommands", "workbench.action.closeAuxiliaryBar", "workbench.action.closePanel", "workbench.action.closeSidebar"
     // [note] 'toggle' maximized editor group (minimize everything except the editor)
     // [note] this is like a pseudo-zen mode; everything closes except the editor and status bar
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (editor) (text)
-    "key": "alt+a c",
-    "command": "workbench.action.focusAuxiliaryBar",
-    // "command": "alt+a c e113",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && editorFocus && editorTextFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && chatIsEnabled"
-    // "0.0.3": "workbench.action.focusAuxiliaryBar",
-    // [note] open and focus the (SECONDARY) CHAT viewlet
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (editor) (text)
@@ -71967,28 +71987,28 @@ Notes:
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (primary)
-    "key": "alt+a x",
-    "command": "workbench.action.closeSidebar",
-    // "command": "alt+a x 5947",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && sideBarFocus"
-    // "0.0.3": "workbench.action.closeSidebar",
-    // [note] close and unfocus the (PRIMARY) EXTENSIONS viewlet
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (primary)
     "key": "alt+a e",
     "command": "workbench.action.closeSidebar",
     // "command": "alt+a e 79a7",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && sideBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && activeViewlet == 'workbench.view.explorer' && focusedView == 'workbench.explorer.openEditorsView'"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && sideBarFocus && activeViewlet == 'workbench.view.explorer'"
     // "0.0.3": "workbench.action.closeSidebar",
     // [note] close and unfocus the (EXPLORER) OPEN EDITORS viewlet
+  },
+  {
+    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (primary)
+    "key": "alt+a x",
+    "command": "workbench.action.closeSidebar",
+    // "command": "alt+a x 5947",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && sideBarFocus && activeViewlet == 'workbench.view.extensions'"
+    // "0.0.3": "workbench.action.closeSidebar",
+    // [note] close and unfocus the (PRIMARY) EXTENSIONS viewlet
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (primary)
     "key": "alt+a r",
     "command": "workbench.action.closeSidebar",
     // "command": "alt+a r 55a5",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && sideBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && activeViewlet == 'workbench.view.remote'"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && sideBarFocus && activeViewlet == 'workbench.view.remote'"
     // "0.0.3": "workbench.action.closeSidebar",
     // [note] close and unfocus the (PRIMARY) REMOTE EXPLORER viewlet
   },
@@ -71997,7 +72017,7 @@ Notes:
     "key": "alt+a g",
     "command": "workbench.action.closeSidebar",
     // "command": "alt+a 53a8",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && sideBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && activeViewlet == 'workbench.view.scm'"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && sideBarFocus && activeViewlet == 'workbench.view.scm'"
     // "0.0.3": "workbench.action.closeSidebar",
     // [note] close and unfocus the (EXPLORER) SCM (git) viewlet
   },
@@ -72006,7 +72026,7 @@ Notes:
     "key": "alt+a s",
     "command": "workbench.action.closeSidebar",
     // "command": "alt+a s 55a8",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && sideBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && activeViewlet == 'workbench.view.search'"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && sideBarFocus && activeViewlet == 'workbench.view.search'"
     // "0.0.3": "workbench.action.closeSidebar",
     // [note] close and unfocus the (PRIMARY) SEARCH viewlet
   },
