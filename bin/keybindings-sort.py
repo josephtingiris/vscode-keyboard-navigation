@@ -2480,18 +2480,23 @@ def main(argv: List[str] | None = None) -> int:
             when_regexes=when_regexes,
         )
 
-    # last-step stable partition. perform two-stage partition: prefixes first, then regexes.
+    # last-step stable partition. produce a deterministic ordering by prefix/regex
+    # combination signature. Desired order:
+    #  1) objects with no prefix and no regex (others)
+    #  2) objects grouped by prefix combinations (ordered by smallest prefix index,
+    #     then by fewer prefixes first), and within each prefix-group emit items
+    #     without regex first, then with regex combinations ordered by fewest regexes.
+    #  3) objects with no prefix but with regex(es) (regex-only)
     if when_prefixes or when_regexes:
-        prefix_only = []
-        prefix_and_regex = []
-        regex_only = []
-        others = []
-        for pair in sorted_groups:
+        # helper: compute matched prefix indices and regex indices for an object
+        def _match_signature(pair: tuple[str, str]):
             _, when_val = extract_key_when(pair[1])
             if not when_val:
                 when_val = _extract_literal_when_from_object(pair[1])
-            found_prefix = False
-            found_regex = False
+
+            prefix_idxs: list[int] = []
+            regex_idxs: list[int] = []
+
             try:
                 parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
                 for part in parts:
@@ -2502,67 +2507,115 @@ def main(argv: List[str] | None = None) -> int:
                         continue
                     left = token[1:].lstrip() if token.startswith('!') else token
                     left_id = left.split()[0] if left else ''
-                    if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
-                        found_prefix = True
+
+                    if when_prefixes:
+                        for idx, prefix in enumerate(when_prefixes):
+                            try:
+                                if left_id.startswith(prefix):
+                                    if idx not in prefix_idxs:
+                                        prefix_idxs.append(idx)
+                            except Exception:
+                                continue
+
                     if when_regexes:
-                        for rx in when_regexes:
+                        for idx, rx in enumerate(when_regexes):
                             try:
                                 if hasattr(rx, 'search'):
                                     if rx.search(left_id):
-                                        found_regex = True
-                                        break
+                                        if idx not in regex_idxs:
+                                            regex_idxs.append(idx)
                                 else:
                                     if str(rx) in left_id:
-                                        found_regex = True
-                                        break
+                                        if idx not in regex_idxs:
+                                            regex_idxs.append(idx)
                             except Exception:
                                 continue
-                    if found_prefix and found_regex:
-                        break
             except Exception:
-                found_prefix = False
-                found_regex = False
+                pass
 
-            if found_prefix and found_regex:
-                prefix_and_regex.append(pair)
-            elif found_prefix:
-                prefix_only.append(pair)
-            elif found_regex:
-                regex_only.append(pair)
-            else:
-                others.append(pair)
+            prefix_idxs.sort()
+            regex_idxs.sort()
+            return tuple(prefix_idxs), tuple(regex_idxs)
 
-        if prefix_only or prefix_and_regex or regex_only:
-            debug_echo(
-                1,
-                'group',
-                None,
-                f"final partition: prefix_only={len(prefix_only)} prefix_and_regex={len(prefix_and_regex)} regex_only={len(regex_only)} others={len(others)}",
-            )
+        # build nested mapping: prefix_tuple -> regex_tuple -> list[pairs]
+        buckets: dict[tuple[int, ...], dict[tuple[int, ...], list[tuple[str, str]]]] = {}
 
-            # secondary ordering
-            def _sort_block(block: list[tuple[str, str]]) -> list[tuple[str, str]]:
-                try:
-                    return sorted(
-                        block,
-                        key=lambda pair: (
-                            canonicalize_when(
-                                extract_key_when(pair[1])[1] or _extract_literal_when_from_object(pair[1]),
-                                mode=grouping_mode,
-                                negation_mode=negation_mode,
-                                when_prefixes=when_prefixes,
-                                when_regexes=when_regexes,
-                            ),
-                            natural_key_case_sensitive(normalize_key_for_compare(extract_key_when(pair[1])[0])),
+        for pair in sorted_groups:
+            p_sig, r_sig = _match_signature(pair)
+            buckets.setdefault(p_sig, {}).setdefault(r_sig, []).append(pair)
+
+        # sort helper for prefix keys: prefer smaller min-index, then fewer prefixes, then lexicographic
+        def _prefix_key(t: tuple[int, ...]):
+            if not t:
+                return (9999, 9999, ())
+            return (min(t), len(t), t)
+
+        # sort helper for regex keys: prefer fewer regexes then lexicographic
+        def _regex_key(t: tuple[int, ...]):
+            return (0 if not t else 1, len(t), t)
+
+        # stable secondary ordering for each concrete bucket
+        def _sort_block(block: list[tuple[str, str]]) -> list[tuple[str, str]]:
+            try:
+                return sorted(
+                    block,
+                    key=lambda pair: (
+                        canonicalize_when(
+                            extract_key_when(pair[1])[1] or _extract_literal_when_from_object(pair[1]),
+                            mode=grouping_mode,
+                            negation_mode=negation_mode,
+                            when_prefixes=when_prefixes,
+                            when_regexes=when_regexes,
                         ),
-                    )
-                except Exception:
-                    return block
+                        natural_key_case_sensitive(normalize_key_for_compare(extract_key_when(pair[1])[0])),
+                    ),
+                )
+            except Exception:
+                return block
 
-            prefix_and_regex = _sort_block(prefix_and_regex)
-            regex_only = _sort_block(regex_only)
+        # assemble final ordered list
+        final_list: list[tuple[str, str]] = []
 
-            sorted_groups = prefix_only + prefix_and_regex + regex_only + others
+        # 1) others: prefix==() and regex==()
+        others = buckets.get((), {}).get((), [])
+        if others:
+            final_list.extend(_sort_block(others))
+
+        # 2) prefix groups (non-empty prefix tuples) in sorted order
+        prefix_keys = sorted([k for k in buckets.keys() if k], key=_prefix_key)
+        for p_key in prefix_keys:
+            regex_map = buckets.get(p_key, {})
+            # emit regex==() first (prefix-only)
+            prefix_only_list = regex_map.get((), [])
+            if prefix_only_list:
+                final_list.extend(_sort_block(prefix_only_list))
+
+            # then emit other regex combinations ordered by fewest regex matches
+            regex_keys = sorted([rk for rk in regex_map.keys() if rk], key=_regex_key)
+            for r_key in regex_keys:
+                final_list.extend(_sort_block(regex_map.get(r_key, [])))
+
+        # 3) regex-only (prefix == () but regex != ())
+        regex_only_map = buckets.get((), {})
+        regex_only_keys = sorted([k for k in regex_only_map.keys() if k], key=_regex_key)
+        for r_key in regex_only_keys:
+            final_list.extend(_sort_block(regex_only_map.get(r_key, [])))
+
+        # if any remaining keys (shouldn't be) append them in natural order
+        remaining_keys = [k for k in buckets.keys() if k not in prefix_keys and k != ()]
+        for k in remaining_keys:
+            regex_map = buckets.get(k, {})
+            for rk in sorted(regex_map.keys(), key=_regex_key):
+                final_list.extend(_sort_block(regex_map.get(rk, [])))
+
+        debug_echo(
+            1,
+            'group',
+            None,
+            f"final partition: buckets={len(buckets)} final={len(final_list)}",
+        )
+
+        sorted_groups = final_list
 
     sorted_groups = _reorder_groups_by_when(sorted_groups, negation_mode)
 
