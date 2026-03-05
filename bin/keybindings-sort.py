@@ -136,6 +136,7 @@ POSITIONAL_TOKENS = [
     'breadcrumbsActive',
     'breadcrumbsPossible',
     'config.keyboardNavigation.juke.enabled',
+    'config.keyboardNavigation.highlights.enabled',
     'config.keyboardNavigation.terminal.enabled',
 ]
 
@@ -169,9 +170,8 @@ WHEN_GROUPING_PROFILES = {
         'secondary': 'key',
         'group_sorting': 'positive',
         'when_prefix': 'config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters',
-        'when_regex': 'config.keyboardNavigation.terminal,config.keyboardNavigation.chords'
+        'when_regex': 'config.keyboardNavigation.(.*).enabled,config.keyboardNavigation.chords'
     },
-        #'when_regex': 'config.keyboardNavigation.juke,config.keyboardNavigation.terminal,config.keyboardNavigation.chords'
     'config-first': {
         # example defaults for config-first
         'primary': 'key',
@@ -870,6 +870,13 @@ def _sort_groups_for_primary_when(
 
                     left = token[1:].lstrip() if token.startswith('!') else token
                     left_id = left.split()[0] if left else ''
+
+                    # debug: trace terminal/keyboardNavigation related operands to diagnose grouping
+                    try:
+                        if 'terminal' in left_id or 'keyboardNavigation' in left_id:
+                            debug_echo(1, 'group', when_val, f"SIG_PART: left_id={left_id!r} token={token!r}")
+                    except Exception:
+                        pass
                     if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
                         found_focus = True
                         break
@@ -929,10 +936,7 @@ def _sort_groups_for_primary_when(
                     left = token[1:].lstrip() if token.startswith('!') else token
                     left_id = left.split()[0] if left else ''
 
-                    if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
-                        found_prefix = True
-                        break
-
+                    # check regexes first and record matches
                     if when_regexes:
                         for rx in when_regexes:
                             try:
@@ -947,16 +951,21 @@ def _sort_groups_for_primary_when(
                             except Exception:
                                 continue
                         if found_regex:
-                            # keep scanning to detect any prefix match first
-                            continue
+                            # when a regex matches, prefer regex grouping regardless of prefix
+                            break
+
+                    if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
+                        found_prefix = True
+                        # continue scanning to detect possible matches in other operands but do not break here; a regex match anywhere should win
+                        continue
             except Exception:
                 found_prefix = False
                 found_regex = False
 
-            if found_prefix:
-                matched_prefix.append(pair)
-            elif found_regex:
+            if found_regex:
                 matched_regex.append(pair)
+            elif found_prefix:
+                matched_prefix.append(pair)
             else:
                 others.append(pair)
 
@@ -2541,10 +2550,38 @@ def main(argv: List[str] | None = None) -> int:
 
         # build nested mapping: prefix_tuple -> regex_tuple -> list[pairs]
         buckets: dict[tuple[int, ...], dict[tuple[int, ...], list[tuple[str, str]]]] = {}
+        # signature map for quick lookup: pair -> (prefix_tuple, regex_tuple)
+        sig_map: dict[tuple[str, str], tuple[tuple[int, ...], tuple[int, ...]]] = {}
 
         for pair in sorted_groups:
             p_sig, r_sig = _match_signature(pair)
             buckets.setdefault(p_sig, {}).setdefault(r_sig, []).append(pair)
+            sig_map[pair] = (p_sig, r_sig)
+
+        # debug: summary counts per regex index and sample terminal entries
+        try:
+            if when_regexes:
+                per_idx = [0] * len(when_regexes)
+                for p, sig in sig_map.items():
+                    _, r_sig = sig
+                    for r in r_sig:
+                        if 0 <= r < len(per_idx):
+                            per_idx[r] += 1
+                debug_echo(1, 'group', None, f"REGEX_COUNTS: {per_idx}")
+
+                sample_count = 0
+                for pair, sig in sig_map.items():
+                    _, r_sig = sig
+                    _, when_val = extract_key_when(pair[1])
+                    if not when_val:
+                        when_val = _extract_literal_when_from_object(pair[1])
+                    if when_val and 'terminal' in when_val:
+                        debug_echo(1, 'group', when_val, f"REGEX_SAMPLE: p_sig={sig[0]} r_sig={r_sig} key={extract_key_when(pair[1])[0]!r}")
+                        sample_count += 1
+                        if sample_count >= 10:
+                            break
+        except Exception:
+            pass
 
         # sort helper for prefix keys: prefer smaller min-index, then fewer prefixes, then lexicographic
         def _prefix_key(t: tuple[int, ...]):
@@ -2575,40 +2612,84 @@ def main(argv: List[str] | None = None) -> int:
             except Exception:
                 return block
 
-        # assemble final ordered list
-        final_list: list[tuple[str, str]] = []
+        # assemble final ordered list using cumulative prefix and cumulative regex ordering
 
         # 1. others: prefix==() and regex==()
+        final_list: list[tuple[str, str]] = []
+        emitted: set[tuple[str, str]] = set()
         others = buckets.get((), {}).get((), [])
         if others:
-            final_list.extend(_sort_block(others))
+            for p in _sort_block(others):
+                if p not in emitted:
+                    final_list.append(p)
+                    emitted.add(p)
 
-        # 2. prefix groups (non-empty prefix tuples) in sorted order
-        prefix_keys = sorted([k for k in buckets.keys() if k], key=_prefix_key)
-        for p_key in prefix_keys:
+        # 2. cumulative prefix groups: p1, p1+p2, p1+p2+p3, ...
+        num_prefixes = 0 if not when_prefixes else len(when_prefixes)
+        num_regexes = 0 if not when_regexes else len(when_regexes)
+
+        for p_len in range(1, num_prefixes + 1):
+            p_key = tuple(range(0, p_len))
             regex_map = buckets.get(p_key, {})
-            # emit regex==() first (prefix-only)
             prefix_only_list = regex_map.get((), [])
             if prefix_only_list:
-                final_list.extend(_sort_block(prefix_only_list))
+                filtered = [p for p in prefix_only_list if not sig_map.get(p, ((), ())) [1]]
+                if filtered:
+                    final_list.extend(_sort_block(filtered))
 
-            # then emit other regex combinations ordered by fewest regex matches
-            regex_keys = sorted([rk for rk in regex_map.keys() if rk], key=_regex_key)
-            for r_key in regex_keys:
-                final_list.extend(_sort_block(regex_map.get(r_key, [])))
+        if when_regexes:
+            for r_idx in range(0, len(when_regexes)):
+                matches = [p for p in sorted_groups if (r_idx in sig_map.get(p, ((), ())) [1] and p not in emitted)]
+                if matches:
+                    for p in _sort_block(matches):
+                        if p not in emitted:
+                            final_list.append(p)
+                            emitted.add(p)
 
-        # 3. regex-only (prefix == () but regex != ())
+        # 3. regex-only cumulative groups (no prefix but regex present)
         regex_only_map = buckets.get((), {})
-        regex_only_keys = sorted([k for k in regex_only_map.keys() if k], key=_regex_key)
-        for r_key in regex_only_keys:
+        for r_len in range(1, (0 if not when_regexes else len(when_regexes)) + 1):
+            r_key = tuple(range(0, r_len))
             final_list.extend(_sort_block(regex_only_map.get(r_key, [])))
 
-        # if any remaining keys (shouldn't be) append them in natural order
-        remaining_keys = [k for k in buckets.keys() if k not in prefix_keys and k != ()]
-        for k in remaining_keys:
+        # 4. any remaining buckets (non-cumulative combinations); append in stable order
+        handled_prefixes: set[tuple[int, ...]] = set()
+
+        handled_prefixes.add(())
+        for p_len in range(1, num_prefixes + 1):
+            handled_prefixes.add(tuple(range(0, p_len)))
+
+        remaining_keys = [k for k in buckets.keys() if k not in handled_prefixes]
+        for k in sorted(remaining_keys, key=_prefix_key):
             regex_map = buckets.get(k, {})
             for rk in sorted(regex_map.keys(), key=_regex_key):
                 final_list.extend(_sort_block(regex_map.get(rk, [])))
+
+        # sanity: ensure we didn't accidentally drop any items during bucket assembly
+        orig_count = len(sorted_groups)
+        if len(final_list) != orig_count:
+            existing = {pair[1] for pair in final_list}
+            missing = [p for p in sorted_groups if p[1] not in existing]
+            if missing:
+                debug_echo(1, 'group', None, f"WARNING: bucket assembly dropped {len(missing)} items; appending missing items back")
+                # append missing items in original order to preserve stability
+                final_list.extend(missing)
+
+        # debug: compute contiguous runs for each regex index in the assembled final_list
+        try:
+            if when_regexes:
+                for r_idx in range(0, len(when_regexes)):
+                    runs = 0
+                    prev_in = False
+                    for pair in final_list:
+                        r_sig = sig_map.get(pair, ((), ())) [1]
+                        in_here = r_idx in r_sig
+                        if in_here and not prev_in:
+                            runs += 1
+                        prev_in = in_here
+                    debug_echo(1, 'group', None, f"REGEX_RUNS idx={r_idx} runs={runs}")
+        except Exception:
+            pass
 
         debug_echo(
             1,
