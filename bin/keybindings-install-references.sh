@@ -18,7 +18,7 @@
 #   keybindings-install-references.sh references/keybindings.json
 #   while true; do KEYBINDINGS_SORT_ARGUMENTS="-p when" watch-runner.sh ./references/keybindings.json keybindings-install-references.sh; sleep 3; done
 #   while true; do KEYBINDINGS_SORT_ARGUMENTS="-p key -s when" watch-runner.sh ./references/keybindings.json keybindings-install-references.sh; sleep 3; done
-#   while true; do KEYBINDINGS_SORT_ARGUMENTS="-p when -w focal-invariant -g positive" watch-runner.sh ./references/keybindings.json keybindings-install-references.sh; sleep 3; done
+#   while true; do KEYBINDINGS_SORT_ARGUMENTS="-p when -w focal-invariant" watch-runner.sh ./references/keybindings.json keybindings-install-references.sh -s; sleep 3; done
 #
 # Behavior:
 #   - Validates JSONC using `keybindings-remove-comments.py | jq` before installing.
@@ -151,9 +151,9 @@ main() {
         fi
 
         if [ "${1}" == "2" ]; then
-            KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -g positive -w focal-invariant"
+            KEYBINDINGS_SORT_ARGUMENTS="-p key -s when -w focal-invariant"
             if [ "${2}" == "w" ]; then
-                KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant"
+                KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -w focal-invariant"
             fi
         fi
 
@@ -193,8 +193,7 @@ main() {
         fi
 
         if [ "${KEYBINDINGS_SORT_ARGUMENTS}" == "" ]; then
-            # TODO: get, or sync this vale with the Makefile's
-            KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters --when-regex config.keyboardNavigation.chords"
+            KEYBINDINGS_SORT_ARGUMENTS="-w focal-invariant"
         fi
 
         ansi_echo "# Sorting JSON with default arguments: ${GREEN}KEYBINDINGS_SORT_ARGUMENTS='${KEYBINDINGS_SORT_ARGUMENTS}'"

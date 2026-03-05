@@ -167,8 +167,8 @@ WHEN_GROUPING_PROFILES = {
         'primary': 'when',
         'secondary': 'key',
         'group_sorting': 'positive',
-        'when_prefix': 'config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters,config.keyboardNavigation.terminal.enabled',
-        'when_regex': 'config.keyboardNavigation.chords'
+        'when_prefix': 'config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters',
+        'when_regex': 'config.keyboardNavigation.terminal,config.keyboardNavigation.chords'
     },
     'config-first': {
         # example defaults for config-first
@@ -2480,13 +2480,13 @@ def main(argv: List[str] | None = None) -> int:
             when_regexes=when_regexes,
         )
 
-    # last-step stable partition. produce a deterministic ordering by prefix/regex
-    # combination signature. Desired order:
-    #  1) objects with no prefix and no regex (others)
-    #  2) objects grouped by prefix combinations (ordered by smallest prefix index,
-    #     then by fewer prefixes first), and within each prefix-group emit items
-    #     without regex first, then with regex combinations ordered by fewest regexes.
-    #  3) objects with no prefix but with regex(es) (regex-only)
+    # last-step stable partition. desired order:
+    #  1. objects with no prefix and no regex (others)
+    #  2. objects grouped by prefix combinations (ordered by smallest prefix index, then by fewer prefixes first),
+    #     and within each prefix-group emit items without regex first, then with regex combinations ordered by fewest regexes.
+    #  3. objects with no prefix but with regex(es) (regex-only)
+
+    # produce a deterministic ordering by prefix/regex combination signature. 
     if when_prefixes or when_regexes:
         # helper: compute matched prefix indices and regex indices for an object
         def _match_signature(pair: tuple[str, str]):
@@ -2576,12 +2576,12 @@ def main(argv: List[str] | None = None) -> int:
         # assemble final ordered list
         final_list: list[tuple[str, str]] = []
 
-        # 1) others: prefix==() and regex==()
+        # 1. others: prefix==() and regex==()
         others = buckets.get((), {}).get((), [])
         if others:
             final_list.extend(_sort_block(others))
 
-        # 2) prefix groups (non-empty prefix tuples) in sorted order
+        # 2. prefix groups (non-empty prefix tuples) in sorted order
         prefix_keys = sorted([k for k in buckets.keys() if k], key=_prefix_key)
         for p_key in prefix_keys:
             regex_map = buckets.get(p_key, {})
@@ -2595,7 +2595,7 @@ def main(argv: List[str] | None = None) -> int:
             for r_key in regex_keys:
                 final_list.extend(_sort_block(regex_map.get(r_key, [])))
 
-        # 3) regex-only (prefix == () but regex != ())
+        # 3. regex-only (prefix == () but regex != ())
         regex_only_map = buckets.get((), {})
         regex_only_keys = sorted([k for k in regex_only_map.keys() if k], key=_regex_key)
         for r_key in regex_only_keys:

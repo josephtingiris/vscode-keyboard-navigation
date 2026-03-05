@@ -20,8 +20,7 @@ fi
 export KEYBINDINGS_MAP_MODIFIERS="${KEYBINDINGS_MAP_MODIFIERS}"
 
 if [ "${0}" != "${BASH_SOURCE}" ] || [ "${KEYBINDINGS_SORT_ARGUMENTS}" == "" ]; then
-    #export KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters --when-regex config.keyboardNavigation.chords,config.keyboardNavigation.*.enabled"
-    export KEYBINDINGS_SORT_ARGUMENTS="-p when -s key -g positive -w focal-invariant --when-prefix config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters,config.keyboardNavigation.terminal.enabled --when-regex config.keyboardNavigation.chords"
+    export KEYBINDINGS_SORT_ARGUMENTS="-w focal-invariant"
 fi
 export KEYBINDINGS_SORT_ARGUMENTS="${KEYBINDINGS_SORT_ARGUMENTS}"
 
