@@ -385,7 +385,7 @@ def _assemble_sorted_output(
 
         rendered_groups.append((comments, obj_out))
 
-    # Coalesce identical canonical `when` values into contiguous blocks when grouping is enabled
+    # coalesce identical canonical `when` values into contiguous blocks when grouping is enabled
     if grouping_mode != 'none' or when_prefixes or when_regexes:
         from collections import OrderedDict
 
@@ -401,13 +401,13 @@ def _assemble_sorted_output(
             )
             grouped.setdefault(canonical, []).append((comments, obj_out))
 
+        # build JSON-only hashes and full-object hashes to detect duplicates and preserve comments
+
         new_rendered: list[tuple[str, str]] = []
+
+        # compute sort keys derived from the object's `key` field (modifier-first, chord-aware, special<digit<letter ordering)
         for canonical, entries in grouped.items():
             if len(entries) > 1:
-                # Build JSON-only hashes and full-object hashes to detect
-                # duplicates and preserve comments. Also compute sort keys
-                # derived from the object's `key` field (modifier-first,
-                # chord-aware, special<digit<letter ordering).
                 hash_map = {}
                 jsonhash_to_indices = {}
 
@@ -438,17 +438,21 @@ def _assemble_sorted_output(
                     return full_hash, json_hash, json_canonical
 
                 def _key_category_and_order(ch: str) -> tuple[int, int]:
-                    # Returns (category, order_key) where category is:
+
+                    # returns (category, order_key) where category is:
+                    #
                     # 0 = primary ASCII special (printable non-alnum, ord < 128)
                     # 1 = extended special (ord >= 128)
                     # 2 = digit
                     # 3 = letter
                     # 4 = empty/unknown
+                    #
                     # order_key is an int used to order within the category:
+                    #
                     # - for ASCII specials: the ASCII code of first char
-                    # - for extended specials: attempt CP1252 byte value (Alt-code)
-                    #   falling back to Unicode codepoint
+                    # - for extended specials: attempt CP1252 byte value (Alt-code) falling back to Unicode codepoint
                     # - for digits/letters: the Unicode codepoint of first char
+
                     if not ch:
                         return (4, 0)
                     c0 = ch[0]
@@ -481,8 +485,8 @@ def _assemble_sorted_output(
 
                 def _key_sort_tuple_from_object(obj_text: str):
                     key_raw = _extract_literal_key_from_object(obj_text) or ''
-                    # Split modifiers and base from the ORIGINAL literal to
-                    # correctly detect a trailing '+' (e.g., 'alt++').
+
+                    # detect a trailing '+' (e.g., 'alt++')
                     if '+' in key_raw:
                         mods_part, base_part = key_raw.rsplit('+', 1)
                         if base_part == '':
@@ -492,10 +496,7 @@ def _assemble_sorted_output(
                         mods_norm = ''
                         base_part = key_raw
 
-                    # If the base is a literal '+' (or consists only of '+'),
-                    # preserve it as a single token. normalize_key_for_compare
-                    # would drop empty parts for '+' so we must handle it
-                    # before normalization.
+                    # handle '+' before normalization
                     if base_part and all(ch == '+' for ch in base_part):
                         tokens = ['+']
                     else:
@@ -2662,7 +2663,10 @@ def main(argv: List[str] | None = None) -> int:
             when_regexes=when_regexes,
         )
 
-    # last-step stable partition. desired order:
+    # last-step stable partition
+    #
+    # desired order:
+    #
     #  1. objects with no prefix and no regex (others)
     #  2. objects grouped by prefix combinations (ordered by smallest prefix index, then by fewer prefixes first),
     #     and within each prefix-group emit items without regex first, then with regex combinations ordered by fewest regexes.
@@ -2721,6 +2725,7 @@ def main(argv: List[str] | None = None) -> int:
 
         # build nested mapping: prefix_tuple -> regex_tuple -> list[pairs]
         buckets: dict[tuple[int, ...], dict[tuple[int, ...], list[tuple[str, str]]]] = {}
+
         # signature map for quick lookup: pair -> (prefix_tuple, regex_tuple)
         sig_map: dict[tuple[str, str], tuple[tuple[int, ...], tuple[int, ...]]] = {}
 
