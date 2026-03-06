@@ -709,9 +709,9 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
 
         # default alpha behavior: preserve group_rank and use natural-sensitive ordering
         if negation_mode == 'alpha':
-            return (group_rank(token), sub_rank, natural_key_case_sensitive(order_token), idx)
+            return (group_rank(token), sub_rank, _natural_key_case_sensitive(order_token), idx)
 
-        return (group_rank(token), natural_key_case_sensitive(order_token), idx)
+        return (group_rank(token), _natural_key_case_sensitive(order_token), idx)
 
     def sort_and_nodes(node: WhenNode):
         if isinstance(node, WhenAnd):
@@ -739,7 +739,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                             matches.append((idx, child))
                     if matches:
                         # alphabetical order for multiples
-                        matches.sort(key=lambda t: natural_key_case_sensitive(
+                        matches.sort(key=lambda t: _natural_key_case_sensitive(
                             render_when_node(t[1])))
                         for m in matches:
                             prioritized.append(m[1])
@@ -761,7 +761,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                         if ok:
                             matches.append((idx, child))
                     if matches:
-                        matches.sort(key=lambda t: natural_key_case_sensitive(
+                        matches.sort(key=lambda t: _natural_key_case_sensitive(
                             render_when_node(t[1])))
                         for m in matches:
                             prioritized.append(m[1])
@@ -794,8 +794,8 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                 for idx, child in indexed:
                     base, is_neg, tok = render_base_and_flag(child)
 
-                    # natural-style comparison: use natural_key (case-insensitive)
-                    base_key = natural_key(base)
+                    # natural-style comparison: use _natural_key (case-insensitive)
+                    base_key = _natural_key(base)
 
                     # always preserve grouping as the primary key so sorting does not move operands between buckets.
                     grp = group_rank(tok)
@@ -826,14 +826,14 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                         neg_sort = 0 if not is_neg else 1
                         # use token-list ordering (focus/positional/visibility) as sub-rank
                         f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
-                        base_key_cs = natural_key_case_sensitive(base)
+                        base_key_cs = _natural_key_case_sensitive(base)
                         items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
                         continue
 
                     if nm == 'negative':
                         neg_sort = 0 if is_neg else 1
                         f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
-                        base_key_cs = natural_key_case_sensitive(base)
+                        base_key_cs = _natural_key_case_sensitive(base)
                         items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
                         continue
 
@@ -875,7 +875,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
 
             # sort OR operands deterministically so equivalent ASTs render the same
             indexed = list(enumerate(items))
-            indexed.sort(key=lambda it: (natural_key_case_sensitive(render_when_node(it[1])), it[0]))
+            indexed.sort(key=lambda it: (_natural_key_case_sensitive(render_when_node(it[1])), it[0]))
             sorted_children = [it[1] for it in indexed]
 
             # remove duplicates while preserving sorted order
@@ -1132,7 +1132,7 @@ def _extract_modifiers_from_object(obj_text: str) -> tuple[tuple[str, ...], str]
     return (mods, lit_key)
 
 
-def extract_preamble_postamble(text):
+def _extract_preamble_postamble(text):
     """Find the top-level JSON array brackets.
 
     Skip any brackets that appear inside comments or strings in the preamble/postamble.
@@ -1293,16 +1293,16 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
         # special-case: when primary is key and secondary is when, ensure strict key-first ordering by returning a simple tuple: (rank, key, when_specificity, when_sortable)
         if primary == 'key' and secondary == 'when':
             norm = normalize_key_for_compare(key_val)
-            key_token = natural_key(norm)
+            key_token = _natural_key(norm)
             spec = when_specificity(when_val)
-            when_token = natural_key_case_sensitive(sortable_when)
+            when_token = _natural_key_case_sensitive(sortable_when)
             return (0, key_token, spec, when_token)
 
         tokens = []
 
         def append_when():
             if primary == 'when':
-                first_key = natural_key_case_sensitive(first_when_token)
+                first_key = _natural_key_case_sensitive(first_when_token)
 
                 # compute an optional priority rank based on given when_prefixes
                 match_rank = 9999
@@ -1346,10 +1346,10 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
 
                 tokens.append(match_rank)
                 if negation_mode == 'alpha':
-                    grouping = natural_key_case_sensitive(sortable_when)
+                    grouping = _natural_key_case_sensitive(sortable_when)
                 elif negation_mode == 'natural':
                     base = sortable_when.lstrip('!')
-                    grouping = natural_key(base)
+                    grouping = _natural_key(base)
                 elif negation_mode in ('positive', 'beta', 'positive-natural'):
                     # positive-natural: prefer non-negated then natural base ordering
                     is_neg = 1 if sortable_when.startswith('!') else 0
@@ -1364,9 +1364,9 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                         if lid.startswith('!'):
                             lid = lid[1:].lstrip()
                         f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
-                        grouping = (is_neg, f_rank, natural_key_case_sensitive(base))
+                        grouping = (is_neg, f_rank, _natural_key_case_sensitive(base))
                     else:
-                        grouping = (is_neg, natural_key(base))
+                        grouping = (is_neg, _natural_key(base))
                 elif negation_mode in ('negative', 'negative-natural'):
                     is_neg = 0 if sortable_when.startswith('!') else 1
                     base = sortable_when.lstrip('!')
@@ -1377,17 +1377,17 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                         if lid.startswith('!'):
                             lid = lid[1:].lstrip()
                         f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
-                        grouping = (is_neg, f_rank, natural_key_case_sensitive(base))
+                        grouping = (is_neg, f_rank, _natural_key_case_sensitive(base))
                     else:
-                        grouping = (is_neg, natural_key(base))
+                        grouping = (is_neg, _natural_key(base))
                 else:
-                    grouping = natural_key_case_sensitive(sortable_when)
+                    grouping = _natural_key_case_sensitive(sortable_when)
 
                 # this makes matched groups easier to inspect
                 if match_rank != 9999:
                     # prefer normalized key ordering for stability: modifiers normalized
                     norm_key = normalize_key_for_compare(key_val)
-                    tokens.append(natural_key(norm_key))
+                    tokens.append(_natural_key(norm_key))
                     tokens.append(spec_key)
                     tokens.append(grouping)
                 else:
@@ -1398,12 +1398,12 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                 return
 
             tokens.append(when_specificity(when_val))
-            tokens.append(natural_key_case_sensitive(sortable_when))
+            tokens.append(_natural_key_case_sensitive(sortable_when))
 
         def append_key():
             # use normalized key comparison (consistent modifier ordering)
             norm = normalize_key_for_compare(key_val)
-            tokens.append(natural_key(norm))
+            tokens.append(_natural_key(norm))
 
         # primary
         if primary == 'when':
@@ -1537,7 +1537,7 @@ def _flag_present(raw_argv: list[str], names: list[str]) -> bool:
     return False
 
 
-def group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]], str]:
+def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]], str]:
     groups: list[tuple[str, str]] = []
     comments = ''
 
@@ -1628,6 +1628,34 @@ def _matches_when_entry(left: str, entry: str) -> bool:
         prefix, suffix = entry.split('<viewId>', 1)
         return left.startswith(prefix) and left.endswith(suffix)
     return left == entry
+
+
+def _natural_key(s):
+    key = str(s)
+    cached = CACHE_NATURAL_KEY.get(key)
+    if cached is not None:
+        return cached
+    parts = NUMBER_SPLIT_RE.split(key)
+    out = [int(text) if text.isdigit() else text.lower() for text in parts]
+    try:
+        CACHE_NATURAL_KEY[key] = out
+    except Exception:
+        pass
+    return out
+
+
+def _natural_key_case_sensitive(s):
+    key = str(s)
+    cached = CACHE_NATURAL_KEY_CS.get(key)
+    if cached is not None:
+        return cached
+    parts = NUMBER_SPLIT_RE.split(key)
+    out = [int(text) if text.isdigit() else text for text in parts]
+    try:
+        CACHE_NATURAL_KEY_CS[key] = out
+    except Exception:
+        pass
+    return out
 
 
 def _normalize_whitespace(text: str) -> str:
@@ -1841,7 +1869,7 @@ def _sort_groups_for_primary_when(
         if DEBUG_LEVEL > 0:
             normalized = normalize_key_for_compare(key_val)
             try:
-                natural = natural_key(normalized)
+                natural = _natural_key(normalized)
             except Exception:
                 natural = normalized
             _debug_echo(
@@ -1861,7 +1889,7 @@ def _sort_groups_for_primary_when(
                 when_regexes=when_regexes,
             ),
             row[1],
-            natural_key_case_sensitive(row[0]),
+            _natural_key_case_sensitive(row[0]),
         )
     )
 
@@ -2008,7 +2036,7 @@ def _sort_groups_for_primary_when(
 
         if j - i > 1 and negation_mode not in ('positive', 'negative'):
             slice_pairs = sorted_groups[i:j]
-            slice_pairs.sort(key=lambda pair: natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
+            slice_pairs.sort(key=lambda pair: _natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
             sorted_groups[i:j] = slice_pairs
 
         i = j
@@ -2099,34 +2127,6 @@ def _with_normalized_when_groups(
             pass
 
     return normalized_groups
-
-
-def natural_key(s):
-    key = str(s)
-    cached = CACHE_NATURAL_KEY.get(key)
-    if cached is not None:
-        return cached
-    parts = NUMBER_SPLIT_RE.split(key)
-    out = [int(text) if text.isdigit() else text.lower() for text in parts]
-    try:
-        CACHE_NATURAL_KEY[key] = out
-    except Exception:
-        pass
-    return out
-
-
-def natural_key_case_sensitive(s):
-    key = str(s)
-    cached = CACHE_NATURAL_KEY_CS.get(key)
-    if cached is not None:
-        return cached
-    parts = NUMBER_SPLIT_RE.split(key)
-    out = [int(text) if text.isdigit() else text for text in parts]
-    try:
-        CACHE_NATURAL_KEY_CS[key] = out
-    except Exception:
-        pass
-    return out
 
 
 def normalize_key_for_compare(key_value):
@@ -2625,8 +2625,8 @@ def main(argv: List[str] | None = None) -> int:
     _set_run_cache_context(grouping_mode, negation_mode, when_prefixes, when_regexes)
 
     raw = sys.stdin.read()
-    preamble, array_text, postamble = extract_preamble_postamble(raw)
-    groups, trailing_comments = group_objects_with_comments(array_text)
+    preamble, array_text, postamble = _extract_preamble_postamble(raw)
+    groups, trailing_comments = _group_objects_with_comments(array_text)
 
     normalized_groups = _with_normalized_when_groups(
         groups,
@@ -2785,7 +2785,7 @@ def main(argv: List[str] | None = None) -> int:
                             when_prefixes=when_prefixes,
                             when_regexes=when_regexes,
                         ),
-                        natural_key_case_sensitive(normalize_key_for_compare(_extract_key_when_from_object(pair[1])[0])),
+                        _natural_key_case_sensitive(normalize_key_for_compare(_extract_key_when_from_object(pair[1])[0])),
                     ),
                 )
             except Exception:
