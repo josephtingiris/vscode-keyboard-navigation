@@ -39,7 +39,7 @@ Behavior
 - Hides exact object clones by default; use `--object-clones` to keep them.
 - Debug messages are written to stderr via `debug_echo(...)` and are controlled by `--debug` and `--color`.
 
-Inputs / outputs
+Inputs / Outputs
 
 - stdin: JSONC text containing a top-level array of keybinding objects.
 - stdout: sorted JSONC text (UTF-8) with formatting and comments preserved where feasible.
