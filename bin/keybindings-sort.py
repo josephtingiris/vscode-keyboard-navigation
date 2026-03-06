@@ -37,7 +37,7 @@ Behavior
 - Attempts to preserve comments and trailing commas in the original JSONC input.
 - Deduplicates operands, groups tokens by semantic buckets, and re-renders a stable canonical `when` form.
 - Hides exact object clones by default; use `--object-clones` to keep them.
-- Debug messages are written to stderr via `debug_echo(...)` and are controlled by `--debug` and `--color`.
+- Debug messages are written to stderr via `_debug_echo(...)` and are controlled by `--debug` and `--color`.
 
 Inputs / Outputs
 
@@ -82,6 +82,9 @@ CACHE_NATURAL_KEY: dict = {}
 
 # global memoization cache for case-sensitive natural keys (key: string, value: list of string and int parts)
 CACHE_NATURAL_KEY_CS: dict = {}
+
+# global modifier order, i.e. ctrl+shift, ctrl+shift+alt, ctrl+shift+alt+meta
+CANONICAL_MODIFIER_ORDER = ['ctrl', 'shift', 'alt', 'meta']
 
 # color default output value, options: 'auto'|'always'|'never'
 COLOR: str = 'auto'
@@ -352,8 +355,8 @@ def _assemble_sorted_output(
             pass
 
         obj_out = obj_out.rstrip()
-        key_val, when_val = extract_key_when(obj_out)
-        canonical_when = canonicalize_when(
+        key_val, when_val = _extract_key_when_from_object(obj_out)
+        canonical_when = _canonicalize_when(
             when_val,
             mode=grouping_mode,
             negation_mode=negation_mode,
@@ -391,8 +394,8 @@ def _assemble_sorted_output(
 
         grouped: 'OrderedDict[str, list[tuple[str, str]]]' = OrderedDict()
         for comments, obj_out in rendered_groups:
-            key_val, when_val = extract_key_when(obj_out)
-            canonical = canonicalize_when(
+            key_val, when_val = _extract_key_when_from_object(obj_out)
+            canonical = _canonicalize_when(
                 when_val,
                 mode=grouping_mode,
                 negation_mode=negation_mode,
@@ -410,18 +413,6 @@ def _assemble_sorted_output(
             if len(entries) > 1:
                 hash_map = {}
                 jsonhash_to_indices = {}
-
-                def _strip_comments_and_trailing_commas(s: str) -> str:
-                    # remove comments
-                    def _repl(m):
-                        g = m.group(1)
-                        if g.startswith('"'):
-                            return g
-                        return ''
-
-                    no_comments = COMMENT_RE.sub(_repl, s)
-                    no_trail = TRAILING_COMMA_RE.sub(r"\1", no_comments)
-                    return no_trail.strip()
 
                 def _hash_pair_for_obj(obj_text: str) -> tuple[str, str, str]:
                     full = obj_text
@@ -476,15 +467,6 @@ def _assemble_sorted_output(
                     # primary ASCII special
                     return (0, oc)
 
-                CANONICAL_MOD_ORDER = ['ctrl', 'shift', 'alt', 'meta']
-
-                def _normalize_mods(mods: str) -> str:
-                    parts = [p for p in mods.split('+') if p]
-                    ordered = [p for p in CANONICAL_MOD_ORDER if p in parts]
-                    others = sorted([p for p in parts if p not in ordered])
-                    out = ordered + others
-                    return '+'.join(out) + ('+' if out else '')
-
                 def _key_sort_tuple_from_object(obj_text: str):
                     key_raw = _extract_literal_key_from_object(obj_text) or ''
 
@@ -513,6 +495,25 @@ def _assemble_sorted_output(
 
                     # final sort tuple: normalized mods (bytewise), token_seq, token_count
                     return (mods_norm.encode('utf-8'), token_seq, len(tokens))
+
+                def _normalize_mods(mods: str) -> str:
+                    parts = [p for p in mods.split('+') if p]
+                    ordered = [p for p in CANONICAL_MODIFIER_ORDER if p in parts]
+                    others = sorted([p for p in parts if p not in ordered])
+                    out = ordered + others
+                    return '+'.join(out) + ('+' if out else '')
+
+                def _strip_comments_and_trailing_commas(s: str) -> str:
+                    # remove comments
+                    def _repl(m):
+                        g = m.group(1)
+                        if g.startswith('"'):
+                            return g
+                        return ''
+
+                    no_comments = COMMENT_RE.sub(_repl, s)
+                    no_trail = TRAILING_COMMA_RE.sub(r"\1", no_comments)
+                    return no_trail.strip()
 
                 # compute hashes and collect json-hash groups
                 for idx_e, (comments, obj_text) in enumerate(entries):
@@ -570,701 +571,7 @@ def _assemble_sorted_output(
     return ''.join(out_parts)
 
 
-def _color_enabled() -> bool:
-    if COLOR == 'never':
-        return False
-    if COLOR == 'always':
-        return True
-    try:
-        # auto (default)
-        return sys.stderr.isatty()
-    except Exception:
-        return False
-
-
-def _contains_focus_token_in_object(obj_text: str) -> bool:
-    when_key, when_val = extract_key_when(obj_text)
-    raw = when_val
-
-    if not raw:
-        raw = _extract_literal_when_from_object(obj_text)
-
-    if not raw:
-        return False
-
-    parts = WHEN_TERM_SPLIT_RE.split(raw)
-    for part in parts:
-        token = part.strip()
-        while token.startswith('(') and token.endswith(')'):
-            token = token[1:-1].strip()
-        if not token:
-            continue
-
-        left = token[1:].lstrip() if token.startswith('!') else token
-        left_id = left.split()[0] if left else ''
-        if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
-            return True
-
-    return False
-
-
-def _decode_json_string_literal(raw: str) -> str:
-    try:
-        return json.loads('"' + raw + '"')
-    except Exception:
-        try:
-            return bytes(raw, 'utf-8').decode('unicode_escape')
-        except Exception:
-            return raw
-
-
-def _embed_duplicate_comment_in_object(obj_text: str, duplicate_comment: str) -> str:
-    if not duplicate_comment:
-        return obj_text
-
-    line_comment = duplicate_comment.strip()
-    if not line_comment:
-        return obj_text
-    if not line_comment.startswith('//'):
-        line_comment = f'// {line_comment}'
-
-    lines = obj_text.splitlines(keepends=True)
-    if not lines:
-        return obj_text
-
-    open_idx = -1
-    for idx, line in enumerate(lines):
-        if '{' in line:
-            open_idx = idx
-            break
-
-    if open_idx == -1:
-        return obj_text
-
-    indent = ''
-    for idx in range(open_idx + 1, len(lines)):
-        stripped = lines[idx].strip()
-        if not stripped:
-            continue
-        if stripped.startswith('}'):
-            break
-        indent = lines[idx][:len(lines[idx]) - len(lines[idx].lstrip(' \t'))]
-        break
-
-    if not indent:
-        opener = lines[open_idx]
-        base_indent = opener[:len(opener) - len(opener.lstrip(' \t'))]
-        indent = base_indent + '    '
-
-    lines.insert(open_idx + 1, f'{indent}{line_comment}\n')
-    return ''.join(lines)
-
-
-def _extract_literal_key_from_object(obj_text: str) -> str:
-    match = KEY_EXTRACT_RE.search(obj_text)
-    if not match:
-        return ''
-    return _decode_json_string_literal(match.group(1))
-
-
-def _extract_literal_when_from_object(obj_text: str) -> str:
-    match = WHEN_EXTRACT_RE.search(obj_text)
-    if not match:
-        return ''
-    return _decode_json_string_literal(match.group(1))
-
-
-def _mods_lit_from_object_text(obj_text: str) -> tuple[tuple[str, ...], str]:
-    key_raw = _extract_literal_key_from_object(obj_text) or ''
-    norm = normalize_key_for_compare(key_raw)
-    first = norm.split()[0] if norm else ''
-    parts = [p for p in first.split('+') if p]
-    mods = tuple(parts[:-1]) if len(parts) > 1 else tuple()
-    lit = parts[-1] if parts else ''
-    lit_key = normalize_key_for_compare(lit)
-    return (mods, lit_key)
-
-
-def _finalize_processed_output(
-    text: str,
-    grouping_mode: str,
-    negation_mode: str,
-    when_prefixes: list | None = None,
-    when_regexes: list | None = None,
-) -> str:
-    return _remove_blank_lines(text)
-
-
-def _first_when_group_rank(
-    obj_text: str,
-    mode: str,
-    negation_mode: str,
-    when_prefixes: list | None = None,
-    when_regexes: list | None = None,
-) -> int:
-    when_key, when_val = extract_key_when(obj_text)
-    canonical = canonicalize_when(
-        when_val,
-        mode=mode,
-        negation_mode=negation_mode,
-        when_prefixes=when_prefixes,
-        when_regexes=when_regexes,
-    )
-
-    if not canonical:
-        return 5
-
-    parts = WHEN_TERM_SPLIT_RE.split(canonical.strip())
-    if not parts:
-        return 5
-
-    # ensure related contexts are grouped together
-    if when_prefixes or when_regexes:
-        for part in parts:
-            token = part.strip()
-            while token.startswith('(') and token.endswith(')'):
-                token = token[1:-1].strip()
-            if not token:
-                continue
-            left = token[1:].lstrip() if token.startswith('!') else token
-            left_id = left.split()[0] if left else ''
-            if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
-                debug_echo(1, 'group', canonical, f"matched when_prefix in operand: {left_id}")
-                return 6
-            if when_regexes:
-                for rx in when_regexes:
-                    try:
-                        if hasattr(rx, 'search'):
-                            if rx.search(left_id):
-                                debug_echo(1, 'group', canonical, f"matched when_regex in operand: {left_id} (pattern={rx.pattern if hasattr(rx, 'pattern') else rx})")
-                                return 6
-                        else:
-                            if str(rx) in left_id:
-                                debug_echo(1, 'group', canonical, f"matched when_regex string in operand: {left_id} (pattern={rx})")
-                                return 6
-                    except Exception:
-                        continue
-
-    first = parts[0].strip()
-    while first.startswith('(') and first.endswith(')'):
-        first = first[1:-1].strip()
-
-    left = first[1:].lstrip() if first.startswith('!') else first
-    if not left:
-        return 5
-
-    left_id = left.split()[0]
-
-    if mode == 'focal-invariant':
-        if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
-            return 1
-        if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
-            return 2
-        if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
-            return 3
-        if left_id.startswith('config.'):
-            return 4
-        return 5
-
-    if left_id.startswith('config.'):
-        return 1
-    if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
-        return 2
-    if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
-        return 3
-    if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
-        return 4
-    return 5
-
-
-def _flag_present(raw_argv: list[str], names: list[str]) -> bool:
-    for name in names:
-        if name in raw_argv:
-            return True
-    return False
-
-
-def _matches_when_entry(left: str, entry: str) -> bool:
-    if entry.endswith('.'):
-        return left.startswith(entry)
-    if '<viewId>' in entry:
-        prefix, suffix = entry.split('<viewId>', 1)
-        return left.startswith(prefix) and left.endswith(suffix)
-    return left == entry
-
-
-def _normalize_whitespace(text: str) -> str:
-    return WHITESPACE_RE.sub(' ', text).strip() if text else ''
-
-
-def _parse_when_prefixes(parser: argparse.ArgumentParser, raw_prefixes: str | None) -> list[str]:
-    if raw_prefixes is not None:
-        if raw_prefixes.strip() == '':
-            parser.error('--when-prefix requires a comma-separated list with at least one entry')
-        when_prefixes = [part.strip() for part in raw_prefixes.split(',') if part.strip()]
-        if not when_prefixes:
-            parser.error('--when-prefix requires a comma-separated list with at least one entry')
-        return when_prefixes
-
-    return DEFAULT_WHEN_PREFIXES.copy()
-
-
-def _parse_when_regexes(parser: argparse.ArgumentParser, raw_regexes: str | None):
-    if not raw_regexes:
-        return None
-
-    parts = [part.strip() for part in raw_regexes.split(',') if part.strip()]
-    if not parts:
-        parser.error('--when-regex requires a comma-separated list with at least one entry')
-
-    compiled = []
-    for part in parts:
-        try:
-            compiled.append(re.compile(part))
-        except Exception:
-            compiled.append(part)
-    return compiled
-
-
-def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
-    """Initialize/clear per-run caches for the current run parameter context.
-
-    This allows fast path lookups inside `canonicalize_when` and
-    `sortable_when_key` using only the raw when string.
-    """
-    global RUN_CACHE_CONTEXT, RUN_CANONICAL_CACHE, RUN_SORTABLE_CACHE
-    RUN_CACHE_CONTEXT = (
-        mode,
-        negation_mode,
-        None if when_prefixes is None else tuple(when_prefixes),
-        None if when_regexes is None else tuple(when_regexes),
-    )
-    # clear per-run caches
-    RUN_CANONICAL_CACHE = {}
-    RUN_SORTABLE_CACHE = {}
-
-
-def _partition_focus_groups_to_end(sorted_groups: list[tuple[str, str]]) -> list[tuple[str, str]]:
-    non_focus: list[tuple[str, str]] = []
-    focus: list[tuple[str, str]] = []
-
-    for pair in sorted_groups:
-        try:
-            if _contains_focus_token_in_object(pair[1]):
-                focus.append(pair)
-            else:
-                non_focus.append(pair)
-        except Exception:
-            non_focus.append(pair)
-
-    return non_focus + focus
-
-
-def _remove_blank_lines(text: str) -> str:
-    lines = text.splitlines(keepends=True)
-    out_lines: list[str] = []
-    in_block = False
-
-    for line in lines:
-        if in_block:
-            out_lines.append(line)
-            if '*/' in line:
-                in_block = False
-            continue
-
-        if '/*' in line:
-            out_lines.append(line)
-            if '*/' not in line:
-                in_block = True
-            continue
-
-        if line.strip() == '':
-            continue
-        out_lines.append(line)
-
-    return ''.join(out_lines)
-
-
-def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode: str) -> list[tuple[str, str]]:
-    if negation_mode in ('positive', 'negative'):
-        return sorted_groups
-    groups_list = list(sorted_groups)
-    i = 0
-    while i < len(groups_list):
-        raw_when = _extract_literal_when_from_object(groups_list[i][1]) or ''
-        norm_when = _normalize_whitespace(raw_when)
-        j = i + 1
-
-        while j < len(groups_list):
-            next_when = _extract_literal_when_from_object(groups_list[j][1]) or ''
-            if _normalize_whitespace(next_when) != norm_when:
-                break
-            j += 1
-
-        if j - i > 1:
-            slice_pairs = groups_list[i:j]
-
-            def _mods_lit_from_pair(pair: tuple[str, str]) -> tuple[tuple[str, ...], str]:
-                key_raw = _extract_literal_key_from_object(pair[1]) or ''
-                norm = normalize_key_for_compare(key_raw)
-                first = norm.split()[0] if norm else ''
-                parts = [p for p in first.split('+') if p]
-                mods = tuple(parts[:-1]) if len(parts) > 1 else tuple()
-                lit = parts[-1] if parts else ''
-                lit_key = normalize_key_for_compare(lit)
-                return (mods, lit_key)
-
-            slice_pairs.sort(key=lambda pair: _mods_lit_from_pair(pair))
-            groups_list[i:j] = slice_pairs
-
-        i = j
-
-    return groups_list
-
-
-def _replace_when_literal_match(
-    match,
-    grouping_mode: str,
-    negation_mode: str,
-    when_prefixes: list | None = None,
-    when_regexes: list | None = None,
-) -> str:
-    inner = match.group(2)
-
-    try:
-        unescaped = json.loads('"' + inner + '"')
-    except Exception:
-        unescaped = inner
-
-    canonical = canonicalize_when(
-        unescaped,
-        mode=grouping_mode,
-        negation_mode=negation_mode,
-        when_prefixes=when_prefixes,
-        when_regexes=when_regexes,
-    )
-
-    try:
-        escaped = json.dumps(canonical)[1:-1]
-    except Exception:
-        escaped = canonical.replace('\\', '\\\\').replace('"', '\\"')
-
-    escaped = escaped.replace('\n', '\\n').replace('\r', '\\r')
-    return match.group(1) + escaped + match.group(3)
-
-
-def _replace_when_literals(
-    text: str,
-    grouping_mode: str,
-    negation_mode: str,
-    when_prefixes: list | None = None,
-    when_regexes: list | None = None,
-) -> str:
-    return re.sub(
-        r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")',
-        lambda match: _replace_when_literal_match(
-            match,
-            grouping_mode,
-            negation_mode,
-            when_prefixes=when_prefixes,
-            when_regexes=when_regexes,
-        ),
-        text,
-    )
-
-
-def _sort_groups_for_primary_when(
-    sorted_groups: list[tuple[str, str]],
-    grouping_mode: str,
-    negation_mode: str,
-    when_prefixes: list | None = None,
-    when_regexes: list | None = None,
-) -> list[tuple[str, str]]:
-    decorated: list[tuple[str, str, tuple[str, str]]] = []
-    for pair in sorted_groups:
-        key_val, when_val = extract_key_when(pair[1])
-        if not key_val:
-            key_val = _extract_literal_key_from_object(pair[1])
-        if not when_val:
-            when_val = _extract_literal_when_from_object(pair[1])
-        decorated.append((key_val, when_val, pair))
-
-    for key_val, when_val, _pair in decorated:
-        try:
-            canonical = canonicalize_when(
-                when_val,
-                mode=grouping_mode,
-                negation_mode=negation_mode,
-                when_prefixes=when_prefixes,
-                when_regexes=when_regexes,
-            )
-        except Exception:
-            canonical = when_val
-
-        if DEBUG_LEVEL > 0:
-            normalized = normalize_key_for_compare(key_val)
-            try:
-                natural = natural_key(normalized)
-            except Exception:
-                natural = normalized
-            debug_echo(
-                2,
-                'sort',
-                when_val,
-                f"DEBUG_SORT: raw_key={key_val!r} normalized={normalized!r} natural_key={natural!r} when_raw={when_val!r} when_canonical={canonical!r}",
-            )
-
-    decorated.sort(
-        key=lambda row: (
-            canonicalize_when(
-                row[1],
-                mode=grouping_mode,
-                negation_mode=negation_mode,
-                when_prefixes=when_prefixes,
-                when_regexes=when_regexes,
-            ),
-            row[1],
-            natural_key_case_sensitive(row[0]),
-        )
-    )
-
-    if grouping_mode == 'focal-invariant':
-        non_focus_rows = []
-        focus_rows = []
-        for row in decorated:
-            when_val = row[1] or ''
-            try:
-                parts = WHEN_TERM_SPLIT_RE.split(when_val.strip()) if when_val else []
-                found_focus = False
-                for part in parts:
-                    token = part.strip()
-                    while token.startswith('(') and token.endswith(')'):
-                        token = token[1:-1].strip()
-                    if not token:
-                        continue
-
-                    left = token[1:].lstrip() if token.startswith('!') else token
-                    left_id = left.split()[0] if left else ''
-
-                    # debug: trace terminal/keyboardNavigation related operands to diagnose grouping
-                    try:
-                        if 'terminal' in left_id or 'keyboardNavigation' in left_id:
-                            debug_echo(1, 'group', when_val, f"SIG_PART: left_id={left_id!r} token={token!r}")
-                    except Exception:
-                        pass
-                    if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
-                        found_focus = True
-                        break
-
-                if found_focus:
-                    focus_rows.append(row)
-                else:
-                    non_focus_rows.append(row)
-            except Exception:
-                non_focus_rows.append(row)
-        decorated = non_focus_rows + focus_rows
-
-    sorted_groups = [row[2] for row in decorated]
-
-    for idx, pair in enumerate(sorted_groups):
-        key_val, when_val = extract_key_when(pair[1])
-        try:
-            canonical = canonicalize_when(
-                when_val,
-                mode=grouping_mode,
-                negation_mode=negation_mode,
-                when_prefixes=when_prefixes,
-                when_regexes=when_regexes,
-            )
-        except Exception:
-            canonical = when_val
-
-        if DEBUG_LEVEL > 0:
-            normalized = normalize_key_for_compare(key_val)
-            debug_echo(1, 'ordered', canonical, f"DEBUG_ORDERED: idx={idx} raw_key={key_val!r} normalized={normalized!r}")
-
-    # stable-partition when prefixes and/or regexes into three contiguous regions,
-    # following this order:
-    #  1. clauses matching any when_prefix (any operand),
-    #  2. clauses matching any when_regex (any operand) but not matching prefixes,
-    #  3. all remaining clauses.
-
-    if when_prefixes or when_regexes:
-        matched_prefix: list[tuple[str, str]] = []
-        matched_regex: list[tuple[str, str]] = []
-        others: list[tuple[str, str]] = []
-        for pair in sorted_groups:
-            _, when_val = extract_key_when(pair[1])
-            if not when_val:
-                when_val = _extract_literal_when_from_object(pair[1])
-            found_prefix = False
-            found_regex = False
-            try:
-                parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
-                for part in parts:
-                    token = part.strip()
-                    while token.startswith('(') and token.endswith(')'):
-                        token = token[1:-1].strip()
-                    if not token:
-                        continue
-
-                    left = token[1:].lstrip() if token.startswith('!') else token
-                    left_id = left.split()[0] if left else ''
-
-                    # check regexes first and record matches
-                    if when_regexes:
-                        for rx in when_regexes:
-                            try:
-                                if hasattr(rx, 'search'):
-                                    if rx.search(left_id):
-                                        found_regex = True
-                                        break
-                                else:
-                                    if str(rx) in left_id:
-                                        found_regex = True
-                                        break
-                            except Exception:
-                                continue
-                        if found_regex:
-                            # when a regex matches, prefer regex grouping regardless of prefix
-                            break
-
-                    if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
-                        found_prefix = True
-                        # continue scanning to detect possible matches in other operands but do not break here; a regex match anywhere should win
-                        continue
-            except Exception:
-                found_prefix = False
-                found_regex = False
-
-            if found_regex:
-                matched_regex.append(pair)
-            elif found_prefix:
-                matched_prefix.append(pair)
-            else:
-                others.append(pair)
-
-        if matched_prefix or matched_regex:
-            debug_echo(
-                1,
-                'group',
-                None,
-                f"partitioned primary-when: prefix={len(matched_prefix)} regex={len(matched_regex)} others={len(others)}",
-            )
-            sorted_groups = matched_prefix + matched_regex + others
-
-    i = 0
-    while i < len(sorted_groups):
-        _, raw_when = extract_key_when(sorted_groups[i][1])
-        if not raw_when:
-            raw_when = _extract_literal_when_from_object(sorted_groups[i][1])
-
-        normalized_when = _normalize_whitespace(raw_when)
-        j = i + 1
-        while j < len(sorted_groups):
-            _, next_when = extract_key_when(sorted_groups[j][1])
-            if not next_when:
-                next_when = _extract_literal_when_from_object(sorted_groups[j][1])
-            if _normalize_whitespace(next_when) != normalized_when:
-                break
-            j += 1
-
-        if j - i > 1 and negation_mode not in ('positive', 'negative'):
-            slice_pairs = sorted_groups[i:j]
-            slice_pairs.sort(key=lambda pair: natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
-            sorted_groups[i:j] = slice_pairs
-
-        i = j
-
-    return sorted_groups
-
-
-def _sort_groups_initial(
-    normalized_groups: list[tuple[str, str]],
-    primary_order: str,
-    secondary_order: str | None,
-    grouping_mode: str,
-    negation_mode: str,
-    when_prefixes: list | None = None,
-    when_regexes: list | None = None,
-) -> list[tuple[str, str]]:
-    return sorted(
-        normalized_groups,
-        key=lambda pair: extract_sort_keys(
-            pair[1],
-            primary=primary_order,
-            secondary=secondary_order,
-            grouping=grouping_mode,
-            negation_mode=negation_mode,
-            when_prefixes=when_prefixes,
-            when_regexes=when_regexes,
-        ),
-    )
-
-
-def _sort_groups_with_grouping_mode(
-    sorted_groups: list[tuple[str, str]],
-    grouping_mode: str,
-    negation_mode: str,
-    when_prefixes: list | None = None,
-    when_regexes: list | None = None,
-) -> list[tuple[str, str]]:
-    if grouping_mode == 'none':
-        return sorted_groups
-
-    buckets: dict[int, list[tuple[str, str]]] = {}
-    for pair in sorted_groups:
-        rank = _first_when_group_rank(
-            pair[1],
-            grouping_mode,
-            negation_mode,
-            when_prefixes=when_prefixes,
-            when_regexes=when_regexes,
-        )
-        buckets.setdefault(rank, []).append(pair)
-
-    final_groups: list[tuple[str, str]] = []
-    for rank in sorted(buckets.keys(), reverse=True):
-        final_groups.extend(buckets[rank])
-    return final_groups
-
-
-def _strip_when_sorted_comment(comment_text: str, when_changed: bool) -> str:
-    if not when_changed:
-        return comment_text
-    return WHEN_SORTED_RE.sub('', comment_text)
-
-
-def _with_normalized_when_groups(
-    groups: list[tuple[str, str]],
-    grouping_mode: str,
-    negation_mode: str,
-    when_prefixes: list | None = None,
-    when_regexes: list | None = None,
-) -> list[tuple[str, str]]:
-    normalized_groups: list[tuple[str, str]] = []
-    for comments, obj in groups:
-        obj_out = obj.rstrip()
-        obj_out, when_changed = normalize_when_in_object(
-            obj_out,
-            mode=grouping_mode,
-            negation_mode=negation_mode,
-            when_prefixes=when_prefixes,
-            when_regexes=when_regexes,
-        )
-        comments = _strip_when_sorted_comment(comments, when_changed)
-        normalized_groups.append((comments, obj_out))
-
-        # warm the parsed-object cache
-        try:
-            _ = parse_object_text(obj_out)
-        except Exception:
-            pass
-
-    return normalized_groups
-
-
-def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Produce a canonical string for a `when` clause.
 
     Sort operands inside every AND node according to project conventions.
@@ -1594,12 +901,12 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                         tok = render_when_node(c)
                     except Exception:
                         tok = str(c)
-                    debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: idx={i} token={tok!r}")
+                    _debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: idx={i} token={tok!r}")
             else:
                 try:
-                    debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: node={render_when_node(ast)!r}")
+                    _debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: node={render_when_node(ast)!r}")
                 except Exception:
-                    debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: node={ast!r}")
+                    _debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: node={ast!r}")
     except Exception:
         pass
 
@@ -1613,12 +920,12 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
                         tok = render_when_node(c)
                     except Exception:
                         tok = str(c)
-                    debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: idx={i} token={tok!r}")
+                    _debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: idx={i} token={tok!r}")
             else:
                 try:
-                    debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: node={render_when_node(ast)!r}")
+                    _debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: node={render_when_node(ast)!r}")
                 except Exception:
-                    debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: node={ast!r}")
+                    _debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: node={ast!r}")
     except Exception:
         pass
 
@@ -1651,7 +958,45 @@ def canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: 
     return result
 
 
-def debug_color(text: str, level: int) -> str:
+def _color_enabled() -> bool:
+    if COLOR == 'never':
+        return False
+    if COLOR == 'always':
+        return True
+    try:
+        # auto (default)
+        return sys.stderr.isatty()
+    except Exception:
+        return False
+
+
+def _contains_focus_token_in_object(obj_text: str) -> bool:
+    when_key, when_val = _extract_key_when_from_object(obj_text)
+    raw = when_val
+
+    if not raw:
+        raw = _extract_literal_when_from_object(obj_text)
+
+    if not raw:
+        return False
+
+    parts = WHEN_TERM_SPLIT_RE.split(raw)
+    for part in parts:
+        token = part.strip()
+        while token.startswith('(') and token.endswith(')'):
+            token = token[1:-1].strip()
+        if not token:
+            continue
+
+        left = token[1:].lstrip() if token.startswith('!') else token
+        left_id = left.split()[0] if left else ''
+        if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
+            return True
+
+    return False
+
+
+def _debug_color(text: str, level: int) -> str:
     if not _color_enabled():
         return text
 
@@ -1667,7 +1012,7 @@ def debug_color(text: str, level: int) -> str:
     return f"{code}{text}\x1b[0m"
 
 
-def debug_echo(level: int, category: str, when_val: str | None, msg: str) -> None:
+def _debug_echo(level: int, category: str, when_val: str | None, msg: str) -> None:
     """Emit a filtered, leveled debug message to stderr.
 
     Messages are emitted when `level` <= `DEBUG_LEVEL` and category/when
@@ -1686,20 +1031,72 @@ def debug_echo(level: int, category: str, when_val: str | None, msg: str) -> Non
         if when_val != DEBUG_TARGET_WHEN:
             return
     out = f"[DEBUG:{level}:{category}] {msg}"
-    out = debug_color(out, level)
+    out = _debug_color(out, level)
     try:
         sys.stderr.write(out + '\n')
     except Exception:
         pass
 
 
-def extract_key_when(obj_text: str) -> Tuple[str, str]:
+def _decode_json_string_literal(raw: str) -> str:
+    try:
+        return json.loads('"' + raw + '"')
+    except Exception:
+        try:
+            return bytes(raw, 'utf-8').decode('unicode_escape')
+        except Exception:
+            return raw
+
+
+def _embed_duplicate_comment_in_object(obj_text: str, duplicate_comment: str) -> str:
+    if not duplicate_comment:
+        return obj_text
+
+    line_comment = duplicate_comment.strip()
+    if not line_comment:
+        return obj_text
+    if not line_comment.startswith('//'):
+        line_comment = f'// {line_comment}'
+
+    lines = obj_text.splitlines(keepends=True)
+    if not lines:
+        return obj_text
+
+    open_idx = -1
+    for idx, line in enumerate(lines):
+        if '{' in line:
+            open_idx = idx
+            break
+
+    if open_idx == -1:
+        return obj_text
+
+    indent = ''
+    for idx in range(open_idx + 1, len(lines)):
+        stripped = lines[idx].strip()
+        if not stripped:
+            continue
+        if stripped.startswith('}'):
+            break
+        indent = lines[idx][:len(lines[idx]) - len(lines[idx].lstrip(' \t'))]
+        break
+
+    if not indent:
+        opener = lines[open_idx]
+        base_indent = opener[:len(opener) - len(opener.lstrip(' \t'))]
+        indent = base_indent + '    '
+
+    lines.insert(open_idx + 1, f'{indent}{line_comment}\n')
+    return ''.join(lines)
+
+
+def _extract_key_when_from_object(obj_text: str) -> Tuple[str, str]:
     # fast-path: check per-run object info cache populated during normalization
     info = RUN_OBJ_INFO_CACHE.get(obj_text)
     if info is not None:
         return (info.get('key', ''), info.get('when', ''))
 
-    parsed = parse_object_text(obj_text)
+    parsed = _parse_object(obj_text)
     if not parsed:
         return ('', '')
     try:
@@ -1708,6 +1105,31 @@ def extract_key_when(obj_text: str) -> Tuple[str, str]:
         return (key_val, when_val)
     except Exception:
         return ('', '')
+
+
+def _extract_literal_key_from_object(obj_text: str) -> str:
+    match = KEY_EXTRACT_RE.search(obj_text)
+    if not match:
+        return ''
+    return _decode_json_string_literal(match.group(1))
+
+
+def _extract_literal_when_from_object(obj_text: str) -> str:
+    match = WHEN_EXTRACT_RE.search(obj_text)
+    if not match:
+        return ''
+    return _decode_json_string_literal(match.group(1))
+
+
+def _extract_modifiers_from_object(obj_text: str) -> tuple[tuple[str, ...], str]:
+    key_raw = _extract_literal_key_from_object(obj_text) or ''
+    norm = normalize_key_for_compare(key_raw)
+    first = norm.split()[0] if norm else ''
+    parts = [p for p in first.split('+') if p]
+    mods = tuple(parts[:-1]) if len(parts) > 1 else tuple()
+    lit = parts[-1] if parts else ''
+    lit_key = normalize_key_for_compare(lit)
+    return (mods, lit_key)
 
 
 def extract_preamble_postamble(text):
@@ -1831,7 +1253,7 @@ def extract_preamble_postamble(text):
     return preamble, array_text, postamble
 
 
-def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None = None, grouping: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple:
+def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondary: str | None = None, grouping: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple:
     # obtain key/when/canonical/sortable values either from cache or by parsing
     info = RUN_OBJ_INFO_CACHE.get(obj_text)
     if info is not None:
@@ -1840,14 +1262,14 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         canonical_when = info.get('canonical', '')
         sortable_when = info.get('sortable', '')
     else:
-        parsed = parse_object_text(obj_text)
+        parsed = _parse_object(obj_text)
         if not parsed:
             # return a consistent fallback sort key (rank high so these sort last)
             return (9999, [], (0,), [])
         try:
             key_val = str(parsed.get('key', ''))
             when_val = str(parsed.get('when', ''))
-            canonical_when = canonicalize_when(
+            canonical_when = _canonicalize_when(
                 when_val, mode=grouping, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
             sortable_when = sortable_when_key(
                 when_val, mode=grouping, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
@@ -2016,6 +1438,105 @@ def extract_sort_keys(obj_text: str, primary: str = 'key', secondary: str | None
         return (9999, [], (0,), [])
 
 
+def _finalize_processed_output(
+    text: str,
+    grouping_mode: str,
+    negation_mode: str,
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> str:
+    return _remove_blank_lines(text)
+
+
+def _first_when_group_rank(
+    obj_text: str,
+    mode: str,
+    negation_mode: str,
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> int:
+    when_key, when_val = _extract_key_when_from_object(obj_text)
+    canonical = _canonicalize_when(
+        when_val,
+        mode=mode,
+        negation_mode=negation_mode,
+        when_prefixes=when_prefixes,
+        when_regexes=when_regexes,
+    )
+
+    if not canonical:
+        return 5
+
+    parts = WHEN_TERM_SPLIT_RE.split(canonical.strip())
+    if not parts:
+        return 5
+
+    # ensure related contexts are grouped together
+    if when_prefixes or when_regexes:
+        for part in parts:
+            token = part.strip()
+            while token.startswith('(') and token.endswith(')'):
+                token = token[1:-1].strip()
+            if not token:
+                continue
+            left = token[1:].lstrip() if token.startswith('!') else token
+            left_id = left.split()[0] if left else ''
+            if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
+                _debug_echo(1, 'group', canonical, f"matched when_prefix in operand: {left_id}")
+                return 6
+            if when_regexes:
+                for rx in when_regexes:
+                    try:
+                        if hasattr(rx, 'search'):
+                            if rx.search(left_id):
+                                _debug_echo(1, 'group', canonical, f"matched when_regex in operand: {left_id} (pattern={rx.pattern if hasattr(rx, 'pattern') else rx})")
+                                return 6
+                        else:
+                            if str(rx) in left_id:
+                                _debug_echo(1, 'group', canonical, f"matched when_regex string in operand: {left_id} (pattern={rx})")
+                                return 6
+                    except Exception:
+                        continue
+
+    first = parts[0].strip()
+    while first.startswith('(') and first.endswith(')'):
+        first = first[1:-1].strip()
+
+    left = first[1:].lstrip() if first.startswith('!') else first
+    if not left:
+        return 5
+
+    left_id = left.split()[0]
+
+    if mode == 'focal-invariant':
+        if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
+            return 1
+        if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
+            return 2
+        if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
+            return 3
+        if left_id.startswith('config.'):
+            return 4
+        return 5
+
+    if left_id.startswith('config.'):
+        return 1
+    if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
+        return 2
+    if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
+        return 3
+    if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
+        return 4
+    return 5
+
+
+def _flag_present(raw_argv: list[str], names: list[str]) -> bool:
+    for name in names:
+        if name in raw_argv:
+            return True
+    return False
+
+
 def group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]], str]:
     groups: list[tuple[str, str]] = []
     comments = ''
@@ -2100,6 +1621,486 @@ def group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]],
     return groups, trailing_comments
 
 
+def _matches_when_entry(left: str, entry: str) -> bool:
+    if entry.endswith('.'):
+        return left.startswith(entry)
+    if '<viewId>' in entry:
+        prefix, suffix = entry.split('<viewId>', 1)
+        return left.startswith(prefix) and left.endswith(suffix)
+    return left == entry
+
+
+def _normalize_whitespace(text: str) -> str:
+    return WHITESPACE_RE.sub(' ', text).strip() if text else ''
+
+
+def _parse_when_prefixes(parser: argparse.ArgumentParser, raw_prefixes: str | None) -> list[str]:
+    if raw_prefixes is not None:
+        if raw_prefixes.strip() == '':
+            parser.error('--when-prefix requires a comma-separated list with at least one entry')
+        when_prefixes = [part.strip() for part in raw_prefixes.split(',') if part.strip()]
+        if not when_prefixes:
+            parser.error('--when-prefix requires a comma-separated list with at least one entry')
+        return when_prefixes
+
+    return DEFAULT_WHEN_PREFIXES.copy()
+
+
+def _parse_when_regexes(parser: argparse.ArgumentParser, raw_regexes: str | None):
+    if not raw_regexes:
+        return None
+
+    parts = [part.strip() for part in raw_regexes.split(',') if part.strip()]
+    if not parts:
+        parser.error('--when-regex requires a comma-separated list with at least one entry')
+
+    compiled = []
+    for part in parts:
+        try:
+            compiled.append(re.compile(part))
+        except Exception:
+            compiled.append(part)
+    return compiled
+
+
+def _partition_focus_groups_to_end(sorted_groups: list[tuple[str, str]]) -> list[tuple[str, str]]:
+    non_focus: list[tuple[str, str]] = []
+    focus: list[tuple[str, str]] = []
+
+    for pair in sorted_groups:
+        try:
+            if _contains_focus_token_in_object(pair[1]):
+                focus.append(pair)
+            else:
+                non_focus.append(pair)
+        except Exception:
+            non_focus.append(pair)
+
+    return non_focus + focus
+
+
+def _remove_blank_lines(text: str) -> str:
+    lines = text.splitlines(keepends=True)
+    out_lines: list[str] = []
+    in_block = False
+
+    for line in lines:
+        if in_block:
+            out_lines.append(line)
+            if '*/' in line:
+                in_block = False
+            continue
+
+        if '/*' in line:
+            out_lines.append(line)
+            if '*/' not in line:
+                in_block = True
+            continue
+
+        if line.strip() == '':
+            continue
+        out_lines.append(line)
+
+    return ''.join(out_lines)
+
+
+def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode: str) -> list[tuple[str, str]]:
+    if negation_mode in ('positive', 'negative'):
+        return sorted_groups
+    groups_list = list(sorted_groups)
+    i = 0
+    while i < len(groups_list):
+        raw_when = _extract_literal_when_from_object(groups_list[i][1]) or ''
+        norm_when = _normalize_whitespace(raw_when)
+        j = i + 1
+
+        while j < len(groups_list):
+            next_when = _extract_literal_when_from_object(groups_list[j][1]) or ''
+            if _normalize_whitespace(next_when) != norm_when:
+                break
+            j += 1
+
+        if j - i > 1:
+            slice_pairs = groups_list[i:j]
+
+            def _mods_lit_from_pair(pair: tuple[str, str]) -> tuple[tuple[str, ...], str]:
+                key_raw = _extract_literal_key_from_object(pair[1]) or ''
+                norm = normalize_key_for_compare(key_raw)
+                first = norm.split()[0] if norm else ''
+                parts = [p for p in first.split('+') if p]
+                mods = tuple(parts[:-1]) if len(parts) > 1 else tuple()
+                lit = parts[-1] if parts else ''
+                lit_key = normalize_key_for_compare(lit)
+                return (mods, lit_key)
+
+            slice_pairs.sort(key=lambda pair: _mods_lit_from_pair(pair))
+            groups_list[i:j] = slice_pairs
+
+        i = j
+
+    return groups_list
+
+
+def _replace_when_literal_match(
+    match,
+    grouping_mode: str,
+    negation_mode: str,
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> str:
+    inner = match.group(2)
+
+    try:
+        unescaped = json.loads('"' + inner + '"')
+    except Exception:
+        unescaped = inner
+
+    canonical = _canonicalize_when(
+        unescaped,
+        mode=grouping_mode,
+        negation_mode=negation_mode,
+        when_prefixes=when_prefixes,
+        when_regexes=when_regexes,
+    )
+
+    try:
+        escaped = json.dumps(canonical)[1:-1]
+    except Exception:
+        escaped = canonical.replace('\\', '\\\\').replace('"', '\\"')
+
+    escaped = escaped.replace('\n', '\\n').replace('\r', '\\r')
+    return match.group(1) + escaped + match.group(3)
+
+
+def _replace_when_literals(
+    text: str,
+    grouping_mode: str,
+    negation_mode: str,
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> str:
+    return re.sub(
+        r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")',
+        lambda match: _replace_when_literal_match(
+            match,
+            grouping_mode,
+            negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        ),
+        text,
+    )
+
+
+def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
+    """Initialize/clear per-run caches for the current run parameter context.
+
+    This allows fast path lookups inside `_canonicalize_when` and
+    `sortable_when_key` using only the raw when string.
+    """
+    global RUN_CACHE_CONTEXT, RUN_CANONICAL_CACHE, RUN_SORTABLE_CACHE
+    RUN_CACHE_CONTEXT = (
+        mode,
+        negation_mode,
+        None if when_prefixes is None else tuple(when_prefixes),
+        None if when_regexes is None else tuple(when_regexes),
+    )
+    # clear per-run caches
+    RUN_CANONICAL_CACHE = {}
+    RUN_SORTABLE_CACHE = {}
+
+
+def _sort_groups_for_primary_when(
+    sorted_groups: list[tuple[str, str]],
+    grouping_mode: str,
+    negation_mode: str,
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> list[tuple[str, str]]:
+    decorated: list[tuple[str, str, tuple[str, str]]] = []
+    for pair in sorted_groups:
+        key_val, when_val = _extract_key_when_from_object(pair[1])
+        if not key_val:
+            key_val = _extract_literal_key_from_object(pair[1])
+        if not when_val:
+            when_val = _extract_literal_when_from_object(pair[1])
+        decorated.append((key_val, when_val, pair))
+
+    for key_val, when_val, _pair in decorated:
+        try:
+            canonical = _canonicalize_when(
+                when_val,
+                mode=grouping_mode,
+                negation_mode=negation_mode,
+                when_prefixes=when_prefixes,
+                when_regexes=when_regexes,
+            )
+        except Exception:
+            canonical = when_val
+
+        if DEBUG_LEVEL > 0:
+            normalized = normalize_key_for_compare(key_val)
+            try:
+                natural = natural_key(normalized)
+            except Exception:
+                natural = normalized
+            _debug_echo(
+                2,
+                'sort',
+                when_val,
+                f"DEBUG_SORT: raw_key={key_val!r} normalized={normalized!r} natural_key={natural!r} when_raw={when_val!r} when_canonical={canonical!r}",
+            )
+
+    decorated.sort(
+        key=lambda row: (
+            _canonicalize_when(
+                row[1],
+                mode=grouping_mode,
+                negation_mode=negation_mode,
+                when_prefixes=when_prefixes,
+                when_regexes=when_regexes,
+            ),
+            row[1],
+            natural_key_case_sensitive(row[0]),
+        )
+    )
+
+    if grouping_mode == 'focal-invariant':
+        non_focus_rows = []
+        focus_rows = []
+        for row in decorated:
+            when_val = row[1] or ''
+            try:
+                parts = WHEN_TERM_SPLIT_RE.split(when_val.strip()) if when_val else []
+                found_focus = False
+                for part in parts:
+                    token = part.strip()
+                    while token.startswith('(') and token.endswith(')'):
+                        token = token[1:-1].strip()
+                    if not token:
+                        continue
+
+                    left = token[1:].lstrip() if token.startswith('!') else token
+                    left_id = left.split()[0] if left else ''
+
+                    # debug: trace terminal/keyboardNavigation related operands to diagnose grouping
+                    try:
+                        if 'terminal' in left_id or 'keyboardNavigation' in left_id:
+                            _debug_echo(1, 'group', when_val, f"SIG_PART: left_id={left_id!r} token={token!r}")
+                    except Exception:
+                        pass
+                    if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
+                        found_focus = True
+                        break
+
+                if found_focus:
+                    focus_rows.append(row)
+                else:
+                    non_focus_rows.append(row)
+            except Exception:
+                non_focus_rows.append(row)
+        decorated = non_focus_rows + focus_rows
+
+    sorted_groups = [row[2] for row in decorated]
+
+    for idx, pair in enumerate(sorted_groups):
+        key_val, when_val = _extract_key_when_from_object(pair[1])
+        try:
+            canonical = _canonicalize_when(
+                when_val,
+                mode=grouping_mode,
+                negation_mode=negation_mode,
+                when_prefixes=when_prefixes,
+                when_regexes=when_regexes,
+            )
+        except Exception:
+            canonical = when_val
+
+        if DEBUG_LEVEL > 0:
+            normalized = normalize_key_for_compare(key_val)
+            _debug_echo(1, 'ordered', canonical, f"DEBUG_ORDERED: idx={idx} raw_key={key_val!r} normalized={normalized!r}")
+
+    # stable-partition when prefixes and/or regexes into three contiguous regions,
+    # following this order:
+    #  1. clauses matching any when_prefix (any operand),
+    #  2. clauses matching any when_regex (any operand) but not matching prefixes,
+    #  3. all remaining clauses.
+
+    if when_prefixes or when_regexes:
+        matched_prefix: list[tuple[str, str]] = []
+        matched_regex: list[tuple[str, str]] = []
+        others: list[tuple[str, str]] = []
+        for pair in sorted_groups:
+            _, when_val = _extract_key_when_from_object(pair[1])
+            if not when_val:
+                when_val = _extract_literal_when_from_object(pair[1])
+            found_prefix = False
+            found_regex = False
+            try:
+                parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
+                for part in parts:
+                    token = part.strip()
+                    while token.startswith('(') and token.endswith(')'):
+                        token = token[1:-1].strip()
+                    if not token:
+                        continue
+
+                    left = token[1:].lstrip() if token.startswith('!') else token
+                    left_id = left.split()[0] if left else ''
+
+                    # check regexes first and record matches
+                    if when_regexes:
+                        for rx in when_regexes:
+                            try:
+                                if hasattr(rx, 'search'):
+                                    if rx.search(left_id):
+                                        found_regex = True
+                                        break
+                                else:
+                                    if str(rx) in left_id:
+                                        found_regex = True
+                                        break
+                            except Exception:
+                                continue
+                        if found_regex:
+                            # when a regex matches, prefer regex grouping regardless of prefix
+                            break
+
+                    if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
+                        found_prefix = True
+                        # continue scanning to detect possible matches in other operands but do not break here; a regex match anywhere should win
+                        continue
+            except Exception:
+                found_prefix = False
+                found_regex = False
+
+            if found_regex:
+                matched_regex.append(pair)
+            elif found_prefix:
+                matched_prefix.append(pair)
+            else:
+                others.append(pair)
+
+        if matched_prefix or matched_regex:
+            _debug_echo(
+                1,
+                'group',
+                None,
+                f"partitioned primary-when: prefix={len(matched_prefix)} regex={len(matched_regex)} others={len(others)}",
+            )
+            sorted_groups = matched_prefix + matched_regex + others
+
+    i = 0
+    while i < len(sorted_groups):
+        _, raw_when = _extract_key_when_from_object(sorted_groups[i][1])
+        if not raw_when:
+            raw_when = _extract_literal_when_from_object(sorted_groups[i][1])
+
+        normalized_when = _normalize_whitespace(raw_when)
+        j = i + 1
+        while j < len(sorted_groups):
+            _, next_when = _extract_key_when_from_object(sorted_groups[j][1])
+            if not next_when:
+                next_when = _extract_literal_when_from_object(sorted_groups[j][1])
+            if _normalize_whitespace(next_when) != normalized_when:
+                break
+            j += 1
+
+        if j - i > 1 and negation_mode not in ('positive', 'negative'):
+            slice_pairs = sorted_groups[i:j]
+            slice_pairs.sort(key=lambda pair: natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
+            sorted_groups[i:j] = slice_pairs
+
+        i = j
+
+    return sorted_groups
+
+
+def _sort_groups_initial(
+    normalized_groups: list[tuple[str, str]],
+    primary_order: str,
+    secondary_order: str | None,
+    grouping_mode: str,
+    negation_mode: str,
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> list[tuple[str, str]]:
+    return sorted(
+        normalized_groups,
+        key=lambda pair: _extract_sort_keys_from_object(
+            pair[1],
+            primary=primary_order,
+            secondary=secondary_order,
+            grouping=grouping_mode,
+            negation_mode=negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        ),
+    )
+
+
+def _sort_groups_with_grouping_mode(
+    sorted_groups: list[tuple[str, str]],
+    grouping_mode: str,
+    negation_mode: str,
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> list[tuple[str, str]]:
+    if grouping_mode == 'none':
+        return sorted_groups
+
+    buckets: dict[int, list[tuple[str, str]]] = {}
+    for pair in sorted_groups:
+        rank = _first_when_group_rank(
+            pair[1],
+            grouping_mode,
+            negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        )
+        buckets.setdefault(rank, []).append(pair)
+
+    final_groups: list[tuple[str, str]] = []
+    for rank in sorted(buckets.keys(), reverse=True):
+        final_groups.extend(buckets[rank])
+    return final_groups
+
+
+def _strip_when_sorted_comment(comment_text: str, when_changed: bool) -> str:
+    if not when_changed:
+        return comment_text
+    return WHEN_SORTED_RE.sub('', comment_text)
+
+
+def _with_normalized_when_groups(
+    groups: list[tuple[str, str]],
+    grouping_mode: str,
+    negation_mode: str,
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> list[tuple[str, str]]:
+    normalized_groups: list[tuple[str, str]] = []
+    for comments, obj in groups:
+        obj_out = obj.rstrip()
+        obj_out, when_changed = normalize_when_in_object(
+            obj_out,
+            mode=grouping_mode,
+            negation_mode=negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        )
+        comments = _strip_when_sorted_comment(comments, when_changed)
+        normalized_groups.append((comments, obj_out))
+
+        # warm the parsed-object cache
+        try:
+            _ = _parse_object(obj_out)
+        except Exception:
+            pass
+
+    return normalized_groups
+
+
 def natural_key(s):
     key = str(s)
     cached = CACHE_NATURAL_KEY.get(key)
@@ -2162,7 +2163,7 @@ def normalize_operand(text: str) -> str:
 
 
 def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple[str, bool]:
-    parsed = parse_object_text(obj_text)
+    parsed = _parse_object(obj_text)
     if not parsed:
         return obj_text, False
 
@@ -2170,7 +2171,7 @@ def normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation
     if not when_val:
         return obj_text, False
 
-    normalized = canonicalize_when(
+    normalized = _canonicalize_when(
         str(when_val), mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
     if normalized == when_val:
         return obj_text, False
@@ -2248,7 +2249,7 @@ def object_has_trailing_comma(obj_text: str) -> bool:
     return False
 
 
-def parse_object_text(obj_text: str):
+def _parse_object(obj_text: str):
     """Parse an object text (including braces) into a dict and cache the result.
 
     Returns the parsed dict or None on failure.
@@ -2381,7 +2382,7 @@ def sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: 
         pass
 
     # preserve negation for stable sorting
-    when = canonicalize_when(when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+    when = _canonicalize_when(when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
 
     try:
         CACHE_SORTABLE_WHEN[cache_key] = when
@@ -2678,7 +2679,7 @@ def main(argv: List[str] | None = None) -> int:
     if when_prefixes or when_regexes:
         # helper: compute matched prefix indices and regex indices for an object
         def _match_signature(pair: tuple[str, str]):
-            _, when_val = extract_key_when(pair[1])
+            _, when_val = _extract_key_when_from_object(pair[1])
             if not when_val:
                 when_val = _extract_literal_when_from_object(pair[1])
 
@@ -2745,16 +2746,16 @@ def main(argv: List[str] | None = None) -> int:
                     for r in r_sig:
                         if 0 <= r < len(per_idx):
                             per_idx[r] += 1
-                debug_echo(1, 'group', None, f"REGEX_COUNTS: {per_idx}")
+                _debug_echo(1, 'group', None, f"REGEX_COUNTS: {per_idx}")
 
                 sample_count = 0
                 for pair, sig in sig_map.items():
                     _, r_sig = sig
-                    _, when_val = extract_key_when(pair[1])
+                    _, when_val = _extract_key_when_from_object(pair[1])
                     if not when_val:
                         when_val = _extract_literal_when_from_object(pair[1])
                     if when_val and 'terminal' in when_val:
-                        debug_echo(1, 'group', when_val, f"REGEX_SAMPLE: p_sig={sig[0]} r_sig={r_sig} key={extract_key_when(pair[1])[0]!r}")
+                        _debug_echo(1, 'group', when_val, f"REGEX_SAMPLE: p_sig={sig[0]} r_sig={r_sig} key={_extract_key_when_from_object(pair[1])[0]!r}")
                         sample_count += 1
                         if sample_count >= 10:
                             break
@@ -2777,14 +2778,14 @@ def main(argv: List[str] | None = None) -> int:
                 return sorted(
                     block,
                     key=lambda pair: (
-                        canonicalize_when(
-                            extract_key_when(pair[1])[1] or _extract_literal_when_from_object(pair[1]),
+                        _canonicalize_when(
+                            _extract_key_when_from_object(pair[1])[1] or _extract_literal_when_from_object(pair[1]),
                             mode=grouping_mode,
                             negation_mode=negation_mode,
                             when_prefixes=when_prefixes,
                             when_regexes=when_regexes,
                         ),
-                        natural_key_case_sensitive(normalize_key_for_compare(extract_key_when(pair[1])[0])),
+                        natural_key_case_sensitive(normalize_key_for_compare(_extract_key_when_from_object(pair[1])[0])),
                     ),
                 )
             except Exception:
@@ -2849,7 +2850,7 @@ def main(argv: List[str] | None = None) -> int:
             existing = {pair[1] for pair in final_list}
             missing = [p for p in sorted_groups if p[1] not in existing]
             if missing:
-                debug_echo(1, 'group', None, f"WARNING: bucket assembly dropped {len(missing)} items; appending missing items back")
+                _debug_echo(1, 'group', None, f"WARNING: bucket assembly dropped {len(missing)} items; appending missing items back")
                 # append missing items in original order to preserve stability
                 final_list.extend(missing)
 
@@ -2865,11 +2866,11 @@ def main(argv: List[str] | None = None) -> int:
                         if in_here and not prev_in:
                             runs += 1
                         prev_in = in_here
-                    debug_echo(1, 'group', None, f"REGEX_RUNS idx={r_idx} runs={runs}")
+                    _debug_echo(1, 'group', None, f"REGEX_RUNS idx={r_idx} runs={runs}")
         except Exception:
             pass
 
-        debug_echo(
+        _debug_echo(
             1,
             'group',
             None,
