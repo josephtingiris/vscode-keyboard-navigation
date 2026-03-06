@@ -81,6 +81,8 @@ gate:
 	@echo --cut--
 	@./keybindings-corpus.test_keynav_comments.py
 	@./keybindings-sort.test_quick_regression.py
+	@./keybindings-sort.test_grouping_regression.py
+	@./keybindings-sort.test_when_output_regression.py
 	@./keybindings-sort.test_performance.py --mode quick --max-overall-median-ms $(GATE_MAX_OVERALL_MEDIAN_MS)
 	@echo --cut--
 	@echo
@@ -122,6 +124,8 @@ regression:
 	@echo "++ Running quick regression suite ..."
 	@echo --cut--
 	@./keybindings-sort.test_quick_regression.py
+	@./keybindings-sort.test_grouping_regression.py
+	@./keybindings-sort.test_when_output_regression.py
 	@echo --cut--
 	@echo
 
