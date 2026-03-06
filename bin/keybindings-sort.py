@@ -426,20 +426,22 @@ def _assemble_sorted_output(
                 def _hash_pair_for_obj(obj_text: str) -> tuple[str, str, str]:
                     full = obj_text
                     json_only = _strip_comments_and_trailing_commas(obj_text)
-                    # ensure we have a JSON object text; if not, attempt to wrap
-                    # and parse to re-dump a canonical JSON representation
+
+                    # ensure JSON object
                     try:
                         parsed = json.loads(json_only)
                         json_canonical = json.dumps(parsed, separators=(",", ":"), ensure_ascii=False)
                     except Exception:
                         json_canonical = json_only
+
                     full_hash = hashlib.sha256(full.encode('utf-8')).hexdigest()
                     json_hash = hashlib.sha256(json_canonical.encode('utf-8')).hexdigest()
+
                     return full_hash, json_hash, json_canonical
 
                 def _key_category_and_order(ch: str) -> tuple[int, int]:
 
-                    # returns (category, order_key) where category is:
+                    # return (category, order_key) where category is:
                     #
                     # 0 = primary ASCII special (printable non-alnum, ord < 128)
                     # 1 = extended special (ord >= 128)
@@ -2841,7 +2843,7 @@ def main(argv: List[str] | None = None) -> int:
             for rk in sorted(regex_map.keys(), key=_regex_key):
                 final_list.extend(_sort_block(regex_map.get(rk, [])))
 
-        # sanity: ensure we didn't accidentally drop any items during bucket assembly
+        # sanity: ensure no items were accidentally dropped during bucket assembly
         orig_count = len(sorted_groups)
         if len(final_list) != orig_count:
             existing = {pair[1] for pair in final_list}
