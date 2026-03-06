@@ -115,7 +115,7 @@ class KeynavCommentsTests(unittest.TestCase):
             parsed = json.loads(stripped)
             self.assertIsInstance(parsed, list)
 
-            # verify original reference file unchanged
+            # vekeybindings_sort_test_performance.graphs.pyy original reference file unchanged
             with open(ref_path, "r", encoding="utf-8") as fh:
                 after = fh.read()
             self.assertEqual(orig, after)
