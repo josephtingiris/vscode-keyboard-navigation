@@ -2,7 +2,7 @@
 """
 (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
 
-Sort and canonicalize VS Code keybindings.json (JSONC) while preserving comments.
+Canonicalize and sort VS Code keybindings.json (JSONC) while preserving comments.
 
 Usage
 
