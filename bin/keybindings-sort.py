@@ -621,32 +621,8 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
     positional_tokens = POSITIONAL_TOKENS
     visibility_tokens = VISIBILITY_TOKENS
 
-    def left_identifier(text: str) -> str:
-        t = text.strip()
-        while t.startswith('(') and t.endswith(')'):
-            t = t[1:-1].strip()
-        if t.startswith('!'):
-            t = t[1:].lstrip()
-        if not t:
-            return t
-        return t.split()[0]
-
-    def _matches_entry(left: str, entry: str) -> bool:
-        if entry.endswith('.'):
-            return left.startswith(entry)
-        if '<viewId>' in entry:
-            prefix, suffix = entry.split('<viewId>', 1)
-            return left.startswith(prefix) and left.endswith(suffix)
-        return left == entry
-
-    def _is_focus(left: str) -> bool:
-        return any(_matches_entry(left, entry) for entry in focus_tokens)
-
-    def _is_visibility(left: str) -> bool:
-        return any(_matches_entry(left, entry) for entry in visibility_tokens)
-
-    def group_rank(text: str) -> int:
-        left = left_identifier(text)
+    def _group_rank(text: str) -> int:
+        left = _left_identifier(text)
 
         if when_prefixes:
             for pref in when_prefixes:
@@ -694,7 +670,31 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
             return 4
         return 5
 
-    def sort_key(idx_and_node):
+    def _is_focus(left: str) -> bool:
+        return any(_matches_entry(left, entry) for entry in focus_tokens)
+
+    def _is_visibility(left: str) -> bool:
+        return any(_matches_entry(left, entry) for entry in visibility_tokens)
+
+    def _left_identifier(text: str) -> str:
+        t = text.strip()
+        while t.startswith('(') and t.endswith(')'):
+            t = t[1:-1].strip()
+        if t.startswith('!'):
+            t = t[1:].lstrip()
+        if not t:
+            return t
+        return t.split()[0]
+
+    def _matches_entry(left: str, entry: str) -> bool:
+        if entry.endswith('.'):
+            return left.startswith(entry)
+        if '<viewId>' in entry:
+            prefix, suffix = entry.split('<viewId>', 1)
+            return left.startswith(prefix) and left.endswith(suffix)
+        return left == entry
+
+    def _sort_key(idx_and_node):
         idx, node = idx_and_node
         token = _render_when_node(node)
 
@@ -702,16 +702,16 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
         order_token = token[1:] if token.startswith('!') else token
 
         # compute left identifier and a combined sub-rank preference
-        left_id = left_identifier(token)
+        left_id = _left_identifier(token)
 
         # prefer focus_order, then positional_order, then visibility_order
         sub_rank = FOCUS_TOKENS_MAP.get(left_id, POSITIONAL_TOKENS_MAP.get(left_id, VISIBILITY_TOKENS_MAP.get(left_id, 9999)))
 
-        # default alpha behavior: preserve group_rank and use natural-sensitive ordering
+        # default alpha behavior: preserve _group_rank and use natural-sensitive ordering
         if negation_mode == 'alpha':
-            return (group_rank(token), sub_rank, _natural_key_case_sensitive(order_token), idx)
+            return (_group_rank(token), sub_rank, _natural_key_case_sensitive(order_token), idx)
 
-        return (group_rank(token), _natural_key_case_sensitive(order_token), idx)
+        return (_group_rank(token), _natural_key_case_sensitive(order_token), idx)
 
     def sort_and_nodes(node: WhenNode):
         if isinstance(node, WhenAnd):
@@ -726,7 +726,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
             # get left identifier for an item
             def _left_id_of(item_node):
                 tok = _render_when_node(item_node)
-                lid = left_identifier(tok)
+                lid = _left_identifier(tok)
                 return lid
             if when_prefixes:
                 for pref in when_prefixes:
@@ -774,8 +774,8 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                 nm = negation_mode
 
             if negation_mode == 'alpha':
-                # use existing group-aware sort_key
-                indexed.sort(key=sort_key)
+                # use existing group-aware _sort_key
+                indexed.sort(key=_sort_key)
                 sorted_children = [it[1] for it in indexed]
             else:
                 # for natural/positive/negative/beta: sort by rendered token base
@@ -798,7 +798,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                     base_key = _natural_key(base)
 
                     # always preserve grouping as the primary key so sorting does not move operands between buckets.
-                    grp = group_rank(tok)
+                    grp = _group_rank(tok)
 
                     # compute a combined sub-rank if this token belongs to a known ordered identifier
                     lid = _left_id_of(child)
