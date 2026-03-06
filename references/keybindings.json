@@ -74,8 +74,6 @@ Notes:
   * My main editor is [neo]vim, so these keybindings are designed to augment and blend with the traditional vi keyboard grammar (and muscle memory).
 
 */
-// ^.*\"key.*alt+h",
-// ^.*\"key.*+h",
 [
   {
     // [keynav] (corpus) (vertical) (split) (0) (self) (gold) (X)
