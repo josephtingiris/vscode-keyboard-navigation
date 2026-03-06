@@ -572,11 +572,7 @@ def _assemble_sorted_output(
 
 
 def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
-    """Produce a canonical string for a `when` clause.
-
-    Sort operands inside every AND node according to project conventions.
-    Preserves OR groupings and existing parentheses; does not reorder OR-level operands.
-    """
+    """Produce a canonical string for a `when` clause."""
 
     def _clear_parens(node: WhenNode):
         node.parens = False
@@ -1028,11 +1024,7 @@ def _debug_color(text: str, level: int) -> str:
 
 
 def _debug_echo(level: int, category: str, when_val: str | None, msg: str) -> None:
-    """Emit a filtered, leveled debug message to stderr.
-
-    Messages are emitted when `level` <= `DEBUG_LEVEL` and category/when
-    filters (if set) match. Always writes to stderr.
-    """
+    """Emit a filtered, leveled debug message to stderr."""
 
     if DEBUG_LEVEL <= 0:
         return
@@ -1148,10 +1140,7 @@ def _extract_modifiers_from_object(obj_text: str) -> tuple[tuple[str, ...], str]
 
 
 def _extract_preamble_postamble(text):
-    """Find the top-level JSON array brackets.
-
-    Skip any brackets that appear inside comments or strings in the preamble/postamble.
-    """
+    """Find the top-level JSON array brackets."""
 
     i = 0
     n = len(text)
@@ -1674,11 +1663,7 @@ def _natural_key_case_sensitive(s):
 
 
 def _normalize_key_for_compare(key_value):
-    """Lightweight normalization for key sorting.
-
-    Lowercases, splits chord parts on spaces, orders modifiers alphabetically
-    before the literal, and rejoins chords with spaces.
-    """
+    """Lightweight normalization for key sorting."""
 
     if not key_value:
         return ""
@@ -1798,10 +1783,7 @@ def _object_has_trailing_comma(obj_text: str) -> bool:
 
 
 def _parse_object(obj_text: str):
-    """Parse an object text (including braces) into a dict and cache the result.
-
-    Returns the parsed dict or None on failure.
-    """
+    """Parse an object text (including braces) into a dict and cache the result."""
 
     if not obj_text:
         return None
@@ -2062,11 +2044,8 @@ def _replace_when_literals(
 
 
 def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
-    """Initialize/clear per-run caches for the current run parameter context.
+    """Initialize/clear per-run caches for the current run parameter context."""
 
-    This allows fast path lookups inside `_canonicalize_when` and
-    `_sortable_when_key` using only the raw when string.
-    """
     global RUN_CACHE_CONTEXT, RUN_CANONICAL_CACHE, RUN_SORTABLE_CACHE
     RUN_CACHE_CONTEXT = (
         mode,
@@ -2515,11 +2494,7 @@ def _tokenize_when(expr: str):
 
 
 def _when_specificity(when_val: str) -> Tuple[int]:
-    """Heuristic specificity scorer for a when clause. Lower is broader.
-
-    Returns a tuple to sort stably by:
-        1) number of condition terms (split on && / ||)
-    """
+    """Heuristic specificity scorer for a when clause. Lower is broader."""
 
     key = '' if when_val is None else str(when_val)
     cached = CACHE_WHEN_SPECIFICITY.get(key)
