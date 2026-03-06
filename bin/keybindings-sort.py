@@ -596,6 +596,28 @@ def _block_sort_key_from_object_text(obj_text: str):
     return natural_key_case_sensitive(norm)
 
 
+def _dictionary_sort_keys(keys: list[str]) -> list[str]:
+    """Return keys sorted using system `sort -u -d` with `LC_ALL=C`.
+
+    Falls back to a deterministic Python order if the external sort call fails.
+    """
+    if not keys:
+        return []
+    try:
+        env = {**os.environ, 'LC_ALL': 'C'}
+        proc = subprocess.run(['sort', '-u', '-d'], input='\n'.join(keys), capture_output=True, text=True, env=env)
+        return [line for line in proc.stdout.splitlines() if line]
+    except Exception:
+        # deterministic fallback: unique-preserving stable sort using natural key
+        seen = []
+        seen_set = set()
+        for k in keys:
+            if k not in seen_set:
+                seen.append(k)
+                seen_set.add(k)
+        return sorted(seen, key=lambda s: natural_key_case_sensitive(s))
+
+
 def _finalize_processed_output(
     text: str,
     grouping_mode: str,
