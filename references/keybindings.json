@@ -42201,9 +42201,8 @@ Notes:
   {
     // [keynav] (map) (right) (vi) (juke) (warp) (3) (black) (C) (primary)
     "key": "ctrl+alt+meta+}",
-    "command": "ctrl+alt+meta+} ds21",
+    // "command": "ctrl+alt+meta+} b936",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && sideBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
-    // MISSING id: "command": "ctrl+alt+meta+} b936",
   },
   {
     // [keynav] (map) (vi) (juke) (warp) (3) (black) (C) (primary)
@@ -71756,12 +71755,12 @@ Notes:
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
     "key": "alt+a k",
+    // "command": "alt+a k 50a7",
     "command": "workbench.action.focusActiveEditorGroup",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action"
     // "0.0.3": "workbench.action.focusActiveEditorGroup",
     // [note] open and focus the (EDITOR) ACTIVE GROUP
     // [note] meh
-    // MISSING id: "command": "alt+a k 183a",
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
