@@ -83,6 +83,7 @@ gate:
 	@./keybindings_sort_test_quick_regression.py
 	@./keybindings_sort_test_grouping_regression.py
 	@./keybindings_sort_test_when_output_regression.py
+	@./keybindings_sort_test_focal_invariant_regression.py
 	@./keybindings_sort_test_performance.py --mode quick --max-overall-median-ms $(GATE_MAX_OVERALL_MEDIAN_MS)
 	@echo --cut--
 	@echo
@@ -126,6 +127,7 @@ regression:
 	@./keybindings_sort_test_quick_regression.py
 	@./keybindings_sort_test_grouping_regression.py
 	@./keybindings_sort_test_when_output_regression.py
+	@./keybindings_sort_test_focal_invariant_regression.py
 	@echo --cut--
 	@echo
 
