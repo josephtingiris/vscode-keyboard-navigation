@@ -1004,7 +1004,6 @@ def _sort_groups_for_primary_when(
     return sorted_groups
 
 
-
 def _sort_groups_initial(
     normalized_groups: list[tuple[str, str]],
     primary_order: str,
@@ -2497,7 +2496,7 @@ def main(argv: List[str] | None = None) -> int:
     #     and within each prefix-group emit items without regex first, then with regex combinations ordered by fewest regexes.
     #  3. objects with no prefix but with regex(es) (regex-only)
 
-    # produce a deterministic ordering by prefix/regex combination signature. 
+    # produce a deterministic ordering by prefix/regex combination signature.
     if when_prefixes or when_regexes:
         # helper: compute matched prefix indices and regex indices for an object
         def _match_signature(pair: tuple[str, str]):
@@ -2633,13 +2632,13 @@ def main(argv: List[str] | None = None) -> int:
             regex_map = buckets.get(p_key, {})
             prefix_only_list = regex_map.get((), [])
             if prefix_only_list:
-                filtered = [p for p in prefix_only_list if not sig_map.get(p, ((), ())) [1]]
+                filtered = [p for p in prefix_only_list if not sig_map.get(p, ((), ()))[1]]
                 if filtered:
                     final_list.extend(_sort_block(filtered))
 
         if when_regexes:
             for r_idx in range(0, len(when_regexes)):
-                matches = [p for p in sorted_groups if (r_idx in sig_map.get(p, ((), ())) [1] and p not in emitted)]
+                matches = [p for p in sorted_groups if (r_idx in sig_map.get(p, ((), ()))[1] and p not in emitted)]
                 if matches:
                     for p in _sort_block(matches):
                         if p not in emitted:
@@ -2682,7 +2681,7 @@ def main(argv: List[str] | None = None) -> int:
                     runs = 0
                     prev_in = False
                     for pair in final_list:
-                        r_sig = sig_map.get(pair, ((), ())) [1]
+                        r_sig = sig_map.get(pair, ((), ()))[1]
                         in_here = r_idx in r_sig
                         if in_here and not prev_in:
                             runs += 1
@@ -2722,7 +2721,14 @@ def main(argv: List[str] | None = None) -> int:
         when_regexes=when_regexes,
     )
 
-    sys.stdout.write(processed)
+    try:
+        sys.stdout.write(processed)
+    except BrokenPipeError:
+        try:
+            sys.stdout.flush()
+        except Exception:
+            pass
+        raise SystemExit(0)
 
     return 0
 
