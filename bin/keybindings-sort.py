@@ -264,6 +264,8 @@ class WhenOr(WhenNode):
 
 
 def _apply_debug_settings(debug_specs: list[str] | None, color: str) -> None:
+    """Configure global debug filters and color mode."""
+
     global DEBUG_LEVEL, DEBUG_TARGET_WHEN, DEBUG_TARGET_CATEGORY, COLOR
 
     COLOR = color
@@ -301,6 +303,8 @@ def _apply_debug_settings(debug_specs: list[str] | None, color: str) -> None:
 
 
 def _apply_when_grouping_profile(args: argparse.Namespace, raw_argv: list[str]) -> None:
+    """Apply a when-grouping profile to set appropriate default argument values."""
+
     sel_profile = args.when_grouping
     if sel_profile not in WHEN_GROUPING_PROFILES:
         return
@@ -334,6 +338,8 @@ def _assemble_sorted_output(
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> str:
+    """Render the final sorted JSONC output by emitting rendered the preamble, objects, comments, and postamble."""
+
     out_parts: list[str] = []
     out_parts.append(preamble)
     out_parts.append('[\n')
@@ -970,6 +976,8 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
 
 
 def _color_enabled() -> bool:
+    """Return True if ANSI coloring should be enabled for stderr output."""
+
     if COLOR == 'never':
         return False
     if COLOR == 'always':
@@ -982,6 +990,8 @@ def _color_enabled() -> bool:
 
 
 def _contains_focus_token_in_object(obj_text: str) -> bool:
+    """Return True if the object's when clause contains any configured focus token."""
+
     when_key, when_val = _extract_key_when_from_object(obj_text)
     raw = when_val
 
@@ -1008,6 +1018,8 @@ def _contains_focus_token_in_object(obj_text: str) -> bool:
 
 
 def _debug_color(text: str, level: int) -> str:
+    """Wrap debug text in ANSI color codes according to the debug level."""
+
     if not _color_enabled():
         return text
 
@@ -1024,7 +1036,7 @@ def _debug_color(text: str, level: int) -> str:
 
 
 def _debug_echo(level: int, category: str, when_val: str | None, msg: str) -> None:
-    """Emit a filtered, leveled debug message to stderr."""
+    """Conditionally output a filtered, leveled debug message to stderr."""
 
     if DEBUG_LEVEL <= 0:
         return
@@ -1046,6 +1058,8 @@ def _debug_echo(level: int, category: str, when_val: str | None, msg: str) -> No
 
 
 def _decode_json_string_literal(raw: str) -> str:
+    """Decode JSON string literal inner text to a Python string value."""
+
     try:
         return json.loads('"' + raw + '"')
     except Exception:
@@ -1056,6 +1070,8 @@ def _decode_json_string_literal(raw: str) -> str:
 
 
 def _embed_duplicate_comment_in_object(obj_text: str, duplicate_comment: str) -> str:
+    """Insert a 'duplicate' line comment immediately inside an object's opening brace."""
+
     if not duplicate_comment:
         return obj_text
 
@@ -1098,6 +1114,8 @@ def _embed_duplicate_comment_in_object(obj_text: str, duplicate_comment: str) ->
 
 
 def _extract_key_when_from_object(obj_text: str) -> Tuple[str, str]:
+    """Return the literal `key` and `when` values extracted from an object text."""
+
     # fast-path: check per-run object info cache populated during normalization
     info = RUN_OBJ_INFO_CACHE.get(obj_text)
     if info is not None:
@@ -1115,20 +1133,28 @@ def _extract_key_when_from_object(obj_text: str) -> Tuple[str, str]:
 
 
 def _extract_literal_key_from_object(obj_text: str) -> str:
+    """Return the literal (decoded) `key` string found in the object text or empty string."""
+
     match = KEY_EXTRACT_RE.search(obj_text)
     if not match:
         return ''
+
     return _decode_json_string_literal(match.group(1))
 
 
 def _extract_literal_when_from_object(obj_text: str) -> str:
+    """Return the literal (decoded) `when` string found in the object text or empty string."""
+
     match = WHEN_EXTRACT_RE.search(obj_text)
     if not match:
         return ''
+
     return _decode_json_string_literal(match.group(1))
 
 
 def _extract_modifiers_from_object(obj_text: str) -> tuple[tuple[str, ...], str]:
+    """Return the modifier tuple and literal key token from the object key string."""
+
     key_raw = _extract_literal_key_from_object(obj_text) or ''
     norm = _normalize_key_for_compare(key_raw)
     first = norm.split()[0] if norm else ''
@@ -1136,11 +1162,12 @@ def _extract_modifiers_from_object(obj_text: str) -> tuple[tuple[str, ...], str]
     mods = tuple(parts[:-1]) if len(parts) > 1 else tuple()
     lit = parts[-1] if parts else ''
     lit_key = _normalize_key_for_compare(lit)
+
     return (mods, lit_key)
 
 
 def _extract_preamble_postamble(text):
-    """Find the top-level JSON array brackets."""
+    """Return sliced preamble, array_text, and postamble."""
 
     i = 0
     n = len(text)
@@ -1254,10 +1281,13 @@ def _extract_preamble_postamble(text):
     preamble = text[:start]
     postamble = text[end + 1:]
     array_text = text[start + 1:end]  # exclude [ and ]
+
     return preamble, array_text, postamble
 
 
 def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondary: str | None = None, grouping: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple:
+    """Return a computed stable sort key tuple for the object text."""
+
     # obtain key/when/canonical/sortable values either from cache or by parsing
     info = RUN_OBJ_INFO_CACHE.get(obj_text)
     if info is not None:
@@ -1449,6 +1479,8 @@ def _finalize_processed_output(
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> str:
+    """Perform final output cleanup on the assembled JSONC text (e.g. remove blank lines)."""
+
     return _remove_blank_lines(text)
 
 
@@ -1459,6 +1491,8 @@ def _first_when_group_rank(
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> int:
+    """Assign a numeric grouping rank to the first operand of an object's when clause."""
+
     when_key, when_val = _extract_key_when_from_object(obj_text)
     canonical = _canonicalize_when(
         when_val,
@@ -1535,6 +1569,8 @@ def _first_when_group_rank(
 
 
 def _flag_present(raw_argv: list[str], names: list[str]) -> bool:
+    """Return True if any of the flag names are present in the raw argv list."""
+
     for name in names:
         if name in raw_argv:
             return True
@@ -1542,6 +1578,8 @@ def _flag_present(raw_argv: list[str], names: list[str]) -> bool:
 
 
 def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]], str]:
+    """Split a JSON array body into a list of (leading_comments, object_text) pairs and trailing comments."""
+
     groups: list[tuple[str, str]] = []
     comments = ''
 
@@ -1626,6 +1664,8 @@ def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]]
 
 
 def _matches_when_entry(left: str, entry: str) -> bool:
+    """Return True if the left identifier matches the when-entry pattern (supports prefixes and <viewId>)."""
+
     if entry.endswith('.'):
         return left.startswith(entry)
     if '<viewId>' in entry:
@@ -1635,6 +1675,8 @@ def _matches_when_entry(left: str, entry: str) -> bool:
 
 
 def _natural_key(s):
+    """Return a locale-independent natural-sort key (list of ints/strings) for the string."""
+
     key = str(s)
     cached = CACHE_NATURAL_KEY.get(key)
     if cached is not None:
@@ -1649,6 +1691,8 @@ def _natural_key(s):
 
 
 def _natural_key_case_sensitive(s):
+    """Return a case-sensitive natural-sort key for the string."""
+
     key = str(s)
     cached = CACHE_NATURAL_KEY_CS.get(key)
     if cached is not None:
@@ -1683,15 +1727,21 @@ def _normalize_key_for_compare(key_value):
             out_chords.append("+".join(mods + [lit]))
         else:
             out_chords.append(lit)
+
     return " ".join(out_chords)
 
 
 def _normalize_operand(text: str) -> str:
+    """Normalize whitespace in an operand and collapse runs to single spaces."""
+
     collapsed = WHITESPACE_RE.sub(' ', text).strip()
+
     return collapsed
 
 
 def _normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple[str, bool]:
+    """Canonicalize the `when` value inside an object text and return (new_text, changed)."""
+
     parsed = _parse_object(obj_text)
     if not parsed:
         return obj_text, False
@@ -1761,12 +1811,17 @@ def _normalize_when_in_object(obj_text: str, mode: str = 'config-first', negatio
 
 
 def _normalize_whitespace(text: str) -> str:
+    """Return the input string with all whitespace collapsed to single spaces and trimmed."""
+
     return WHITESPACE_RE.sub(' ', text).strip() if text else ''
 
 
 def _object_has_trailing_comma(obj_text: str) -> bool:
+    """Return True if an object text ends with a trailing comma after its closing brace."""
+
     lines = obj_text.rstrip().splitlines()
     found_closing = False
+
     for line in reversed(lines):
         stripped = line.strip()
         if not stripped:
@@ -1779,6 +1834,7 @@ def _object_has_trailing_comma(obj_text: str) -> bool:
                 return True
             elif stripped and not stripped.startswith('//') and not stripped.startswith('/*'):
                 return False
+
     return False
 
 
@@ -1810,6 +1866,8 @@ def _parse_object(obj_text: str):
 
 
 def _parse_when(expr: str) -> WhenNode:
+    """Parse a `when` expression into a WhenNode AST (WhenAnd/WhenOr/WhenNot/WhenLeaf)."""
+
     tokens = _tokenize_when(expr)
     idx = 0
 
@@ -1879,6 +1937,8 @@ def _parse_when(expr: str) -> WhenNode:
 
 
 def _parse_when_prefixes(parser: argparse.ArgumentParser, raw_prefixes: str | None) -> list[str]:
+    """Return the parsed `--when-prefix` comma-separated list of prefixes or default a list."""
+
     if raw_prefixes is not None:
         if raw_prefixes.strip() == '':
             parser.error('--when-prefix requires a comma-separated list with at least one entry')
@@ -1891,6 +1951,8 @@ def _parse_when_prefixes(parser: argparse.ArgumentParser, raw_prefixes: str | No
 
 
 def _parse_when_regexes(parser: argparse.ArgumentParser, raw_regexes: str | None):
+    """Return the parsed `--when-regex` comma-separated list of regexes into compiled regexes or string patterns."""
+
     if not raw_regexes:
         return None
 
@@ -1899,15 +1961,19 @@ def _parse_when_regexes(parser: argparse.ArgumentParser, raw_regexes: str | None
         parser.error('--when-regex requires a comma-separated list with at least one entry')
 
     compiled = []
+
     for part in parts:
         try:
             compiled.append(re.compile(part))
         except Exception:
             compiled.append(part)
+
     return compiled
 
 
 def _partition_focus_groups_to_end(sorted_groups: list[tuple[str, str]]) -> list[tuple[str, str]]:
+    """Stable-partition groups so that entries containing focus tokens are moved to the end."""
+
     non_focus: list[tuple[str, str]] = []
     focus: list[tuple[str, str]] = []
 
@@ -1924,6 +1990,8 @@ def _partition_focus_groups_to_end(sorted_groups: list[tuple[str, str]]) -> list
 
 
 def _remove_blank_lines(text: str) -> str:
+    """Remove empty lines that are not present in comments."""
+
     lines = text.splitlines(keepends=True)
     out_lines: list[str] = []
     in_block = False
@@ -1949,6 +2017,8 @@ def _remove_blank_lines(text: str) -> str:
 
 
 def _render_when_node(node: WhenNode) -> str:
+    """Render a WhenNode AST back to its string representation, preserving parentheses."""
+
     inner = node._to_str()
     if node.parens:
         return f'({inner})'
@@ -1956,6 +2026,8 @@ def _render_when_node(node: WhenNode) -> str:
 
 
 def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode: str) -> list[tuple[str, str]]:
+    """Within equal when groups, reorder objects deterministically by key."""
+
     if negation_mode in ('positive', 'negative'):
         return sorted_groups
     groups_list = list(sorted_groups)
@@ -1999,6 +2071,8 @@ def _replace_when_literal_match(
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> str:
+    """Replace a `when` literal match with its canonicalized, JSON-escaped value."""
+
     inner = match.group(2)
 
     try:
@@ -2030,6 +2104,8 @@ def _replace_when_literals(
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> str:
+    """Replace all `when` string literals inside JSONC text with their canonical forms."""
+
     return re.sub(
         r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")',
         lambda match: _replace_when_literal_match(
@@ -2044,7 +2120,7 @@ def _replace_when_literals(
 
 
 def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
-    """Initialize/clear per-run caches for the current run parameter context."""
+    """Initialize and clear per-run caches for the current run parameter context."""
 
     global RUN_CACHE_CONTEXT, RUN_CANONICAL_CACHE, RUN_SORTABLE_CACHE
     RUN_CACHE_CONTEXT = (
@@ -2065,6 +2141,8 @@ def _sort_groups_for_primary_when(
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> list[tuple[str, str]]:
+    """Sort by `--primary when` derived keys and apply grouping heuristics."""
+
     decorated: list[tuple[str, str, tuple[str, str]]] = []
     for pair in sorted_groups:
         key_val, when_val = _extract_key_when_from_object(pair[1])
@@ -2273,6 +2351,8 @@ def _sort_groups_initial(
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> list[tuple[str, str]]:
+    """Perform the initial stable sort of normalized groups using extract_sort_keys logic."""
+
     return sorted(
         normalized_groups,
         key=lambda pair: _extract_sort_keys_from_object(
@@ -2294,6 +2374,8 @@ def _sort_groups_with_grouping_mode(
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> list[tuple[str, str]]:
+    """Re-bucket sorted groups into positional bins according to the when-grouping mode."""
+
     if grouping_mode == 'none':
         return sorted_groups
 
@@ -2315,6 +2397,8 @@ def _sort_groups_with_grouping_mode(
 
 
 def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+    """Return a canonicalized when string suitable for stable sorting (preserving negation)."""
+
     if not when_val:
         return ''
 
@@ -2359,6 +2443,8 @@ def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode:
 
 
 def _strip_json_comments(text):
+    """Strip JavaScript-style comments from JSONC text, preserving string literals."""
+
     def _replacer(match):
         s = match.group(0)
         if s.startswith('/'):
@@ -2369,17 +2455,25 @@ def _strip_json_comments(text):
 
 
 def _strip_trailing_commas(text):
+    """Remove trailing commas from JSON-like object/array text."""
+
     text = TRAILING_COMMA_RE.sub(r'\1', text)
+
     return text
 
 
 def _strip_when_sorted_comment(comment_text: str, when_changed: bool) -> str:
+    """Remove previously-inserted when-sorted comment lines."""
+
     if not when_changed:
         return comment_text
+
     return WHEN_SORTED_RE.sub('', comment_text)
 
 
 def _tokenize_when(expr: str):
+    """Tokenize a when expression into OPERAND/OP tokens for parsing into an AST."""
+
     tokens = []
     buf = ''
     i = 0
@@ -2519,6 +2613,8 @@ def _with_normalized_when_groups(
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> list[tuple[str, str]]:
+    """Normalize the when clauses across a list of groups and return the resulting list."""
+
     normalized_groups: list[tuple[str, str]] = []
     for comments, obj in groups:
         obj_out = obj.rstrip()
@@ -2546,6 +2642,7 @@ def _with_normalized_when_groups(
 
 
 def main(argv: List[str] | None = None) -> int:
+    """CLI entry point: read stdin, sort keybinding objects, and write sorted JSONC to stdout."""
     argv = sys.argv[1:] if argv is None else argv
 
     parser = argparse.ArgumentParser(
@@ -2598,6 +2695,7 @@ def main(argv: List[str] | None = None) -> int:
     # Notes:
     #   - Use multiple --debug flags to combine filters and levels, i.e. `--debug when-panelFocus --debug 3`
     #   - The following is NOT supported and will be parsed incorrectly: `--debug when=panelFocus 3`
+    #
 
     parser.add_argument('--debug', '-d', nargs='?', const='1', action='append', dest='debug',
                         help=("Enable debug. Use level (integer), or a key=value filter like \"when=EXPR, target=NAME, or level=N\"."))
