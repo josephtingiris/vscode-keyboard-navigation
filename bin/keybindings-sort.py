@@ -578,48 +578,16 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
     Preserves OR groupings and existing parentheses; does not reorder OR-level operands.
     """
 
-    if not when_val:
-        return ''
-
-    # memoization: avoid repeated expensive parsing of identical inputs
-    cache_key = (
-        when_val,
-        mode,
-        negation_mode,
-        None if when_prefixes is None else tuple(when_prefixes),
-        None if when_regexes is None else tuple(when_regexes),
-    )
-
-    # key: (when_val, mode, negation_mode, when_prefixes_tuple_or_None, when_regexes_tuple_or_None)
-    cached = CACHE_CANONICALIZE_WHEN.get(cache_key)
-
-    if cached is not None:
-        return cached
-
-    # fast per-run cache
-    try:
-        run_key = (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes))
-        if RUN_CACHE_CONTEXT == run_key:
-            cached_run = RUN_CANONICAL_CACHE.get(when_val)
-            if cached_run is not None:
-                return cached_run
-    except Exception:
-        pass
-
-    """
-        TBD: these need to be better tested before being fully integrated, especially with the focal-invariant mode:
-        'view.',
-        'view.<viewId>.visible',
-        'view.container.',
-        'viewContainer.',
-        'workbench.panel.',
-        'workbench.view.',
-    ]
-    """
-
-    focus_tokens = FOCUS_TOKENS
-    positional_tokens = POSITIONAL_TOKENS
-    visibility_tokens = VISIBILITY_TOKENS
+    def _clear_parens(node: WhenNode):
+        node.parens = False
+        if isinstance(node, WhenLeaf):
+            return
+        if isinstance(node, WhenNot):
+            _clear_parens(node.child)
+            return
+        if isinstance(node, WhenAnd) or isinstance(node, WhenOr):
+            for c in node.children:
+                _clear_parens(c)
 
     def _group_rank(text: str) -> int:
         left = _left_identifier(text)
@@ -631,6 +599,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                 # literal exact-match against the left identifier
                 if left == pref:
                     return 0
+
         if when_regexes:
             for pat in when_regexes:
                 try:
@@ -647,8 +616,10 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
         # 'config-first' Group order: config.* -> positional prefixes -> focus -> visibility -> other
         # 'focal-invariant' Group order: focus -> positional prefixes -> visibility -> config.* -> other
         # 'none' disables grouping by returning the same rank for all tokens.
+
         if mode == 'none':
             return 1
+
         if mode == 'focal-invariant':
             if _is_focus(left):
                 return 1
@@ -659,6 +630,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
             if left.startswith('config.'):
                 return 4
             return 5
+
         # config-first behavior
         if left.startswith('config.'):
             return 1
@@ -694,29 +666,10 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
             return left.startswith(prefix) and left.endswith(suffix)
         return left == entry
 
-    def _sort_key(idx_and_node):
-        idx, node = idx_and_node
-        token = _render_when_node(node)
-
-        # strip leading '!' for ordering token but keep for grouping rank
-        order_token = token[1:] if token.startswith('!') else token
-
-        # compute left identifier and a combined sub-rank preference
-        left_id = _left_identifier(token)
-
-        # prefer focus_order, then positional_order, then visibility_order
-        sub_rank = FOCUS_TOKENS_MAP.get(left_id, POSITIONAL_TOKENS_MAP.get(left_id, VISIBILITY_TOKENS_MAP.get(left_id, 9999)))
-
-        # default alpha behavior: preserve _group_rank and use natural-sensitive ordering
-        if negation_mode == 'alpha':
-            return (_group_rank(token), sub_rank, _natural_key_case_sensitive(order_token), idx)
-
-        return (_group_rank(token), _natural_key_case_sensitive(order_token), idx)
-
-    def sort_and_nodes(node: WhenNode):
+    def _sort_and_nodes(node: WhenNode):
         if isinstance(node, WhenAnd):
             for child in node.children:
-                sort_and_nodes(child)
+                _sort_and_nodes(child)
             indexed = list(enumerate(node.children))
 
             # prioritize operands
@@ -728,6 +681,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                 tok = _render_when_node(item_node)
                 lid = _left_identifier(tok)
                 return lid
+
             if when_prefixes:
                 for pref in when_prefixes:
                     matches = []
@@ -737,6 +691,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                         lid = _left_id_of(child)
                         if lid == pref:
                             matches.append((idx, child))
+
                     if matches:
                         # alphabetical order for multiples
                         matches.sort(key=lambda t: _natural_key_case_sensitive(
@@ -744,6 +699,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                         for m in matches:
                             prioritized.append(m[1])
                             picked.add(m[0])
+
             if when_regexes:
                 for pat in when_regexes:
                     matches = []
@@ -760,6 +716,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                                 ok = False
                         if ok:
                             matches.append((idx, child))
+
                     if matches:
                         matches.sort(key=lambda t: _natural_key_case_sensitive(
                             _render_when_node(t[1])))
@@ -860,10 +817,11 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                 seen.add(tok)
                 unique.append(c)
             node.children = unique
+
         elif isinstance(node, WhenOr):
             # recurse first
             for child in node.children:
-                sort_and_nodes(child)
+                _sort_and_nodes(child)
 
             # flatten nested ORs (commutative) and collect items
             items: list[WhenNode] = []
@@ -889,8 +847,74 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                 unique.append(c)
             node.children = unique
         elif isinstance(node, WhenNot):
-            sort_and_nodes(node.child)
+            _sort_and_nodes(node.child)
 
+    def _sort_key(idx_and_node):
+        idx, node = idx_and_node
+        token = _render_when_node(node)
+
+        # strip leading '!' for ordering token but keep for grouping rank
+        order_token = token[1:] if token.startswith('!') else token
+
+        # compute left identifier and a combined sub-rank preference
+        left_id = _left_identifier(token)
+
+        # prefer focus_order, then positional_order, then visibility_order
+        sub_rank = FOCUS_TOKENS_MAP.get(left_id, POSITIONAL_TOKENS_MAP.get(left_id, VISIBILITY_TOKENS_MAP.get(left_id, 9999)))
+
+        # default alpha behavior: preserve _group_rank and use natural-sensitive ordering
+        if negation_mode == 'alpha':
+            return (_group_rank(token), sub_rank, _natural_key_case_sensitive(order_token), idx)
+
+        return (_group_rank(token), _natural_key_case_sensitive(order_token), idx)
+
+    # end defs
+
+    """
+        TBD: these contexts need to be better tested before being fully integrated, especially with the focal-invariant mode:
+        'view.',
+        'view.<viewId>.visible',
+        'view.container.',
+        'viewContainer.',
+        'workbench.panel.',
+        'workbench.view.',
+    """
+
+    # empty gets nothing
+    if not when_val:
+        return ''
+
+    # memoization: avoid repeated expensive parsing of identical inputs
+    cache_key = (
+        when_val,
+        mode,
+        negation_mode,
+        None if when_prefixes is None else tuple(when_prefixes),
+        None if when_regexes is None else tuple(when_regexes),
+    )
+
+    # key: (when_val, mode, negation_mode, when_prefixes_tuple_or_None, when_regexes_tuple_or_None)
+    cached = CACHE_CANONICALIZE_WHEN.get(cache_key)
+
+    # return cached key
+    if cached is not None:
+        return cached
+
+    # return per-run cache
+    try:
+        run_key = (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes))
+        if RUN_CACHE_CONTEXT == run_key:
+            cached_run = RUN_CANONICAL_CACHE.get(when_val)
+            if cached_run is not None:
+                return cached_run
+    except Exception:
+        pass
+
+    focus_tokens = FOCUS_TOKENS
+    positional_tokens = POSITIONAL_TOKENS
+    visibility_tokens = VISIBILITY_TOKENS
+
+    # build tree
     ast = _parse_when(when_val)
     try:
         # debug: dump top-level AND operand ordering before/after sort for inspection
@@ -910,7 +934,8 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
     except Exception:
         pass
 
-    sort_and_nodes(ast)
+    # sort tree
+    _sort_and_nodes(ast)
 
     try:
         if DEBUG_LEVEL > 0:
@@ -929,18 +954,8 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
     except Exception:
         pass
 
-    def _clear_parens(node: WhenNode):
-        node.parens = False
-        if isinstance(node, WhenLeaf):
-            return
-        if isinstance(node, WhenNot):
-            _clear_parens(node.child)
-            return
-        if isinstance(node, WhenAnd) or isinstance(node, WhenOr):
-            for c in node.children:
-                _clear_parens(c)
-
     _clear_parens(ast)
+
     result = _render_when_node(ast)
 
     try:
@@ -948,7 +963,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
     except Exception:
         pass
 
-    # populate per-run cache when applicable
+    # populate per-run cache
     try:
         if RUN_CACHE_CONTEXT == (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes)):
             RUN_CANONICAL_CACHE[when_val] = result
