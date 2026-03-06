@@ -206,7 +206,7 @@ class WhenNode:
     def __init__(self, parens: bool = False):
         self.parens = parens
 
-    def to_str(self) -> str:
+    def _to_str(self) -> str:
         raise NotImplementedError
 
 
@@ -215,7 +215,7 @@ class WhenAnd(WhenNode):
         super().__init__(parens=parens)
         self.children = children
 
-    def to_str(self) -> str:
+    def _to_str(self) -> str:
         parts: list[str] = []
         for c in self.children:
             s = _render_when_node(c)
@@ -231,7 +231,7 @@ class WhenLeaf(WhenNode):
         super().__init__(parens=parens)
         self.text = text
 
-    def to_str(self) -> str:
+    def _to_str(self) -> str:
         return self.text
 
 
@@ -240,8 +240,8 @@ class WhenNot(WhenNode):
         super().__init__(parens=parens)
         self.child = child
 
-    def to_str(self) -> str:
-        child_str = self.child.to_str()
+    def _to_str(self) -> str:
+        child_str = self.child._to_str()
         if isinstance(self.child, (WhenAnd, WhenOr)) and not self.child.parens:
             child_str = f'({child_str})'
         return f'!{child_str}'
@@ -252,7 +252,7 @@ class WhenOr(WhenNode):
         super().__init__(parens=parens)
         self.children = children
 
-    def to_str(self) -> str:
+    def _to_str(self) -> str:
         parts: list[str] = []
         for c in self.children:
             s = _render_when_node(c)
@@ -1831,68 +1831,69 @@ def _parse_when(expr: str) -> WhenNode:
     tokens = _tokenize_when(expr)
     idx = 0
 
-    def peek():
-        return tokens[idx] if idx < len(tokens) else None
-
-    def consume():
+    def _consume():
         nonlocal idx
         t = tokens[idx] if idx < len(tokens) else None
         idx += 1
         return t
 
-    def parse_primary():
-        t = peek()
-        if not t:
-            return WhenLeaf('')
-        if t[0] == 'OP' and t[1] == '(':
-            consume()  # (
-            node = parse_or()
-            next_token = peek()
-            if next_token and next_token[0] == 'OP' and next_token[1] == ')':
-                consume()
-                node.parens = True
-            return node
-        if t[0] == 'OPERAND':
-            consume()
-            return WhenLeaf(t[1])
-        return WhenLeaf('')
-
-    def parse_unary():
-        t = peek()
-        if t and t[0] == 'OP' and t[1] == '!':
-            consume()
-            return WhenNot(parse_unary())
-        return parse_primary()
-
-    def parse_and():
-        node = parse_unary()
+    def _parse_and():
+        node = _parse_unary()
         children = [node]
         while True:
-            t = peek()
+            t = _peek()
             if t and t[0] == 'OP' and t[1] == '&&':
-                consume()
-                children.append(parse_unary())
+                _consume()
+                children.append(_parse_unary())
             else:
                 break
         if len(children) == 1:
             return children[0]
         return WhenAnd(children)
 
-    def parse_or():
-        node = parse_and()
+    def _parse_or():
+        node = _parse_and()
         children = [node]
+
         while True:
-            t = peek()
+            t = _peek()
             if t and t[0] == 'OP' and t[1] == '||':
-                consume()
-                children.append(parse_and())
+                _consume()
+                children.append(_parse_and())
             else:
                 break
         if len(children) == 1:
             return children[0]
         return WhenOr(children)
 
-    return parse_or()
+    def _parse_primary():
+        t = _peek()
+        if not t:
+            return WhenLeaf('')
+        if t[0] == 'OP' and t[1] == '(':
+            _consume()  # (
+            node = _parse_or()
+            next_token = _peek()
+            if next_token and next_token[0] == 'OP' and next_token[1] == ')':
+                _consume()
+                node.parens = True
+            return node
+        if t[0] == 'OPERAND':
+            _consume()
+            return WhenLeaf(t[1])
+        return WhenLeaf('')
+
+    def _parse_unary():
+        t = _peek()
+        if t and t[0] == 'OP' and t[1] == '!':
+            _consume()
+            return WhenNot(_parse_unary())
+        return _parse_primary()
+
+    def _peek():
+        return tokens[idx] if idx < len(tokens) else None
+
+    return _parse_or()
 
 
 def _parse_when_prefixes(parser: argparse.ArgumentParser, raw_prefixes: str | None) -> list[str]:
@@ -1966,7 +1967,7 @@ def _remove_blank_lines(text: str) -> str:
 
 
 def _render_when_node(node: WhenNode) -> str:
-    inner = node.to_str()
+    inner = node._to_str()
     if node.parens:
         return f'({inner})'
     return inner
@@ -2379,12 +2380,13 @@ def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode:
 
 
 def _strip_json_comments(text):
-    def replacer(match):
+    def _replacer(match):
         s = match.group(0)
         if s.startswith('/'):
             return ''
         return s
-    return COMMENT_RE.sub(replacer, text)
+
+    return COMMENT_RE.sub(_replacer, text)
 
 
 def _strip_trailing_commas(text):
@@ -2409,7 +2411,7 @@ def _tokenize_when(expr: str):
     regex_escape = False
     prev_nonspace = ''
 
-    def flush_buf():
+    def _flush_buf():
         nonlocal buf
         if buf.strip():
             tokens.append(('OPERAND', _normalize_operand(buf)))
@@ -2475,14 +2477,14 @@ def _tokenize_when(expr: str):
             continue
 
         if expr.startswith('&&', i) or expr.startswith('||', i):
-            flush_buf()
+            _flush_buf()
             tokens.append(('OP', expr[i:i + 2]))
             i += 2
             prev_nonspace = ''
             continue
 
         if ch in '()':
-            flush_buf()
+            _flush_buf()
             tokens.append(('OP', ch))
             i += 1
             prev_nonspace = ch
@@ -2496,7 +2498,7 @@ def _tokenize_when(expr: str):
                 prev_nonspace = ch
                 continue
             if not buf.strip():
-                flush_buf()
+                _flush_buf()
                 tokens.append(('OP', '!'))
                 i += 1
                 prev_nonspace = '!'
@@ -2507,7 +2509,8 @@ def _tokenize_when(expr: str):
             prev_nonspace = ch
         i += 1
 
-    flush_buf()
+    _flush_buf()
+
     return tokens
 
 
