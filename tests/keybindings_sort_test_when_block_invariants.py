@@ -58,7 +58,7 @@ def extract_objects_from_jsonc(text: str):
         elif ch == '}':
             depth -= 1
             if depth == 0 and start is not None:
-                objs.append(text[start:i+1])
+                objs.append(text[start:i + 1])
                 start = None
         i += 1
     return objs
@@ -178,10 +178,10 @@ def test_when_blocks_contiguous_and_modifier_first():
         block_objs = objs[i:j]
         # compute keys and comparator tuples
         keys_block = [parse_obj_text(o).get('key', '') or '' for o in block_objs]
-        tuples = [ _key_sort_tuple_from_key(k) for k in keys_block ]
+        tuples = [_key_sort_tuple_from_key(k) for k in keys_block]
         # check stable sorted order
         sorted_indices = sorted(range(len(tuples)), key=lambda idx: tuples[idx])
         if sorted_indices != list(range(len(tuples))):
-            violations.append((whens[i], i, j-1, keys_block[:8], [t.decode('utf-8', errors='ignore') if isinstance(t, bytes) else t for t in tuples[:8]]))
+            violations.append((whens[i], i, j - 1, keys_block[:8], [t.decode('utf-8', errors='ignore') if isinstance(t, bytes) else t for t in tuples[:8]]))
         i = j
     assert not violations, f"Modifier-first ordering violated in {len(violations)} blocks; sample: {violations[:5]}"

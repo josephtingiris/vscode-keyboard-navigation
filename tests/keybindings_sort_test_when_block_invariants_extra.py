@@ -57,7 +57,7 @@ def extract_objects_from_jsonc(text: str):
         elif ch == '}':
             depth -= 1
             if depth == 0 and start is not None:
-                objs.append(text[start:i+1])
+                objs.append(text[start:i + 1])
                 start = None
         i += 1
     return objs
@@ -98,7 +98,7 @@ def test_when_block_invariants_extra():
     idxs = {}
     for i, w in enumerate(whens):
         idxs.setdefault(w, []).append(i)
-    bad = [ (k, arr) for k, arr in idxs.items() if arr and (arr[-1]-arr[0]+1) != len(arr) ]
+    bad = [(k, arr) for k, arr in idxs.items() if arr and (arr[-1] - arr[0] + 1) != len(arr)]
     assert not bad, f"Non-contiguous whens: {bad[:5]}"
 
     # in-block ordering: compare against sorter's key tuple logic
@@ -160,14 +160,14 @@ def test_when_block_invariants_extra():
     n = len(whens)
     viol = []
     while i < n:
-        j = i+1
+        j = i + 1
         while j < n and whens[j] == whens[i]:
             j += 1
         block = parsed_objs[i:j]
-        keys_block = [p[1].get('key','') or '' for p in block]
+        keys_block = [p[1].get('key', '') or '' for p in block]
         tuples = [_key_sort_tuple_from_key(k) for k in keys_block]
         sorted_idx = sorted(range(len(tuples)), key=lambda idx: tuples[idx])
         if sorted_idx != list(range(len(tuples))):
-            viol.append((whens[i], i, j-1, keys_block[:6]))
+            viol.append((whens[i], i, j - 1, keys_block[:6]))
         i = j
     assert not viol, f"In-block ordering violations: {viol[:5]}"
