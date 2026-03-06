@@ -848,7 +848,20 @@ def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode:
             def _mods_lit_from_pair(pair: tuple[str, str]) -> tuple[int, tuple[int, ...], str]:
                 return _mods_lit_from_object_text(pair[1], pref_index=pref_index)
 
-            slice_pairs.sort(key=lambda pair: _block_sort_key_from_object_text(pair[1]))
+            try:
+                keys = [(_extract_literal_key_from_object(obj_text) or '') for _comments, obj_text in slice_pairs]
+                sorted_keys = _dictionary_sort_keys(keys)
+                buckets: dict[str, list[tuple[str, str]]] = {}
+                for pair, key in zip(slice_pairs, keys):
+                    buckets.setdefault(key, []).append(pair)
+                new_slice: list[tuple[str, str]] = []
+                for k in sorted_keys:
+                    new_slice.extend(buckets.get(k, []))
+                remaining = [p for p in slice_pairs if (_extract_literal_key_from_object(p[1]) or '') not in set(sorted_keys)]
+                new_slice.extend(remaining)
+                slice_pairs = new_slice
+            except Exception:
+                slice_pairs.sort(key=lambda pair: _block_sort_key_from_object_text(pair[1]))
             groups_list[i:j] = slice_pairs
 
         i = j
@@ -1104,7 +1117,20 @@ def _sort_groups_for_primary_when(
 
         if j - i > 1 and negation_mode not in ('positive', 'negative'):
             slice_pairs = sorted_groups[i:j]
-            slice_pairs.sort(key=lambda pair: natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
+            try:
+                keys = [(_extract_literal_key_from_object(pair[1]) or '') for pair in slice_pairs]
+                sorted_keys = _dictionary_sort_keys(keys)
+                buckets: dict[str, list[tuple[str, str]]] = {}
+                for pair, key in zip(slice_pairs, keys):
+                    buckets.setdefault(key, []).append(pair)
+                new_slice: list[tuple[str, str]] = []
+                for k in sorted_keys:
+                    new_slice.extend(buckets.get(k, []))
+                remaining = [p for p in slice_pairs if (_extract_literal_key_from_object(p[1]) or '') not in set(sorted_keys)]
+                new_slice.extend(remaining)
+                slice_pairs = new_slice
+            except Exception:
+                slice_pairs.sort(key=lambda pair: natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
             sorted_groups[i:j] = slice_pairs
 
         i = j
