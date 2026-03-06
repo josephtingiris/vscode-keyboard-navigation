@@ -175,9 +175,8 @@ def test_when_blocks_contiguous_and_modifier_first():
         j = i + 1
         while j < n and whens[j] == whens[i]:
             j += 1
-        block_objs = objs[i:j]
-        # compute keys and comparator tuples
-        keys_block = [parse_obj_text(o).get('key', '') or '' for o in block_objs]
+        # use already-parsed keys for this contiguous block
+        keys_block = keys[i:j]
         tuples = [_key_sort_tuple_from_key(k) for k in keys_block]
         # check stable sorted order
         sorted_indices = sorted(range(len(tuples)), key=lambda idx: tuples[idx])
