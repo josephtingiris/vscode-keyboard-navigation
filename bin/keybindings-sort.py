@@ -403,15 +403,7 @@ def _assemble_sorted_output(
         new_rendered: list[tuple[str, str]] = []
         for canonical, entries in grouped.items():
             if len(entries) > 1:
-                # derive modifier preference from all entries in this canonical when block
-                mods_seen: set[str] = set()
-                for _comments, obj_text in entries:
-                    m, _ = _extract_mods_and_lit(obj_text)
-                    mods_seen.update(m)
-                pref_order = sorted(mods_seen)
-                pref_index = {m: i for i, m in enumerate(pref_order)}
-
-                entries.sort(key=lambda pair: _block_sort_key_from_object_text(pair[1]))
+                entries.sort(key=lambda pair: _mods_lit_from_object_text(pair[1]))
             new_rendered.extend(entries)
 
         rendered_groups = new_rendered
@@ -552,70 +544,15 @@ def _extract_literal_when_from_object(obj_text: str) -> str:
     return _decode_json_string_literal(match.group(1))
 
 
-def _extract_mods_and_lit(obj_text: str) -> tuple[list[str], str]:
+def _mods_lit_from_object_text(obj_text: str) -> tuple[tuple[str, ...], str]:
     key_raw = _extract_literal_key_from_object(obj_text) or ''
     norm = normalize_key_for_compare(key_raw)
     first = norm.split()[0] if norm else ''
     parts = [p for p in first.split('+') if p]
-    mods = parts[:-1] if len(parts) > 1 else []
+    mods = tuple(parts[:-1]) if len(parts) > 1 else tuple()
     lit = parts[-1] if parts else ''
-    return mods, lit
-
-
-def _mods_lit_from_object_text(obj_text: str, pref_index: dict | None = None) -> tuple[int, tuple[int, ...], str]:
-    """Return a sort key: (modifier_count, modifier_priority_tuple, literal_key).
-
-    If `pref_index` is provided it is used to map modifiers to priority indices;
-    otherwise modifiers are sorted naturally (alphabetical) for priority.
-    """
-    mods, lit = _extract_mods_and_lit(obj_text)
-    if pref_index is None:
-        # derive natural alphabetical preference from mods seen in this single object
-        pref_order = sorted(set(mods))
-        pref_index = {m: i for i, m in enumerate(pref_order)}
-
-    mod_priority = tuple(pref_index.get(m, len(pref_index)) for m in mods)
     lit_key = normalize_key_for_compare(lit)
-    return (len(mods), mod_priority, lit_key)
-
-
-def _natural_key_from_object_text(obj_text: str):
-    key_raw = _extract_literal_key_from_object(obj_text) or ''
-    norm = normalize_key_for_compare(key_raw)
-    return natural_key_case_sensitive(norm)
-
-
-def _block_sort_key_from_object_text(obj_text: str):
-    """Return the sort key used for ordering entries inside a canonical-when block.
-
-    This mirrors the global `grep | sort -u` ordering by normalizing the literal
-    `key` value and applying the natural sort transformation.
-    """
-    key_raw = _extract_literal_key_from_object(obj_text) or ''
-    norm = normalize_key_for_compare(key_raw)
-    return natural_key_case_sensitive(norm)
-
-
-def _dictionary_sort_keys(keys: list[str]) -> list[str]:
-    """Return keys sorted using system `sort -u -d` with `LC_ALL=C`.
-
-    Falls back to a deterministic Python order if the external sort call fails.
-    """
-    if not keys:
-        return []
-    try:
-        env = {**os.environ, 'LC_ALL': 'C'}
-        proc = subprocess.run(['sort', '-u', '-d'], input='\n'.join(keys), capture_output=True, text=True, env=env)
-        return [line for line in proc.stdout.splitlines() if line]
-    except Exception:
-        # deterministic fallback: unique-preserving stable sort using natural key
-        seen = []
-        seen_set = set()
-        for k in keys:
-            if k not in seen_set:
-                seen.append(k)
-                seen_set.add(k)
-        return sorted(seen, key=lambda s: natural_key_case_sensitive(s))
+    return (mods, lit_key)
 
 
 def _finalize_processed_output(
@@ -837,31 +774,17 @@ def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode:
         if j - i > 1:
             slice_pairs = groups_list[i:j]
 
-            # derive modifier preference from this contiguous slice (natural alphabetical)
-            mods_seen: set[str] = set()
-            for _comments, obj_text in slice_pairs:
-                m, _ = _extract_mods_and_lit(obj_text)
-                mods_seen.update(m)
-            pref_order = sorted(mods_seen)
-            pref_index = {m: i for i, m in enumerate(pref_order)}
+            def _mods_lit_from_pair(pair: tuple[str, str]) -> tuple[tuple[str, ...], str]:
+                key_raw = _extract_literal_key_from_object(pair[1]) or ''
+                norm = normalize_key_for_compare(key_raw)
+                first = norm.split()[0] if norm else ''
+                parts = [p for p in first.split('+') if p]
+                mods = tuple(parts[:-1]) if len(parts) > 1 else tuple()
+                lit = parts[-1] if parts else ''
+                lit_key = normalize_key_for_compare(lit)
+                return (mods, lit_key)
 
-            def _mods_lit_from_pair(pair: tuple[str, str]) -> tuple[int, tuple[int, ...], str]:
-                return _mods_lit_from_object_text(pair[1], pref_index=pref_index)
-
-            try:
-                keys = [(_extract_literal_key_from_object(obj_text) or '') for _comments, obj_text in slice_pairs]
-                sorted_keys = _dictionary_sort_keys(keys)
-                buckets: dict[str, list[tuple[str, str]]] = {}
-                for pair, key in zip(slice_pairs, keys):
-                    buckets.setdefault(key, []).append(pair)
-                new_slice: list[tuple[str, str]] = []
-                for k in sorted_keys:
-                    new_slice.extend(buckets.get(k, []))
-                remaining = [p for p in slice_pairs if (_extract_literal_key_from_object(p[1]) or '') not in set(sorted_keys)]
-                new_slice.extend(remaining)
-                slice_pairs = new_slice
-            except Exception:
-                slice_pairs.sort(key=lambda pair: _block_sort_key_from_object_text(pair[1]))
+            slice_pairs.sort(key=lambda pair: _mods_lit_from_pair(pair))
             groups_list[i:j] = slice_pairs
 
         i = j
@@ -970,7 +893,8 @@ def _sort_groups_for_primary_when(
                 when_prefixes=when_prefixes,
                 when_regexes=when_regexes,
             ),
-            natural_key_case_sensitive(normalize_key_for_compare(row[0])),
+            row[1],
+            natural_key_case_sensitive(row[0]),
         )
     )
 
@@ -1117,20 +1041,7 @@ def _sort_groups_for_primary_when(
 
         if j - i > 1 and negation_mode not in ('positive', 'negative'):
             slice_pairs = sorted_groups[i:j]
-            try:
-                keys = [(_extract_literal_key_from_object(pair[1]) or '') for pair in slice_pairs]
-                sorted_keys = _dictionary_sort_keys(keys)
-                buckets: dict[str, list[tuple[str, str]]] = {}
-                for pair, key in zip(slice_pairs, keys):
-                    buckets.setdefault(key, []).append(pair)
-                new_slice: list[tuple[str, str]] = []
-                for k in sorted_keys:
-                    new_slice.extend(buckets.get(k, []))
-                remaining = [p for p in slice_pairs if (_extract_literal_key_from_object(p[1]) or '') not in set(sorted_keys)]
-                new_slice.extend(remaining)
-                slice_pairs = new_slice
-            except Exception:
-                slice_pairs.sort(key=lambda pair: natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
+            slice_pairs.sort(key=lambda pair: natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
             sorted_groups[i:j] = slice_pairs
 
         i = j
