@@ -100,6 +100,66 @@ RUN_CANONICAL_CACHE: dict = {}
 RUN_SORTABLE_CACHE: dict = {}
 RUN_OBJ_INFO_CACHE: dict = {}
 
+
+def _get_run_obj_info(
+    obj_text: str,
+    grouping_mode: str = 'config-first',
+    negation_mode: str = 'alpha',
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> dict:
+    """Return per-run cached object metadata for the current sorting context."""
+
+    info = RUN_OBJ_INFO_CACHE.get(obj_text)
+    if info is not None:
+        return info
+
+    parsed = _parse_object(obj_text)
+    key_val = ''
+    when_val = ''
+    canonical_when = ''
+    sortable_when = ''
+
+    if parsed:
+        try:
+            key_val = str(parsed.get('key', ''))
+            when_val = str(parsed.get('when', ''))
+        except Exception:
+            key_val = ''
+            when_val = ''
+
+    if when_val:
+        canonical_when = _canonicalize_when(
+            when_val,
+            mode=grouping_mode,
+            negation_mode=negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        )
+        sortable_when = _sortable_when_key(
+            when_val,
+            mode=grouping_mode,
+            negation_mode=negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        )
+
+    info = {
+        'parsed': parsed,
+        'key': key_val,
+        'when': when_val,
+        'canonical': canonical_when,
+        'sortable': sortable_when,
+    }
+
+    try:
+        RUN_OBJ_INFO_CACHE[obj_text] = info
+    except Exception:
+        pass
+
+    return info
+
+
 # default when prefixes to be added to standard output, if none are given via the cli
 DEFAULT_WHEN_PREFIXES = []
 
@@ -1116,20 +1176,8 @@ def _embed_duplicate_comment_in_object(obj_text: str, duplicate_comment: str) ->
 def _extract_key_when_from_object(obj_text: str) -> Tuple[str, str]:
     """Return the literal `key` and `when` values extracted from an object text."""
 
-    # fast-path: check per-run object info cache populated during normalization
-    info = RUN_OBJ_INFO_CACHE.get(obj_text)
-    if info is not None:
-        return (info.get('key', ''), info.get('when', ''))
-
-    parsed = _parse_object(obj_text)
-    if not parsed:
-        return ('', '')
-    try:
-        key_val = str(parsed.get('key', ''))
-        when_val = str(parsed.get('when', ''))
-        return (key_val, when_val)
-    except Exception:
-        return ('', '')
+    info = _get_run_obj_info(obj_text)
+    return (info.get('key', ''), info.get('when', ''))
 
 
 def _extract_literal_key_from_object(obj_text: str) -> str:
@@ -1288,27 +1336,21 @@ def _extract_preamble_postamble(text):
 def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondary: str | None = None, grouping: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple:
     """Return a computed stable sort key tuple for the object text."""
 
-    # obtain key/when/canonical/sortable values either from cache or by parsing
-    info = RUN_OBJ_INFO_CACHE.get(obj_text)
-    if info is not None:
-        key_val = info.get('key', '')
-        when_val = info.get('when', '')
-        canonical_when = info.get('canonical', '')
-        sortable_when = info.get('sortable', '')
-    else:
-        parsed = _parse_object(obj_text)
-        if not parsed:
-            # return a consistent fallback sort key (rank high so these sort last)
-            return (9999, [], (0,), [])
-        try:
-            key_val = str(parsed.get('key', ''))
-            when_val = str(parsed.get('when', ''))
-            canonical_when = _canonicalize_when(
-                when_val, mode=grouping, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
-            sortable_when = _sortable_when_key(
-                when_val, mode=grouping, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
-        except Exception:
-            return (9999, [], (0,), [])
+    info = _get_run_obj_info(
+        obj_text,
+        grouping_mode=grouping,
+        negation_mode=negation_mode,
+        when_prefixes=when_prefixes,
+        when_regexes=when_regexes,
+    )
+    key_val = info.get('key', '')
+    when_val = info.get('when', '')
+    canonical_when = info.get('canonical', '')
+    sortable_when = info.get('sortable', '')
+    parsed = info.get('parsed')
+    if not parsed:
+        # return a consistent fallback sort key (rank high so these sort last)
+        return (9999, [], (0,), [])
 
     # main token-building logic (covering both cache and parsed paths)
     try:
@@ -1493,14 +1535,14 @@ def _first_when_group_rank(
 ) -> int:
     """Assign a numeric grouping rank to the first operand of an object's when clause."""
 
-    when_key, when_val = _extract_key_when_from_object(obj_text)
-    canonical = _canonicalize_when(
-        when_val,
-        mode=mode,
+    info = _get_run_obj_info(
+        obj_text,
+        grouping_mode=mode,
         negation_mode=negation_mode,
         when_prefixes=when_prefixes,
         when_regexes=when_regexes,
     )
+    canonical = info.get('canonical', '')
 
     if not canonical:
         return 5
@@ -2122,7 +2164,7 @@ def _replace_when_literals(
 def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
     """Initialize and clear per-run caches for the current run parameter context."""
 
-    global RUN_CACHE_CONTEXT, RUN_CANONICAL_CACHE, RUN_SORTABLE_CACHE
+    global RUN_CACHE_CONTEXT, RUN_CANONICAL_CACHE, RUN_SORTABLE_CACHE, RUN_OBJ_INFO_CACHE
     RUN_CACHE_CONTEXT = (
         mode,
         negation_mode,
@@ -2132,6 +2174,7 @@ def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | 
     # clear per-run caches
     RUN_CANONICAL_CACHE = {}
     RUN_SORTABLE_CACHE = {}
+    RUN_OBJ_INFO_CACHE = {}
 
 
 def _sort_groups_for_primary_when(
@@ -2143,25 +2186,28 @@ def _sort_groups_for_primary_when(
 ) -> list[tuple[str, str]]:
     """Sort by `--primary when` derived keys and apply grouping heuristics."""
 
-    decorated: list[tuple[str, str, tuple[str, str]]] = []
+    decorated: list[tuple[str, str, str, tuple[str, str]]] = []
     for pair in sorted_groups:
-        key_val, when_val = _extract_key_when_from_object(pair[1])
+        info = _get_run_obj_info(
+            pair[1],
+            grouping_mode=grouping_mode,
+            negation_mode=negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        )
+        key_val = info.get('key', '')
+        when_val = info.get('when', '')
+        canonical = info.get('canonical', '')
         if not key_val:
             key_val = _extract_literal_key_from_object(pair[1])
         if not when_val:
             when_val = _extract_literal_when_from_object(pair[1])
-        decorated.append((key_val, when_val, pair))
+            if not canonical:
+                canonical = when_val
+        decorated.append((key_val, when_val, canonical, pair))
 
-    for key_val, when_val, _pair in decorated:
-        try:
-            canonical = _canonicalize_when(
-                when_val,
-                mode=grouping_mode,
-                negation_mode=negation_mode,
-                when_prefixes=when_prefixes,
-                when_regexes=when_regexes,
-            )
-        except Exception:
+    for key_val, when_val, canonical, _pair in decorated:
+        if not canonical:
             canonical = when_val
 
         if DEBUG_LEVEL > 0:
@@ -2179,13 +2225,7 @@ def _sort_groups_for_primary_when(
 
     decorated.sort(
         key=lambda row: (
-            _canonicalize_when(
-                row[1],
-                mode=grouping_mode,
-                negation_mode=negation_mode,
-                when_prefixes=when_prefixes,
-                when_regexes=when_regexes,
-            ),
+            row[2],
             row[1],
             _natural_key_case_sensitive(row[0]),
         )
@@ -2227,7 +2267,7 @@ def _sort_groups_for_primary_when(
                 non_focus_rows.append(row)
         decorated = non_focus_rows + focus_rows
 
-    sorted_groups = [row[2] for row in decorated]
+    sorted_groups = [row[3] for row in decorated]
 
     for idx, pair in enumerate(sorted_groups):
         key_val, when_val = _extract_key_when_from_object(pair[1])
@@ -2246,11 +2286,13 @@ def _sort_groups_for_primary_when(
             normalized = _normalize_key_for_compare(key_val)
             _debug_echo(1, 'ordered', canonical, f"DEBUG_ORDERED: idx={idx} raw_key={key_val!r} normalized={normalized!r}")
 
+    #
     # stable-partition when prefixes and/or regexes into three contiguous regions,
     # following this order:
     #  1. clauses matching any when_prefix (any operand),
     #  2. clauses matching any when_regex (any operand) but not matching prefixes,
     #  3. all remaining clauses.
+    #
 
     if when_prefixes or when_regexes:
         matched_prefix: list[tuple[str, str]] = []
@@ -2628,9 +2670,15 @@ def _with_normalized_when_groups(
         comments = _strip_when_sorted_comment(comments, when_changed)
         normalized_groups.append((comments, obj_out))
 
-        # warm the parsed-object cache
+        # warm the per-run object cache for downstream sort and grouping passes
         try:
-            _ = _parse_object(obj_out)
+            _ = _get_run_obj_info(
+                obj_out,
+                grouping_mode=grouping_mode,
+                negation_mode=negation_mode,
+                when_prefixes=when_prefixes,
+                when_regexes=when_regexes,
+            )
         except Exception:
             pass
 
@@ -2642,7 +2690,8 @@ def _with_normalized_when_groups(
 
 
 def main(argv: List[str] | None = None) -> int:
-    """CLI entry point: read stdin, sort keybinding objects, and write sorted JSONC to stdout."""
+    """Parse arguments, read stdin, sort keybinding objects, and write sorted JSONC to stdout."""
+
     argv = sys.argv[1:] if argv is None else argv
 
     parser = argparse.ArgumentParser(
@@ -2757,6 +2806,7 @@ def main(argv: List[str] | None = None) -> int:
             when_regexes=when_regexes,
         )
 
+    #
     # last-step stable partition
     #
     # desired order:
@@ -2765,6 +2815,7 @@ def main(argv: List[str] | None = None) -> int:
     #  2. objects grouped by prefix combinations (ordered by smallest prefix index, then by fewer prefixes first),
     #     and within each prefix-group emit items without regex first, then with regex combinations ordered by fewest regexes.
     #  3. objects with no prefix but with regex(es) (regex-only)
+    #
 
     # produce a deterministic ordering by prefix/regex combination signature.
     if when_prefixes or when_regexes:
