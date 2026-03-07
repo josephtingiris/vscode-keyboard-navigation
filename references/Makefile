@@ -103,7 +103,8 @@ maps-quick:
 	@echo
 	# generate only a small representative subset to validate changes quickly
 	@../bin/keybindings-map.sh --make none
-	@../bin/keybindings-map.sh --make vi
+	# there should not be any diffs
+	@git diff keybindings.map.jsonc
 	@echo
 
 surfaces:
