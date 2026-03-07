@@ -1,6 +1,6 @@
 
 .DEFAULT_GOAL := help
-.PHONY: help all build clean test tests corpus corpora map maps surfaces surface
+.PHONY: help all build clean test tests corpus corpora map maps maps-quick surfaces surface
 
 # default: show help when `make` is run with no args
 help:
@@ -15,6 +15,7 @@ help:
 	@echo "  corpus                  - alias for corpora"
 	@echo "  maps                    - generate all map files"
 	@echo "  map                     - alias for maps"
+	@echo "  maps-quick              - quick/smoke map generation (fast validation)"
 	@echo "  surfaces                - generate all surface files"
 	@echo "  surface                 - alias for surfaces"
 	@echo "  tests                   - run all tests in ../tests/"
@@ -96,6 +97,14 @@ maps:
 	@echo
 
 map: maps
+
+maps-quick:
+	@echo "++ Running quick map generation (none + vi) ..."
+	@echo
+	# generate only a small representative subset to validate changes quickly
+	@../bin/keybindings-map.sh --make none
+	@../bin/keybindings-map.sh --make vi
+	@echo
 
 surfaces:
 	@echo "++ Updating references keybindings surface files ..."
