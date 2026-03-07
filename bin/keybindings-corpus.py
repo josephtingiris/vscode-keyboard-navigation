@@ -494,6 +494,7 @@ def _when_for(key, mod: str = ""):
 
 def main(argv: List[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
+
     parser = argparse.ArgumentParser(
         description=(
             "Generate a deterministic JSONC array of unique keybinding "
@@ -532,6 +533,7 @@ def main(argv: List[str] | None = None) -> int:
             "Select the active letter-key navigation group (default: none)."
         ),
     )
+
     args = parser.parse_args(argv)
 
     # determine selected letter-group from a when-clause
@@ -553,6 +555,7 @@ def main(argv: List[str] | None = None) -> int:
             return 2
 
         original_text = None
+
         try:
             with open(fname, 'r', encoding='utf-8') as fh:
                 original_text = fh.read()
@@ -560,7 +563,7 @@ def main(argv: List[str] | None = None) -> int:
             print(f"error: failed to read '{fname}': {e}", file=sys.stderr)
             return 2
 
-        # strip JSONC comments safely (state-machine)
+        # strip JSONC comments (state-machine)
         def strip_jsonc(text: str) -> str:
             out = []
             i = 0
@@ -625,9 +628,10 @@ def main(argv: List[str] | None = None) -> int:
             in_block_comment = False
             start = -1
 
+            # find opening bracket, skipping comments and strings
             while i < n:
                 ch = text[i]
-                nxt2 = text[i:i + 2] if i + 2 <= n else ''
+                next2 = text[i:i + 2] if i + 2 <= n else ''
 
                 if in_line_comment:
                     if ch == '\n':
@@ -635,17 +639,17 @@ def main(argv: List[str] | None = None) -> int:
                     i += 1
                     continue
                 if in_block_comment:
-                    if nxt2 == '*/':
-                        i += 2
+                    if next2 == '*/':
                         in_block_comment = False
+                        i += 2
                     else:
                         i += 1
                     continue
-                if nxt2 == '//':
+                if next2 == '//':
                     in_line_comment = True
                     i += 2
                     continue
-                if nxt2 == '/*':
+                if next2 == '/*':
                     in_block_comment = True
                     i += 2
                     continue
@@ -653,17 +657,6 @@ def main(argv: List[str] | None = None) -> int:
                     in_string = True
                     string_char = ch
                     i += 1
-
-                    # enter string state and skip until close
-                    while i < n:
-                        c = text[i]
-                        if c == '\\':
-                            i += 2
-                            continue
-                        if c == string_char:
-                            i += 1
-                            break
-                        i += 1
                     continue
                 if ch == '[':
                     start = i
@@ -673,49 +666,55 @@ def main(argv: List[str] | None = None) -> int:
             if start == -1:
                 return None
 
-            # find matching ]
+            # find matching closing bracket
             depth = 1
             i = start + 1
             in_string = False
             string_char = ''
+            esc = False
             in_line_comment = False
             in_block_comment = False
+            end = -1
+
             while i < n:
                 ch = text[i]
-                nxt2 = text[i:i + 2] if i + 2 <= n else ''
+                next2 = text[i:i + 2] if i + 2 <= n else ''
+
                 if in_line_comment:
                     if ch == '\n':
                         in_line_comment = False
                     i += 1
                     continue
                 if in_block_comment:
-                    if nxt2 == '*/':
-                        i += 2
+                    if next2 == '*/':
                         in_block_comment = False
+                        i += 2
                     else:
                         i += 1
+                    continue
+                if in_string:
+                    if esc:
+                        esc = False
+                    elif ch == '\\':
+                        esc = True
+                    elif ch == string_char:
+                        in_string = False
+                    i += 1
+                    continue
+
+                # not in string/comment
+                if next2 == '//':
+                    in_line_comment = True
+                    i += 2
+                    continue
+                if next2 == '/*':
+                    in_block_comment = True
+                    i += 2
                     continue
                 if ch == '"' or ch == "'":
                     in_string = True
                     string_char = ch
                     i += 1
-                    while i < n:
-                        c = text[i]
-                        if c == '\\':
-                            i += 2
-                            continue
-                        if c == string_char:
-                            i += 1
-                            break
-                        i += 1
-                    continue
-                if nxt2 == '//':
-                    in_line_comment = True
-                    i += 2
-                    continue
-                if nxt2 == '/*':
-                    in_block_comment = True
-                    i += 2
                     continue
                 if ch == '[':
                     depth += 1
@@ -723,58 +722,115 @@ def main(argv: List[str] | None = None) -> int:
                     depth -= 1
                     if depth == 0:
                         end = i
-                        preamble = text[:start]
-                        array_text = text[start + 1:end]
-                        postamble = text[end + 1:]
-                        return preamble, array_text, postamble
+                        break
                 i += 1
-            return None
+
+            if end == -1:
+                return None
+
+            preamble = text[:start]
+            postamble = text[end + 1:]
+            array_text = text[start + 1:end]  # exclude [ and ]
+
+            return preamble, array_text, postamble
 
         def _group_objects_with_comments(array_text: str, base_line: int = 1):
-            groups = []
-            comments_buf = ''
-            obj_buf = ''
+            """Split a JSON array body into a list of (leading_comments, object_text, start_line) tuples and trailing comments."""
+
+            groups: list[tuple[str, str, int]] = []
+            n = len(array_text)
+            i = 0
+            comments_start = 0
+            obj_start: int | None = None
             depth = 0
-            in_obj = False
+            comments = ''
             obj_start_line = base_line
+
+            in_string = False
+            string_char = ''
+            esc = False
+            in_line_comment = False
+            in_block_comment = False
+
             current_line = base_line
-            for line in array_text.splitlines(keepends=True):
-                stripped = line.strip()
-                if not in_obj:
-                    if stripped.startswith('//') or stripped.startswith('/*'):
-                        comments_buf += line
-                        current_line += line.count('\n')
-                        continue
-                    if '{' in line:
-                        in_obj = True
+
+            while i < n:
+                ch = array_text[i]
+                next2 = array_text[i:i + 2] if i + 2 <= n else ''
+
+                if in_line_comment:
+                    if ch == '\n':
+                        in_line_comment = False
+                    i += 1
+                    current_line += 1 if ch == '\n' else 0
+                    continue
+
+                if in_block_comment:
+                    if next2 == '*/':
+                        in_block_comment = False
+                        i += 2
+                        current_line += 2 if '\n' in next2 else 0
+                    else:
+                        if ch == '\n':
+                            current_line += 1
+                        i += 1
+                    continue
+
+                if in_string:
+                    if esc:
+                        esc = False
+                    elif ch == '\\':
+                        esc = True
+                    elif ch == string_char:
+                        in_string = False
+                    if ch == '\n':
+                        current_line += 1
+                    i += 1
+                    continue
+
+                if next2 == '//':
+                    in_line_comment = True
+                    i += 2
+                    continue
+
+                if next2 == '/*':
+                    in_block_comment = True
+                    i += 2
+                    continue
+
+                if ch == '"' or ch == "'":
+                    in_string = True
+                    string_char = ch
+                    i += 1
+                    continue
+
+                if obj_start is None:
+                    if ch == '{':
+                        comments = array_text[comments_start:i]
+                        obj_start = i
+                        depth = 1
                         obj_start_line = current_line
-                        obj_buf = line
-                        # if line contains '}' too, handle short objects
-                        if '}' in line and line.index('}') > line.index('{'):
-                            groups.append((comments_buf, obj_buf, obj_start_line))
-                            comments_buf = ''
-                            obj_buf = ''
-                            in_obj = False
-                        current_line += line.count('\n')
-                        continue
-                    # ignore blank or comma lines
-                    if stripped == '' or stripped == ',':
-                        current_line += line.count('\n')
-                        continue
-                    # fallback: accumulate as comments
-                    comments_buf += line
-                    current_line += line.count('\n')
-                else:
-                    obj_buf += line
-                    if '}' in line:
-                        # crude close detection; rely on JSON parse later for exactness
-                        groups.append((comments_buf, obj_buf, obj_start_line))
-                        comments_buf = ''
-                        obj_buf = ''
-                        in_obj = False
-                    current_line += line.count('\n')
-            trailing = comments_buf
-            return groups, trailing
+                    i += 1
+                    if ch == '\n':
+                        current_line += 1
+                    continue
+
+                if ch == '{':
+                    depth += 1
+                elif ch == '}':
+                    depth -= 1
+                    if depth == 0:
+                        obj_end = i + 1
+                        obj_text = array_text[obj_start:obj_end]
+                        groups.append((comments, obj_text, obj_start_line))
+                        obj_start = None
+                        comments_start = obj_end
+                if ch == '\n':
+                    current_line += 1
+                i += 1
+
+            trailing_comments = array_text[comments_start:]
+            return groups, trailing_comments
 
         def _preview_for_error(obj, src_text: str | None = None, max_len: int = 1000) -> str:
             if src_text:
@@ -1003,7 +1059,129 @@ def main(argv: List[str] | None = None) -> int:
             # advance search position past this object to avoid matching earlier duplicates
             search_pos = obj_end + len(insert_text) + 1
 
-        # print modified text to stdout
+        # final corrective pass: ensure injected objects contain their computed when clauses
+        def _find_matching_brace_in_text(text: str, start_idx: int) -> int:
+            i = start_idx
+            n = len(text)
+            depth = 0
+            in_string = False
+            string_char = ''
+            esc = False
+            in_line = False
+            in_block = False
+            while i < n:
+                ch = text[i]
+                nxt2 = text[i:i + 2] if i + 2 <= n else ''
+                if in_line:
+                    if ch == '\n':
+                        in_line = False
+                    i += 1
+                    continue
+                if in_block:
+                    if nxt2 == '*/':
+                        i += 2
+                        in_block = False
+                        continue
+                    i += 1
+                    continue
+                if in_string:
+                    if esc:
+                        esc = False
+                    elif ch == '\\':
+                        esc = True
+                    elif ch == string_char:
+                        in_string = False
+                    i += 1
+                    continue
+                if nxt2 == '//':
+                    in_line = True
+                    i += 2
+                    continue
+                if nxt2 == '/*':
+                    in_block = True
+                    i += 2
+                    continue
+                if ch == '"' or ch == "'":
+                    in_string = True
+                    string_char = ch
+                    i += 1
+                    continue
+                if ch == '{':
+                    depth += 1
+                elif ch == '}':
+                    depth -= 1
+                    if depth == 0:
+                        return i
+                i += 1
+            return -1
+
+        # for each parsed object, verify the out_text fragment contains the expected effective_when
+        search_pos = 0
+        for (_comments_blob, obj_text, _obj_line), effective_when, comment_line, obj in zip(
+            groups, transformed_whens, comments_lines, parsed
+        ):
+            obj_index = out_text.find(obj_text, search_pos)
+            if obj_index == -1:
+                # fallback to locate by key only
+                k = obj.get('key')
+                key_marker = f'"key": "{k}"'
+                key_pos = out_text.find(key_marker, search_pos)
+                if key_pos == -1:
+                    continue
+                brace_pos = out_text.rfind('{', 0, key_pos)
+                if brace_pos == -1:
+                    continue
+                obj_start = brace_pos
+            else:
+                obj_start = obj_index
+            obj_end = _find_matching_brace_in_text(out_text, obj_start)
+            if obj_end == -1:
+                continue
+            obj_fragment = out_text[obj_start:obj_end + 1]
+
+            # ensure all WHEN_CONTEXT_SELECTORS matching this key are present
+            # recompute literal key and normalize
+            k_full = obj.get('key')
+            try:
+                mmod, literal_key = k_full.rsplit('+', 1)
+                if literal_key == '':
+                    mmod = mmod.rstrip('+')
+                    literal_key = '+'
+            except Exception:
+                mmod = ''
+                literal_key = k_full
+
+            key_norm = _normalize_key(literal_key)
+
+            # collect missing contexts
+            missing_ctxs: list = []
+            for group, ctx in WHEN_CONTEXT_SELECTORS:
+                if key_norm in {str(g) for g in group}:
+                    if ctx not in effective_when:
+                        missing_ctxs.append(ctx)
+
+            if missing_ctxs:
+                # merge them into effective_when
+                if effective_when and effective_when.strip():
+                    new_effective = effective_when + " && " + " && ".join(missing_ctxs)
+                else:
+                    new_effective = " && ".join(missing_ctxs)
+                # attempt robust replacement of the "when" value
+                when_match = re.search(r'("when"\s*:\s*)("(?:\\.|[^"\\])*")', obj_fragment)
+                if when_match:
+                    serialized_when = json.dumps(new_effective)
+                    new_obj_fragment = (
+                        obj_fragment[:when_match.start(2)]
+                        + serialized_when
+                        + obj_fragment[when_match.end(2):]
+                    )
+                    out_text = out_text[:obj_start] + new_obj_fragment + out_text[obj_end + 1:]
+                    # advance search_pos to avoid reprocessing earlier objects
+                    search_pos = obj_start + len(new_obj_fragment)
+                    continue
+            # advance search_pos if we didn't replace
+            search_pos = obj_end + 1
+
         sys.stdout.write(out_text)
         return 0
 
