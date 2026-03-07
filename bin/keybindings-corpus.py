@@ -1140,45 +1140,48 @@ def main(argv: List[str] | None = None) -> int:
             obj_fragment = out_text[obj_start:obj_end + 1]
 
             # ensure all WHEN_CONTEXT_SELECTORS matching this key are present
-            # recompute literal key and normalize
-            k_full = obj.get('key')
-            try:
-                mmod, literal_key = k_full.rsplit('+', 1)
-                if literal_key == '':
-                    mmod = mmod.rstrip('+')
-                    literal_key = '+'
-            except Exception:
-                mmod = ''
-                literal_key = k_full
+            # Only inject missing feature-gate contexts when the user explicitly
+            # requested context augmentation via the `--add-context` flag.
+            if add_context_arg is not None:
+                # recompute literal key and normalize
+                k_full = obj.get('key')
+                try:
+                    mmod, literal_key = k_full.rsplit('+', 1)
+                    if literal_key == '':
+                        mmod = mmod.rstrip('+')
+                        literal_key = '+'
+                except Exception:
+                    mmod = ''
+                    literal_key = k_full
 
-            key_norm = _normalize_key(literal_key)
+                key_norm = _normalize_key(literal_key)
 
-            # collect missing contexts
-            missing_ctxs: list = []
-            for group, ctx in WHEN_CONTEXT_SELECTORS:
-                if key_norm in {str(g) for g in group}:
-                    if ctx not in effective_when:
-                        missing_ctxs.append(ctx)
+                # collect missing contexts
+                missing_ctxs: list = []
+                for group, ctx in WHEN_CONTEXT_SELECTORS:
+                    if key_norm in {str(g) for g in group}:
+                        if ctx not in effective_when:
+                            missing_ctxs.append(ctx)
 
-            if missing_ctxs:
-                # merge them into effective_when
-                if effective_when and effective_when.strip():
-                    new_effective = effective_when + " && " + " && ".join(missing_ctxs)
-                else:
-                    new_effective = " && ".join(missing_ctxs)
-                # attempt robust replacement of the "when" value
-                when_match = re.search(r'("when"\s*:\s*)("(?:\\.|[^"\\])*")', obj_fragment)
-                if when_match:
-                    serialized_when = json.dumps(new_effective)
-                    new_obj_fragment = (
-                        obj_fragment[:when_match.start(2)]
-                        + serialized_when
-                        + obj_fragment[when_match.end(2):]
-                    )
-                    out_text = out_text[:obj_start] + new_obj_fragment + out_text[obj_end + 1:]
-                    # advance search_pos to avoid reprocessing earlier objects
-                    search_pos = obj_start + len(new_obj_fragment)
-                    continue
+                if missing_ctxs:
+                    # merge them into effective_when
+                    if effective_when and effective_when.strip():
+                        new_effective = effective_when + " && " + " && ".join(missing_ctxs)
+                    else:
+                        new_effective = " && ".join(missing_ctxs)
+                    # attempt robust replacement of the "when" value
+                    when_match = re.search(r'("when"\s*:\s*)("(?:\\.|[^"\\])*")', obj_fragment)
+                    if when_match:
+                        serialized_when = json.dumps(new_effective)
+                        new_obj_fragment = (
+                            obj_fragment[:when_match.start(2)]
+                            + serialized_when
+                            + obj_fragment[when_match.end(2):]
+                        )
+                        out_text = out_text[:obj_start] + new_obj_fragment + out_text[obj_end + 1:]
+                        # advance search_pos to avoid reprocessing earlier objects
+                        search_pos = obj_start + len(new_obj_fragment)
+                        continue
             # advance search_pos if we didn't replace
             search_pos = obj_end + 1
 
