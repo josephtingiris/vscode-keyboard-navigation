@@ -1139,9 +1139,7 @@ def main(argv: List[str] | None = None) -> int:
                 continue
             obj_fragment = out_text[obj_start:obj_end + 1]
 
-            # ensure all WHEN_CONTEXT_SELECTORS matching this key are present
-            # Only inject missing feature-gate contexts when the user explicitly
-            # requested context augmentation via the `--add-context` flag.
+            # ensure WHEN_CONTEXT_SELECTORS matching this key are present
             if add_context_arg is not None:
                 # recompute literal key and normalize
                 k_full = obj.get('key')
@@ -1325,6 +1323,7 @@ def main(argv: List[str] | None = None) -> int:
                     # "config.keyboardNavigation.terminal",
                     # "!config.keyboardNavigation.terminal",
                 ]
+
                 m = len(EXTRA_WHENS)
 
                 for this_when in emitted_whens:
