@@ -1,6 +1,6 @@
 
 .DEFAULT_GOAL := help
-.PHONY: help all build clean test tests corpus corpora extension map maps references
+.PHONY: help all build clean test tests corpus corpora extension install map maps references uninstall
 
 # default: show help when `make` is run with no args
 help:
@@ -13,6 +13,7 @@ help:
 	@echo "  clean                   - clean all artifacts"
 	@echo "  corpora                 - generate all corpus files in references/"
 	@echo "  corpus                  - alias for corpora"
+	@echo "  install                 - install development packages"
 	@echo "  maps                    - generate all map files in references/"
 	@echo "  map                     - alias for maps"
 	@echo "  extension               - make extension in extension/"
@@ -20,6 +21,7 @@ help:
 	@echo "  surface                 - alias for surfaces"
 	@echo "  tests                   - run all tests in tests/"
 	@echo "  test                    - alias for tests"
+	@echo "  uninstall               - uninstall development packages"
 	@echo
 
 #
@@ -74,6 +76,11 @@ extension:
 	@echo
 	$(MAKE) -C extension all
 
+install:
+	@echo "++ Installing development packages ..."
+	@command -v python3 >/dev/null 2>&1 || { echo "error: python3 not found in PATH"; exit 2; }
+	python3 -m pip install -e .
+
 maps:
 	@echo "++ Making maps in references/ ..."
 	@echo
@@ -99,3 +106,8 @@ tests:
 	@$(MAKE) -C tests tests
 
 test: tests
+
+uninstall:
+	@echo "++ Uninstalling development packages ..."
+	@command -v python3 >/dev/null 2>&1 || { echo "error: python3 not found in PATH"; exit 2; }
+	python3 -m pip uninstall -y vscode-keynav || true
