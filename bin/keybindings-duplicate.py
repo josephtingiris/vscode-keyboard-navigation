@@ -56,6 +56,8 @@ import re
 import hashlib
 import sys
 from dataclasses import dataclass
+from pathlib import Path
+from vscode_keynav.io import read_input_text, write_output_text
 
 
 ABORTING_EXIT_CODE = 1
@@ -1305,15 +1307,7 @@ def parse_args(argv: list[str], parser: argparse.ArgumentParser) -> argparse.Nam
     return args
 
 
-def read_input_text(path: str | None) -> str | None:
-    """Read input from file, piped stdin, or return None when absent."""
-
-    if path:
-        with open(path, "r", encoding="utf-8") as handle:
-            return handle.read()
-    if not sys.stdin.isatty():
-        return sys.stdin.read()
-    return None
+# `read_input_text` is provided by `keynav.io` package
 
 
 def main(argv: List[str] | None = None) -> int:
