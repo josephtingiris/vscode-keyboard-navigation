@@ -66,35 +66,45 @@ import hashlib
 from typing import List, Tuple
 
 # global memoization cache for canonicalized when results
+
 CACHE_CANONICALIZE_WHEN: dict = {}
 
 # global memoization object cache for parsed JSON objects (key: raw object string including braces)
+
 CACHE_JSON_OBJECT: dict = {}
 
 # global memoization cache for sortable when keys (key: when string, value: sortable key)
+
 CACHE_SORTABLE_WHEN: dict = {}
 
 # global memoization cache for when specificity (key: when string, value: specificity tuple)
+
 CACHE_WHEN_SPECIFICITY: dict = {}
 
 # global memoization cache for natural keys (key: string, value: list of string and int parts)
+
 CACHE_NATURAL_KEY: dict = {}
 
 # global memoization cache for case-sensitive natural keys (key: string, value: list of string and int parts)
+
 CACHE_NATURAL_KEY_CS: dict = {}
 
 # global modifier order, i.e. ctrl+shift, ctrl+shift+alt, ctrl+shift+alt+meta
+
 CANONICAL_MODIFIER_ORDER = ['ctrl', 'shift', 'alt', 'meta']
 
 # color default output value, options: 'auto'|'always'|'never'
+
 COLOR: str = 'auto'
 
 # debug defaults
+
 DEBUG_LEVEL: int = 0  # off
 DEBUG_TARGET_CATEGORY: str | None = None  # set vial --debug target=['when', 'ordered', 'canonicalize', ...]
 DEBUG_TARGET_WHEN: str = ""  # set via --debug when=
 
 # avoid repeatedly hashing compound cache keys and redoing canonicalize
+
 RUN_CACHE_CONTEXT = None
 RUN_CANONICAL_CACHE: dict = {}
 RUN_SORTABLE_CACHE: dict = {}
@@ -102,11 +112,10 @@ RUN_OBJ_INFO_CACHE: dict = {}
 
 
 # default when prefixes to be added to standard output, if none are given via the cli
+
 DEFAULT_WHEN_PREFIXES = []
 
-#
 # global token groups used for heuristics
-#
 
 FOCUS_TOKENS = [
     # primary (order matters!)
@@ -164,11 +173,13 @@ VISIBILITY_TOKENS = [
 ]
 
 # precomputed token ordering maps for performance
+
 FOCUS_TOKENS_MAP = {t: i for i, t in enumerate(FOCUS_TOKENS)}
 POSITIONAL_TOKENS_MAP = {t: i for i, t in enumerate(POSITIONAL_TOKENS)}
 VISIBILITY_TOKENS_MAP = {t: i for i, t in enumerate(VISIBILITY_TOKENS)}
 
 # profile defaults for `--when-grouping` values; arg values always override these
+
 WHEN_GROUPING_PROFILES = {
     'focal-invariant': {
         'primary': 'when',
@@ -187,6 +198,7 @@ WHEN_GROUPING_PROFILES = {
 }
 
 # precompiled regexes for performance
+
 COMMENT_RE = re.compile(r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)', re.DOTALL | re.MULTILINE)
 TRAILING_COMMA_RE = re.compile(r',\s*([}\]])')
 NUMBER_SPLIT_RE = re.compile(r'(\d+)')
@@ -201,6 +213,10 @@ BLANK_LINES_RE = re.compile(r'(?m)^[ \t]*\n+')
 LEADING_COMMA_RE = re.compile(r'^\s*,+')
 STRIP_WS_RE = re.compile(r'^[ \t\r\n]+|[ \t\r\n]+$')
 LEADING_NEWLINES_RE = re.compile(r'^\n+')
+
+#
+# classes
+#
 
 
 class WhenNode:
@@ -263,6 +279,10 @@ class WhenOr(WhenNode):
             parts.append(s)
         return ' || '.join(parts)
 
+
+#
+# function definitions
+#
 
 def _apply_debug_settings(debug_specs: list[str] | None, color: str) -> None:
     """Configure global debug filters and color mode."""
