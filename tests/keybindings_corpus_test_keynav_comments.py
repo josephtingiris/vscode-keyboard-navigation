@@ -10,18 +10,26 @@ emitted JSONC can be stripped and parsed as valid JSON.
 import json
 import os
 import re
+import shutil
 import subprocess
-import sys
 import tempfile
 import unittest
-
-from textwrap import dedent
 
 
 SCRIPT = os.path.normpath(
     os.path.join(os.path.dirname(__file__), "..", "bin", "keybindings-corpus.py")
 )
 REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+
+def get_path_python() -> str:
+    python_path = shutil.which("python3") or shutil.which("python")
+    if python_path is None:
+        raise RuntimeError("python3 or python must be available on PATH")
+    return python_path
+
+
+PATH_PYTHON = get_path_python()
 
 
 def strip_jsonc(text: str) -> str:
@@ -85,6 +93,58 @@ def _strip_trailing_commas(text: str) -> str:
 
 
 class KeynavCommentsTests(unittest.TestCase):
+    def test_default_output_does_not_add_feature_gate_contexts(self):
+        proc = subprocess.run(
+            [
+                PATH_PYTHON,
+                SCRIPT,
+                "--comments",
+                "none",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=REPO_ROOT,
+        )
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
+
+        parsed = json.loads(proc.stdout.decode("utf-8"))
+        self.assertIsInstance(parsed, list)
+
+        juke_record = next(item for item in parsed if item["key"] == "alt+end")
+        self.assertNotIn("config.keyboardNavigation.juke.enabled", juke_record["when"])
+
+        split_record = next(item for item in parsed if item["key"] == "alt+-")
+        self.assertNotIn("config.keyboardNavigation.split.enabled", split_record["when"])
+
+    def test_add_context_augments_generated_when_clauses(self):
+        proc = subprocess.run(
+            [
+                PATH_PYTHON,
+                SCRIPT,
+                "--comments",
+                "none",
+                "--add-context",
+                "editorTextFocus && !inputFocus",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=REPO_ROOT,
+        )
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
+
+        parsed = json.loads(proc.stdout.decode("utf-8"))
+        self.assertIsInstance(parsed, list)
+
+        juke_record = next(item for item in parsed if item["key"] == "alt+end")
+        self.assertIn("config.keyboardNavigation.juke.enabled", juke_record["when"])
+        self.assertIn("editorTextFocus", juke_record["when"])
+        self.assertIn("!inputFocus", juke_record["when"])
+
+        split_record = next(item for item in parsed if item["key"] == "alt+-")
+        self.assertIn("config.keyboardNavigation.split.enabled", split_record["when"])
+        self.assertIn("editorTextFocus", split_record["when"])
+        self.assertIn("!inputFocus", split_record["when"])
+
     def test_inject_comments_and_validate_json(self):
         # ensure the reference file is not modified
         rel = "references/keybindings.json"
@@ -93,7 +153,7 @@ class KeynavCommentsTests(unittest.TestCase):
             orig = fh.read()
 
         proc = subprocess.run(
-            [sys.executable, SCRIPT, "-c", rel],
+            [PATH_PYTHON, SCRIPT, "-c", rel],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             cwd=REPO_ROOT,
@@ -124,6 +184,36 @@ class KeynavCommentsTests(unittest.TestCase):
                 os.unlink(tmp_name)
             except Exception:
                 pass
+
+    def test_add_context_updates_comments_mode_when_output_only(self):
+        rel = "references/keybindings.json"
+        ref_path = os.path.join(REPO_ROOT, rel)
+        with open(ref_path, "r", encoding="utf-8") as fh:
+            orig = fh.read()
+
+        proc = subprocess.run(
+            [
+                PATH_PYTHON,
+                SCRIPT,
+                "-c",
+                rel,
+                "--add-context",
+                "editorTextFocus",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=REPO_ROOT,
+        )
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
+
+        emitted = proc.stdout.decode("utf-8")
+        self.assertIn("config.keyboardNavigation.juke.enabled", emitted)
+        self.assertIn("config.keyboardNavigation.split.enabled", emitted)
+        self.assertIn("editorTextFocus", emitted)
+
+        with open(ref_path, "r", encoding="utf-8") as fh:
+            after = fh.read()
+        self.assertEqual(orig, after)
 
 
 if __name__ == "__main__":
