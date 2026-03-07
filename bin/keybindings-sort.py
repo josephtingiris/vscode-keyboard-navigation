@@ -101,173 +101,6 @@ RUN_SORTABLE_CACHE: dict = {}
 RUN_OBJ_INFO_CACHE: dict = {}
 
 
-def _get_run_obj_info(
-    obj_text: str,
-    grouping_mode: str = 'config-first',
-    negation_mode: str = 'alpha',
-    when_prefixes: list | None = None,
-    when_regexes: list | None = None,
-) -> dict:
-    """Return per-run cached object metadata for the current sorting context."""
-
-    info = RUN_OBJ_INFO_CACHE.get(obj_text)
-    if info is not None:
-        return info
-
-    parsed = _parse_object(obj_text)
-    key_val = ''
-    when_val = ''
-    canonical_when = ''
-    sortable_when = ''
-
-    if parsed:
-        try:
-            key_val = str(parsed.get('key', ''))
-            when_val = str(parsed.get('when', ''))
-        except Exception:
-            key_val = ''
-            when_val = ''
-
-    if when_val:
-        canonical_when = _canonicalize_when(
-            when_val,
-            mode=grouping_mode,
-            negation_mode=negation_mode,
-            when_prefixes=when_prefixes,
-            when_regexes=when_regexes,
-        )
-        sortable_when = _sortable_when_key(
-            when_val,
-            mode=grouping_mode,
-            negation_mode=negation_mode,
-            when_prefixes=when_prefixes,
-            when_regexes=when_regexes,
-        )
-
-    info = {
-        'parsed': parsed,
-        'key': key_val,
-        'when': when_val,
-        'canonical': canonical_when,
-        'sortable': sortable_when,
-    }
-
-    try:
-        RUN_OBJ_INFO_CACHE[obj_text] = info
-    except Exception:
-        pass
-
-    return info
-
-
-def _get_run_obj_duplicate_info(obj_text: str) -> tuple[str, str, str]:
-    """Return per-run cached duplicate-detection fingerprints for an object text."""
-
-    info = _get_run_obj_info(obj_text)
-
-    full_hash = info.get('full_hash')
-    json_hash = info.get('json_hash')
-    json_canonical = info.get('json_canonical')
-    if full_hash and json_hash and json_canonical is not None:
-        return (full_hash, json_hash, json_canonical)
-
-    parsed = info.get('parsed')
-    if parsed is not None:
-        try:
-            json_canonical = json.dumps(parsed, separators=(",", ":"), ensure_ascii=False)
-        except Exception:
-            json_canonical = ''
-    else:
-        json_only = _strip_trailing_commas(_strip_json_comments(obj_text)).strip()
-        try:
-            parsed = json.loads(json_only)
-            json_canonical = json.dumps(parsed, separators=(",", ":"), ensure_ascii=False)
-        except Exception:
-            json_canonical = json_only
-
-    full_hash = hashlib.sha256(obj_text.encode('utf-8')).hexdigest()
-    json_hash = hashlib.sha256(json_canonical.encode('utf-8')).hexdigest()
-
-    info['full_hash'] = full_hash
-    info['json_hash'] = json_hash
-    info['json_canonical'] = json_canonical
-
-    return (full_hash, json_hash, json_canonical)
-
-
-def _get_run_obj_match_info(obj_text: str) -> dict:
-    """Return per-run cached focus and prefix or regex match signatures for an object text."""
-
-    info = _get_run_obj_info(obj_text)
-    cached = info.get('match_info')
-    if cached is not None:
-        return cached
-
-    when_val = info.get('when', '')
-    if not when_val:
-        when_val = _extract_literal_when_from_object(obj_text)
-
-    left_ids: list[str] = []
-    prefix_idxs: set[int] = set()
-    regex_idxs: set[int] = set()
-    has_focus = False
-
-    try:
-        parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
-        for part in parts:
-            token = part.strip()
-            while token.startswith('(') and token.endswith(')'):
-                token = token[1:-1].strip()
-            if not token:
-                continue
-
-            left = token[1:].lstrip() if token.startswith('!') else token
-            left_id = left.split()[0] if left else ''
-            if not left_id:
-                continue
-
-            left_ids.append(left_id)
-
-            if not has_focus and any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
-                has_focus = True
-
-            run_prefixes = RUN_CACHE_CONTEXT[2] if RUN_CACHE_CONTEXT else None
-            if run_prefixes:
-                for idx, prefix in enumerate(run_prefixes):
-                    try:
-                        if left_id.startswith(prefix):
-                            prefix_idxs.add(idx)
-                    except Exception:
-                        continue
-
-            run_regexes = RUN_CACHE_CONTEXT[3] if RUN_CACHE_CONTEXT else None
-            if run_regexes:
-                for idx, rx in enumerate(run_regexes):
-                    try:
-                        if hasattr(rx, 'search'):
-                            if rx.search(left_id):
-                                regex_idxs.add(idx)
-                        else:
-                            if str(rx) in left_id:
-                                regex_idxs.add(idx)
-                    except Exception:
-                        continue
-    except Exception:
-        left_ids = []
-        prefix_idxs = set()
-        regex_idxs = set()
-        has_focus = False
-
-    match_info = {
-        'left_ids': tuple(left_ids),
-        'has_focus': has_focus,
-        'prefix_idxs': tuple(sorted(prefix_idxs)),
-        'regex_idxs': tuple(sorted(regex_idxs)),
-    }
-    info['match_info'] = match_info
-    return match_info
-
-
 # default when prefixes to be added to standard output, if none are given via the cli
 DEFAULT_WHEN_PREFIXES = []
 
@@ -1659,6 +1492,173 @@ def _flag_present(raw_argv: list[str], names: list[str]) -> bool:
         if name in raw_argv:
             return True
     return False
+
+
+def _get_run_obj_duplicate_info(obj_text: str) -> tuple[str, str, str]:
+    """Return per-run cached duplicate-detection fingerprints for an object text."""
+
+    info = _get_run_obj_info(obj_text)
+
+    full_hash = info.get('full_hash')
+    json_hash = info.get('json_hash')
+    json_canonical = info.get('json_canonical')
+    if full_hash and json_hash and json_canonical is not None:
+        return (full_hash, json_hash, json_canonical)
+
+    parsed = info.get('parsed')
+    if parsed is not None:
+        try:
+            json_canonical = json.dumps(parsed, separators=(",", ":"), ensure_ascii=False)
+        except Exception:
+            json_canonical = ''
+    else:
+        json_only = _strip_trailing_commas(_strip_json_comments(obj_text)).strip()
+        try:
+            parsed = json.loads(json_only)
+            json_canonical = json.dumps(parsed, separators=(",", ":"), ensure_ascii=False)
+        except Exception:
+            json_canonical = json_only
+
+    full_hash = hashlib.sha256(obj_text.encode('utf-8')).hexdigest()
+    json_hash = hashlib.sha256(json_canonical.encode('utf-8')).hexdigest()
+
+    info['full_hash'] = full_hash
+    info['json_hash'] = json_hash
+    info['json_canonical'] = json_canonical
+
+    return (full_hash, json_hash, json_canonical)
+
+
+def _get_run_obj_info(
+    obj_text: str,
+    grouping_mode: str = 'config-first',
+    negation_mode: str = 'alpha',
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> dict:
+    """Return per-run cached object metadata for the current sorting context."""
+
+    info = RUN_OBJ_INFO_CACHE.get(obj_text)
+    if info is not None:
+        return info
+
+    parsed = _parse_object(obj_text)
+    key_val = ''
+    when_val = ''
+    canonical_when = ''
+    sortable_when = ''
+
+    if parsed:
+        try:
+            key_val = str(parsed.get('key', ''))
+            when_val = str(parsed.get('when', ''))
+        except Exception:
+            key_val = ''
+            when_val = ''
+
+    if when_val:
+        canonical_when = _canonicalize_when(
+            when_val,
+            mode=grouping_mode,
+            negation_mode=negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        )
+        sortable_when = _sortable_when_key(
+            when_val,
+            mode=grouping_mode,
+            negation_mode=negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        )
+
+    info = {
+        'parsed': parsed,
+        'key': key_val,
+        'when': when_val,
+        'canonical': canonical_when,
+        'sortable': sortable_when,
+    }
+
+    try:
+        RUN_OBJ_INFO_CACHE[obj_text] = info
+    except Exception:
+        pass
+
+    return info
+
+
+def _get_run_obj_match_info(obj_text: str) -> dict:
+    """Return per-run cached focus and prefix or regex match signatures for an object text."""
+
+    info = _get_run_obj_info(obj_text)
+    cached = info.get('match_info')
+    if cached is not None:
+        return cached
+
+    when_val = info.get('when', '')
+    if not when_val:
+        when_val = _extract_literal_when_from_object(obj_text)
+
+    left_ids: list[str] = []
+    prefix_idxs: set[int] = set()
+    regex_idxs: set[int] = set()
+    has_focus = False
+
+    try:
+        parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
+        for part in parts:
+            token = part.strip()
+            while token.startswith('(') and token.endswith(')'):
+                token = token[1:-1].strip()
+            if not token:
+                continue
+
+            left = token[1:].lstrip() if token.startswith('!') else token
+            left_id = left.split()[0] if left else ''
+            if not left_id:
+                continue
+
+            left_ids.append(left_id)
+
+            if not has_focus and any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
+                has_focus = True
+
+            run_prefixes = RUN_CACHE_CONTEXT[2] if RUN_CACHE_CONTEXT else None
+            if run_prefixes:
+                for idx, prefix in enumerate(run_prefixes):
+                    try:
+                        if left_id.startswith(prefix):
+                            prefix_idxs.add(idx)
+                    except Exception:
+                        continue
+
+            run_regexes = RUN_CACHE_CONTEXT[3] if RUN_CACHE_CONTEXT else None
+            if run_regexes:
+                for idx, rx in enumerate(run_regexes):
+                    try:
+                        if hasattr(rx, 'search'):
+                            if rx.search(left_id):
+                                regex_idxs.add(idx)
+                        else:
+                            if str(rx) in left_id:
+                                regex_idxs.add(idx)
+                    except Exception:
+                        continue
+    except Exception:
+        left_ids = []
+        prefix_idxs = set()
+        regex_idxs = set()
+        has_focus = False
+
+    match_info = {
+        'left_ids': tuple(left_ids),
+        'has_focus': has_focus,
+        'prefix_idxs': tuple(sorted(prefix_idxs)),
+        'regex_idxs': tuple(sorted(regex_idxs)),
+    }
+    info['match_info'] = match_info
+    return match_info
 
 
 def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]], str]:
