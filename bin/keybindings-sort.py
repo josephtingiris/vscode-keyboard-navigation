@@ -403,32 +403,21 @@ def _assemble_sorted_output(
     out_parts: list[str] = []
     out_parts.append(preamble)
     out_parts.append('[\n')
-    rendered_groups: list[tuple[str, str]] = []
+    rendered_groups: list[tuple[str, str, str]] = []
 
     seen_pairs: dict[tuple[str, str], set[str]] = {}
     for comments, obj in sorted_groups:
         obj_out = obj.rstrip()
 
-        try:
-            obj_out, _ = _normalize_when_in_object(
-                obj_out,
-                mode=grouping_mode,
-                negation_mode=negation_mode,
-                when_prefixes=when_prefixes,
-                when_regexes=when_regexes,
-            )
-        except Exception:
-            pass
-
-        obj_out = obj_out.rstrip()
-        key_val, when_val = _extract_key_when_from_object(obj_out)
-        canonical_when = _canonicalize_when(
-            when_val,
-            mode=grouping_mode,
+        info = _get_run_obj_info(
+            obj_out,
+            grouping_mode=grouping_mode,
             negation_mode=negation_mode,
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         )
+        key_val = info.get('key', '')
+        canonical_when = info.get('canonical', '')
         pair_id = (key_val, canonical_when)
         if key_val or canonical_when:
             idx_r = obj_out.rfind('}')
@@ -452,27 +441,19 @@ def _assemble_sorted_output(
                 obj_out = _embed_duplicate_comment_in_object(obj_out, duplicate_comment)
                 seen_fingerprints.add(obj_fingerprint)
 
-        rendered_groups.append((comments, obj_out))
+        rendered_groups.append((comments, obj_out, canonical_when))
 
     # coalesce identical canonical `when` values into contiguous blocks when grouping is enabled
     if grouping_mode != 'none' or when_prefixes or when_regexes:
         from collections import OrderedDict
 
-        grouped: 'OrderedDict[str, list[tuple[str, str]]]' = OrderedDict()
-        for comments, obj_out in rendered_groups:
-            key_val, when_val = _extract_key_when_from_object(obj_out)
-            canonical = _canonicalize_when(
-                when_val,
-                mode=grouping_mode,
-                negation_mode=negation_mode,
-                when_prefixes=when_prefixes,
-                when_regexes=when_regexes,
-            )
-            grouped.setdefault(canonical, []).append((comments, obj_out))
+        grouped: 'OrderedDict[str, list[tuple[str, str, str]]]' = OrderedDict()
+        for comments, obj_out, canonical in rendered_groups:
+            grouped.setdefault(canonical, []).append((comments, obj_out, canonical))
 
         # build JSON-only hashes and full-object hashes to detect duplicates and preserve comments
 
-        new_rendered: list[tuple[str, str]] = []
+        new_rendered: list[tuple[str, str, str]] = []
 
         # compute sort keys derived from the object's `key` field (modifier-first, chord-aware, special<digit<letter ordering)
         for canonical, entries in grouped.items():
@@ -582,7 +563,7 @@ def _assemble_sorted_output(
                     return no_trail.strip()
 
                 # compute hashes and collect json-hash groups
-                for idx_e, (comments, obj_text) in enumerate(entries):
+                for idx_e, (_comments, obj_text, _canonical) in enumerate(entries):
                     full_h, json_h, json_canonical = _hash_pair_for_obj(obj_text)
                     hash_map[idx_e] = (full_h, json_h, json_canonical)
                     jsonhash_to_indices.setdefault(json_h, []).append(idx_e)
@@ -595,9 +576,9 @@ def _assemble_sorted_output(
                     if len(full_hashes) > 1:
                         # inject duplicate comment into each involved object
                         for i in inds:
-                            c, o = entries[i]
+                            c, o, entry_canonical = entries[i]
                             dup_comment = f'// DUPLICATE JSON object (json-hash={json_h})'
-                            entries[i] = (c, _embed_duplicate_comment_in_object(o, dup_comment))
+                            entries[i] = (c, _embed_duplicate_comment_in_object(o, dup_comment), entry_canonical)
 
                 # now sort entries by comparator derived from their key strings
                 entries.sort(key=lambda pair: _key_sort_tuple_from_object(pair[1]))
@@ -605,7 +586,7 @@ def _assemble_sorted_output(
 
         rendered_groups = new_rendered
 
-    for i, (comments, obj_out) in enumerate(rendered_groups):
+    for i, (comments, obj_out, _canonical) in enumerate(rendered_groups):
         is_last = (i == len(rendered_groups) - 1)
         if comments:
             comments = BLANK_LINES_RE.sub('', comments)
