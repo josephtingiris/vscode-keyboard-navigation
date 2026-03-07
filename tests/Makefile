@@ -81,6 +81,7 @@ gate:
 	@echo --cut--
 	@./keybindings_corpus_test_keynav_comments.py
 	@./keybindings_sort_test_quick_regression.py
+	@./keybindings_sort_test_duplicate_regression.py
 	@./keybindings_sort_test_grouping_regression.py
 	@./keybindings_sort_test_when_output_regression.py
 	@./keybindings_sort_test_focal_invariant_regression.py
@@ -125,6 +126,7 @@ regression:
 	@echo "++ Running quick regression suite ..."
 	@echo --cut--
 	@./keybindings_sort_test_quick_regression.py
+	@./keybindings_sort_test_duplicate_regression.py
 	@./keybindings_sort_test_grouping_regression.py
 	@./keybindings_sort_test_when_output_regression.py
 	@./keybindings_sort_test_focal_invariant_regression.py

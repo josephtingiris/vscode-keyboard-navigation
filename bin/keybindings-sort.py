@@ -160,6 +160,41 @@ def _get_run_obj_info(
     return info
 
 
+def _get_run_obj_duplicate_info(obj_text: str) -> tuple[str, str, str]:
+    """Return per-run cached duplicate-detection fingerprints for an object text."""
+
+    info = _get_run_obj_info(obj_text)
+
+    full_hash = info.get('full_hash')
+    json_hash = info.get('json_hash')
+    json_canonical = info.get('json_canonical')
+    if full_hash and json_hash and json_canonical is not None:
+        return (full_hash, json_hash, json_canonical)
+
+    parsed = info.get('parsed')
+    if parsed is not None:
+        try:
+            json_canonical = json.dumps(parsed, separators=(",", ":"), ensure_ascii=False)
+        except Exception:
+            json_canonical = ''
+    else:
+        json_only = _strip_trailing_commas(_strip_json_comments(obj_text)).strip()
+        try:
+            parsed = json.loads(json_only)
+            json_canonical = json.dumps(parsed, separators=(",", ":"), ensure_ascii=False)
+        except Exception:
+            json_canonical = json_only
+
+    full_hash = hashlib.sha256(obj_text.encode('utf-8')).hexdigest()
+    json_hash = hashlib.sha256(json_canonical.encode('utf-8')).hexdigest()
+
+    info['full_hash'] = full_hash
+    info['json_hash'] = json_hash
+    info['json_canonical'] = json_canonical
+
+    return (full_hash, json_hash, json_canonical)
+
+
 # default when prefixes to be added to standard output, if none are given via the cli
 DEFAULT_WHEN_PREFIXES = []
 
@@ -461,22 +496,6 @@ def _assemble_sorted_output(
                 hash_map = {}
                 jsonhash_to_indices = {}
 
-                def _hash_pair_for_obj(obj_text: str) -> tuple[str, str, str]:
-                    full = obj_text
-                    json_only = _strip_comments_and_trailing_commas(obj_text)
-
-                    # ensure JSON object
-                    try:
-                        parsed = json.loads(json_only)
-                        json_canonical = json.dumps(parsed, separators=(",", ":"), ensure_ascii=False)
-                    except Exception:
-                        json_canonical = json_only
-
-                    full_hash = hashlib.sha256(full.encode('utf-8')).hexdigest()
-                    json_hash = hashlib.sha256(json_canonical.encode('utf-8')).hexdigest()
-
-                    return full_hash, json_hash, json_canonical
-
                 def _key_category_and_order(ch: str) -> tuple[int, int]:
 
                     # return (category, order_key) where category is:
@@ -550,21 +569,9 @@ def _assemble_sorted_output(
                     out = ordered + others
                     return '+'.join(out) + ('+' if out else '')
 
-                def _strip_comments_and_trailing_commas(s: str) -> str:
-                    # remove comments
-                    def _repl(m):
-                        g = m.group(1)
-                        if g.startswith('"'):
-                            return g
-                        return ''
-
-                    no_comments = COMMENT_RE.sub(_repl, s)
-                    no_trail = TRAILING_COMMA_RE.sub(r"\1", no_comments)
-                    return no_trail.strip()
-
                 # compute hashes and collect json-hash groups
                 for idx_e, (_comments, obj_text, _canonical) in enumerate(entries):
-                    full_h, json_h, json_canonical = _hash_pair_for_obj(obj_text)
+                    full_h, json_h, json_canonical = _get_run_obj_duplicate_info(obj_text)
                     hash_map[idx_e] = (full_h, json_h, json_canonical)
                     jsonhash_to_indices.setdefault(json_h, []).append(idx_e)
 
