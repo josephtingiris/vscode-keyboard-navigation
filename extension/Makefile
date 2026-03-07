@@ -47,6 +47,8 @@ clean:
 	# remove any other temporary files in extension/
 	-@rm -rf node_modules .cache tmp
 
+install: package package-uninstall package-install
+
 # package: create a .vsix
 package:
 	@echo "++ Packaging extension artifacts ..."
@@ -94,9 +96,13 @@ package-uninstall:
 		echo "ERROR: 'code' CLI not found; please uninstall the extension manually: $${ID}"; exit 1; \
 	fi
 
+reinstall: install
+
 tests:
 	@echo "++ Running tests ..."
 	@echo
 	@$(MAKE) -C ../tests tests
 
 test: tests
+
+uninstall: package-uninstall

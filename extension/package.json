@@ -1,5 +1,5 @@
 {
-  "version": "0.0.3",
+  "version": "0.0.21",
   "name": "keyboard-navigation",
   "description": "An opinionated keyboard grammar extension that focuses on navigating the workbench UI",
   "displayName": "Keyboard Navigation",
