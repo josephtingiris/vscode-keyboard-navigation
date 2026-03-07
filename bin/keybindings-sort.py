@@ -195,6 +195,79 @@ def _get_run_obj_duplicate_info(obj_text: str) -> tuple[str, str, str]:
     return (full_hash, json_hash, json_canonical)
 
 
+def _get_run_obj_match_info(obj_text: str) -> dict:
+    """Return per-run cached focus and prefix or regex match signatures for an object text."""
+
+    info = _get_run_obj_info(obj_text)
+    cached = info.get('match_info')
+    if cached is not None:
+        return cached
+
+    when_val = info.get('when', '')
+    if not when_val:
+        when_val = _extract_literal_when_from_object(obj_text)
+
+    left_ids: list[str] = []
+    prefix_idxs: set[int] = set()
+    regex_idxs: set[int] = set()
+    has_focus = False
+
+    try:
+        parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
+        for part in parts:
+            token = part.strip()
+            while token.startswith('(') and token.endswith(')'):
+                token = token[1:-1].strip()
+            if not token:
+                continue
+
+            left = token[1:].lstrip() if token.startswith('!') else token
+            left_id = left.split()[0] if left else ''
+            if not left_id:
+                continue
+
+            left_ids.append(left_id)
+
+            if not has_focus and any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
+                has_focus = True
+
+            run_prefixes = RUN_CACHE_CONTEXT[2] if RUN_CACHE_CONTEXT else None
+            if run_prefixes:
+                for idx, prefix in enumerate(run_prefixes):
+                    try:
+                        if left_id.startswith(prefix):
+                            prefix_idxs.add(idx)
+                    except Exception:
+                        continue
+
+            run_regexes = RUN_CACHE_CONTEXT[3] if RUN_CACHE_CONTEXT else None
+            if run_regexes:
+                for idx, rx in enumerate(run_regexes):
+                    try:
+                        if hasattr(rx, 'search'):
+                            if rx.search(left_id):
+                                regex_idxs.add(idx)
+                        else:
+                            if str(rx) in left_id:
+                                regex_idxs.add(idx)
+                    except Exception:
+                        continue
+    except Exception:
+        left_ids = []
+        prefix_idxs = set()
+        regex_idxs = set()
+        has_focus = False
+
+    match_info = {
+        'left_ids': tuple(left_ids),
+        'has_focus': has_focus,
+        'prefix_idxs': tuple(sorted(prefix_idxs)),
+        'regex_idxs': tuple(sorted(regex_idxs)),
+    }
+    info['match_info'] = match_info
+    return match_info
+
+
 # default when prefixes to be added to standard output, if none are given via the cli
 DEFAULT_WHEN_PREFIXES = []
 
@@ -1040,29 +1113,7 @@ def _color_enabled() -> bool:
 def _contains_focus_token_in_object(obj_text: str) -> bool:
     """Return True if the object's when clause contains any configured focus token."""
 
-    when_key, when_val = _extract_key_when_from_object(obj_text)
-    raw = when_val
-
-    if not raw:
-        raw = _extract_literal_when_from_object(obj_text)
-
-    if not raw:
-        return False
-
-    parts = WHEN_TERM_SPLIT_RE.split(raw)
-    for part in parts:
-        token = part.strip()
-        while token.startswith('(') and token.endswith(')'):
-            token = token[1:-1].strip()
-        if not token:
-            continue
-
-        left = token[1:].lstrip() if token.startswith('!') else token
-        left_id = left.split()[0] if left else ''
-        if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
-            return True
-
-    return False
+    return bool(_get_run_obj_match_info(obj_text).get('has_focus', False))
 
 
 def _debug_color(text: str, level: int) -> str:
@@ -1541,30 +1592,33 @@ def _first_when_group_rank(
 
     # ensure related contexts are grouped together
     if when_prefixes or when_regexes:
-        for part in parts:
-            token = part.strip()
-            while token.startswith('(') and token.endswith(')'):
-                token = token[1:-1].strip()
-            if not token:
-                continue
-            left = token[1:].lstrip() if token.startswith('!') else token
-            left_id = left.split()[0] if left else ''
-            if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
+        match_info = _get_run_obj_match_info(obj_text)
+        left_ids = match_info.get('left_ids', ())
+        prefix_idxs = match_info.get('prefix_idxs', ())
+        regex_idxs = match_info.get('regex_idxs', ())
+        if prefix_idxs:
+            left_id = next((lid for lid in left_ids if any(lid.startswith(prefix) for prefix in when_prefixes or [])), '')
+            if left_id:
                 _debug_echo(1, 'group', canonical, f"matched when_prefix in operand: {left_id}")
-                return 6
-            if when_regexes:
-                for rx in when_regexes:
+            return 6
+        if regex_idxs:
+            left_id = ''
+            pattern = ''
+            for candidate in left_ids:
+                for rx in when_regexes or []:
                     try:
-                        if hasattr(rx, 'search'):
-                            if rx.search(left_id):
-                                _debug_echo(1, 'group', canonical, f"matched when_regex in operand: {left_id} (pattern={rx.pattern if hasattr(rx, 'pattern') else rx})")
-                                return 6
-                        else:
-                            if str(rx) in left_id:
-                                _debug_echo(1, 'group', canonical, f"matched when_regex string in operand: {left_id} (pattern={rx})")
-                                return 6
+                        ok = rx.search(candidate) if hasattr(rx, 'search') else str(rx) in candidate
                     except Exception:
-                        continue
+                        ok = False
+                    if ok:
+                        left_id = candidate
+                        pattern = rx.pattern if hasattr(rx, 'pattern') else rx
+                        break
+                if left_id:
+                    break
+            if left_id:
+                _debug_echo(1, 'group', canonical, f"matched when_regex in operand: {left_id} (pattern={pattern})")
+            return 6
 
     first = parts[0].strip()
     while first.startswith('(') and first.endswith(')'):
@@ -2225,27 +2279,14 @@ def _sort_groups_for_primary_when(
         for row in decorated:
             when_val = row[1] or ''
             try:
-                parts = WHEN_TERM_SPLIT_RE.split(when_val.strip()) if when_val else []
-                found_focus = False
-                for part in parts:
-                    token = part.strip()
-                    while token.startswith('(') and token.endswith(')'):
-                        token = token[1:-1].strip()
-                    if not token:
-                        continue
-
-                    left = token[1:].lstrip() if token.startswith('!') else token
-                    left_id = left.split()[0] if left else ''
-
-                    # debug: trace terminal/keyboardNavigation related operands to diagnose grouping
+                match_info = _get_run_obj_match_info(row[3][1])
+                found_focus = bool(match_info.get('has_focus', False))
+                for left_id in match_info.get('left_ids', ()):
                     try:
                         if 'terminal' in left_id or 'keyboardNavigation' in left_id:
-                            _debug_echo(1, 'group', when_val, f"SIG_PART: left_id={left_id!r} token={token!r}")
+                            _debug_echo(1, 'group', when_val, f"SIG_PART: left_id={left_id!r}")
                     except Exception:
                         pass
-                    if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
-                        found_focus = True
-                        break
 
                 if found_focus:
                     focus_rows.append(row)
@@ -2287,48 +2328,9 @@ def _sort_groups_for_primary_when(
         matched_regex: list[tuple[str, str]] = []
         others: list[tuple[str, str]] = []
         for pair in sorted_groups:
-            _, when_val = _extract_key_when_from_object(pair[1])
-            if not when_val:
-                when_val = _extract_literal_when_from_object(pair[1])
-            found_prefix = False
-            found_regex = False
-            try:
-                parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
-                for part in parts:
-                    token = part.strip()
-                    while token.startswith('(') and token.endswith(')'):
-                        token = token[1:-1].strip()
-                    if not token:
-                        continue
-
-                    left = token[1:].lstrip() if token.startswith('!') else token
-                    left_id = left.split()[0] if left else ''
-
-                    # check regexes first and record matches
-                    if when_regexes:
-                        for rx in when_regexes:
-                            try:
-                                if hasattr(rx, 'search'):
-                                    if rx.search(left_id):
-                                        found_regex = True
-                                        break
-                                else:
-                                    if str(rx) in left_id:
-                                        found_regex = True
-                                        break
-                            except Exception:
-                                continue
-                        if found_regex:
-                            # when a regex matches, prefer regex grouping regardless of prefix
-                            break
-
-                    if when_prefixes and any(left_id.startswith(prefix) for prefix in when_prefixes):
-                        found_prefix = True
-                        # continue scanning to detect possible matches in other operands but do not break here; a regex match anywhere should win
-                        continue
-            except Exception:
-                found_prefix = False
-                found_regex = False
+            match_info = _get_run_obj_match_info(pair[1])
+            found_prefix = bool(match_info.get('prefix_idxs'))
+            found_regex = bool(match_info.get('regex_idxs'))
 
             if found_regex:
                 matched_regex.append(pair)
@@ -2809,52 +2811,11 @@ def main(argv: List[str] | None = None) -> int:
     if when_prefixes or when_regexes:
         # helper: compute matched prefix indices and regex indices for an object
         def _match_signature(pair: tuple[str, str]):
-            _, when_val = _extract_key_when_from_object(pair[1])
-            if not when_val:
-                when_val = _extract_literal_when_from_object(pair[1])
-
-            prefix_idxs: list[int] = []
-            regex_idxs: list[int] = []
-
-            try:
-                parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
-                for part in parts:
-                    token = part.strip()
-                    while token.startswith('(') and token.endswith(')'):
-                        token = token[1:-1].strip()
-                    if not token:
-                        continue
-                    left = token[1:].lstrip() if token.startswith('!') else token
-                    left_id = left.split()[0] if left else ''
-
-                    if when_prefixes:
-                        for idx, prefix in enumerate(when_prefixes):
-                            try:
-                                if left_id.startswith(prefix):
-                                    if idx not in prefix_idxs:
-                                        prefix_idxs.append(idx)
-                            except Exception:
-                                continue
-
-                    if when_regexes:
-                        for idx, rx in enumerate(when_regexes):
-                            try:
-                                if hasattr(rx, 'search'):
-                                    if rx.search(left_id):
-                                        if idx not in regex_idxs:
-                                            regex_idxs.append(idx)
-                                else:
-                                    if str(rx) in left_id:
-                                        if idx not in regex_idxs:
-                                            regex_idxs.append(idx)
-                            except Exception:
-                                continue
-            except Exception:
-                pass
-
-            prefix_idxs.sort()
-            regex_idxs.sort()
-            return tuple(prefix_idxs), tuple(regex_idxs)
+            match_info = _get_run_obj_match_info(pair[1])
+            return (
+                match_info.get('prefix_idxs', ()),
+                match_info.get('regex_idxs', ()),
+            )
 
         # build nested mapping: prefix_tuple -> regex_tuple -> list[pairs]
         buckets: dict[tuple[int, ...], dict[tuple[int, ...], list[tuple[str, str]]]] = {}
@@ -2881,11 +2842,10 @@ def main(argv: List[str] | None = None) -> int:
                 sample_count = 0
                 for pair, sig in sig_map.items():
                     _, r_sig = sig
-                    _, when_val = _extract_key_when_from_object(pair[1])
-                    if not when_val:
-                        when_val = _extract_literal_when_from_object(pair[1])
+                    info = _get_run_obj_info(pair[1])
+                    when_val = info.get('when', '') or _extract_literal_when_from_object(pair[1])
                     if when_val and 'terminal' in when_val:
-                        _debug_echo(1, 'group', when_val, f"REGEX_SAMPLE: p_sig={sig[0]} r_sig={r_sig} key={_extract_key_when_from_object(pair[1])[0]!r}")
+                        _debug_echo(1, 'group', when_val, f"REGEX_SAMPLE: p_sig={sig[0]} r_sig={r_sig} key={info.get('key', '')!r}")
                         sample_count += 1
                         if sample_count >= 10:
                             break
