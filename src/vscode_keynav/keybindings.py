@@ -13,6 +13,7 @@ from typing import List, Tuple
 
 from functools import lru_cache
 
+from vscode_keynav import debug as _debug
 from vscode_keynav import io as _io
 
 #
@@ -938,6 +939,93 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
     except Exception:
         # return a key with the same structural types as a normal sort key: (int rank, list key, tuple specificity, list grouping)
         return (9999, [], (0,), [])
+
+
+def _first_when_group_rank(
+    obj_text: str,
+    mode: str,
+    negation_mode: str,
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> int:
+    """Assign a numeric grouping rank to the first operand of an object's when clause."""
+
+    info = _get_run_obj_info(
+        obj_text,
+        grouping_mode=mode,
+        negation_mode=negation_mode,
+        when_prefixes=when_prefixes,
+        when_regexes=when_regexes,
+    )
+    canonical = info.get('canonical', '')
+
+    if not canonical:
+        return 5
+
+    parts = _io._WHEN_TERM_SPLIT_RE.split(canonical.strip())
+    if not parts:
+        return 5
+
+    # ensure related contexts are grouped together
+    if when_prefixes or when_regexes:
+        match_info = _get_run_obj_match_info(obj_text)
+        left_ids = match_info.get('left_ids', ())
+        prefix_idxs = match_info.get('prefix_idxs', ())
+        regex_idxs = match_info.get('regex_idxs', ())
+        if prefix_idxs:
+            left_id = next((lid for lid in left_ids if any(lid.startswith(prefix) for prefix in when_prefixes or [])), '')
+            if left_id:
+                _debug._echo(1, 'group', canonical, f"matched when_prefix in operand: {left_id}")
+            return 6
+        if regex_idxs:
+            left_id = ''
+            pattern = ''
+            for candidate in left_ids:
+                for rx in when_regexes or []:
+                    try:
+                        ok = rx.search(candidate) if hasattr(rx, 'search') else str(rx) in candidate
+                    except Exception:
+                        ok = False
+                    if ok:
+                        left_id = candidate
+                        pattern = rx.pattern if hasattr(rx, 'pattern') else rx
+                        break
+                if left_id:
+                    break
+            if left_id:
+                _debug._echo(1, 'group', canonical, f"matched when_regex in operand: {left_id} (pattern={pattern})")
+            return 6
+
+    first = parts[0].strip()
+    while first.startswith('(') and first.endswith(')'):
+        first = first[1:-1].strip()
+
+    left = first[1:].lstrip() if first.startswith('!') else first
+    if not left:
+        return 5
+
+    left_id = left.split()[0]
+
+    if mode == 'focal-invariant':
+        if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
+            return 1  # Focus tokens have the highest priority
+        if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
+            return 2  # Positional tokens are next in priority
+        if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
+            return 3  # Visibility tokens follow
+        if left_id.startswith('config.'):
+            return 4  # Config tokens are lower priority
+        return 5
+
+    if left_id.startswith('config.'):
+        return 1
+    if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
+        return 2
+    if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
+        return 3
+    if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
+        return 4
+    return 5
 
 
 def _get_run_obj_info(
