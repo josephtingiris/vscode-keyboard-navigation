@@ -1613,6 +1613,24 @@ def _parse_when(expr: str) -> WhenNode:
     return _parse_or()
 
 
+def _partition_focus_groups_to_end(sorted_groups: list[tuple[str, str]]) -> list[tuple[str, str]]:
+    """Stable-partition groups so that entries containing focus tokens are moved to the end."""
+
+    non_focus: list[tuple[str, str]] = []
+    focus: list[tuple[str, str]] = []
+
+    for pair in sorted_groups:
+        try:
+            if _contains_focus_token_in_object(pair[1]):
+                focus.append(pair)
+            else:
+                non_focus.append(pair)
+        except Exception:
+            non_focus.append(pair)
+
+    return non_focus + focus
+
+
 def _render_when_node(node: WhenNode) -> str:
     """Render a WhenNode AST back to its string form while preserving parentheses."""
 

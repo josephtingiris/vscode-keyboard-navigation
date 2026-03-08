@@ -84,10 +84,6 @@ DEBUG_LEVEL: int = 0  # off
 DEBUG_TARGET_CATEGORY: str | None = None  # set vial --debug target=['when', 'ordered', 'canonicalize', ...]
 DEBUG_TARGET_WHEN: str = ""  # set via --debug when=
 
-# default when prefixes to be added to standard output, if none are given via the cli
-
-DEFAULT_WHEN_PREFIXES = []
-
 # profile defaults for `--when-grouping` values; arg values always override these
 
 WHEN_GROUPING_PROFILES = {
@@ -369,24 +365,6 @@ def _assemble_final_output(
     """Perform final output cleanup on the assembled JSONC text (e.g. remove blank lines)."""
 
     return _remove_blank_lines(text)
-
-
-def _partition_focus_groups_to_end(sorted_groups: list[tuple[str, str]]) -> list[tuple[str, str]]:
-    """Stable-partition groups so that entries containing focus tokens are moved to the end."""
-
-    non_focus: list[tuple[str, str]] = []
-    focus: list[tuple[str, str]] = []
-
-    for pair in sorted_groups:
-        try:
-            if _keybindings._contains_focus_token_in_object(pair[1]):
-                focus.append(pair)
-            else:
-                non_focus.append(pair)
-        except Exception:
-            non_focus.append(pair)
-
-    return non_focus + focus
 
 
 def _remove_blank_lines(text: str) -> str:
@@ -880,7 +858,7 @@ def main(argv: List[str] | None = None) -> int:
     )
 
     if grouping_mode == 'focal-invariant':
-        sorted_groups = _partition_focus_groups_to_end(sorted_groups)
+        sorted_groups = _keybindings._partition_focus_groups_to_end(sorted_groups)
 
     if primary_order == 'when':
         sorted_groups = _sort_groups_for_primary_when(
