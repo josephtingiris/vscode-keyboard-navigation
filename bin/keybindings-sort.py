@@ -69,32 +69,6 @@ from typing import List, Tuple
 from vscode_keynav import debug as _debug
 from vscode_keynav import io as _io
 from vscode_keynav import keybindings as _keybindings
-from vscode_keynav.keybindings import WhenNode, WhenAnd, WhenOr, WhenNot, WhenLeaf
-
-
-# global memoization cache for canonicalized when results
-
-CACHE_CANONICALIZE_WHEN: dict = {}
-
-# global memoization object cache for parsed JSON objects (key: raw object string including braces)
-
-CACHE_JSON_OBJECT: dict = {}
-
-# global memoization cache for sortable when keys (key: when string, value: sortable key)
-
-CACHE_SORTABLE_WHEN: dict = {}
-
-# global memoization cache for when specificity (key: when string, value: specificity tuple)
-
-CACHE_WHEN_SPECIFICITY: dict = {}
-
-# global memoization cache for natural keys (key: string, value: list of string and int parts)
-
-CACHE_NATURAL_KEY: dict = {}
-
-# global memoization cache for case-sensitive natural keys (key: string, value: list of string and int parts)
-
-CACHE_NATURAL_KEY_CS: dict = {}
 
 # global modifier order, i.e. ctrl+shift, ctrl+shift+alt, ctrl+shift+alt+meta
 
@@ -110,26 +84,9 @@ DEBUG_LEVEL: int = 0  # off
 DEBUG_TARGET_CATEGORY: str | None = None  # set vial --debug target=['when', 'ordered', 'canonicalize', ...]
 DEBUG_TARGET_WHEN: str = ""  # set via --debug when=
 
-# avoid repeatedly hashing compound cache keys and redoing canonicalize
-
-RUN_CACHE_CONTEXT = None
-RUN_CANONICAL_CACHE: dict = {}
-RUN_SORTABLE_CACHE: dict = {}
-RUN_OBJ_INFO_CACHE: dict = {}
-
-
 # default when prefixes to be added to standard output, if none are given via the cli
 
 DEFAULT_WHEN_PREFIXES = []
-
-# Use token groups and maps from the package to avoid duplicate definitions.
-FOCUS_TOKENS = _keybindings.FOCUS_TOKENS
-POSITIONAL_TOKENS = _keybindings.POSITIONAL_TOKENS
-VISIBILITY_TOKENS = _keybindings.VISIBILITY_TOKENS
-
-FOCUS_TOKENS_MAP = _keybindings.FOCUS_TOKENS_MAP
-POSITIONAL_TOKENS_MAP = _keybindings.POSITIONAL_TOKENS_MAP
-VISIBILITY_TOKENS_MAP = _keybindings.VISIBILITY_TOKENS_MAP
 
 # profile defaults for `--when-grouping` values; arg values always override these
 
@@ -150,25 +107,10 @@ WHEN_GROUPING_PROFILES = {
     }
 }
 
-# precompiled regexes for performance
+#
+# functions
+#
 
-COMMENT_RE = re.compile(r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)', re.DOTALL | re.MULTILINE)
-TRAILING_COMMA_RE = re.compile(r',\s*([}\]])')
-NUMBER_SPLIT_RE = re.compile(r'(\d+)')
-WHEN_TERM_SPLIT_RE = re.compile(r'\s*&&\s*|\s*\|\|\s*')
-OBJ_RE = re.compile(r'\{.*\}', re.DOTALL)
-WHEN_LITERAL_RE = re.compile(r'("when"\s*:\s*\")((?:\\.|[^"\\])*)(\")')
-KEY_EXTRACT_RE = re.compile(r'"key"\s*:\s*"((?:\\.|[^"\\])*)"')
-WHEN_EXTRACT_RE = re.compile(r'"when"\s*:\s*"((?:\\.|[^"\\])*)"')
-WHITESPACE_RE = re.compile(r'\s+')
-WHEN_SORTED_RE = re.compile(r'^\s*//\s*when-sorted:.*\n', re.MULTILINE)
-BLANK_LINES_RE = re.compile(r'(?m)^[ \t]*\n+')
-LEADING_COMMA_RE = re.compile(r'^\s*,+')
-STRIP_WS_RE = re.compile(r'^[ \t\r\n]+|[ \t\r\n]+$')
-LEADING_NEWLINES_RE = re.compile(r'^\n+')
-
-
-# function definitions
 
 def _apply_debug_settings(debug_specs: list[str] | None, color: str) -> None:
     """Configure global debug filters and color mode."""
@@ -386,14 +328,14 @@ def _assemble_sorted_output(
     for i, (comments, obj_out, _canonical) in enumerate(rendered_groups):
         is_last = (i == len(rendered_groups) - 1)
         if comments:
-            comments = BLANK_LINES_RE.sub('', comments)
-            comments = LEADING_COMMA_RE.sub('', comments)
+            comments = _io._BLANK_LINES_RE.sub('', comments)
+            comments = _io._LEADING_COMMA_RE.sub('', comments)
             out_parts.append(comments)
 
         idx = obj_out.rfind('}')
         if idx != -1:
             after = obj_out[idx + 1:]
-            after_clean = LEADING_COMMA_RE.sub('', after)
+            after_clean = _io._LEADING_COMMA_RE.sub('', after)
             obj_out = obj_out[:idx + 1] + after_clean
 
         out_parts.append(obj_out)
@@ -401,21 +343,18 @@ def _assemble_sorted_output(
             out_parts.append(',')
         out_parts.append('\n')
 
-    trailing_comments = LEADING_COMMA_RE.sub('', trailing_comments)
+    trailing_comments = _io._LEADING_COMMA_RE.sub('', trailing_comments)
     out_parts.append(trailing_comments)
     if trailing_comments and not trailing_comments.endswith('\n'):
         out_parts.append('\n')
 
-    postamble_trimmed = STRIP_WS_RE.sub('', postamble)
+    postamble_trimmed = _io._STRIP_WS_RE.sub('', postamble)
     if postamble_trimmed:
         out_parts.append(']\n' + postamble_trimmed + '\n')
     else:
         out_parts.append(']\n')
 
     return ''.join(out_parts)
-
-
-# canonicalization moved to package: use _keybindings._canonicalize_when(...)
 
 
 def _color_enabled() -> bool:
@@ -633,7 +572,7 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
         # derive the first top-level when token for grouping when primary sorting
         first_when_token = ''
         if canonical_when:
-            parts = WHEN_TERM_SPLIT_RE.split(canonical_when.strip())
+            parts = _io._WHEN_TERM_SPLIT_RE.split(canonical_when.strip())
             if parts:
                 first_when_token = parts[0].strip()
                 # remove surrounding parentheses and leading negation for grouping
@@ -716,7 +655,7 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                             lid = lid[1:-1].strip()
                         if lid.startswith('!'):
                             lid = lid[1:].lstrip()
-                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
+                        f_rank = _keybindings.FOCUS_TOKENS_MAP.get(lid, _keybindings.POSITIONAL_TOKENS_MAP.get(lid, _keybindings.VISIBILITY_TOKENS_MAP.get(lid, 9999)))
                         grouping = (is_neg, f_rank, _keybindings._natural_key_case_sensitive(base))
                     else:
                         grouping = (is_neg, _keybindings._natural_key(base))
@@ -729,7 +668,7 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                             lid = lid[1:-1].strip()
                         if lid.startswith('!'):
                             lid = lid[1:].lstrip()
-                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
+                        f_rank = _keybindings.FOCUS_TOKENS_MAP.get(lid, _keybindings.POSITIONAL_TOKENS_MAP.get(lid, _keybindings.VISIBILITY_TOKENS_MAP.get(lid, 9999)))
                         grouping = (is_neg, f_rank, _keybindings._natural_key_case_sensitive(base))
                     else:
                         grouping = (is_neg, _keybindings._natural_key(base))
@@ -824,7 +763,7 @@ def _first_when_group_rank(
     if not canonical:
         return 5
 
-    parts = WHEN_TERM_SPLIT_RE.split(canonical.strip())
+    parts = _io._WHEN_TERM_SPLIT_RE.split(canonical.strip())
     if not parts:
         return 5
 
@@ -869,23 +808,23 @@ def _first_when_group_rank(
     left_id = left.split()[0]
 
     if mode == 'focal-invariant':
-        if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
-            return 1
-        if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
-            return 2
-        if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
-            return 3
+        if any(_matches_when_entry(left_id, entry) for entry in _keybindings.FOCUS_TOKENS):
+            return 1  # Focus tokens have the highest priority
+        if any(left_id.startswith(prefix) for prefix in _keybindings.POSITIONAL_TOKENS):
+            return 2  # Positional tokens are next in priority
+        if any(_matches_when_entry(left_id, entry) for entry in _keybindings.VISIBILITY_TOKENS):
+            return 3  # Visibility tokens follow
         if left_id.startswith('config.'):
-            return 4
+            return 4  # Config tokens are lower priority
         return 5
 
     if left_id.startswith('config.'):
         return 1
-    if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
+    if any(_matches_when_entry(left_id, entry) for entry in _keybindings.FOCUS_TOKENS):
         return 2
-    if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
+    if any(left_id.startswith(prefix) for prefix in _keybindings.POSITIONAL_TOKENS):
         return 3
-    if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
+    if any(_matches_when_entry(left_id, entry) for entry in _keybindings.VISIBILITY_TOKENS):
         return 4
     return 5
 
@@ -943,7 +882,7 @@ def _get_run_obj_info(
 ) -> dict:
     """Return per-run cached object metadata for the current sorting context."""
 
-    info = RUN_OBJ_INFO_CACHE.get(obj_text)
+    info = _keybindings.RUN_OBJ_INFO_CACHE.get(obj_text)
     if info is not None:
         return info
 
@@ -986,7 +925,7 @@ def _get_run_obj_info(
     }
 
     try:
-        RUN_OBJ_INFO_CACHE[obj_text] = info
+        _keybindings.RUN_OBJ_INFO_CACHE[obj_text] = info
     except Exception:
         pass
 
@@ -1011,7 +950,7 @@ def _get_run_obj_match_info(obj_text: str) -> dict:
     has_focus = False
 
     try:
-        parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
+        parts = _io._WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
         for part in parts:
             token = part.strip()
             while token.startswith('(') and token.endswith(')'):
@@ -1026,10 +965,10 @@ def _get_run_obj_match_info(obj_text: str) -> dict:
 
             left_ids.append(left_id)
 
-            if not has_focus and any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
+            if not has_focus and any(_matches_when_entry(left_id, entry) for entry in _keybindings.FOCUS_TOKENS):
                 has_focus = True
 
-            run_prefixes = RUN_CACHE_CONTEXT[2] if RUN_CACHE_CONTEXT else None
+            run_prefixes = _keybindings.RUN_CACHE_CONTEXT[2] if _keybindings.RUN_CACHE_CONTEXT else None
             if run_prefixes:
                 for idx, prefix in enumerate(run_prefixes):
                     try:
@@ -1038,7 +977,7 @@ def _get_run_obj_match_info(obj_text: str) -> dict:
                     except Exception:
                         continue
 
-            run_regexes = RUN_CACHE_CONTEXT[3] if RUN_CACHE_CONTEXT else None
+            run_regexes = _keybindings.RUN_CACHE_CONTEXT[3] if _keybindings.RUN_CACHE_CONTEXT else None
             if run_regexes:
                 for idx, rx in enumerate(run_regexes):
                     try:
@@ -1191,7 +1130,7 @@ def _normalize_key_for_compare(key_value):
 def _normalize_operand(text: str) -> str:
     """Normalize whitespace in an operand and collapse runs to single spaces."""
 
-    collapsed = WHITESPACE_RE.sub(' ', text).strip()
+    collapsed = _io._WHITESPACE_RE.sub(' ', text).strip()
 
     return collapsed
 
@@ -1270,7 +1209,7 @@ def _normalize_when_in_object(obj_text: str, mode: str = 'config-first', negatio
 def _normalize_whitespace(text: str) -> str:
     """Return the input string with all whitespace collapsed to single spaces and trimmed."""
 
-    return WHITESPACE_RE.sub(' ', text).strip() if text else ''
+    return _io._WHITESPACE_RE.sub(' ', text).strip() if text else ''
 
 
 def _object_has_trailing_comma(obj_text: str) -> bool:
@@ -1375,13 +1314,7 @@ def _remove_blank_lines(text: str) -> str:
     return ''.join(out_lines)
 
 
-def _render_when_node(node: WhenNode) -> str:
-    """Render a WhenNode AST back to its string representation, preserving parentheses."""
-
-    inner = node._to_str()
-    if node.parens:
-        return f'({inner})'
-    return inner
+_render_when_node = _keybindings._render_when_node
 
 
 def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode: str) -> list[tuple[str, str]]:
@@ -1480,18 +1413,26 @@ def _replace_when_literals(
 
 def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
     """Initialize and clear per-run caches for the current run parameter context."""
-
-    global RUN_CACHE_CONTEXT, RUN_CANONICAL_CACHE, RUN_SORTABLE_CACHE, RUN_OBJ_INFO_CACHE
-    RUN_CACHE_CONTEXT = (
+    # set the package-level run context and clear package-run caches so
+    # both CLI and package helpers share the same memoization during a run.
+    _keybindings.RUN_CACHE_CONTEXT = (
         mode,
         negation_mode,
         None if when_prefixes is None else tuple(when_prefixes),
         None if when_regexes is None else tuple(when_regexes),
     )
-    # clear per-run caches
-    RUN_CANONICAL_CACHE = {}
-    RUN_SORTABLE_CACHE = {}
-    RUN_OBJ_INFO_CACHE = {}
+    try:
+        _keybindings.RUN_CANONICAL_CACHE.clear()
+    except Exception:
+        _keybindings.RUN_CANONICAL_CACHE = {}
+    try:
+        _keybindings.RUN_SORTABLE_CACHE.clear()
+    except Exception:
+        _keybindings.RUN_SORTABLE_CACHE = {}
+    try:
+        _keybindings.RUN_OBJ_INFO_CACHE.clear()
+    except Exception:
+        _keybindings.RUN_OBJ_INFO_CACHE = {}
 
 
 def _sort_groups_for_primary_when(
@@ -1709,7 +1650,7 @@ def _strip_when_sorted_comment(comment_text: str, when_changed: bool) -> str:
     if not when_changed:
         return comment_text
 
-    return WHEN_SORTED_RE.sub('', comment_text)
+    return _io._WHEN_SORTED_RE.sub('', comment_text)
 
 
 def _with_normalized_when_groups(

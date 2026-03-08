@@ -10,9 +10,11 @@ import json
 import re
 from typing import List, Tuple
 
-# Simple helpers and constants
-NUMBER_SPLIT_RE = re.compile(r"(\d+)")
-WHEN_TERM_SPLIT_RE = re.compile(r"\s*&&\s*|\s*\|\|\s*")
+from vscode_keynav import io as _io
+
+# Simple helpers and constants (compiled regexes centralized in _io)
+NUMBER_SPLIT_RE = _io._NUMBER_SPLIT_RE
+WHEN_TERM_SPLIT_RE = _io._WHEN_TERM_SPLIT_RE
 
 # token groups and maps used by canonicalization heuristics
 FOCUS_TOKENS = [
@@ -74,14 +76,16 @@ VISIBILITY_TOKENS_MAP = {t: i for i, t in enumerate(VISIBILITY_TOKENS)}
 CACHE_CANONICALIZE_WHEN: dict = {}
 RUN_CACHE_CONTEXT = None
 RUN_CANONICAL_CACHE: dict = {}
+RUN_SORTABLE_CACHE: dict = {}
+RUN_OBJ_INFO_CACHE: dict = {}
 
 
-# JSONC / object helpers used by CLI and other tools
-COMMENT_RE = re.compile(r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)', re.DOTALL | re.MULTILINE)
-TRAILING_COMMA_RE = re.compile(r',\s*([}\]])')
-OBJ_RE = re.compile(r'\{.*\}', re.DOTALL)
-KEY_EXTRACT_RE = re.compile(r'"key"\s*:\s*"((?:\\.|[^"\\])*)"')
-WHEN_EXTRACT_RE = re.compile(r'"when"\s*:\s*"((?:\\.|[^"\\])*)"')
+# JSONC / object helpers used by CLI and other tools (centralized compiled regexes)
+COMMENT_RE = _io._COMMENT_RE
+TRAILING_COMMA_RE = _io._TRAILING_COMMA_RE
+OBJ_RE = _io._OBJ_RE
+KEY_EXTRACT_RE = _io._KEY_EXTRACT_RE
+WHEN_EXTRACT_RE = _io._WHEN_EXTRACT_RE
 
 # caches
 CACHE_JSON_OBJECT: dict = {}
