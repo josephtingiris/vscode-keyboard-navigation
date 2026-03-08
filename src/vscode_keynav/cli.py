@@ -21,6 +21,15 @@ from typing import Callable
 #
 
 
+def _flag_present(raw_argv: list[str], names: list[str]) -> bool:
+    """Return True if any of the flag names are present in the raw argv list."""
+
+    for name in names:
+        if name in raw_argv:
+            return True
+    return False
+
+
 def _make_common_parser(prog: str | None = None) -> argparse.ArgumentParser:
     """Create and return a common ArgumentParser preconfigured with standard options."""
 

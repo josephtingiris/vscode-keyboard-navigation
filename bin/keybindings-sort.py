@@ -66,6 +66,7 @@ import re
 
 from typing import List, Tuple
 
+from vscode_keynav import cli as _cli
 from vscode_keynav import debug as _debug
 from vscode_keynav import io as _io
 from vscode_keynav import keybindings as _keybindings
@@ -142,19 +143,19 @@ def _apply_when_grouping_profile(args: argparse.Namespace, raw_argv: list[str]) 
 
     profile = WHEN_GROUPING_PROFILES[sel_profile]
 
-    if not _flag_present(raw_argv, ['-p', '--primary']) and profile.get('primary') is not None:
+    if not _cli._flag_present(raw_argv, ['-p', '--primary']) and profile.get('primary') is not None:
         args.primary = profile['primary']
 
-    if not _flag_present(raw_argv, ['-s', '--secondary']):
+    if not _cli._flag_present(raw_argv, ['-s', '--secondary']):
         args.secondary = profile.get('secondary')
 
-    if not _flag_present(raw_argv, ['-g', '--group-sorting']) and profile.get('group_sorting') is not None:
+    if not _cli._flag_present(raw_argv, ['-g', '--group-sorting']) and profile.get('group_sorting') is not None:
         args.group_sorting = profile['group_sorting']
 
-    if not _flag_present(raw_argv, ['-P', '--when-prefix']):
+    if not _cli._flag_present(raw_argv, ['-P', '--when-prefix']):
         args.when_prefix = profile.get('when_prefix')
 
-    if not _flag_present(raw_argv, ['-R', '--when-regex']):
+    if not _cli._flag_present(raw_argv, ['-R', '--when-regex']):
         args.when_regex = profile.get('when_regex')
 
 
@@ -405,20 +406,6 @@ def _embed_duplicate_comment_in_object(obj_text: str, duplicate_comment: str) ->
 
     lines.insert(open_idx + 1, f'{indent}{line_comment}\n')
     return ''.join(lines)
-
-
-def _extract_modifiers_from_object(obj_text: str) -> tuple[tuple[str, ...], str]:
-    """Return the modifier tuple and literal key token from the object key string."""
-
-    key_raw = _keybindings._extract_literal_key_from_object(obj_text) or ''
-    norm = _normalize_key_for_compare(key_raw)
-    first = norm.split()[0] if norm else ''
-    parts = [p for p in first.split('+') if p]
-    mods = tuple(parts[:-1]) if len(parts) > 1 else tuple()
-    lit = parts[-1] if parts else ''
-    lit_key = _normalize_key_for_compare(lit)
-
-    return (mods, lit_key)
 
 
 def _extract_preamble_postamble(text):
@@ -823,15 +810,6 @@ def _first_when_group_rank(
     if any(_matches_when_entry(left_id, entry) for entry in _keybindings.VISIBILITY_TOKENS):
         return 4
     return 5
-
-
-def _flag_present(raw_argv: list[str], names: list[str]) -> bool:
-    """Return True if any of the flag names are present in the raw argv list."""
-
-    for name in names:
-        if name in raw_argv:
-            return True
-    return False
 
 
 def _get_run_obj_duplicate_info(obj_text: str) -> tuple[str, str, str]:
