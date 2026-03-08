@@ -1,8 +1,8 @@
 """
 (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
 
-vscode_keynav package: shared modules for vscode-keyboard-navigation.
-
-Expose small, stable helpers here where appropriate.
+VS Code Keyboard Navigation (vscode-keyboard-navigation) shared modules.
 """
-__all__ = ["io", "keybindings", "corpus", "debug"]
+
+# vscode_keynav package
+__all__ = ["corpus", "debug", "io", "keybindings"]

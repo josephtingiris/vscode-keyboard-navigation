@@ -1,10 +1,15 @@
 """
 (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
+VS Code Keyboard Navigation common io functions.
 """
 
 from __future__ import annotations
+
 from pathlib import Path
+
 import sys
+
 from typing import Optional, Union
 
 

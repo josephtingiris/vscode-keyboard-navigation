@@ -1,8 +1,11 @@
 """
 (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
+VS Code Keyboard Navigation common corpus functions.
 """
 
 from __future__ import annotations
+
 from typing import Any, Dict, List
 
 from .keybindings import canonicalize_when, key_tail_literal

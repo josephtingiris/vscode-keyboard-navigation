@@ -1,14 +1,13 @@
 """
 (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
 
-Debug and ANSI color helpers extracted from keybindings-sort.
-
-This module provides minimal debug configuration and filtered debug
-output helpers so other modules can call `debug.echo(...)` uniformly.
+VS Code Keyboard Navigation common debug functions.
 """
+
 from __future__ import annotations
 
 import sys
+
 from typing import Iterable, List
 
 # public configuration
@@ -18,26 +17,7 @@ DEBUG_TARGET_CATEGORY: str | None = None
 DEBUG_TARGET_WHEN: str = ""
 
 
-def _color_enabled() -> bool:
-    if COLOR == "never":
-        return False
-    if COLOR == "always":
-        return True
-    try:
-        return sys.stderr.isatty()
-    except Exception:
-        return False
-
-
-def _debug_color(text: str, level: int) -> str:
-    if not _color_enabled():
-        return text
-    colors = {1: "\x1b[33m", 2: "\x1b[36m", 3: "\x1b[35m", 4: "\x1b[34m"}
-    code = colors.get(level, "\x1b[37m")
-    return f"{code}{text}\x1b[0m"
-
-
-def apply_debug_settings(debug_specs: Iterable[str] | None, color: str = "auto") -> None:
+def _apply_settings(debug_specs: Iterable[str] | None, color: str = "auto") -> None:
     """Configure module-level debug filters.
 
     `debug_specs` is an iterable of spec strings such as ['2', 'target=when'].
@@ -66,12 +46,28 @@ def apply_debug_settings(debug_specs: Iterable[str] | None, color: str = "auto")
     DEBUG_LEVEL = max_level
 
 
-def echo(level: int, category: str, when_val: str | None, msg: str) -> None:
-    """Conditionally output a debug message to stderr.
+def _color(text: str, level: int) -> str:
+    if not _color_enabled():
+        return text
+    colors = {1: "\x1b[33m", 2: "\x1b[36m", 3: "\x1b[35m", 4: "\x1b[34m"}
+    code = colors.get(level, "\x1b[37m")
+    return f"{code}{text}\x1b[0m"
 
-    Filtering mirrors the behavior used in bin scripts: messages are
-    shown only when `level <= DEBUG_LEVEL` and category/when filters match.
-    """
+
+def _color_enabled() -> bool:
+    if COLOR == "never":
+        return False
+    if COLOR == "always":
+        return True
+    try:
+        return sys.stderr.isatty()
+    except Exception:
+        return False
+
+
+def _echo(level: int, category: str, when_val: str | None, msg: str) -> None:
+    """Conditionally output a debug message to stderr."""
+
     if DEBUG_LEVEL <= 0:
         return
     if level > DEBUG_LEVEL:
@@ -83,7 +79,7 @@ def echo(level: int, category: str, when_val: str | None, msg: str) -> None:
             return
 
     out = f"[DEBUG:{level}:{category}] {msg}"
-    out = _debug_color(out, level)
+    out = _color(out, level)
     try:
         print(out, file=sys.stderr)
     except Exception:

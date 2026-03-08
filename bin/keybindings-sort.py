@@ -37,7 +37,7 @@ Behavior
 - Attempts to preserve comments and trailing commas in the original JSONC input.
 - Deduplicates operands, groups tokens by semantic buckets, and re-renders a stable canonical `when` form.
 - Hides exact object clones by default; use `--object-clones` to keep them.
-- Debug messages are written to stderr via `_debug_echo(...)` and are controlled by `--debug` and `--color`.
+- Debug messages are written to stderr via `_debug._echo(...)` and are controlled by `--debug` and `--color`.
 
 Inputs / Outputs
 
@@ -58,13 +58,15 @@ Exit codes
 ```
 """
 
-import sys
-import re
-import json
 import argparse
 import hashlib
+import json
+import sys
+import re
+
 from typing import List, Tuple
-from vscode_keynav import debug as _dbg
+
+from vscode_keynav import debug as _debug
 
 # global memoization cache for canonicalized when results
 
@@ -287,15 +289,17 @@ class WhenOr(WhenNode):
 
 def _apply_debug_settings(debug_specs: list[str] | None, color: str) -> None:
     """Configure global debug filters and color mode."""
+
     # delegate to shared debug module and mirror selected values locally
-    _dbg.apply_debug_settings(debug_specs, color)
+    _debug._apply_settings(debug_specs, color)
+
     try:
         # mirror values so existing module references continue to work
         global COLOR, DEBUG_LEVEL, DEBUG_TARGET_WHEN, DEBUG_TARGET_CATEGORY
-        COLOR = _dbg.COLOR
-        DEBUG_LEVEL = _dbg.DEBUG_LEVEL
-        DEBUG_TARGET_WHEN = _dbg.DEBUG_TARGET_WHEN
-        DEBUG_TARGET_CATEGORY = _dbg.DEBUG_TARGET_CATEGORY
+        COLOR = _debug.COLOR
+        DEBUG_LEVEL = _debug.DEBUG_LEVEL
+        DEBUG_TARGET_WHEN = _debug.DEBUG_TARGET_WHEN
+        DEBUG_TARGET_CATEGORY = _debug.DEBUG_TARGET_CATEGORY
     except Exception:
         pass
 
@@ -878,12 +882,12 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                         tok = _render_when_node(c)
                     except Exception:
                         tok = str(c)
-                    _debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: idx={i} token={tok!r}")
+                    _debug._echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: idx={i} token={tok!r}")
             else:
                 try:
-                    _debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: node={_render_when_node(ast)!r}")
+                    _debug._echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: node={_render_when_node(ast)!r}")
                 except Exception:
-                    _debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: node={ast!r}")
+                    _debug._echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: node={ast!r}")
     except Exception:
         pass
 
@@ -898,12 +902,12 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                         tok = _render_when_node(c)
                     except Exception:
                         tok = str(c)
-                    _debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: idx={i} token={tok!r}")
+                    _debug._echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: idx={i} token={tok!r}")
             else:
                 try:
-                    _debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: node={_render_when_node(ast)!r}")
+                    _debug._echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: node={_render_when_node(ast)!r}")
                 except Exception:
-                    _debug_echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: node={ast!r}")
+                    _debug._echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: node={ast!r}")
     except Exception:
         pass
 
@@ -929,7 +933,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
 def _color_enabled() -> bool:
     """Return True if ANSI coloring should be enabled for stderr output."""
     try:
-        return _dbg._color_enabled()
+        return _debug._color_enabled()
     except Exception:
         return False
 
@@ -938,22 +942,6 @@ def _contains_focus_token_in_object(obj_text: str) -> bool:
     """Return True if the object's when clause contains any configured focus token."""
 
     return bool(_get_run_obj_match_info(obj_text).get('has_focus', False))
-
-
-def _debug_color(text: str, level: int) -> str:
-    """Wrap debug text in ANSI color codes according to the debug level."""
-    try:
-        return _dbg._debug_color(text, level)
-    except Exception:
-        return text
-
-
-def _debug_echo(level: int, category: str, when_val: str | None, msg: str) -> None:
-    """Conditionally output a filtered, leveled debug message to stderr."""
-    try:
-        _dbg.echo(level, category, when_val, msg)
-    except Exception:
-        pass
 
 
 def _decode_json_string_literal(raw: str) -> str:
@@ -1399,7 +1387,7 @@ def _first_when_group_rank(
         if prefix_idxs:
             left_id = next((lid for lid in left_ids if any(lid.startswith(prefix) for prefix in when_prefixes or [])), '')
             if left_id:
-                _debug_echo(1, 'group', canonical, f"matched when_prefix in operand: {left_id}")
+                _debug._echo(1, 'group', canonical, f"matched when_prefix in operand: {left_id}")
             return 6
         if regex_idxs:
             left_id = ''
@@ -1417,7 +1405,7 @@ def _first_when_group_rank(
                 if left_id:
                     break
             if left_id:
-                _debug_echo(1, 'group', canonical, f"matched when_regex in operand: {left_id} (pattern={pattern})")
+                _debug._echo(1, 'group', canonical, f"matched when_regex in operand: {left_id} (pattern={pattern})")
             return 6
 
     first = parts[0].strip()
@@ -2225,7 +2213,7 @@ def _sort_groups_for_primary_when(
                 natural = _natural_key(normalized)
             except Exception:
                 natural = normalized
-            _debug_echo(
+            _debug._echo(
                 2,
                 'sort',
                 when_val,
@@ -2251,7 +2239,7 @@ def _sort_groups_for_primary_when(
                 for left_id in match_info.get('left_ids', ()):
                     try:
                         if 'terminal' in left_id or 'keyboardNavigation' in left_id:
-                            _debug_echo(1, 'group', when_val, f"SIG_PART: left_id={left_id!r}")
+                            _debug._echo(1, 'group', when_val, f"SIG_PART: left_id={left_id!r}")
                     except Exception:
                         pass
 
@@ -2280,7 +2268,7 @@ def _sort_groups_for_primary_when(
 
         if DEBUG_LEVEL > 0:
             normalized = _normalize_key_for_compare(key_val)
-            _debug_echo(1, 'ordered', canonical, f"DEBUG_ORDERED: idx={idx} raw_key={key_val!r} normalized={normalized!r}")
+            _debug._echo(1, 'ordered', canonical, f"DEBUG_ORDERED: idx={idx} raw_key={key_val!r} normalized={normalized!r}")
 
     #
     # stable-partition when prefixes and/or regexes into three contiguous regions,
@@ -2307,7 +2295,7 @@ def _sort_groups_for_primary_when(
                 others.append(pair)
 
         if matched_prefix or matched_regex:
-            _debug_echo(
+            _debug._echo(
                 1,
                 'group',
                 None,
@@ -2804,7 +2792,7 @@ def main(argv: List[str] | None = None) -> int:
                     for r in r_sig:
                         if 0 <= r < len(per_idx):
                             per_idx[r] += 1
-                _debug_echo(1, 'group', None, f"REGEX_COUNTS: {per_idx}")
+                _debug._echo(1, 'group', None, f"REGEX_COUNTS: {per_idx}")
 
                 sample_count = 0
                 for pair, sig in sig_map.items():
@@ -2812,7 +2800,7 @@ def main(argv: List[str] | None = None) -> int:
                     info = _get_run_obj_info(pair[1])
                     when_val = info.get('when', '') or _extract_literal_when_from_object(pair[1])
                     if when_val and 'terminal' in when_val:
-                        _debug_echo(1, 'group', when_val, f"REGEX_SAMPLE: p_sig={sig[0]} r_sig={r_sig} key={info.get('key', '')!r}")
+                        _debug._echo(1, 'group', when_val, f"REGEX_SAMPLE: p_sig={sig[0]} r_sig={r_sig} key={info.get('key', '')!r}")
                         sample_count += 1
                         if sample_count >= 10:
                             break
@@ -2907,7 +2895,7 @@ def main(argv: List[str] | None = None) -> int:
             existing = {pair[1] for pair in final_list}
             missing = [p for p in sorted_groups if p[1] not in existing]
             if missing:
-                _debug_echo(1, 'group', None, f"WARNING: bucket assembly dropped {len(missing)} items; appending missing items back")
+                _debug._echo(1, 'group', None, f"WARNING: bucket assembly dropped {len(missing)} items; appending missing items back")
                 # append missing items in original order to preserve stability
                 final_list.extend(missing)
 
@@ -2923,11 +2911,11 @@ def main(argv: List[str] | None = None) -> int:
                         if in_here and not prev_in:
                             runs += 1
                         prev_in = in_here
-                    _debug_echo(1, 'group', None, f"REGEX_RUNS idx={r_idx} runs={runs}")
+                    _debug._echo(1, 'group', None, f"REGEX_RUNS idx={r_idx} runs={runs}")
         except Exception:
             pass
 
-        _debug_echo(
+        _debug._echo(
             1,
             'group',
             None,
