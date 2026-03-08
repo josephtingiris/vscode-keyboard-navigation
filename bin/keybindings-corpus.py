@@ -40,57 +40,19 @@ from __future__ import annotations
 import json
 import sys
 import argparse
+
 from random import Random
 from itertools import combinations
 from typing import List, Tuple
 from collections import Counter
+
 import hashlib
 import inspect
 import os
 import re
 
-from vscode_keynav.corpus import (
-    _MODIFIERS_SINGLE,
-    _MODIFIERS_MULTI,
-    _ARROW_GROUP,
-    _LEFT,
-    _DOWN,
-    _UP,
-    _RIGHT,
-    _EMACS_GROUP,
-    _KBM_GROUP,
-    _VI_GROUP,
-    _LETTER_GROUPS,
-    _FOUR_PACK_DOWN_GROUP,
-    _FOUR_PACK_UP_GROUP,
-    _FOUR_PACK_GROUP,
-    _PUNCTUATION_LEFT_GROUP,
-    _PUNCTUATION_RIGHT_GROUP,
-    _PUNCTUATION_GROUP,
-    _FOLD_LEFT_GROUP,
-    _FOLD_RIGHT_GROUP,
-    _FOLD_GROUP,
-    _LEFT_GROUP,
-    _DOWN_GROUP,
-    _UP_GROUP,
-    _RIGHT_GROUP,
-    _DIRECTIONAL_GROUP_TAGS,
-    _DIRECTIONAL_KEY_TAGS,
-    _JUKE_GROUP,
-    _SPLIT_HORIZONTAL_GROUP,
-    _SPLIT_VERTICAL_GROUP,
-    _SPLIT_GROUP,
-    _ACTION_GROUP,
-    _ALTERNATE_ACTION_KEY,
-    _DEBUG_GROUP,
-    _ALTERNATE_DEBUG_KEY,
-    _EXTENSION_GROUP,
-    _ALTERNATE_EXTENSION_KEY,
-    _FIN_TAGS,
-    _TAG_ORDER,
-    _WHEN_CONTEXT_SELECTORS,
-    _WHEN_TAG_SELECTORS,
-)
+from vscode_keynav import io as _io
+from vscode_keynav import corpus as _corpus
 from vscode_keynav import keybindings as _keybindings
 
 
@@ -116,7 +78,7 @@ def _augment_when_clause(key: str, when_clause: str, extra_context: str | None =
 
     key_norm = _keybindings._normalize_key(key)
 
-    for group, context in _WHEN_CONTEXT_SELECTORS:
+    for group, context in _corpus._WHEN_CONTEXT_SELECTORS:
         if key_norm in {str(g) for g in group}:
             _add_many([context])
 
@@ -150,7 +112,7 @@ def _init_directional_groups(selected: str, letter_groups: dict) -> None:
         "right": "_RIGHT_GROUP",
     }
 
-    for i, direction_name in enumerate(_ARROW_GROUP):
+    for i, direction_name in enumerate(_corpus._ARROW_GROUP):
         var_name = direction_to_var[direction_name]
         current = set(globals().get(var_name, set()))
 
@@ -184,36 +146,36 @@ def _tags_for(
 
     nav_group_clauses = {
         name
-        for name in _LETTER_GROUPS
+        for name in _corpus._LETTER_GROUPS
         if f"config.keyboardNavigation.keys.letters == '{name}'" in when_clause
     }
 
-    for tag, keys in _DIRECTIONAL_KEY_TAGS.items():
+    for tag, keys in _corpus._DIRECTIONAL_KEY_TAGS.items():
         if key_norm not in keys:
             continue
-        if key_norm in _ARROW_GROUP or key_norm in _PUNCTUATION_GROUP:
+        if key_norm in _corpus._ARROW_GROUP or key_norm in _corpus._PUNCTUATION_GROUP:
             dynamic_tags.add(tag)
             continue
-        if any(key_norm in _LETTER_GROUPS[name] for name in nav_group_clauses):
+        if any(key_norm in _corpus._LETTER_GROUPS[name] for name in nav_group_clauses):
             dynamic_tags.add(tag)
 
     if "config.keyboardNavigation.keys.arrows" in when_clause:
         dynamic_tags.add("(arrow)")
 
-    for name in _LETTER_GROUPS:
+    for name in _corpus._LETTER_GROUPS:
         clause = f"config.keyboardNavigation.keys.letters == '{name}'"
         if clause in when_clause:
             dynamic_tags.add(f"({name})")
 
-    if key_norm in _FOLD_GROUP:
+    if key_norm in _corpus._FOLD_GROUP:
         dynamic_tags.add("(fold)")
-    if key_norm in _JUKE_GROUP:
+    if key_norm in _corpus._JUKE_GROUP:
         dynamic_tags.add("(juke)")
-    if key_norm in _SPLIT_GROUP:
+    if key_norm in _corpus._SPLIT_GROUP:
         dynamic_tags.add("(split)")
-    if key_norm in _SPLIT_HORIZONTAL_GROUP:
+    if key_norm in _corpus._SPLIT_HORIZONTAL_GROUP:
         dynamic_tags.add("(horizontal)")
-    if key_norm in _SPLIT_VERTICAL_GROUP:
+    if key_norm in _corpus._SPLIT_VERTICAL_GROUP:
         dynamic_tags.add("(vertical)")
 
     if "config.keyboardNavigation.chords.debug" in when_clause:
@@ -238,7 +200,7 @@ def _tags_for(
     if command and command.strip().lower() == "noop":
         dynamic_tags.add("(block)")
 
-    fin_entry = _FIN_TAGS.get(mod)
+    fin_entry = _corpus._FIN_TAGS.get(mod)
     if fin_entry:
         color_tag, meta_tags = fin_entry
         if color_tag:
@@ -252,7 +214,7 @@ def _tags_for(
 
     # context-based tags: map substrings or regexes in the when-clause to tags
     if when_clause:
-        for pattern, tag in _WHEN_TAG_SELECTORS:
+        for pattern, tag in _corpus._WHEN_TAG_SELECTORS:
             if pattern.startswith("/") and pattern.endswith("/"):
                 regex = pattern[1:-1]
                 try:
@@ -273,10 +235,10 @@ def _tags_for(
                     if pattern in when_clause:
                         dynamic_tags.add(tag)
 
-    ordered_tags.extend([tag for tag in _TAG_ORDER if tag in dynamic_tags])
+    ordered_tags.extend([tag for tag in _corpus._TAG_ORDER if tag in dynamic_tags])
 
     # append any remaining dynamic tags not listed in TAG_ORDER, sorted alphabetically
-    remaining = sorted(t for t in dynamic_tags if t not in _TAG_ORDER)
+    remaining = sorted(t for t in dynamic_tags if t not in _corpus._TAG_ORDER)
     ordered_tags.extend(remaining)
 
     return ordered_tags
@@ -293,26 +255,27 @@ def _when_for(key, mod: str = ""):
 
     key_norm = _keybindings._normalize_key(key)
 
-    if key_norm in _ARROW_GROUP:
+    if key_norm in _corpus._ARROW_GROUP:
         _add("config.keyboardNavigation.keys.arrows")
-    for name, group in _LETTER_GROUPS.items():
-        if key_norm in group and key_norm in globals().get("ALLOWED_LETTER_KEYS", set()):
+    for name, group in _corpus._LETTER_GROUPS.items():
+        if key_norm in group and key_norm in globals().get("_ALLOWED_LETTER_KEYS", set()):
             _add(f"config.keyboardNavigation.keys.letters == '{name}'")
 
     # qualify a chord when it's a valid combination defined in MODIFIERS_SINGLE or MODIFIERS_MULTI
     def _qualify_chord(chord_set, chord_name: str) -> None:
-        allowed_mods = set(_MODIFIERS_SINGLE) | set(_MODIFIERS_MULTI)
+        allowed_mods = set(_corpus._MODIFIERS_SINGLE) | set(_corpus._MODIFIERS_MULTI)
         if mod not in allowed_mods:
             return
         if key_norm in chord_set:
             _add(f"config.keyboardNavigation.chords.{chord_name}")
-            sel = globals().get("SELECTED_NAV_GROUP")
+            sel = globals().get("_SELECTED_NAV_GROUP")
             if sel and sel != "none":
                 _add(f"config.keyboardNavigation.keys.letters == '{sel}'")
 
-    _qualify_chord(_DEBUG_GROUP, 'debug')
-    _qualify_chord(_ACTION_GROUP, 'action')
-    _qualify_chord(_EXTENSION_GROUP, 'extension')
+    # use runtime-adaptive chord groups (stored in globals())
+    _qualify_chord(set(globals().get("_DEBUG_GROUP", set())), 'debug')
+    _qualify_chord(set(globals().get("_ACTION_GROUP", set())), 'action')
+    _qualify_chord(set(globals().get("_EXTENSION_GROUP", set())), 'extension')
 
     return " && ".join(parts)
 
@@ -357,7 +320,7 @@ def main(argv: List[str] | None = None) -> int:
     parser.add_argument(
         "-n",
         "--navigation-group",
-        choices=list(_LETTER_GROUPS.keys()) + ["none", "all"],
+        choices=list(_corpus._LETTER_GROUPS.keys()) + ["none", "all"],
         default="none",
         help=(
             "Select the active letter-key navigation group (default: none)."
@@ -368,7 +331,7 @@ def main(argv: List[str] | None = None) -> int:
 
     # determine selected letter-group from a when-clause
     def sel_from_when(when_val: str) -> str:
-        for name in _LETTER_GROUPS.keys():
+        for name in _corpus._LETTER_GROUPS.keys():
             if f"config.keyboardNavigation.keys.letters == '{name}'" in when_val:
                 return name
         return 'none'
@@ -674,9 +637,9 @@ def main(argv: List[str] | None = None) -> int:
                 return text[:max_len] + "...<truncated>"
             return text
 
-        ACTION_GROUP_ORIG = set(_ACTION_GROUP)
-        DEBUG_GROUP_ORIG = set(_DEBUG_GROUP)
-        EXTENSION_GROUP_ORIG = set(_EXTENSION_GROUP)
+        ACTION_GROUP_ORIG = set(_corpus._ACTION_GROUP)
+        DEBUG_GROUP_ORIG = set(_corpus._DEBUG_GROUP)
+        EXTENSION_GROUP_ORIG = set(_corpus._EXTENSION_GROUP)
 
         # remove trailing commas (safe)
         def _strip_trailing_commas(text: str) -> str:
@@ -751,26 +714,26 @@ def main(argv: List[str] | None = None) -> int:
 
             sel = sel_from_when(when_val)
 
-            globals()["SELECTED_NAV_GROUP"] = sel
+            globals()["_SELECTED_NAV_GROUP"] = sel
             if sel == 'none':
-                globals()["ALLOWED_LETTER_KEYS"] = set()
+                globals()["_ALLOWED_LETTER_KEYS"] = set()
             else:
-                globals()["ALLOWED_LETTER_KEYS"] = set(
-                    _LETTER_GROUPS.get(sel, ()))
-            _init_directional_groups(sel, _LETTER_GROUPS)
+                globals()["_ALLOWED_LETTER_KEYS"] = set(
+                    _corpus._LETTER_GROUPS.get(sel, ()))
+            _init_directional_groups(sel, _corpus._LETTER_GROUPS)
 
             # recompute adaptive chord groups
             def _select_adaptive_key_local(primary_group: set, alternate_key: str) -> str:
                 primary_key = sorted(primary_group)[0]
-                contains_primary = primary_key in globals().get("ALLOWED_LETTER_KEYS", set())
-                contains_alternate = alternate_key in globals().get("ALLOWED_LETTER_KEYS", set())
+                contains_primary = primary_key in globals().get("_ALLOWED_LETTER_KEYS", set())
+                contains_alternate = alternate_key in globals().get("_ALLOWED_LETTER_KEYS", set())
                 if contains_primary and not contains_alternate:
                     return alternate_key
                 return primary_key
 
-            globals()["_ACTION_GROUP"] = {_select_adaptive_key_local(ACTION_GROUP_ORIG, _ALTERNATE_ACTION_KEY)}
-            globals()["_DEBUG_GROUP"] = {_select_adaptive_key_local(DEBUG_GROUP_ORIG, _ALTERNATE_DEBUG_KEY)}
-            globals()["_EXTENSION_GROUP"] = {_select_adaptive_key_local(EXTENSION_GROUP_ORIG, _ALTERNATE_EXTENSION_KEY)}
+            globals()["_ACTION_GROUP"] = {_select_adaptive_key_local(ACTION_GROUP_ORIG, _corpus._ALTERNATE_ACTION_KEY)}
+            globals()["_DEBUG_GROUP"] = {_select_adaptive_key_local(DEBUG_GROUP_ORIG, _corpus._ALTERNATE_DEBUG_KEY)}
+            globals()["_EXTENSION_GROUP"] = {_select_adaptive_key_local(EXTENSION_GROUP_ORIG, _corpus._ALTERNATE_EXTENSION_KEY)}
 
             if idx < len(groups):
                 lead_comments, obj_text, _obj_line = groups[idx]
@@ -809,7 +772,7 @@ def main(argv: List[str] | None = None) -> int:
 
             obj_index = out_text.find(obj_text, search_pos)
             if obj_index == -1:
-                # fallback: try to locate by key only
+                # fallback: locate by key only
                 k = obj.get('key')
                 key_marker = f'"key": "{k}"'
                 key_pos = out_text.find(key_marker, search_pos)
@@ -969,7 +932,7 @@ def main(argv: List[str] | None = None) -> int:
                 continue
             obj_fragment = out_text[obj_start:obj_end + 1]
 
-            # ensure _WHEN_CONTEXT_SELECTORS matching this key are present
+            # ensure _corpus._WHEN_CONTEXT_SELECTORS matching this key are present
             if add_context_arg is not None:
                 # recompute literal key and normalize
                 k_full = obj.get('key')
@@ -986,7 +949,7 @@ def main(argv: List[str] | None = None) -> int:
 
                 # collect missing contexts
                 missing_ctxs: list = []
-                for group, ctx in _WHEN_CONTEXT_SELECTORS:
+                for group, ctx in _corpus._WHEN_CONTEXT_SELECTORS:
                     if key_norm in {str(g) for g in group}:
                         if ctx not in effective_when:
                             missing_ctxs.append(ctx)
@@ -1018,43 +981,42 @@ def main(argv: List[str] | None = None) -> int:
 
     selected = args.navigation_group
 
-    # expose letter-groups and selected mode for subordinates
-    globals()["_LETTER_GROUPS"] = _LETTER_GROUPS
-    globals()["SELECTED_NAV_GROUP"] = selected
+    # expose selected mode for subordinates
+    globals()["_SELECTED_NAV_GROUP"] = selected
     if selected == "none" or selected == "all":
         allowed_letter_keys = set()
     else:
-        allowed_letter_keys = set(_LETTER_GROUPS[selected])
+        allowed_letter_keys = set(_corpus._LETTER_GROUPS[selected])
 
-    globals()["ALLOWED_LETTER_KEYS"] = allowed_letter_keys
+    globals()["_ALLOWED_LETTER_KEYS"] = allowed_letter_keys
 
-    _init_directional_groups(selected, _LETTER_GROUPS)
+    _init_directional_groups(selected, _corpus._LETTER_GROUPS)
 
     # preserve the original chord groups
 
-    ACTION_GROUP_ORIG = set(_ACTION_GROUP)
-    DEBUG_GROUP_ORIG = set(_DEBUG_GROUP)
-    EXTENSION_GROUP_ORIG = set(_EXTENSION_GROUP)
+    ACTION_GROUP_ORIG = set(_corpus._ACTION_GROUP)
+    DEBUG_GROUP_ORIG = set(_corpus._DEBUG_GROUP)
+    EXTENSION_GROUP_ORIG = set(_corpus._EXTENSION_GROUP)
 
     def generate_records_for_mode(mode: str) -> List[Tuple[str, str, List[str]]]:
-        globals()["SELECTED_NAV_GROUP"] = mode
+        globals()["_SELECTED_NAV_GROUP"] = mode
         if mode == "none":
-            globals()["ALLOWED_LETTER_KEYS"] = set()
+            globals()["_ALLOWED_LETTER_KEYS"] = set()
         else:
-            globals()["ALLOWED_LETTER_KEYS"] = set(_LETTER_GROUPS.get(mode, ()))
-        _init_directional_groups(mode, _LETTER_GROUPS)
+            globals()["_ALLOWED_LETTER_KEYS"] = set(_corpus._LETTER_GROUPS.get(mode, ()))
+        _init_directional_groups(mode, _corpus._LETTER_GROUPS)
 
         def _select_adaptive_key(primary_group: set, alternate_key: str, label: str) -> str:
             primary_key = sorted(primary_group)[0]
-            contains_primary = primary_key in globals().get("ALLOWED_LETTER_KEYS", set())
-            contains_alternate = alternate_key in globals().get("ALLOWED_LETTER_KEYS", set())
+            contains_primary = primary_key in globals().get("_ALLOWED_LETTER_KEYS", set())
+            contains_alternate = alternate_key in globals().get("_ALLOWED_LETTER_KEYS", set())
 
             if contains_primary and not contains_alternate:
                 return alternate_key
             if contains_primary and contains_alternate:
                 YELLOW = "\x1b[33m"
                 RESET = "\x1b[0m"
-                allowed = sorted(globals().get("ALLOWED_LETTER_KEYS", set()))
+                allowed = sorted(globals().get("_ALLOWED_LETTER_KEYS", set()))
                 primary_group_sorted = sorted(primary_group)
                 frame = inspect.currentframe()
                 if frame is not None:
@@ -1074,30 +1036,30 @@ def main(argv: List[str] | None = None) -> int:
         # apply adaptive chord key selection based on mode
         globals()["_ACTION_GROUP"] = {
             _select_adaptive_key(
-                ACTION_GROUP_ORIG, _ALTERNATE_ACTION_KEY, "action")
+                ACTION_GROUP_ORIG, _corpus._ALTERNATE_ACTION_KEY, "action")
         }
         globals()["_DEBUG_GROUP"] = {
             _select_adaptive_key(
-                DEBUG_GROUP_ORIG, _ALTERNATE_DEBUG_KEY, "debug")
+                DEBUG_GROUP_ORIG, _corpus._ALTERNATE_DEBUG_KEY, "debug")
         }
         globals()["_EXTENSION_GROUP"] = {
-            _select_adaptive_key(EXTENSION_GROUP_ORIG, _ALTERNATE_EXTENSION_KEY, "extension")
+            _select_adaptive_key(EXTENSION_GROUP_ORIG, _corpus._ALTERNATE_EXTENSION_KEY, "extension")
         }
 
         keys_to_emit = set()
-        keys_to_emit.update(_ARROW_GROUP)
-        keys_to_emit.update(_JUKE_GROUP)
-        keys_to_emit.update(_SPLIT_GROUP)
+        keys_to_emit.update(_corpus._ARROW_GROUP)
+        keys_to_emit.update(_corpus._JUKE_GROUP)
+        keys_to_emit.update(_corpus._SPLIT_GROUP)
         keys_to_emit.update(globals()["_DEBUG_GROUP"])
         keys_to_emit.update(globals()["_EXTENSION_GROUP"])
         keys_to_emit.update(globals()["_ACTION_GROUP"])
-        keys_to_emit.update(globals()["ALLOWED_LETTER_KEYS"])
+        keys_to_emit.update(globals()["_ALLOWED_LETTER_KEYS"])
 
         keys_ordered = sorted(keys_to_emit)
 
         recs: List[Tuple[str, str, List[str]]] = []
         local_seen: set = set()
-        all_mods = _MODIFIERS_SINGLE + _MODIFIERS_MULTI
+        all_mods = _corpus._MODIFIERS_SINGLE + _corpus._MODIFIERS_MULTI
         for key in keys_ordered:
             for mod in all_mods:
                 key_str = f"{mod}+{key}"
@@ -1107,8 +1069,8 @@ def main(argv: List[str] | None = None) -> int:
 
                 mode_when = _augment_when_clause(key, _when_for(key, mod), add_context_arg)
 
-                SELECTED_NAV_GROUP_STATE = globals().get("SELECTED_NAV_GROUP")
-                ALLOWED_LETTER_KEYS_STATE = globals().get("ALLOWED_LETTER_KEYS")
+                _SELECTED_NAV_GROUP_STATE = globals().get("_SELECTED_NAV_GROUP")
+                _ALLOWED_LETTER_KEYS_STATE = globals().get("_ALLOWED_LETTER_KEYS")
 
                 LEFT_GROUP_STATE = set(globals().get("_LEFT_GROUP", set()))
                 DOWN_GROUP_STATE = set(globals().get("_DOWN_GROUP", set()))
@@ -1120,19 +1082,19 @@ def main(argv: List[str] | None = None) -> int:
                 EXTENSION_GROUP_STATE = set(
                     globals().get("_EXTENSION_GROUP", set()))
 
-                globals()["SELECTED_NAV_GROUP"] = "none"
-                globals()["ALLOWED_LETTER_KEYS"] = set()
+                globals()["_SELECTED_NAV_GROUP"] = "none"
+                globals()["_ALLOWED_LETTER_KEYS"] = set()
 
                 globals()["_ACTION_GROUP"] = set()
                 globals()["_DEBUG_GROUP"] = set()
                 globals()["_EXTENSION_GROUP"] = set()
 
-                _init_directional_groups("none", _LETTER_GROUPS)
+                _init_directional_groups("none", _corpus._LETTER_GROUPS)
                 generic_when = _augment_when_clause(key, _when_for(key, mod), add_context_arg)
 
                 # restore selected / letter / directional groups
-                globals()["SELECTED_NAV_GROUP"] = SELECTED_NAV_GROUP_STATE
-                globals()["ALLOWED_LETTER_KEYS"] = ALLOWED_LETTER_KEYS_STATE
+                globals()["_SELECTED_NAV_GROUP"] = _SELECTED_NAV_GROUP_STATE
+                globals()["_ALLOWED_LETTER_KEYS"] = _ALLOWED_LETTER_KEYS_STATE
                 globals()["_LEFT_GROUP"] = LEFT_GROUP_STATE
                 globals()["_DOWN_GROUP"] = DOWN_GROUP_STATE
                 globals()["_UP_GROUP"] = UP_GROUP_STATE
@@ -1207,23 +1169,62 @@ def main(argv: List[str] | None = None) -> int:
             records.append(rec)
 
     # compute deterministic per-record ids using SHA-256(key||when)
+
+    if len(modes) == 1:
+        augmented_records: List[Tuple[str, str, List[str]]] = []
+        # avoid introducing exact duplicate (key,when) pairs when adding catch keys
+        existing_pairs = {(k, w) for (k, w, _) in records}
+        for (k, w, t) in records:
+            augmented_records.append((k, w, t))
+            if w and "config.keyboardNavigation.chords." in w:
+                catch_pair = (k, "config.keyboardNavigation.enabled")
+                if catch_pair not in existing_pairs:
+                    augmented_records.append((k, "config.keyboardNavigation.enabled", t))
+                    existing_pairs.add(catch_pair)
+        records = augmented_records
+
     id_fulls = [hashlib.sha256(f"{k}||{w}".encode()).hexdigest()
                 for (k, w, _) in records]
     n = len(id_fulls)
+
+    #
+    # preference: produce a 4-char hex id by taking the first
+    # 4 hex chars of the SHA and, on collision, increment that 4-char
+    # value (mod 0x10000) until an unused 4-char is found.
+    #
+
     assigned: List[str | None] = [None] * n
+    seen_prefixes: set[str] = set()
 
-    # assign the shortest unique prefix, starting at 4 chars, up to 12
-    for L in range(4, 13):
-        prefixes = [h[:L] for h in id_fulls]
-        counts = Counter(prefixes)
-        for i, p in enumerate(prefixes):
-            if assigned[i] is None and counts[p] == 1:
+    for i, h in enumerate(id_fulls):
+        base = int(h[:4], 16)
+        found = False
+
+        # try up to all 65536 4-char possibilities
+        for delta in range(0x10000):
+            cand = (base + delta) & 0xFFFF
+            p = f"{cand:04x}"
+            if p not in seen_prefixes:
                 assigned[i] = p
+                seen_prefixes.add(p)
+                found = True
+                break
+        if not found:
+            assigned[i] = None
 
-    # finalize any remaining by using 12-char prefix
-    for i in range(n):
-        if assigned[i] is None:
-            assigned[i] = id_fulls[i][:12]
+    # fallback: original prefix-length algorithm (4..12) to resolve uniqueness
+    if any(a is None for a in assigned):
+        assigned2: List[str | None] = [None] * n
+        for L in range(4, 13):
+            prefixes = [h[:L] for h in id_fulls]
+            counts = Counter(prefixes)
+            for i, p in enumerate(prefixes):
+                if assigned2[i] is None and counts[p] == 1:
+                    assigned2[i] = p
+        for i in range(n):
+            if assigned2[i] is None:
+                assigned2[i] = id_fulls[i][:12]
+        assigned = assigned2
 
     # if comments_arg == 'none', emit pure JSON (no comments) and exit.
     if comments_arg == 'none':
@@ -1249,25 +1250,25 @@ def main(argv: List[str] | None = None) -> int:
 
         sel = sel_from_when(w)
 
-        globals()["SELECTED_NAV_GROUP"] = sel
+        globals()["_SELECTED_NAV_GROUP"] = sel
         if sel == 'none':
-            globals()["ALLOWED_LETTER_KEYS"] = set()
+            globals()["_ALLOWED_LETTER_KEYS"] = set()
         else:
-            globals()["ALLOWED_LETTER_KEYS"] = set(_LETTER_GROUPS.get(sel, ()))
-        _init_directional_groups(sel, _LETTER_GROUPS)
+            globals()["_ALLOWED_LETTER_KEYS"] = set(_corpus._LETTER_GROUPS.get(sel, ()))
+        _init_directional_groups(sel, _corpus._LETTER_GROUPS)
 
         # recompute adaptive chord groups for this selection
         def _select_adaptive_key_local(primary_group: set, alternate_key: str) -> str:
             primary_key = sorted(primary_group)[0]
-            contains_primary = primary_key in globals().get("ALLOWED_LETTER_KEYS", set())
-            contains_alternate = alternate_key in globals().get("ALLOWED_LETTER_KEYS", set())
+            contains_primary = primary_key in globals().get("_ALLOWED_LETTER_KEYS", set())
+            contains_alternate = alternate_key in globals().get("_ALLOWED_LETTER_KEYS", set())
             if contains_primary and not contains_alternate:
                 return alternate_key
             return primary_key
 
-        globals()["_ACTION_GROUP"] = {_select_adaptive_key_local(ACTION_GROUP_ORIG, _ALTERNATE_ACTION_KEY)}
-        globals()["_DEBUG_GROUP"] = {_select_adaptive_key_local(DEBUG_GROUP_ORIG, _ALTERNATE_DEBUG_KEY)}
-        globals()["_EXTENSION_GROUP"] = {_select_adaptive_key_local(EXTENSION_GROUP_ORIG, _ALTERNATE_EXTENSION_KEY)}
+        globals()["_ACTION_GROUP"] = {_select_adaptive_key_local(ACTION_GROUP_ORIG, _corpus._ALTERNATE_ACTION_KEY)}
+        globals()["_DEBUG_GROUP"] = {_select_adaptive_key_local(DEBUG_GROUP_ORIG, _corpus._ALTERNATE_DEBUG_KEY)}
+        globals()["_EXTENSION_GROUP"] = {_select_adaptive_key_local(EXTENSION_GROUP_ORIG, _corpus._ALTERNATE_EXTENSION_KEY)}
 
         cmd = f"(corpus) {k} {assigned[idx]}"
         tags = _tags_for(key, mod, w, command=cmd)
