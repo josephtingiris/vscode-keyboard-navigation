@@ -359,7 +359,7 @@ def _assemble_sorted_output(
     return ''.join(out_parts)
 
 
-def _finalize_processed_output(
+def _assemble_final_output(
     text: str,
     grouping_mode: str,
     negation_mode: str,
@@ -369,14 +369,6 @@ def _finalize_processed_output(
     """Perform final output cleanup on the assembled JSONC text (e.g. remove blank lines)."""
 
     return _remove_blank_lines(text)
-
-
-def _normalize_whitespace(text: str) -> str:
-    """Normalize whitespace in an operand and collapse runs to single spaces."""
-
-    collapsed = _io._WHITESPACE_RE.sub(' ', text).strip()
-
-    return collapsed
 
 
 def _object_has_trailing_comma(obj_text: str) -> bool:
@@ -479,9 +471,6 @@ def _remove_blank_lines(text: str) -> str:
         out_lines.append(line)
 
     return ''.join(out_lines)
-
-
-_render_when_node = _keybindings._render_when_node
 
 
 def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode: str) -> list[tuple[str, str]]:
@@ -833,6 +822,9 @@ def _sort_groups_with_grouping_mode(
 #
 
 
+_render_when_node = _keybindings._render_when_node
+
+
 def main(argv: List[str] | None = None) -> int:
     """Parse arguments, read stdin, sort keybinding objects, and write sorted JSONC to stdout."""
 
@@ -1143,7 +1135,7 @@ def main(argv: List[str] | None = None) -> int:
         when_regexes=when_regexes,
     )
 
-    processed = _finalize_processed_output(
+    processed = _assemble_final_output(
         final_text,
         grouping_mode,
         negation_mode,
