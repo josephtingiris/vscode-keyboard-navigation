@@ -361,14 +361,6 @@ def _assemble_sorted_output(
     return ''.join(out_parts)
 
 
-def _color_enabled() -> bool:
-    """Return True if ANSI coloring should be enabled for stderr output."""
-    try:
-        return _debug._color_enabled()
-    except Exception:
-        return False
-
-
 def _contains_focus_token_in_object(obj_text: str) -> bool:
     """Return True if the object's when clause contains any configured focus token."""
 
