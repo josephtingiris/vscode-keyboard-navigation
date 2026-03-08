@@ -1200,7 +1200,7 @@ def main(argv: List[str] | None = None) -> int:
         base = int(h[:4], 16)
         found = False
 
-        # try up to all 65536 4-char possibilities
+        # try all 65536 4-char possibilities
         for delta in range(0x10000):
             cand = (base + delta) & 0xFFFF
             p = f"{cand:04x}"
