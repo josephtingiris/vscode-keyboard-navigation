@@ -13,6 +13,8 @@ from typing import Callable
 
 
 def _make_common_parser(prog: str | None = None) -> argparse.ArgumentParser:
+    """Create and return a common ArgumentParser preconfigured with standard options."""
+
     p = argparse.ArgumentParser(prog=prog)
     p.add_argument("-i", "--input", help="input file (defaults to stdin)", default="-")
     p.add_argument("-o", "--output", help="output file (defaults to stdout)", default="-")
@@ -24,11 +26,15 @@ def _make_common_parser(prog: str | None = None) -> argparse.ArgumentParser:
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse and return CLI arguments using the common parser."""
+
     parser = _make_common_parser()
     return parser.parse_args(argv)
 
 
 def _run_main(main_fn: Callable[[argparse.Namespace], int] | Callable[[argparse.Namespace], None], argv: list[str] | None = None) -> int:
+    """Run a CLI main function with parsed args and convert exceptions into exit codes."""
+
     args = _parse_args(argv)
 
     try:

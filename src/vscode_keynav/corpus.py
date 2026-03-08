@@ -12,6 +12,8 @@ from .keybindings import _canonicalize_when, _key_tail_literal
 
 
 def _augment_when_clause(base_when: str, contexts: List[str]) -> str:
+    """Augment a base when clause by OR-ing the provided context clauses."""
+
     if not contexts:
         return base_when or ""
     ctx_clause = " || ".join([c.strip() for c in contexts if c and c.strip()])
@@ -21,6 +23,8 @@ def _augment_when_clause(base_when: str, contexts: List[str]) -> str:
 
 
 def _tags_for(obj: Dict[str, Any]) -> List[str]:
+    """Return a list of simple tags for a keybinding object (command, key-tail, and when)."""
+
     tags: List[str] = []
     if not isinstance(obj, dict):
         return tags

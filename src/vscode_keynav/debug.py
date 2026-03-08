@@ -18,10 +18,8 @@ DEBUG_TARGET_WHEN: str = ""
 
 
 def _apply_settings(debug_specs: Iterable[str] | None, color: str = "auto") -> None:
-    """Configure module-level debug filters.
+    """Configure module-level debug filters and color mode from spec strings."""
 
-    `debug_specs` is an iterable of spec strings such as ['2', 'target=when'].
-    """
     global DEBUG_LEVEL, DEBUG_TARGET_CATEGORY, DEBUG_TARGET_WHEN, COLOR
     COLOR = color
     DEBUG_LEVEL = 0
@@ -47,6 +45,8 @@ def _apply_settings(debug_specs: Iterable[str] | None, color: str = "auto") -> N
 
 
 def _color(text: str, level: int) -> str:
+    """Wrap text with ANSI color codes for a given debug level when enabled."""
+
     if not _color_enabled():
         return text
     colors = {1: "\x1b[33m", 2: "\x1b[36m", 3: "\x1b[35m", 4: "\x1b[34m"}
@@ -55,6 +55,8 @@ def _color(text: str, level: int) -> str:
 
 
 def _color_enabled() -> bool:
+    """Return True when ANSI coloring should be enabled based on `COLOR` and stderr TTY status."""
+
     if COLOR == "never":
         return False
     if COLOR == "always":
@@ -66,7 +68,7 @@ def _color_enabled() -> bool:
 
 
 def _echo(level: int, category: str, when_val: str | None, msg: str) -> None:
-    """Conditionally output a debug message to stderr."""
+    """Conditionally output a debug message to stderr according to configured filters and level."""
 
     if DEBUG_LEVEL <= 0:
         return

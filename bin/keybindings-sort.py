@@ -69,6 +69,8 @@ from typing import List, Tuple
 from vscode_keynav import debug as _debug
 from vscode_keynav import io as _io
 from vscode_keynav import keybindings as _keybindings
+from vscode_keynav.keybindings import WhenNode, WhenAnd, WhenOr, WhenNot, WhenLeaf
+
 
 # global memoization cache for canonicalized when results
 
@@ -219,75 +221,8 @@ LEADING_COMMA_RE = re.compile(r'^\s*,+')
 STRIP_WS_RE = re.compile(r'^[ \t\r\n]+|[ \t\r\n]+$')
 LEADING_NEWLINES_RE = re.compile(r'^\n+')
 
-#
-# classes
-#
 
-
-class WhenNode:
-    def __init__(self, parens: bool = False):
-        self.parens = parens
-
-    def _to_str(self) -> str:
-        raise NotImplementedError
-
-
-class WhenAnd(WhenNode):
-    def __init__(self, children, parens: bool = False):
-        super().__init__(parens=parens)
-        self.children = children
-
-    def _to_str(self) -> str:
-        parts: list[str] = []
-        for c in self.children:
-            s = _render_when_node(c)
-            # when an OR appears as an operand of an AND, it must be parenthesized
-            if isinstance(c, WhenOr):
-                s = f'({s})'
-            parts.append(s)
-        return ' && '.join(parts)
-
-
-class WhenLeaf(WhenNode):
-    def __init__(self, text: str, parens: bool = False):
-        super().__init__(parens=parens)
-        self.text = text
-
-    def _to_str(self) -> str:
-        return self.text
-
-
-class WhenNot(WhenNode):
-    def __init__(self, child: WhenNode, parens: bool = False):
-        super().__init__(parens=parens)
-        self.child = child
-
-    def _to_str(self) -> str:
-        child_str = self.child._to_str()
-        if isinstance(self.child, (WhenAnd, WhenOr)) and not self.child.parens:
-            child_str = f'({child_str})'
-        return f'!{child_str}'
-
-
-class WhenOr(WhenNode):
-    def __init__(self, children, parens: bool = False):
-        super().__init__(parens=parens)
-        self.children = children
-
-    def _to_str(self) -> str:
-        parts: list[str] = []
-        for c in self.children:
-            s = _render_when_node(c)
-            # when an AND appears as an operand of an OR, it must be parenthesized
-            if isinstance(c, WhenAnd):
-                s = f'({s})'
-            parts.append(s)
-        return ' || '.join(parts)
-
-
-#
 # function definitions
-#
 
 def _apply_debug_settings(debug_specs: list[str] | None, color: str) -> None:
     """Configure global debug filters and color mode."""
@@ -653,7 +588,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
 
                     if matches:
                         # alphabetical order for multiples
-                        matches.sort(key=lambda t: _natural_key_case_sensitive(
+                        matches.sort(key=lambda t: _keybindings._natural_key_case_sensitive(
                             _render_when_node(t[1])))
                         for m in matches:
                             prioritized.append(m[1])
@@ -677,7 +612,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                             matches.append((idx, child))
 
                     if matches:
-                        matches.sort(key=lambda t: _natural_key_case_sensitive(
+                        matches.sort(key=lambda t: _keybindings._natural_key_case_sensitive(
                             _render_when_node(t[1])))
                         for m in matches:
                             prioritized.append(m[1])
@@ -711,7 +646,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                     base, is_neg, tok = render_base_and_flag(child)
 
                     # natural-style comparison: use _natural_key (case-insensitive)
-                    base_key = _natural_key(base)
+                    base_key = _keybindings._natural_key(base)
 
                     # always preserve grouping as the primary key so sorting does not move operands between buckets.
                     grp = _group_rank(tok)
@@ -742,14 +677,14 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
                         neg_sort = 0 if not is_neg else 1
                         # use token-list ordering (focus/positional/visibility) as sub-rank
                         f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
-                        base_key_cs = _natural_key_case_sensitive(base)
+                        base_key_cs = _keybindings._natural_key_case_sensitive(base)
                         items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
                         continue
 
                     if nm == 'negative':
                         neg_sort = 0 if is_neg else 1
                         f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
-                        base_key_cs = _natural_key_case_sensitive(base)
+                        base_key_cs = _keybindings._natural_key_case_sensitive(base)
                         items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
                         continue
 
@@ -792,7 +727,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
 
             # sort OR operands deterministically so equivalent ASTs render the same
             indexed = list(enumerate(items))
-            indexed.sort(key=lambda it: (_natural_key_case_sensitive(_render_when_node(it[1])), it[0]))
+            indexed.sort(key=lambda it: (_keybindings._natural_key_case_sensitive(_render_when_node(it[1])), it[0]))
             sorted_children = [it[1] for it in indexed]
 
             # remove duplicates while preserving sorted order
@@ -823,9 +758,9 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
 
         # default alpha behavior: preserve _group_rank and use natural-sensitive ordering
         if negation_mode == 'alpha':
-            return (_group_rank(token), sub_rank, _natural_key_case_sensitive(order_token), idx)
+            return (_group_rank(token), sub_rank, _keybindings._natural_key_case_sensitive(order_token), idx)
 
-        return (_group_rank(token), _natural_key_case_sensitive(order_token), idx)
+        return (_group_rank(token), _keybindings._natural_key_case_sensitive(order_token), idx)
 
     # end defs
 
@@ -874,7 +809,7 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
     visibility_tokens = VISIBILITY_TOKENS
 
     # build tree
-    ast = _parse_when(when_val)
+    ast = _keybindings._parse_when(when_val)
     try:
         # debug: dump top-level AND operand ordering before/after sort for inspection
         if DEBUG_LEVEL > 0:
@@ -1198,19 +1133,20 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
         # special-case: when primary is key and secondary is when, ensure strict key-first ordering by returning a simple tuple: (rank, key, when_specificity, when_sortable)
         if primary == 'key' and secondary == 'when':
             norm = _normalize_key_for_compare(key_val)
-            key_token = _natural_key(norm)
-            spec = _when_specificity(when_val)
-            when_token = _natural_key_case_sensitive(sortable_when)
+            key_token = _keybindings._natural_key(norm)
+            spec = _keybindings._when_specificity(when_val)
+            when_token = _keybindings._natural_key_case_sensitive(sortable_when)
             return (0, key_token, spec, when_token)
 
         tokens = []
 
         def append_when():
             if primary == 'when':
-                first_key = _natural_key_case_sensitive(first_when_token)
+                first_key = _keybindings._natural_key_case_sensitive(first_when_token)
 
                 # compute an optional priority rank based on given when_prefixes
                 match_rank = 9999
+                spec_key = _keybindings._when_specificity(when_val)
                 left_id = first_when_token
                 if left_id.startswith('(') and left_id.endswith(')'):
                     left_id = left_id[1:-1].strip()
@@ -1247,14 +1183,14 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                             match_rank = (len(when_prefixes)
                                           if when_prefixes else 0) + i
                             break
-                spec_key = _when_specificity(when_val)
+                    spec_key = _keybindings._when_specificity(when_val)
 
                 tokens.append(match_rank)
                 if negation_mode == 'alpha':
-                    grouping = _natural_key_case_sensitive(sortable_when)
+                    grouping = _keybindings._natural_key_case_sensitive(sortable_when)
                 elif negation_mode == 'natural':
                     base = sortable_when.lstrip('!')
-                    grouping = _natural_key(base)
+                    grouping = _keybindings._natural_key(base)
                 elif negation_mode in ('positive', 'beta', 'positive-natural'):
                     # positive-natural: prefer non-negated then natural base ordering
                     is_neg = 1 if sortable_when.startswith('!') else 0
@@ -1269,9 +1205,9 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                         if lid.startswith('!'):
                             lid = lid[1:].lstrip()
                         f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
-                        grouping = (is_neg, f_rank, _natural_key_case_sensitive(base))
+                        grouping = (is_neg, f_rank, _keybindings._natural_key_case_sensitive(base))
                     else:
-                        grouping = (is_neg, _natural_key(base))
+                        grouping = (is_neg, _keybindings._natural_key(base))
                 elif negation_mode in ('negative', 'negative-natural'):
                     is_neg = 0 if sortable_when.startswith('!') else 1
                     base = sortable_when.lstrip('!')
@@ -1282,17 +1218,17 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                         if lid.startswith('!'):
                             lid = lid[1:].lstrip()
                         f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
-                        grouping = (is_neg, f_rank, _natural_key_case_sensitive(base))
+                        grouping = (is_neg, f_rank, _keybindings._natural_key_case_sensitive(base))
                     else:
-                        grouping = (is_neg, _natural_key(base))
+                        grouping = (is_neg, _keybindings._natural_key(base))
                 else:
-                    grouping = _natural_key_case_sensitive(sortable_when)
+                    grouping = _keybindings._natural_key_case_sensitive(sortable_when)
 
                 # this makes matched groups easier to inspect
                 if match_rank != 9999:
                     # prefer normalized key ordering for stability: modifiers normalized
                     norm_key = _normalize_key_for_compare(key_val)
-                    tokens.append(_natural_key(norm_key))
+                    tokens.append(_keybindings._natural_key(norm_key))
                     tokens.append(spec_key)
                     tokens.append(grouping)
                 else:
@@ -1302,13 +1238,13 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                     tokens.append(grouping)
                 return
 
-            tokens.append(_when_specificity(when_val))
-            tokens.append(_natural_key_case_sensitive(sortable_when))
+            tokens.append(_keybindings._when_specificity(when_val))
+            tokens.append(_keybindings._natural_key_case_sensitive(sortable_when))
 
         def append_key():
             # use normalized key comparison (consistent modifier ordering)
             norm = _normalize_key_for_compare(key_val)
-            tokens.append(_natural_key(norm))
+            tokens.append(_keybindings._natural_key(norm))
 
         # primary
         if primary == 'when':
@@ -1715,38 +1651,6 @@ def _matches_when_entry(left: str, entry: str) -> bool:
     return left == entry
 
 
-def _natural_key(s):
-    """Return a locale-independent natural-sort key (list of ints/strings) for the string."""
-
-    key = str(s)
-    cached = CACHE_NATURAL_KEY.get(key)
-    if cached is not None:
-        return cached
-    parts = NUMBER_SPLIT_RE.split(key)
-    out = [int(text) if text.isdigit() else text.lower() for text in parts]
-    try:
-        CACHE_NATURAL_KEY[key] = out
-    except Exception:
-        pass
-    return out
-
-
-def _natural_key_case_sensitive(s):
-    """Return a case-sensitive natural-sort key for the string."""
-
-    key = str(s)
-    cached = CACHE_NATURAL_KEY_CS.get(key)
-    if cached is not None:
-        return cached
-    parts = NUMBER_SPLIT_RE.split(key)
-    out = [int(text) if text.isdigit() else text for text in parts]
-    try:
-        CACHE_NATURAL_KEY_CS[key] = out
-    except Exception:
-        pass
-    return out
-
-
 def _normalize_key_for_compare(key_value):
     """Lightweight normalization for key sorting."""
 
@@ -1904,77 +1808,6 @@ def _parse_object(obj_text: str):
         return parsed
     except Exception:
         return None
-
-
-def _parse_when(expr: str) -> WhenNode:
-    """Parse a `when` expression into a WhenNode AST (WhenAnd/WhenOr/WhenNot/WhenLeaf)."""
-
-    tokens = _tokenize_when(expr)
-    idx = 0
-
-    def _consume():
-        nonlocal idx
-        t = tokens[idx] if idx < len(tokens) else None
-        idx += 1
-        return t
-
-    def _parse_and():
-        node = _parse_unary()
-        children = [node]
-        while True:
-            t = _peek()
-            if t and t[0] == 'OP' and t[1] == '&&':
-                _consume()
-                children.append(_parse_unary())
-            else:
-                break
-        if len(children) == 1:
-            return children[0]
-        return WhenAnd(children)
-
-    def _parse_or():
-        node = _parse_and()
-        children = [node]
-
-        while True:
-            t = _peek()
-            if t and t[0] == 'OP' and t[1] == '||':
-                _consume()
-                children.append(_parse_and())
-            else:
-                break
-        if len(children) == 1:
-            return children[0]
-        return WhenOr(children)
-
-    def _parse_primary():
-        t = _peek()
-        if not t:
-            return WhenLeaf('')
-        if t[0] == 'OP' and t[1] == '(':
-            _consume()  # (
-            node = _parse_or()
-            next_token = _peek()
-            if next_token and next_token[0] == 'OP' and next_token[1] == ')':
-                _consume()
-                node.parens = True
-            return node
-        if t[0] == 'OPERAND':
-            _consume()
-            return WhenLeaf(t[1])
-        return WhenLeaf('')
-
-    def _parse_unary():
-        t = _peek()
-        if t and t[0] == 'OP' and t[1] == '!':
-            _consume()
-            return WhenNot(_parse_unary())
-        return _parse_primary()
-
-    def _peek():
-        return tokens[idx] if idx < len(tokens) else None
-
-    return _parse_or()
 
 
 def _parse_when_prefixes(parser: argparse.ArgumentParser, raw_prefixes: str | None) -> list[str]:
@@ -2212,7 +2045,7 @@ def _sort_groups_for_primary_when(
         if DEBUG_LEVEL > 0:
             normalized = _normalize_key_for_compare(key_val)
             try:
-                natural = _natural_key(normalized)
+                natural = _keybindings._natural_key(normalized)
             except Exception:
                 natural = normalized
             _debug._echo(
@@ -2226,7 +2059,7 @@ def _sort_groups_for_primary_when(
         key=lambda row: (
             row[2],
             row[1],
-            _natural_key_case_sensitive(row[0]),
+            _keybindings._natural_key_case_sensitive(row[0]),
         )
     )
 
@@ -2323,7 +2156,7 @@ def _sort_groups_for_primary_when(
 
         if j - i > 1 and negation_mode not in ('positive', 'negative'):
             slice_pairs = sorted_groups[i:j]
-            slice_pairs.sort(key=lambda pair: _natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
+            slice_pairs.sort(key=lambda pair: _keybindings._natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
             sorted_groups[i:j] = slice_pairs
 
         i = j
@@ -2458,141 +2291,6 @@ def _strip_when_sorted_comment(comment_text: str, when_changed: bool) -> str:
         return comment_text
 
     return WHEN_SORTED_RE.sub('', comment_text)
-
-
-def _tokenize_when(expr: str):
-    """Tokenize a when expression into OPERAND/OP tokens for parsing into an AST."""
-
-    tokens = []
-    buf = ''
-    i = 0
-    n = len(expr)
-    in_single = False
-    in_double = False
-    in_regex = False
-    regex_escape = False
-    prev_nonspace = ''
-
-    def _flush_buf():
-        nonlocal buf
-        if buf.strip():
-            tokens.append(('OPERAND', _normalize_operand(buf)))
-        buf = ''
-
-    while i < n:
-        ch = expr[i]
-
-        if in_single:
-            buf += ch
-            if ch == '\\':
-                if i + 1 < n:
-                    buf += expr[i + 1]
-                    i += 1
-            elif ch == "'":
-                in_single = False
-            i += 1
-            continue
-
-        if in_double:
-            buf += ch
-            if ch == '\\':
-                if i + 1 < n:
-                    buf += expr[i + 1]
-                    i += 1
-            elif ch == '"':
-                in_double = False
-            i += 1
-            continue
-
-        if in_regex:
-            buf += ch
-            if regex_escape:
-                regex_escape = False
-            elif ch == '\\':
-                regex_escape = True
-            elif ch == '/':
-                in_regex = False
-            i += 1
-            continue
-
-        if ch.isspace():
-            buf += ch
-            i += 1
-            continue
-
-        if ch == "'":
-            in_single = True
-            buf += ch
-            i += 1
-            continue
-
-        if ch == '"':
-            in_double = True
-            buf += ch
-            i += 1
-            continue
-
-        if ch == '/' and prev_nonspace == '~':
-            in_regex = True
-            buf += ch
-            i += 1
-            continue
-
-        if expr.startswith('&&', i) or expr.startswith('||', i):
-            _flush_buf()
-            tokens.append(('OP', expr[i:i + 2]))
-            i += 2
-            prev_nonspace = ''
-            continue
-
-        if ch in '()':
-            _flush_buf()
-            tokens.append(('OP', ch))
-            i += 1
-            prev_nonspace = ch
-            continue
-
-        if ch == '!':
-            nxt = expr[i + 1] if i + 1 < n else ''
-            if nxt == '=':
-                buf += ch
-                i += 1
-                prev_nonspace = ch
-                continue
-            if not buf.strip():
-                _flush_buf()
-                tokens.append(('OP', '!'))
-                i += 1
-                prev_nonspace = '!'
-                continue
-
-        buf += ch
-        if not ch.isspace():
-            prev_nonspace = ch
-        i += 1
-
-    _flush_buf()
-
-    return tokens
-
-
-def _when_specificity(when_val: str) -> Tuple[int]:
-    """Heuristic specificity scorer for a when clause. Lower is broader."""
-
-    key = '' if when_val is None else str(when_val)
-    cached = CACHE_WHEN_SPECIFICITY.get(key)
-    if cached is not None:
-        return cached
-    if not key:
-        res = (0,)
-    else:
-        term_count = len(WHEN_TERM_SPLIT_RE.split(key.strip()))
-        res = (term_count,)
-    try:
-        CACHE_WHEN_SPECIFICITY[key] = res
-    except Exception:
-        pass
-    return res
 
 
 def _with_normalized_when_groups(
@@ -2832,7 +2530,7 @@ def main(argv: List[str] | None = None) -> int:
                             when_prefixes=when_prefixes,
                             when_regexes=when_regexes,
                         ),
-                        _natural_key_case_sensitive(_normalize_key_for_compare(_extract_key_when_from_object(pair[1])[0])),
+                        _keybindings._natural_key_case_sensitive(_normalize_key_for_compare(_extract_key_when_from_object(pair[1])[0])),
                     ),
                 )
             except Exception:

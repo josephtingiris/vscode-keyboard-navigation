@@ -14,10 +14,8 @@ from typing import Optional, Union
 
 
 def _read_input_text(path: Union[str, Path, None]) -> Optional[str]:
-    """Read UTF-8 text from a path or from piped stdin.
+    """Read UTF-8 text from a file path or from piped stdin, returning None if no input."""
 
-    Returns the text or None when no input was provided (tty stdin and no path).
-    """
     if path:
         p = Path(path)
         return p.read_text(encoding="utf-8")
@@ -28,7 +26,8 @@ def _read_input_text(path: Union[str, Path, None]) -> Optional[str]:
 
 
 def _write_output_text(path: Union[str, Path, None], text: str) -> None:
-    """Write UTF-8 text to a path or stdout when path is None."""
+    """Write UTF-8 text to a file when `path` is provided, otherwise write to stdout."""
+
     if path:
         p = Path(path)
         p.write_text(text, encoding="utf-8")
