@@ -19,6 +19,10 @@ from vscode_keynav import io as _io
 # globals & constants
 #
 
+# CLI-level per-run caches to avoid repeated parsing/regex work across hot loops
+_CLI_RUN_OBJ_INFO_CACHE: dict = {}
+_CLI_RUN_OBJ_MATCH_CACHE: dict = {}
+
 # token groups and maps used by canonicalization heuristics
 
 FOCUS_TOKENS = [
@@ -544,6 +548,50 @@ def _decode_json_string_literal(raw: str) -> str:
     return val
 
 
+def _embed_duplicate_comment_in_object(obj_text: str, duplicate_comment: str) -> str:
+    """Insert a 'duplicate' line comment immediately inside an object's opening brace."""
+
+    if not duplicate_comment:
+        return obj_text
+
+    line_comment = duplicate_comment.strip()
+    if not line_comment:
+        return obj_text
+    if not line_comment.startswith('//'):
+        line_comment = f'// {line_comment}'
+
+    lines = obj_text.splitlines(keepends=True)
+    if not lines:
+        return obj_text
+
+    open_idx = -1
+    for idx, line in enumerate(lines):
+        if '{' in line:
+            open_idx = idx
+            break
+
+    if open_idx == -1:
+        return obj_text
+
+    indent = ''
+    for idx in range(open_idx + 1, len(lines)):
+        stripped = lines[idx].strip()
+        if not stripped:
+            continue
+        if stripped.startswith('}'):
+            break
+        indent = lines[idx][:len(lines[idx]) - len(lines[idx].lstrip(' \t'))]
+        break
+
+    if not indent:
+        opener = lines[open_idx]
+        base_indent = opener[:len(opener) - len(opener.lstrip(' \t'))]
+        indent = base_indent + '    '
+
+    lines.insert(open_idx + 1, f'{indent}{line_comment}\n')
+    return ''.join(lines)
+
+
 def _extract_key_when_from_object(obj_text: str) -> Tuple[str, str]:
     """Return a tuple of literal `(key, when)` values extracted from an object text."""
 
@@ -582,6 +630,389 @@ def _extract_modifiers_from_object(obj_text: str) -> tuple[tuple[str, ...], str]
     lit_key = _normalize_key_for_compare(lit)
 
     return (mods, lit_key)
+
+
+def _extract_preamble_postamble(text):
+    """Return sliced preamble, array_text, and postamble."""
+
+    # optimized single-pass scanner with local variables bound for speed
+    n = len(text)
+    i = 0
+    start = -1
+    in_line = False
+    in_block = False
+    in_str = False
+    esc = False
+    str_char = ''
+
+    while i < n:
+        ch = text[i]
+        nxt = text[i + 1] if i + 1 < n else ''
+
+        if in_line:
+            if ch == '\n':
+                in_line = False
+            i += 1
+            continue
+        if in_block:
+            if ch == '*' and nxt == '/':
+                in_block = False
+                i += 2
+            else:
+                i += 1
+            continue
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == '\\':
+                esc = True
+            elif ch == str_char:
+                in_str = False
+            i += 1
+            continue
+
+        if ch == '/' and nxt == '/':
+            in_line = True
+            i += 2
+            continue
+        if ch == '/' and nxt == '*':
+            in_block = True
+            i += 2
+            continue
+        if ch == '"' or ch == "'":
+            in_str = True
+            str_char = ch
+            i += 1
+            continue
+        if ch == '[':
+            start = i
+            break
+        i += 1
+
+    if start == -1:
+        return '', '', text
+
+    # scan for matching closing bracket
+    depth = 1
+    i = start + 1
+    in_line = False
+    in_block = False
+    in_str = False
+    esc = False
+    str_char = ''
+    end = -1
+
+    while i < n:
+        ch = text[i]
+        nxt = text[i + 1] if i + 1 < n else ''
+
+        if in_line:
+            if ch == '\n':
+                in_line = False
+            i += 1
+            continue
+        if in_block:
+            if ch == '*' and nxt == '/':
+                in_block = False
+                i += 2
+            else:
+                i += 1
+            continue
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == '\\':
+                esc = True
+            elif ch == str_char:
+                in_str = False
+            i += 1
+            continue
+
+        if ch == '/' and nxt == '/':
+            in_line = True
+            i += 2
+            continue
+        if ch == '/' and nxt == '*':
+            in_block = True
+            i += 2
+            continue
+        if ch == '"' or ch == "'":
+            in_str = True
+            str_char = ch
+            i += 1
+            continue
+        if ch == '[':
+            depth += 1
+        elif ch == ']':
+            depth -= 1
+            if depth == 0:
+                end = i
+                break
+        i += 1
+
+    if end == -1:
+        return '', '', text
+
+    return text[:start], text[start + 1:end], text[end + 1:]
+
+
+def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondary: str | None = None, grouping: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple:
+    """Return a computed stable sort key tuple for the object text."""
+
+    info = _get_run_obj_info(
+        obj_text,
+        grouping_mode=grouping,
+        negation_mode=negation_mode,
+        when_prefixes=when_prefixes,
+        when_regexes=when_regexes,
+    )
+
+    key_val = info.get('key', '')
+    when_val = info.get('when', '')
+    canonical_when = info.get('canonical', '')
+    sortable_when = info.get('sortable', '')
+    parsed = info.get('parsed')
+
+    if not parsed:
+        # return a consistent fallback sort key (rank high so these sort last)
+        return (9999, [], (0,), [])
+
+    # main token-building logic
+    try:
+        # derive the first top-level when token for grouping when primary sorting
+        first_when_token = ''
+        if canonical_when:
+            parts = _io._WHEN_TERM_SPLIT_RE.split(canonical_when.strip())
+            if parts:
+                first_when_token = parts[0].strip()
+                # remove surrounding parentheses and leading negation for grouping
+                while first_when_token.startswith('(') and first_when_token.endswith(')'):
+                    first_when_token = first_when_token[1:-1].strip()
+                if first_when_token.startswith('!'):
+                    first_when_token = first_when_token[1:].lstrip()
+
+        # special-case: when primary is key and secondary is when, ensure strict key-first ordering by returning a simple tuple: (rank, key, when_specificity, when_sortable)
+        if primary == 'key' and secondary == 'when':
+            norm = _normalize_key_for_compare(key_val)
+            key_token = _natural_key(norm)
+            spec = _when_specificity(when_val)
+            when_token = _natural_key_case_sensitive(sortable_when)
+            return (0, key_token, spec, when_token)
+
+        tokens = []
+
+        def append_when():
+            if primary == 'when':
+                first_key = _natural_key_case_sensitive(first_when_token)
+
+                # compute an optional priority rank based on given when_prefixes
+                match_rank = 9999
+                spec_key = _when_specificity(when_val)
+                left_id = first_when_token
+                if left_id.startswith('(') and left_id.endswith(')'):
+                    left_id = left_id[1:-1].strip()
+                if left_id.startswith('!'):
+                    left_id = left_id[1:].lstrip()
+                if when_prefixes:
+                    for i, pref in enumerate(when_prefixes):
+                        if not pref:
+                            continue
+                        # support literal prefix ending in '.' to match startswith
+                        if pref.endswith('.'):
+                            if left_id.startswith(pref):
+                                match_rank = i
+                                break
+                        elif '<viewId>' in pref:
+                            prefix, suffix = pref.split('<viewId>', 1)
+                            if left_id.startswith(prefix) and left_id.endswith(suffix):
+                                match_rank = i
+                                break
+                        else:
+                            if left_id == pref:
+                                match_rank = i
+                                break
+                if when_regexes and match_rank == 9999:
+                    for i, pat in enumerate(when_regexes):
+                        try:
+                            ok = pat.search(left_id)
+                        except Exception:
+                            try:
+                                ok = re.search(pat, left_id)
+                            except Exception:
+                                ok = False
+                        if ok:
+                            match_rank = (len(when_prefixes)
+                                          if when_prefixes else 0) + i
+                            break
+                    spec_key = _when_specificity(when_val)
+
+                tokens.append(match_rank)
+                if negation_mode == 'alpha':
+                    grouping = _natural_key_case_sensitive(sortable_when)
+                elif negation_mode == 'natural':
+                    base = sortable_when.lstrip('!')
+                    grouping = _natural_key(base)
+                elif negation_mode in ('positive', 'beta', 'positive-natural'):
+                    # positive-natural: prefer non-negated then natural base ordering
+                    is_neg = 1 if sortable_when.startswith('!') else 0
+                    base = sortable_when.lstrip('!')
+
+                    # prioritize token-list ordering (FOCUS -> POSITIONAL -> VISIBILITY)
+                    if negation_mode == 'positive':
+                        # compute sub-rank based on the first_when_token
+                        lid = first_when_token
+                        if lid.startswith('(') and lid.endswith(')'):
+                            lid = lid[1:-1].strip()
+                        if lid.startswith('!'):
+                            lid = lid[1:].lstrip()
+                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
+                        grouping = (is_neg, f_rank, _natural_key_case_sensitive(base))
+                    else:
+                        grouping = (is_neg, _natural_key(base))
+                elif negation_mode in ('negative', 'negative-natural'):
+                    is_neg = 0 if sortable_when.startswith('!') else 1
+                    base = sortable_when.lstrip('!')
+                    if negation_mode == 'negative':
+                        lid = first_when_token
+                        if lid.startswith('(') and lid.endswith(')'):
+                            lid = lid[1:-1].strip()
+                        if lid.startswith('!'):
+                            lid = lid[1:].lstrip()
+                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
+                        grouping = (is_neg, f_rank, _natural_key_case_sensitive(base))
+                    else:
+                        grouping = (is_neg, _natural_key(base))
+                else:
+                    grouping = _natural_key_case_sensitive(sortable_when)
+
+                # this makes matched groups easier to inspect
+                if match_rank != 9999:
+                    # prefer normalized key ordering for stability: modifiers normalized
+                    norm_key = _normalize_key_for_compare(key_val)
+                    tokens.append(_natural_key(norm_key))
+                    tokens.append(spec_key)
+                    tokens.append(grouping)
+                else:
+                    # default behavior: include first_when token so grouping remains primary, then specificity and grouping ordering
+                    tokens.append(first_key)
+                    tokens.append(spec_key)
+                    tokens.append(grouping)
+                return
+
+            tokens.append(_when_specificity(when_val))
+            tokens.append(_natural_key_case_sensitive(sortable_when))
+
+        def append_key():
+            # use normalized key comparison (consistent modifier ordering)
+            norm = _normalize_key_for_compare(key_val)
+            tokens.append(_natural_key(norm))
+
+        # primary
+        if primary == 'when':
+            append_when()
+        else:
+            append_key()
+
+        # secondary (if provided and different)
+        if secondary and secondary != primary:
+            if secondary == 'when':
+                append_when()
+            else:
+                append_key()
+
+        # append any remaining fields not yet included
+        if 'when' not in (primary, secondary):
+            append_when()
+        if 'key' not in (primary, secondary):
+            append_key()
+
+        if tokens:
+            if not isinstance(tokens[0], int):
+                # prefer a low rank when primary is 'key'
+                if primary == 'key':
+                    tokens.insert(0, 0)
+                else:
+                    tokens.insert(0, 9999)
+
+        return tuple(tokens)
+    except Exception:
+        # return a key with the same structural types as a normal sort key: (int rank, list key, tuple specificity, list grouping)
+        return (9999, [], (0,), [])
+
+
+def _get_run_obj_info(
+    obj_text: str,
+    grouping_mode: str = 'config-first',
+    negation_mode: str = 'alpha',
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> dict:
+    """Return per-run cached object metadata for the current sorting context."""
+
+    # prefer a CLI-local cache keyed by object text and current run context
+    run_ctx = RUN_CACHE_CONTEXT if RUN_CACHE_CONTEXT else None
+    cache_key = (obj_text, run_ctx)
+    info = _CLI_RUN_OBJ_INFO_CACHE.get(cache_key)
+    if info is not None:
+        return info
+
+    # fall back to package-level per-object cache (by raw obj_text)
+    info = RUN_OBJ_INFO_CACHE.get(obj_text)
+    if info is not None:
+        try:
+            _CLI_RUN_OBJ_INFO_CACHE[cache_key] = info
+        except Exception:
+            pass
+        return info
+
+    parsed = _parse_object(obj_text)
+    key_val = ''
+    when_val = ''
+    canonical_when = ''
+    sortable_when = ''
+
+    if parsed:
+        try:
+            key_val = str(parsed.get('key', ''))
+            when_val = str(parsed.get('when', ''))
+        except Exception:
+            key_val = ''
+            when_val = ''
+
+    if when_val:
+        canonical_when = _canonicalize_when(
+            when_val,
+            mode=grouping_mode,
+            negation_mode=negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        )
+        sortable_when = _sortable_when_key(
+            when_val,
+            mode=grouping_mode,
+            negation_mode=negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        )
+
+    info = {
+        'parsed': parsed,
+        'key': key_val,
+        'when': when_val,
+        'canonical': canonical_when,
+        'sortable': sortable_when,
+    }
+
+    try:
+        RUN_OBJ_INFO_CACHE[obj_text] = info
+    except Exception:
+        pass
+    try:
+        _CLI_RUN_OBJ_INFO_CACHE[cache_key] = info
+    except Exception:
+        pass
+
+    return info
 
 
 def _get_run_obj_match_info(obj_text: str) -> dict:
@@ -771,6 +1202,77 @@ def _normalize_key_for_compare(key_value: str) -> str:
             out_chords.append(lit)
 
     return " ".join(out_chords)
+
+
+def _normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple[str, bool]:
+    """Canonicalize the `when` value inside an object text and return (new_text, changed)."""
+
+    parsed = _parse_object(obj_text)
+    if not parsed or 'when' not in parsed:
+        return obj_text, False
+
+    when_val = parsed.get('when')
+    if not when_val:
+        return obj_text, False
+
+    normalized = _canonicalize_when(
+        str(when_val), mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+    if normalized == when_val:
+        return obj_text, False
+
+    # safely locate and replace the string literal for the `when` value
+    idx = obj_text.find('"when"')
+    if idx == -1:
+        return obj_text, False
+    # find the colon after the key
+    colon = obj_text.find(':', idx)
+    if colon == -1:
+        return obj_text, False
+
+    i = colon + 1
+    n = len(obj_text)
+
+    # skip whitespace/comments to find opening quote
+    while i < n:
+        if obj_text.startswith('//', i):
+            i2 = obj_text.find('\n', i)
+            i = i2 + 1 if i2 != -1 else n
+            continue
+        if obj_text.startswith('/*', i):
+            i2 = obj_text.find('*/', i + 2)
+            i = (i2 + 2) if i2 != -1 else n
+            continue
+        if obj_text[i].isspace():
+            i += 1
+            continue
+        break
+
+    if i >= n or obj_text[i] != '"':
+        return obj_text, False
+
+    qstart = i
+
+    # find matching closing quote, honoring backslash escapes
+    j = qstart + 1
+    while j < n:
+        ch = obj_text[j]
+        if ch == '\\':
+            j += 2
+            continue
+        if ch == '"':
+            break
+        j += 1
+    if j >= n:
+        return obj_text, False
+
+    # build JSON-escaped inner string reliably
+    try:
+        escaped = json.dumps(normalized)[1:-1]
+    except Exception:
+        escaped = normalized.replace('\\', '\\\\').replace('"', '\\"')
+
+    new_obj = obj_text[:qstart + 1] + escaped + obj_text[j:]
+    return new_obj, True
 
 
 def _parse_jsonc(text: str):
@@ -1159,3 +1661,40 @@ def _operand_match_signature(token: str, run_ctx) -> tuple[str, bool, tuple[int,
     except Exception:
         pass
     return res
+
+
+def _with_normalized_when_groups(
+    groups: list[tuple[str, str]],
+    grouping_mode: str,
+    negation_mode: str,
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> list[tuple[str, str]]:
+    """Normalize the when clauses across a list of groups and return the resulting list."""
+
+    normalized_groups: list[tuple[str, str]] = []
+    for comments, obj in groups:
+        obj_out = obj.rstrip()
+        obj_out, when_changed = _normalize_when_in_object(
+            obj_out,
+            mode=grouping_mode,
+            negation_mode=negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        )
+        comments = _strip_when_sorted_comment(comments, when_changed)
+        normalized_groups.append((comments, obj_out))
+
+        # warm the per-run object cache for downstream sort and grouping passes
+        try:
+            _ = _get_run_obj_info(
+                obj_out,
+                grouping_mode=grouping_mode,
+                negation_mode=negation_mode,
+                when_prefixes=when_prefixes,
+                when_regexes=when_regexes,
+            )
+        except Exception:
+            pass
+
+    return normalized_groups

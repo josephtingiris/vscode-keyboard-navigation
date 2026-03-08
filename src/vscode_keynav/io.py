@@ -11,31 +11,29 @@ from pathlib import Path
 import re
 import sys
 
-from typing import Optional, Union
+from typing import Optional, Union, Pattern
 
 #
 # globals & constants
 #
 
 
-# NOTE: prefer adding more parsing/formatting helpers here rather than scattering regexes across multiple modules.
+# prefer adding more parsing/formatting regexes here rather than scattering them across multiple modules
 
-_RE_PATTERNS = {
-    '_WHEN_LITERAL_RE': (r'("when"\s*:\s*\")((?:\\.|[^"\\])*)(\")', 0),
-    '_WHITESPACE_RE': (r"\s+", 0),
-    '_WHEN_SORTED_RE': (r'^\s*//\s*when-sorted:.*\n', re.MULTILINE),
-    '_BLANK_LINES_RE': (r'(?m)^[ \t]*\n+', 0),
-    '_LEADING_COMMA_RE': (r'^\s*,+', 0),
-    '_STRIP_WS_RE': (r'^[ \t\r\n]+|[ \t\r\n]+$', 0),
-    '_LEADING_NEWLINES_RE': (r'^\n+', 0),
-    '_NUMBER_SPLIT_RE': (r"(\d+)", 0),
-    '_WHEN_TERM_SPLIT_RE': (r"\s*&&\s*|\s*\|\|\s*", 0),
-    '_COMMENT_RE': (r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)', re.DOTALL | re.MULTILINE),
-    '_TRAILING_COMMA_RE': (r',\s*([}\]])', 0),
-    '_OBJ_RE': (r'\{.*\}', re.DOTALL),
-    '_KEY_EXTRACT_RE': (r'"key"\s*:\s*"((?:\\.|[^"\\])*)"', 0),
-    '_WHEN_EXTRACT_RE': (r'"when"\s*:\s*"((?:\\.|[^"\\])*)"', 0),
-}
+_BLANK_LINES_RE = re.compile(r'(?m)^[ \t]*\n+', 0)
+_COMMENT_RE = re.compile(r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)', re.DOTALL | re.MULTILINE)
+_KEY_EXTRACT_RE = re.compile(r'"key"\s*:\s*"((?:\\.|[^"\\])*)"', 0)
+_LEADING_COMMA_RE = re.compile(r'^\s*,+', 0)
+_LEADING_NEWLINES_RE = re.compile(r'^\n+', 0)
+_NUMBER_SPLIT_RE = re.compile(r"(\d+)", 0)
+_OBJ_RE = re.compile(r'\{.*\}', re.DOTALL)
+_STRIP_WS_RE = re.compile(r'^[ \t\r\n]+|[ \t\r\n]+$', 0)
+_TRAILING_COMMA_RE = re.compile(r',\s*([}\]])', 0)
+_WHEN_EXTRACT_RE = re.compile(r'"when"\s*:\s*"((?:\\.|[^"\\])*)"', 0)
+_WHEN_LITERAL_RE = re.compile(r'("when"\s*:\s*\")(?:\\.|[^"\\])*(\")', 0)
+_WHEN_SORTED_RE = re.compile(r'^\s*//\s*when-sorted:.*\n', re.MULTILINE)
+_WHEN_TERM_SPLIT_RE = re.compile(r"\s*&&\s*|\s*\|\|\s*", 0)
+_WHITESPACE_RE = re.compile(r"\s+", 0)
 
 
 #
@@ -43,18 +41,10 @@ _RE_PATTERNS = {
 #
 
 
-def __getattr__(name: str):
-    """Lazily compile and cache regex attributes on first access.
+def _normalize_whitespace(text: str) -> str:
+    """Return the input string with all whitespace collapsed to single spaces and trimmed."""
 
-    This reduces import-time overhead by deferring regex compilation until used.
-    """
-    if name in _RE_PATTERNS:
-        pattern, flags = _RE_PATTERNS[name]
-        compiled = re.compile(pattern, flags)
-        globals()[name] = compiled
-        return compiled
-
-    raise AttributeError(name)
+    return _WHITESPACE_RE.sub(' ', text).strip() if text else ''
 
 
 def _read_input_text(path: Union[str, Path, None]) -> Optional[str]:
