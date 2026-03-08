@@ -27,7 +27,7 @@ _CLI_RUN_OBJ_MATCH_CACHE: dict = {}
 
 # token groups and maps used by canonicalization heuristics
 
-FOCUS_TOKENS = [
+_FOCUS_TOKENS = [
     'auxiliaryBarFocus',
     'terminalFocus',
     'sideBarFocus',
@@ -43,7 +43,7 @@ FOCUS_TOKENS = [
     'textInputFocus',
 ]
 
-POSITIONAL_TOKENS = [
+_POSITIONAL_TOKENS = [
     'config.workbench.activityBar.location',
     'config.workbench.sideBar.location',
     'panel.location',
@@ -60,7 +60,7 @@ POSITIONAL_TOKENS = [
     'config.keyboardNavigation.terminal.enabled',
 ]
 
-VISIBILITY_TOKENS = [
+_VISIBILITY_TOKENS = [
     'chatIsEnabled',
     'auxiliaryBarVisible',
     'editorVisible',
@@ -79,9 +79,9 @@ VISIBILITY_TOKENS = [
 
 # precomputed maps
 
-FOCUS_TOKENS_MAP = {t: i for i, t in enumerate(FOCUS_TOKENS)}
-POSITIONAL_TOKENS_MAP = {t: i for i, t in enumerate(POSITIONAL_TOKENS)}
-VISIBILITY_TOKENS_MAP = {t: i for i, t in enumerate(VISIBILITY_TOKENS)}
+_FOCUS_TOKENS_MAP = {t: i for i, t in enumerate(_FOCUS_TOKENS)}
+_POSITIONAL_TOKENS_MAP = {t: i for i, t in enumerate(_POSITIONAL_TOKENS)}
+_VISIBILITY_TOKENS_MAP = {t: i for i, t in enumerate(_VISIBILITY_TOKENS)}
 
 # re-usable caches
 
@@ -250,7 +250,7 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
         if mode == 'focal-invariant':
             if _is_focus(left):
                 return 1
-            if any(left.startswith(p) for p in POSITIONAL_TOKENS):
+            if any(left.startswith(p) for p in _POSITIONAL_TOKENS):
                 return 2
             if _is_visibility(left):
                 return 3
@@ -260,7 +260,7 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
 
         if left.startswith('config.'):
             return 1
-        if any(left.startswith(p) for p in POSITIONAL_TOKENS):
+        if any(left.startswith(p) for p in _POSITIONAL_TOKENS):
             return 2
         if _is_focus(left):
             return 3
@@ -269,10 +269,10 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
         return 5
 
     def _is_focus(left: str) -> bool:
-        return any(_matches_entry(left, entry) for entry in FOCUS_TOKENS)
+        return any(_matches_entry(left, entry) for entry in _FOCUS_TOKENS)
 
     def _is_visibility(left: str) -> bool:
-        return any(_matches_entry(left, entry) for entry in VISIBILITY_TOKENS)
+        return any(_matches_entry(left, entry) for entry in _VISIBILITY_TOKENS)
 
     def _left_identifier(text: str) -> str:
         t = text.strip()
@@ -370,7 +370,7 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
                     base_key = _natural_key(base)
                     grp = _group_rank(tok)
                     lid = _left_id_of(child)
-                    f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
+                    f_rank = _FOCUS_TOKENS_MAP.get(lid, _POSITIONAL_TOKENS_MAP.get(lid, _VISIBILITY_TOKENS_MAP.get(lid, 9999)))
 
                     if nm == 'natural':
                         items_with_keys.append((idx, child, (grp, f_rank, base_key, idx, tok)))
@@ -388,14 +388,14 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
 
                     if nm == 'positive':
                         neg_sort = 0 if not is_neg else 1
-                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
+                        f_rank = _FOCUS_TOKENS_MAP.get(lid, _POSITIONAL_TOKENS_MAP.get(lid, _VISIBILITY_TOKENS_MAP.get(lid, 9999)))
                         base_key_cs = _natural_key_case_sensitive(base)
                         items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
                         continue
 
                     if nm == 'negative':
                         neg_sort = 0 if is_neg else 1
-                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
+                        f_rank = _FOCUS_TOKENS_MAP.get(lid, _POSITIONAL_TOKENS_MAP.get(lid, _VISIBILITY_TOKENS_MAP.get(lid, 9999)))
                         base_key_cs = _natural_key_case_sensitive(base)
                         items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
                         continue
@@ -455,7 +455,7 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
         token = _render_when_node(node)
         order_token = token[1:] if token.startswith('!') else token
         left_id = _left_identifier(token)
-        sub_rank = FOCUS_TOKENS_MAP.get(left_id, POSITIONAL_TOKENS_MAP.get(left_id, VISIBILITY_TOKENS_MAP.get(left_id, 9999)))
+        sub_rank = _FOCUS_TOKENS_MAP.get(left_id, _POSITIONAL_TOKENS_MAP.get(left_id, _VISIBILITY_TOKENS_MAP.get(left_id, 9999)))
         if negation_mode == 'alpha':
             return (_group_rank(token), sub_rank, _natural_key_case_sensitive(order_token), idx)
         return (_group_rank(token), _natural_key_case_sensitive(order_token), idx)
@@ -484,9 +484,9 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
     except Exception:
         pass
 
-    focus_tokens = FOCUS_TOKENS
-    positional_tokens = POSITIONAL_TOKENS
-    visibility_tokens = VISIBILITY_TOKENS
+    focus_tokens = _FOCUS_TOKENS
+    positional_tokens = _POSITIONAL_TOKENS
+    visibility_tokens = _VISIBILITY_TOKENS
 
     ast = _parse_when(when_val)
 
@@ -867,7 +867,7 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                             lid = lid[1:-1].strip()
                         if lid.startswith('!'):
                             lid = lid[1:].lstrip()
-                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
+                        f_rank = _FOCUS_TOKENS_MAP.get(lid, _POSITIONAL_TOKENS_MAP.get(lid, _VISIBILITY_TOKENS_MAP.get(lid, 9999)))
                         grouping = (is_neg, f_rank, _natural_key_case_sensitive(base))
                     else:
                         grouping = (is_neg, _natural_key(base))
@@ -880,7 +880,7 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                             lid = lid[1:-1].strip()
                         if lid.startswith('!'):
                             lid = lid[1:].lstrip()
-                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
+                        f_rank = _FOCUS_TOKENS_MAP.get(lid, _POSITIONAL_TOKENS_MAP.get(lid, _VISIBILITY_TOKENS_MAP.get(lid, 9999)))
                         grouping = (is_neg, f_rank, _natural_key_case_sensitive(base))
                     else:
                         grouping = (is_neg, _natural_key(base))
@@ -1008,11 +1008,11 @@ def _first_when_group_rank(
     left_id = left.split()[0]
 
     if mode == 'focal-invariant':
-        if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
+        if any(_matches_when_entry(left_id, entry) for entry in _FOCUS_TOKENS):
             return 1  # Focus tokens have the highest priority
-        if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
+        if any(left_id.startswith(prefix) for prefix in _POSITIONAL_TOKENS):
             return 2  # Positional tokens are next in priority
-        if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
+        if any(_matches_when_entry(left_id, entry) for entry in _VISIBILITY_TOKENS):
             return 3  # Visibility tokens follow
         if left_id.startswith('config.'):
             return 4  # Config tokens are lower priority
@@ -1020,11 +1020,11 @@ def _first_when_group_rank(
 
     if left_id.startswith('config.'):
         return 1
-    if any(_matches_when_entry(left_id, entry) for entry in FOCUS_TOKENS):
+    if any(_matches_when_entry(left_id, entry) for entry in _FOCUS_TOKENS):
         return 2
-    if any(left_id.startswith(prefix) for prefix in POSITIONAL_TOKENS):
+    if any(left_id.startswith(prefix) for prefix in _POSITIONAL_TOKENS):
         return 3
-    if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
+    if any(_matches_when_entry(left_id, entry) for entry in _VISIBILITY_TOKENS):
         return 4
     return 5
 
@@ -2040,7 +2040,7 @@ def _operand_match_signature(token: str, run_ctx) -> tuple[str, bool, tuple[int,
     left = t[1:].lstrip() if t.startswith('!') else t
     left_id = left.split()[0] if left else ''
 
-    has_focus = any(_matches_entry(left_id, entry) for entry in FOCUS_TOKENS) if left_id else False
+    has_focus = any(_matches_entry(left_id, entry) for entry in _FOCUS_TOKENS) if left_id else False
 
     prefix_idxs: set[int] = set()
     regex_idxs: set[int] = set()
