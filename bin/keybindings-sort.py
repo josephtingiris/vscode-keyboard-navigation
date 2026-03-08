@@ -70,6 +70,10 @@ from vscode_keynav import debug as _debug
 from vscode_keynav import io as _io
 from vscode_keynav import keybindings as _keybindings
 
+# CLI-level per-run caches to avoid repeated parsing/regex work across hot loops
+_CLI_RUN_OBJ_INFO_CACHE: dict = {}
+_CLI_RUN_OBJ_MATCH_CACHE: dict = {}
+
 # global modifier order, i.e. ctrl+shift, ctrl+shift+alt, ctrl+shift+alt+meta
 
 CANONICAL_MODIFIER_ORDER = ['ctrl', 'shift', 'alt', 'meta']
@@ -882,8 +886,20 @@ def _get_run_obj_info(
 ) -> dict:
     """Return per-run cached object metadata for the current sorting context."""
 
+    # prefer a CLI-local cache keyed by object text and current run context
+    run_ctx = _keybindings.RUN_CACHE_CONTEXT if _keybindings.RUN_CACHE_CONTEXT else None
+    cache_key = (obj_text, run_ctx)
+    info = _CLI_RUN_OBJ_INFO_CACHE.get(cache_key)
+    if info is not None:
+        return info
+
+    # fall back to package-level per-object cache (by raw obj_text)
     info = _keybindings.RUN_OBJ_INFO_CACHE.get(obj_text)
     if info is not None:
+        try:
+            _CLI_RUN_OBJ_INFO_CACHE[cache_key] = info
+        except Exception:
+            pass
         return info
 
     parsed = _keybindings._parse_object(obj_text)
@@ -928,81 +944,39 @@ def _get_run_obj_info(
         _keybindings.RUN_OBJ_INFO_CACHE[obj_text] = info
     except Exception:
         pass
+    try:
+        _CLI_RUN_OBJ_INFO_CACHE[cache_key] = info
+    except Exception:
+        pass
 
     return info
 
 
 def _get_run_obj_match_info(obj_text: str) -> dict:
     """Return per-run cached focus and prefix or regex match signatures for an object text."""
-
-    info = _get_run_obj_info(obj_text)
-    cached = info.get('match_info')
+    # prefer a CLI-local cache keyed by object text and current run context
+    run_ctx = _keybindings.RUN_CACHE_CONTEXT if _keybindings.RUN_CACHE_CONTEXT else None
+    cache_key = (obj_text, run_ctx)
+    cached = _CLI_RUN_OBJ_MATCH_CACHE.get(cache_key)
     if cached is not None:
         return cached
 
-    when_val = info.get('when', '')
-    if not when_val:
-        when_val = _keybindings._extract_literal_when_from_object(obj_text)
-
-    left_ids: list[str] = []
-    prefix_idxs: set[int] = set()
-    regex_idxs: set[int] = set()
-    has_focus = False
-
+    # delegate to package-level implementation which has its own per-run cache
     try:
-        parts = _io._WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
-        for part in parts:
-            token = part.strip()
-            while token.startswith('(') and token.endswith(')'):
-                token = token[1:-1].strip()
-            if not token:
-                continue
-
-            left = token[1:].lstrip() if token.startswith('!') else token
-            left_id = left.split()[0] if left else ''
-            if not left_id:
-                continue
-
-            left_ids.append(left_id)
-
-            if not has_focus and any(_matches_when_entry(left_id, entry) for entry in _keybindings.FOCUS_TOKENS):
-                has_focus = True
-
-            run_prefixes = _keybindings.RUN_CACHE_CONTEXT[2] if _keybindings.RUN_CACHE_CONTEXT else None
-            if run_prefixes:
-                for idx, prefix in enumerate(run_prefixes):
-                    try:
-                        if left_id.startswith(prefix):
-                            prefix_idxs.add(idx)
-                    except Exception:
-                        continue
-
-            run_regexes = _keybindings.RUN_CACHE_CONTEXT[3] if _keybindings.RUN_CACHE_CONTEXT else None
-            if run_regexes:
-                for idx, rx in enumerate(run_regexes):
-                    try:
-                        if hasattr(rx, 'search'):
-                            if rx.search(left_id):
-                                regex_idxs.add(idx)
-                        else:
-                            if str(rx) in left_id:
-                                regex_idxs.add(idx)
-                    except Exception:
-                        continue
+        pkg_match = _keybindings._get_run_obj_match_info(obj_text)
+        try:
+            _CLI_RUN_OBJ_MATCH_CACHE[cache_key] = pkg_match
+        except Exception:
+            pass
+        return pkg_match
     except Exception:
-        left_ids = []
-        prefix_idxs = set()
-        regex_idxs = set()
-        has_focus = False
-
-    match_info = {
-        'left_ids': tuple(left_ids),
-        'has_focus': has_focus,
-        'prefix_idxs': tuple(sorted(prefix_idxs)),
-        'regex_idxs': tuple(sorted(regex_idxs)),
-    }
-    info['match_info'] = match_info
-    return match_info
+        # on any failure, fall back to a conservative empty signature
+        empty = {'left_ids': (), 'has_focus': False, 'prefix_idxs': (), 'regex_idxs': ()}
+        try:
+            _CLI_RUN_OBJ_MATCH_CACHE[cache_key] = empty
+        except Exception:
+            pass
+        return empty
 
 
 def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]], str]:
@@ -1415,6 +1389,7 @@ def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | 
     """Initialize and clear per-run caches for the current run parameter context."""
     # set the package-level run context and clear package-run caches so
     # both CLI and package helpers share the same memoization during a run.
+    global _CLI_RUN_OBJ_INFO_CACHE, _CLI_RUN_OBJ_MATCH_CACHE
     _keybindings.RUN_CACHE_CONTEXT = (
         mode,
         negation_mode,
@@ -1433,6 +1408,23 @@ def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | 
         _keybindings.RUN_OBJ_INFO_CACHE.clear()
     except Exception:
         _keybindings.RUN_OBJ_INFO_CACHE = {}
+    try:
+        _CLI_RUN_OBJ_INFO_CACHE.clear()
+    except Exception:
+        _CLI_RUN_OBJ_INFO_CACHE = {}
+    try:
+        _CLI_RUN_OBJ_MATCH_CACHE.clear()
+    except Exception:
+        _CLI_RUN_OBJ_MATCH_CACHE = {}
+    try:
+        _keybindings.RUN_MATCH_CACHE.clear()
+    except Exception:
+        _keybindings.RUN_MATCH_CACHE = {}
+    try:
+        # clear package-level canonicalizer LRU cache
+        _keybindings._canonicalize_when_cache_clear()
+    except Exception:
+        pass
 
 
 def _sort_groups_for_primary_when(
@@ -2013,13 +2005,27 @@ def main(argv: List[str] | None = None) -> int:
     )
 
     try:
-        sys.stdout.write(processed)
-    except BrokenPipeError:
+        # write via the binary buffer to avoid Python-level text encoding costs
+        out_bytes = processed.encode('utf-8')
         try:
-            sys.stdout.flush()
-        except Exception:
-            pass
-        raise SystemExit(0)
+            sys.stdout.buffer.write(out_bytes)
+            sys.stdout.buffer.flush()
+        except BrokenPipeError:
+            try:
+                sys.stdout.buffer.flush()
+            except Exception:
+                pass
+            raise SystemExit(0)
+    except Exception:
+        # fallback to text write if buffer isn't available for any reason
+        try:
+            sys.stdout.write(processed)
+        except BrokenPipeError:
+            try:
+                sys.stdout.flush()
+            except Exception:
+                pass
+            raise SystemExit(0)
 
     return 0
 
