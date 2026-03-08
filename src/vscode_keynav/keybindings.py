@@ -513,6 +513,12 @@ def _clear_lru_when_cache() -> None:
         pass
 
 
+def _contains_focus_token_in_object(obj_text: str) -> bool:
+    """Return True if the object's when clause contains any configured focus token."""
+
+    return bool(_get_run_obj_match_info(obj_text).get('has_focus', False))
+
+
 def _decode_json_string_literal(raw: str) -> str:
     """Decode the inner text of a JSON string literal into a Python string."""
 
@@ -907,6 +913,15 @@ def _strip_trailing_commas(text):
     """Remove trailing commas from JSON/JSONC text."""
 
     return _io._TRAILING_COMMA_RE.sub(r"\1", text)
+
+
+def _strip_when_sorted_comment(comment_text: str, when_changed: bool) -> str:
+    """Remove previously-inserted when-sorted comment lines."""
+
+    if not when_changed:
+        return comment_text
+
+    return _io._WHEN_SORTED_RE.sub('', comment_text)
 
 
 def _tokenize_when(expr: str):

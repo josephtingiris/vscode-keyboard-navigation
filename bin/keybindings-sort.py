@@ -361,12 +361,6 @@ def _assemble_sorted_output(
     return ''.join(out_parts)
 
 
-def _contains_focus_token_in_object(obj_text: str) -> bool:
-    """Return True if the object's when clause contains any configured focus token."""
-
-    return bool(_get_run_obj_match_info(obj_text).get('has_focus', False))
-
-
 def _embed_duplicate_comment_in_object(obj_text: str, duplicate_comment: str) -> str:
     """Insert a 'duplicate' line comment immediately inside an object's opening brace."""
 
@@ -946,7 +940,7 @@ def _get_run_obj_info(
 
 def _get_run_obj_match_info(obj_text: str) -> dict:
     """Return per-run cached focus and prefix or regex match signatures for an object text."""
-    # prefer a CLI-local cache keyed by object text and current run context
+
     run_ctx = _keybindings.RUN_CACHE_CONTEXT if _keybindings.RUN_CACHE_CONTEXT else None
     cache_key = (obj_text, run_ctx)
     cached = _CLI_RUN_OBJ_MATCH_CACHE.get(cache_key)
@@ -1243,7 +1237,7 @@ def _partition_focus_groups_to_end(sorted_groups: list[tuple[str, str]]) -> list
 
     for pair in sorted_groups:
         try:
-            if _contains_focus_token_in_object(pair[1]):
+            if _keybindings._contains_focus_token_in_object(pair[1]):
                 focus.append(pair)
             else:
                 non_focus.append(pair)
@@ -1379,8 +1373,7 @@ def _replace_when_literals(
 
 def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
     """Initialize and clear per-run caches for the current run parameter context."""
-    # set the package-level run context and clear package-run caches so
-    # both CLI and package helpers share the same memoization during a run.
+
     global _CLI_RUN_OBJ_INFO_CACHE, _CLI_RUN_OBJ_MATCH_CACHE
     _keybindings.RUN_CACHE_CONTEXT = (
         mode,
@@ -1628,15 +1621,6 @@ def _sort_groups_with_grouping_mode(
     return final_groups
 
 
-def _strip_when_sorted_comment(comment_text: str, when_changed: bool) -> str:
-    """Remove previously-inserted when-sorted comment lines."""
-
-    if not when_changed:
-        return comment_text
-
-    return _io._WHEN_SORTED_RE.sub('', comment_text)
-
-
 def _with_normalized_when_groups(
     groups: list[tuple[str, str]],
     grouping_mode: str,
@@ -1656,7 +1640,7 @@ def _with_normalized_when_groups(
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         )
-        comments = _strip_when_sorted_comment(comments, when_changed)
+        comments = _keybindings._strip_when_sorted_comment(comments, when_changed)
         normalized_groups.append((comments, obj_out))
 
         # warm the per-run object cache for downstream sort and grouping passes
