@@ -1986,6 +1986,35 @@ def _sort_groups_initial(
     )
 
 
+def _sort_groups_with_grouping_mode(
+    sorted_groups: list[tuple[str, str]],
+    grouping_mode: str,
+    negation_mode: str,
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> list[tuple[str, str]]:
+    """Re-bucket sorted groups into positional bins according to the when-grouping mode."""
+
+    if grouping_mode == 'none':
+        return sorted_groups
+
+    buckets: dict[int, list[tuple[str, str]]] = {}
+    for pair in sorted_groups:
+        rank = _first_when_group_rank(
+            pair[1],
+            grouping_mode,
+            negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        )
+        buckets.setdefault(rank, []).append(pair)
+
+    final_groups: list[tuple[str, str]] = []
+    for rank in sorted(buckets.keys(), reverse=True):
+        final_groups.extend(buckets[rank])
+    return final_groups
+
+
 def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Return a canonicalized when string suitable for stable sorting, preserving negation."""
 
