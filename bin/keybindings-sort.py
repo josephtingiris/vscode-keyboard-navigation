@@ -234,6 +234,7 @@ def _assemble_sorted_output(
 
                 def _key_category_and_order(ch: str) -> tuple[int, int]:
 
+                    #
                     # return (category, order_key) where category is:
                     #
                     # 0 = primary ASCII special (printable non-alnum, ord < 128)
@@ -247,6 +248,7 @@ def _assemble_sorted_output(
                     # - for ASCII specials: the ASCII code of first char
                     # - for extended specials: attempt CP1252 byte value (Alt-code) falling back to Unicode codepoint
                     # - for digits/letters: the Unicode codepoint of first char
+                    #
 
                     if not ch:
                         return (4, 0)
@@ -421,44 +423,53 @@ def _extract_modifiers_from_object(obj_text: str) -> tuple[tuple[str, ...], str]
 
 def _extract_preamble_postamble(text):
     """Return sliced preamble, array_text, and postamble."""
-
-    i = 0
+    # optimized single-pass scanner with local variables bound for speed
     n = len(text)
-    in_string = False
-    string_char = ''
-    esc = False
-    in_line_comment = False
-    in_block_comment = False
+    i = 0
     start = -1
+    in_line = False
+    in_block = False
+    in_str = False
+    esc = False
+    str_char = ''
 
-    # find opening bracket, skipping comments and strings
     while i < n:
         ch = text[i]
-        next2 = text[i:i + 2] if i + 2 <= n else ''
+        nxt = text[i + 1] if i + 1 < n else ''
 
-        if in_line_comment:
+        if in_line:
             if ch == '\n':
-                in_line_comment = False
+                in_line = False
             i += 1
             continue
-        if in_block_comment:
-            if next2 == '*/':
-                in_block_comment = False
+        if in_block:
+            if ch == '*' and nxt == '/':
+                in_block = False
                 i += 2
             else:
                 i += 1
             continue
-        if next2 == '//':
-            in_line_comment = True
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == '\\':
+                esc = True
+            elif ch == str_char:
+                in_str = False
+            i += 1
+            continue
+
+        if ch == '/' and nxt == '/':
+            in_line = True
             i += 2
             continue
-        if next2 == '/*':
-            in_block_comment = True
+        if ch == '/' and nxt == '*':
+            in_block = True
             i += 2
             continue
         if ch == '"' or ch == "'":
-            in_string = True
-            string_char = ch
+            in_str = True
+            str_char = ch
             i += 1
             continue
         if ch == '[':
@@ -469,54 +480,53 @@ def _extract_preamble_postamble(text):
     if start == -1:
         return '', '', text
 
-    # find matching closing bracket
+    # scan for matching closing bracket
     depth = 1
     i = start + 1
-    in_string = False
-    string_char = ''
+    in_line = False
+    in_block = False
+    in_str = False
     esc = False
-    in_line_comment = False
-    in_block_comment = False
+    str_char = ''
     end = -1
 
     while i < n:
         ch = text[i]
-        next2 = text[i:i + 2] if i + 2 <= n else ''
+        nxt = text[i + 1] if i + 1 < n else ''
 
-        if in_line_comment:
+        if in_line:
             if ch == '\n':
-                in_line_comment = False
+                in_line = False
             i += 1
             continue
-        if in_block_comment:
-            if next2 == '*/':
-                in_block_comment = False
+        if in_block:
+            if ch == '*' and nxt == '/':
+                in_block = False
                 i += 2
             else:
                 i += 1
             continue
-        if in_string:
+        if in_str:
             if esc:
                 esc = False
             elif ch == '\\':
                 esc = True
-            elif ch == string_char:
-                in_string = False
+            elif ch == str_char:
+                in_str = False
             i += 1
             continue
 
-        # not in string/comment
-        if next2 == '//':
-            in_line_comment = True
+        if ch == '/' and nxt == '/':
+            in_line = True
             i += 2
             continue
-        if next2 == '/*':
-            in_block_comment = True
+        if ch == '/' and nxt == '*':
+            in_block = True
             i += 2
             continue
         if ch == '"' or ch == "'":
-            in_string = True
-            string_char = ch
+            in_str = True
+            str_char = ch
             i += 1
             continue
         if ch == '[':
@@ -531,11 +541,7 @@ def _extract_preamble_postamble(text):
     if end == -1:
         return '', '', text
 
-    preamble = text[:start]
-    postamble = text[end + 1:]
-    array_text = text[start + 1:end]  # exclude [ and ]
-
-    return preamble, array_text, postamble
+    return text[:start], text[start + 1:end], text[end + 1:]
 
 
 def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondary: str | None = None, grouping: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple:
@@ -967,69 +973,66 @@ def _get_run_obj_match_info(obj_text: str) -> dict:
 
 def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]], str]:
     """Split a JSON array body into a list of (leading_comments, object_text) pairs and trailing comments."""
-
     groups: list[tuple[str, str]] = []
     comments = ''
-
     n = len(array_text)
     i = 0
     comments_start = 0
-    obj_start: int | None = None
+    obj_start = None
     depth = 0
 
-    in_string = False
-    string_char = ''
+    in_line = False
+    in_block = False
+    in_str = False
     esc = False
-    in_line_comment = False
-    in_block_comment = False
+    str_char = ''
+
+    append = groups.append
+    txt = array_text
 
     while i < n:
-        ch = array_text[i]
-        next2 = array_text[i:i + 2] if i + 2 <= n else ''
+        ch = txt[i]
+        nxt = txt[i + 1] if i + 1 < n else ''
 
-        if in_line_comment:
+        if in_line:
             if ch == '\n':
-                in_line_comment = False
+                in_line = False
             i += 1
             continue
-
-        if in_block_comment:
-            if next2 == '*/':
-                in_block_comment = False
+        if in_block:
+            if ch == '*' and nxt == '/':
+                in_block = False
                 i += 2
             else:
                 i += 1
             continue
-
-        if in_string:
+        if in_str:
             if esc:
                 esc = False
             elif ch == '\\':
                 esc = True
-            elif ch == string_char:
-                in_string = False
+            elif ch == str_char:
+                in_str = False
             i += 1
             continue
 
-        if next2 == '//':
-            in_line_comment = True
+        if ch == '/' and nxt == '/':
+            in_line = True
             i += 2
             continue
-
-        if next2 == '/*':
-            in_block_comment = True
+        if ch == '/' and nxt == '*':
+            in_block = True
             i += 2
             continue
-
         if ch == '"' or ch == "'":
-            in_string = True
-            string_char = ch
+            in_str = True
+            str_char = ch
             i += 1
             continue
 
         if obj_start is None:
             if ch == '{':
-                comments = array_text[comments_start:i]
+                comments = txt[comments_start:i]
                 obj_start = i
                 depth = 1
             i += 1
@@ -1041,13 +1044,13 @@ def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]]
             depth -= 1
             if depth == 0:
                 obj_end = i + 1
-                obj_text = array_text[obj_start:obj_end]
-                groups.append((comments, obj_text))
+                obj_text = txt[obj_start:obj_end]
+                append((comments, obj_text))
                 obj_start = None
                 comments_start = obj_end
         i += 1
 
-    trailing_comments = array_text[comments_start:]
+    trailing_comments = txt[comments_start:]
     return groups, trailing_comments
 
 
