@@ -570,6 +570,20 @@ def _extract_literal_when_from_object(obj_text: str) -> str:
     return _decode_json_string_literal(match.group(1))
 
 
+def _extract_modifiers_from_object(obj_text: str) -> tuple[tuple[str, ...], str]:
+    """Return the modifier tuple and literal key token from the object key string."""
+
+    key_raw = _extract_literal_key_from_object(obj_text) or ''
+    norm = _normalize_key_for_compare(key_raw)
+    first = norm.split()[0] if norm else ''
+    parts = [p for p in first.split('+') if p]
+    mods = tuple(parts[:-1]) if len(parts) > 1 else tuple()
+    lit = parts[-1] if parts else ''
+    lit_key = _normalize_key_for_compare(lit)
+
+    return (mods, lit_key)
+
+
 def _get_run_obj_match_info(obj_text: str) -> dict:
     """Return per-run cached focus/prefix/regex match signatures for an object text."""
 
