@@ -132,7 +132,7 @@ regression:
 	@./keybindings_sort_test_grouping_regression.py
 	@./keybindings_sort_test_when_output_regression.py
 	@./keybindings_sort_test_focal_invariant_regression.py
-	@$(PYTHON) ./vscode_keynav_vscode_keynav_debug_unit_test.py
+	@$(PYTHON) ./vscode_keynav_debug_unit_test.py
 	@$(PYTHON) ./vscode_keynav_debug_integration_test.py
 	@echo --cut--
 	@echo
