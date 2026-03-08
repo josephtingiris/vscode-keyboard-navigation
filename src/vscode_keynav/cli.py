@@ -18,7 +18,7 @@ from typing import Callable
 
 # default when prefixes to be added to standard output, if none are given via the cli
 
-DEFAULT_WHEN_PREFIXES = []
+_DEFAULT_WHEN_PREFIXES = []
 
 
 #
@@ -72,7 +72,7 @@ def _parse_when_prefixes(parser: argparse.ArgumentParser, raw_prefixes: str | No
             parser.error('--when-prefix requires a comma-separated list with at least one entry')
         return when_prefixes
 
-    return DEFAULT_WHEN_PREFIXES.copy()
+    return _DEFAULT_WHEN_PREFIXES.copy()
 
 
 def _parse_when_regexes(parser: argparse.ArgumentParser, raw_regexes: str | None):

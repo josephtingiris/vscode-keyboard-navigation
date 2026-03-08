@@ -18,12 +18,12 @@ from vscode_keynav import debug as _debug
 def run_unit_tests() -> None:
     # apply numeric level and target/category parsing
     _debug._apply_settings(["2", "target=can"], color="never")
-    assert _debug.DEBUG_LEVEL == 2
-    assert _debug.DEBUG_TARGET_CATEGORY == "can"
+    assert _debug._DEBUG_LEVEL == 2
+    assert _debug._DEBUG_TARGET_CATEGORY == "can"
 
     # apply when filter
     _debug._apply_settings(["when=foo"], color="never")
-    assert _debug.DEBUG_TARGET_WHEN == "foo"
+    assert _debug._DEBUG_TARGET_WHEN == "foo"
 
     # echo prints at or below level
     buf = io.StringIO()
@@ -45,7 +45,7 @@ def run_unit_tests() -> None:
         sys.stderr = real_stderr
 
     # color formatting when COLOR = 'always'
-    _debug.COLOR = "always"
+    _debug._COLOR = "always"
     colored = _debug._color("x", 2)
     assert "\x1b[" in colored
 

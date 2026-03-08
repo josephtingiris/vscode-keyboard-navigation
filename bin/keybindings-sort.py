@@ -117,10 +117,10 @@ def _apply_debug_settings(debug_specs: list[str] | None, color: str) -> None:
     try:
         # mirror values so existing module references continue to work
         global COLOR, DEBUG_LEVEL, DEBUG_TARGET_WHEN, DEBUG_TARGET_CATEGORY
-        COLOR = _debug.COLOR
-        DEBUG_LEVEL = _debug.DEBUG_LEVEL
-        DEBUG_TARGET_WHEN = _debug.DEBUG_TARGET_WHEN
-        DEBUG_TARGET_CATEGORY = _debug.DEBUG_TARGET_CATEGORY
+        COLOR = _debug._COLOR
+        DEBUG_LEVEL = _debug._DEBUG_LEVEL
+        DEBUG_TARGET_WHEN = _debug._DEBUG_TARGET_WHEN
+        DEBUG_TARGET_CATEGORY = _debug._DEBUG_TARGET_CATEGORY
     except Exception:
         pass
 
