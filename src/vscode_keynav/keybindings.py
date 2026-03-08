@@ -5,19 +5,7 @@ VS Code Keyboard Navigation common keybindings.json functions.
 """
 
 
-def parse_jsonc(text: str):
-    """Parse JSON with comments."""
-
-    import json
-    import re
-
-    text = re.sub(r"//.*?$", "", text, flags=re.M)
-    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
-    text = re.sub(r",\s*([}\]])", r"\1", text)
-    return json.loads(text)
-
-
-def canonicalize_when(when_val: str) -> str:
+def _canonicalize_when(when_val: str) -> str:
     """Return a stable canonical form for a when expression."""
 
     if not when_val:
@@ -25,13 +13,7 @@ def canonicalize_when(when_val: str) -> str:
     return ' && '.join(sorted({p.strip() for p in when_val.split('&&')}))
 
 
-def normalize_key_for_compare(key_value: str) -> str:
-    if not key_value:
-        return ""
-    return key_value.strip().lower()
-
-
-def key_tail_literal(key_value: str) -> str:
+def _key_tail_literal(key_value: str) -> str:
     """Return the last literal in a key description, e.g. `ctrl+k` -> `k`."""
 
     cleaned = str(key_value).strip().lower()
@@ -44,7 +26,7 @@ def key_tail_literal(key_value: str) -> str:
     return bits[-1]
 
 
-def normalize_key(k: str | None) -> str:
+def _normalize_key(k: str | None) -> str:
     """Return a normalized key literal for reliable membership tests."""
 
     if k is None:
@@ -58,7 +40,25 @@ def normalize_key(k: str | None) -> str:
     return nk
 
 
-def split_when_contexts(expr: str | None) -> list[str]:
+def _normalize_key_for_compare(key_value: str) -> str:
+    if not key_value:
+        return ""
+    return key_value.strip().lower()
+
+
+def _parse_jsonc(text: str):
+    """Parse JSON with comments."""
+
+    import json
+    import re
+
+    text = re.sub(r"//.*?$", "", text, flags=re.M)
+    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    text = re.sub(r",\s*([}\]])", r"\1", text)
+    return json.loads(text)
+
+
+def _split_when_contexts(expr: str | None) -> list[str]:
     if not expr:
         return []
 

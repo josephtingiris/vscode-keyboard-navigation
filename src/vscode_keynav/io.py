@@ -13,7 +13,7 @@ import sys
 from typing import Optional, Union
 
 
-def read_input_text(path: Union[str, Path, None]) -> Optional[str]:
+def _read_input_text(path: Union[str, Path, None]) -> Optional[str]:
     """Read UTF-8 text from a path or from piped stdin.
 
     Returns the text or None when no input was provided (tty stdin and no path).
@@ -27,7 +27,7 @@ def read_input_text(path: Union[str, Path, None]) -> Optional[str]:
     return None
 
 
-def write_output_text(path: Union[str, Path, None], text: str) -> None:
+def _write_output_text(path: Union[str, Path, None], text: str) -> None:
     """Write UTF-8 text to a path or stdout when path is None."""
     if path:
         p = Path(path)

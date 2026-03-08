@@ -48,7 +48,7 @@ import hashlib
 import inspect
 import os
 import re
-from vscode_keynav.keybindings import normalize_key as _normalize_key, split_when_contexts as _split_when_contexts
+from vscode_keynav import keybindings as _keybindings
 
 # MODIFIERS
 
@@ -248,18 +248,18 @@ def _augment_when_clause(key: str, when_clause: str, extra_context: str | None =
                 parts.append(value)
                 seen.add(value)
 
-    _add_many(_split_when_contexts(when_clause))
+    _add_many(_keybindings._split_when_contexts(when_clause))
 
     if extra_context is None:
         return " && ".join(parts)
 
-    key_norm = _normalize_key(key)
+    key_norm = _keybindings._normalize_key(key)
 
     for group, context in WHEN_CONTEXT_SELECTORS:
         if key_norm in {str(g) for g in group}:
             _add_many([context])
 
-    _add_many(_split_when_contexts(extra_context))
+    _add_many(_keybindings._split_when_contexts(extra_context))
     return " && ".join(parts)
 
 
@@ -303,23 +303,7 @@ def _init_directional_groups(selected: str, letter_groups: dict) -> None:
         globals()[var_name] = current
 
 
-def _normalize_key(k: str | None) -> str:
-    """Return a normalized key literal for reliable membership tests.
-
-    Strips surrounding whitespace and decodes common escape sequences
-    such as "\\uXXXX" or "\\x.." when present. Returns an empty
-    string for None or invalid inputs.
-    """
-    if k is None:
-        return ""
-    nk = str(k).strip()
-    try:
-        if "\\u" in nk or "\\x" in nk:
-            nk = nk.encode('utf-8').decode('unicode_escape')
-    except Exception:
-        pass
-    return nk
-
+# Use `_normalize_key` from the `vscode_keynav.keybindings` package
 
 
 def _tags_for(
@@ -335,7 +319,7 @@ def _tags_for(
     ordered_tags: List[str] = ["[keynav]"]
     dynamic_tags: set[str] = set()
 
-    key_norm = _normalize_key(key)
+    key_norm = _keybindings._normalize_key(key)
 
     nav_group_clauses = {
         name
@@ -446,7 +430,7 @@ def _when_for(key, mod: str = ""):
             parts.append(cond)
             seen.add(cond)
 
-    key_norm = _normalize_key(key)
+    key_norm = _keybindings._normalize_key(key)
 
     if key_norm in ARROW_GROUP:
         _add("config.keyboardNavigation.keys.arrows")
@@ -1138,7 +1122,7 @@ def main(argv: List[str] | None = None) -> int:
                     mmod = ''
                     literal_key = k_full
 
-                key_norm = _normalize_key(literal_key)
+                key_norm = _keybindings._normalize_key(literal_key)
 
                 # collect missing contexts
                 missing_ctxs: list = []

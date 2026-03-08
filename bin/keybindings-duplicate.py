@@ -57,7 +57,8 @@ import hashlib
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from vscode_keynav.io import read_input_text, write_output_text
+from vscode_keynav import io as _io
+from vscode_keynav import keybindings as _keybindings
 
 
 ABORTING_EXIT_CODE = 1
@@ -392,55 +393,7 @@ def parse_when(expr: str) -> WhenNode:
     return parse_or()
 
 
-def canonicalize_when(when_val: str) -> str:
-    """Canonicalize when by flattening AND terms and deduping exact operands."""
-
-    if not when_val:
-        return ""
-
-    def sort_and_nodes(node: WhenNode) -> None:
-        if isinstance(node, WhenAnd):
-            for child in node.children:
-                sort_and_nodes(child)
-            items = list(enumerate(node.children))
-
-            def key_func(item: tuple[int, WhenNode]) -> tuple[list[object], int]:
-                idx, child = item
-                token = render_when_node(child)
-                return natural_key(token), idx
-
-            items.sort(key=key_func)
-            merged = [item[1] for item in items]
-
-            unique: list[WhenNode] = []
-            seen: set[str] = set()
-            for child in merged:
-                token = render_when_node(child)
-                if token in seen:
-                    continue
-                seen.add(token)
-                unique.append(child)
-            node.children = unique
-
-        elif isinstance(node, WhenOr):
-            for child in node.children:
-                sort_and_nodes(child)
-
-            unique = []
-            seen = set()
-            for child in node.children:
-                token = render_when_node(child)
-                if token in seen:
-                    continue
-                seen.add(token)
-                unique.append(child)
-            node.children = unique
-        elif isinstance(node, WhenNot):
-            sort_and_nodes(node.child)
-
-    ast = parse_when(when_val)
-    sort_and_nodes(ast)
-    return render_when_node(ast)
+# Use `canonicalize_when` from package
 
 
 def natural_key(text: str) -> list[object]:
@@ -820,60 +773,10 @@ def normalize_modifier(modifier: str) -> str:
     return modifier.strip().lower()
 
 
-def normalize_key_for_compare(key_value: str) -> str:
-    """Normalize key text for duplicate comparisons."""
-
-    key_value = key_value.strip().lower()
-    if not key_value:
-        return ""
-
-    chord_parts = [part for part in key_value.split() if part.strip()]
-    normalized_chords: list[str] = []
-
-    for chord in chord_parts:
-        key_bits = [bit.strip() for bit in chord.split("+") if bit.strip()]
-        if not key_bits:
-            continue
-        literal = key_bits[-1]
-        modifiers = [normalize_modifier(bit) for bit in key_bits[:-1]]
-        unique_modifiers = list(dict.fromkeys(modifiers))
-
-        corpus_modifier_tokens = list(
-            dict.fromkeys(
-                token
-                for modifier in CORPUS_MODIFIERS
-                for token in modifier.split("+")
-                if token
-            )
-        )
-        ordered_modifiers: list[str] = []
-        for token in corpus_modifier_tokens:
-            if token in unique_modifiers:
-                ordered_modifiers.append(token)
-        unknown_modifiers = sorted([
-            token for token in unique_modifiers if token not in corpus_modifier_tokens
-        ])
-        ordered_modifiers.extend(unknown_modifiers)
-
-        if ordered_modifiers:
-            normalized_chords.append("+".join(ordered_modifiers + [literal]))
-        else:
-            normalized_chords.append(literal)
-
-    return " ".join(normalized_chords)
+# Use `normalize_key_for_compare` from package
 
 
-def key_tail_literal(key_value: str) -> str:
-    """Extract final literal key token (without modifiers) from key text."""
-
-    cleaned = key_value.strip().lower()
-    if not cleaned:
-        return ""
-    final_chord = cleaned.split()[-1]
-    bits = [bit.strip() for bit in final_chord.split("+") if bit.strip()]
-    if not bits:
-        return ""
-    return bits[-1]
+# Use `key_tail_literal` from package
 
 
 def combine_modifier_and_key(modifier: str, key_literal: str) -> str:
@@ -895,8 +798,8 @@ def merge_when_clause(existing: str, extra: str) -> str:
         return extra
     if not extra:
         return existing
-    canonical_existing = canonicalize_when(existing)
-    canonical_extra = canonicalize_when(extra)
+    canonical_existing = _keybindings._canonicalize_when(existing)
+    canonical_extra = _keybindings._canonicalize_when(extra)
     if canonical_extra and canonical_extra in canonical_existing:
         return existing
     return f"{extra} && {existing}"
@@ -1100,7 +1003,7 @@ def build_emitted_objects(
 
     source_to_targets: dict[str, list[str]] = {}
     for source_key, target_key in expanded_pairs:
-        normalized_source = normalize_key_for_compare(source_key)
+        normalized_source = _keybindings._normalize_key_for_compare(source_key)
         if normalized_source not in source_to_targets:
             source_to_targets[normalized_source] = []
         source_to_targets[normalized_source].append(target_key)
@@ -1151,7 +1054,7 @@ def build_emitted_objects(
             continue
 
         source_key = str(record.parsed_obj.get("key", ""))
-        normalized_source = normalize_key_for_compare(source_key)
+        normalized_source = _keybindings._normalize_key_for_compare(source_key)
         matching_targets = source_to_targets.get(normalized_source)
         if not matching_targets:
             continue
@@ -1235,8 +1138,8 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, de
         elif item.parsed_obj is not None and detect:
             key_value = str(item.parsed_obj.get("key", ""))
             when_value = str(item.parsed_obj.get("when", ""))
-            normalized_key = normalize_key_for_compare(key_value)
-            canonical_when = canonicalize_when(when_value)
+            normalized_key = _keybindings._normalize_key_for_compare(key_value)
+            canonical_when = _keybindings._canonicalize_when(when_value)
 
             pair = (normalized_key, canonical_when)
             if pair in seen_pairs:
@@ -1422,7 +1325,7 @@ def main(argv: List[str] | None = None) -> int:
             return USAGE_EXIT_CODE
 
     try:
-        raw_text = read_input_text(args.input)
+        raw_text = _io._read_input_text(args.input)
     except Exception as exc:
         print(f"error: failed to read input: {exc}", file=sys.stderr)
         return ERROR_EXIT_CODE

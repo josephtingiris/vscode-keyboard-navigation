@@ -1,3 +1,4 @@
+from vscode_keynav import keybindings as _keybindings
 import re
 import json
 import subprocess
@@ -8,39 +9,6 @@ def strip_json_comments(s: str) -> str:
     s = re.sub(r'//.*?\n', '\n', s)
     s = re.sub(r'/\*.*?\*/', '', s, flags=re.S)
     return s
-
-
-def normalize_key_for_compare(key_value: str) -> str:
-    if not key_value:
-        return ""
-    raw = str(key_value).strip()
-    if not raw:
-        return ""
-
-    CANONICAL_MOD_ORDER = ['ctrl', 'shift', 'alt', 'meta']
-
-    chords = [p for p in raw.split() if p.strip()]
-    out_chords = []
-    for chord in chords:
-        # Preserve trailing '+' (e.g., 'alt++' -> base '+')
-        if '+' in chord:
-            mods_part, base_part = chord.rsplit('+', 1)
-            if base_part == '':
-                base = '+'
-            else:
-                base = base_part.strip().lower()
-            mods = [m.strip().lower() for m in mods_part.split('+') if m.strip()]
-        else:
-            mods = []
-            base = chord.strip().lower()
-
-        ordered = [m for m in CANONICAL_MOD_ORDER if m in mods]
-        others = sorted([m for m in mods if m not in ordered])
-        if ordered or others:
-            out_chords.append('+'.join(ordered + others + [base]))
-        else:
-            out_chords.append(base)
-    return ' '.join(out_chords)
 
 
 def extract_objects_from_jsonc(text: str):
@@ -158,7 +126,7 @@ def test_when_blocks_contiguous_and_modifier_first():
         if base_part and all(ch == '+' for ch in base_part):
             tokens = ['+']
         else:
-            base_norm = normalize_key_for_compare(base_part)
+            base_norm = _keybindings._normalize_key_for_compare(base_part)
             tokens = [t for t in base_norm.split() if t != '']
 
         token_seq = []

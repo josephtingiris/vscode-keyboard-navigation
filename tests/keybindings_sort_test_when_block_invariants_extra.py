@@ -2,6 +2,7 @@ import re
 import json
 import subprocess
 from pathlib import Path
+from vscode_keynav import keybindings as _keybindings
 
 
 def strip_json_comments(s: str) -> str:
@@ -11,36 +12,7 @@ def strip_json_comments(s: str) -> str:
 
 
 def normalize_key_for_compare(key_value: str) -> str:
-    if not key_value:
-        return ""
-    raw = str(key_value).strip()
-    if not raw:
-        return ""
-
-    CANONICAL_MOD_ORDER = ['ctrl', 'shift', 'alt', 'meta']
-
-    chords = [p for p in raw.split() if p.strip()]
-    out_chords = []
-    for chord in chords:
-        # Preserve trailing '+' (e.g., 'alt++' -> base '+')
-        if '+' in chord:
-            mods_part, base_part = chord.rsplit('+', 1)
-            if base_part == '':
-                base = '+'
-            else:
-                base = base_part.strip().lower()
-            mods = [m.strip().lower() for m in mods_part.split('+') if m.strip()]
-        else:
-            mods = []
-            base = chord.strip().lower()
-
-        ordered = [m for m in CANONICAL_MOD_ORDER if m in mods]
-        others = sorted([m for m in mods if m not in ordered])
-        if ordered or others:
-            out_chords.append('+'.join(ordered + others + [base]))
-        else:
-            out_chords.append(base)
-    return ' '.join(out_chords)
+    return _keybindings._normalize_key_for_compare(key_value)
 
 
 def extract_objects_from_jsonc(text: str):

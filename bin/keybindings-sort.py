@@ -67,6 +67,8 @@ import re
 from typing import List, Tuple
 
 from vscode_keynav import debug as _debug
+from vscode_keynav import io as _io
+from vscode_keynav import keybindings as _keybindings
 
 # global memoization cache for canonicalized when results
 
