@@ -371,41 +371,6 @@ def _assemble_final_output(
     return _remove_blank_lines(text)
 
 
-def _parse_when_prefixes(parser: argparse.ArgumentParser, raw_prefixes: str | None) -> list[str]:
-    """Return the parsed `--when-prefix` comma-separated list of prefixes or default a list."""
-
-    if raw_prefixes is not None:
-        if raw_prefixes.strip() == '':
-            parser.error('--when-prefix requires a comma-separated list with at least one entry')
-        when_prefixes = [part.strip() for part in raw_prefixes.split(',') if part.strip()]
-        if not when_prefixes:
-            parser.error('--when-prefix requires a comma-separated list with at least one entry')
-        return when_prefixes
-
-    return DEFAULT_WHEN_PREFIXES.copy()
-
-
-def _parse_when_regexes(parser: argparse.ArgumentParser, raw_regexes: str | None):
-    """Return the parsed `--when-regex` comma-separated list of regexes into compiled regexes or string patterns."""
-
-    if not raw_regexes:
-        return None
-
-    parts = [part.strip() for part in raw_regexes.split(',') if part.strip()]
-    if not parts:
-        parser.error('--when-regex requires a comma-separated list with at least one entry')
-
-    compiled = []
-
-    for part in parts:
-        try:
-            compiled.append(re.compile(part))
-        except Exception:
-            compiled.append(part)
-
-    return compiled
-
-
 def _partition_focus_groups_to_end(sorted_groups: list[tuple[str, str]]) -> list[tuple[str, str]]:
     """Stable-partition groups so that entries containing focus tokens are moved to the end."""
 
@@ -879,8 +844,8 @@ def main(argv: List[str] | None = None) -> int:
     grouping_mode = args.when_grouping
     negation_mode = args.group_sorting
 
-    when_prefixes = _parse_when_prefixes(parser, args.when_prefix)
-    when_regexes = _parse_when_regexes(parser, args.when_regex)
+    when_prefixes = _cli._parse_when_prefixes(parser, args.when_prefix)
+    when_regexes = _cli._parse_when_regexes(parser, args.when_regex)
 
     _set_run_cache_context(grouping_mode, negation_mode, when_prefixes, when_regexes)
 

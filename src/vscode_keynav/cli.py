@@ -7,6 +7,7 @@ VS Code Keyboard Navigation common cli functions.
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 
 from typing import Callable
@@ -14,6 +15,10 @@ from typing import Callable
 #
 # globals & constants
 #
+
+# default when prefixes to be added to standard output, if none are given via the cli
+
+DEFAULT_WHEN_PREFIXES = []
 
 
 #
@@ -54,6 +59,41 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = _make_common_parser()
 
     return parser.parse_args(argv)
+
+
+def _parse_when_prefixes(parser: argparse.ArgumentParser, raw_prefixes: str | None) -> list[str]:
+    """Return the parsed `--when-prefix` comma-separated list of prefixes or default a list."""
+
+    if raw_prefixes is not None:
+        if raw_prefixes.strip() == '':
+            parser.error('--when-prefix requires a comma-separated list with at least one entry')
+        when_prefixes = [part.strip() for part in raw_prefixes.split(',') if part.strip()]
+        if not when_prefixes:
+            parser.error('--when-prefix requires a comma-separated list with at least one entry')
+        return when_prefixes
+
+    return DEFAULT_WHEN_PREFIXES.copy()
+
+
+def _parse_when_regexes(parser: argparse.ArgumentParser, raw_regexes: str | None):
+    """Return the parsed `--when-regex` comma-separated list of regexes into compiled regexes or string patterns."""
+
+    if not raw_regexes:
+        return None
+
+    parts = [part.strip() for part in raw_regexes.split(',') if part.strip()]
+    if not parts:
+        parser.error('--when-regex requires a comma-separated list with at least one entry')
+
+    compiled = []
+
+    for part in parts:
+        try:
+            compiled.append(re.compile(part))
+        except Exception:
+            compiled.append(part)
+
+    return compiled
 
 
 def _run_main(main_fn: Callable[[argparse.Namespace], int] | Callable[[argparse.Namespace], None], argv: list[str] | None = None) -> int:
