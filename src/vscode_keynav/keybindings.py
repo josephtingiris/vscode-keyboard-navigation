@@ -17,9 +17,11 @@ from functools import lru_cache
 from vscode_keynav import debug as _debug
 from vscode_keynav import io as _io
 
+
 #
 # globals & constants
 #
+
 
 # CLI-level per-run caches to avoid repeated parsing/regex work across hot loops
 _CLI__RUN_OBJ_INFO_CACHE: dict = {}

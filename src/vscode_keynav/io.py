@@ -13,6 +13,7 @@ import sys
 
 from typing import Optional, Union, Pattern
 
+
 #
 # globals & constants
 #
@@ -22,6 +23,7 @@ from typing import Optional, Union, Pattern
 
 _BLANK_LINES_RE = re.compile(r'(?m)^[ \t]*\n+', 0)
 _COMMENT_RE = re.compile(r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)', re.DOTALL | re.MULTILINE)
+_KEY_RE = re.compile(r'"key"\s*:\s*"((?:[^"\\]|\\.)*)"')
 _KEY_EXTRACT_RE = re.compile(r'"key"\s*:\s*"((?:\\.|[^"\\])*)"', 0)
 _LEADING_COMMA_RE = re.compile(r'^\s*,+', 0)
 _LEADING_NEWLINES_RE = re.compile(r'^\n+', 0)
@@ -29,6 +31,7 @@ _NUMBER_SPLIT_RE = re.compile(r"(\d+)", 0)
 _OBJ_RE = re.compile(r'\{.*\}', re.DOTALL)
 _STRIP_WS_RE = re.compile(r'^[ \t\r\n]+|[ \t\r\n]+$', 0)
 _TRAILING_COMMA_RE = re.compile(r',\s*([}\]])', 0)
+_WHEN_RE = re.compile(r'"when"\s*:\s*"((?:[^"\\]|\\.)*)"')
 _WHEN_EXTRACT_RE = re.compile(r'"when"\s*:\s*"((?:\\.|[^"\\])*)"', 0)
 _WHEN_LITERAL_RE = re.compile(r'("when"\s*:\s*\")(?:\\.|[^"\\])*(\")', 0)
 _WHEN_SORTED_RE = re.compile(r'^\s*//\s*when-sorted:.*\n', re.MULTILINE)

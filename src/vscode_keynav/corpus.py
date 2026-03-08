@@ -10,6 +10,7 @@ from typing import Any, Dict, List
 
 from .keybindings import _canonicalize_when, _key_tail_literal
 
+
 #
 # globals & constants
 #
