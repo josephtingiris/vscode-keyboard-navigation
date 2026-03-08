@@ -23,8 +23,8 @@ from vscode_keynav import keybindings as _keybindings
 
 REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 
-DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.json")
-DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.json")
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.corpus.all.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.corpus.jsonc")
 
 KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
 
@@ -39,22 +39,27 @@ PYTHON_EXEC = _cli._get_python_exec()
 
 
 class KeynavCommentsTests(unittest.TestCase):
-    def test_default_output_does_not_add_feature_gate_contexts(self):
-        proc = subprocess.run(
-            [
-                PYTHON_EXEC,
-                KEYBINDINGS_CORPUS_PY,
-                "--comments",
-                "none",
-            ],
+    def _run_corpus(self, args: list[str]) -> subprocess.CompletedProcess[bytes]:
+        """Run keybindings-corpus and return the completed process."""
+
+        return subprocess.run(
+            [PYTHON_EXEC, KEYBINDINGS_CORPUS_PY, *args],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             cwd=REPO_ROOT,
         )
-        self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
 
+    def _run_corpus_json(self, args: list[str]) -> list[dict]:
+        """Run keybindings-corpus and parse stdout as JSON list."""
+
+        proc = self._run_corpus(args)
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
         parsed = json.loads(proc.stdout.decode("utf-8"))
         self.assertIsInstance(parsed, list)
+        return parsed
+
+    def test_default_output_does_not_add_feature_gate_contexts(self):
+        parsed = self._run_corpus_json(["--comments", "none"])
 
         juke_record = next(item for item in parsed if item["key"] == "alt+end")
         self.assertNotIn("config.keyboardNavigation.juke.enabled", juke_record["when"])
@@ -63,23 +68,9 @@ class KeynavCommentsTests(unittest.TestCase):
         self.assertNotIn("config.keyboardNavigation.split.enabled", split_record["when"])
 
     def test_add_context_augments_generated_when_clauses(self):
-        proc = subprocess.run(
-            [
-                PYTHON_EXEC,
-                KEYBINDINGS_CORPUS_PY,
-                "--comments",
-                "none",
-                "--add-context",
-                "editorTextFocus && !inputFocus",
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=REPO_ROOT,
+        parsed = self._run_corpus_json(
+            ["--comments", "none", "--add-context", "editorTextFocus && !inputFocus"]
         )
-        self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
-
-        parsed = json.loads(proc.stdout.decode("utf-8"))
-        self.assertIsInstance(parsed, list)
 
         juke_record = next(item for item in parsed if item["key"] == "alt+end")
         self.assertIn("config.keyboardNavigation.juke.enabled", juke_record["when"])
@@ -97,12 +88,7 @@ class KeynavCommentsTests(unittest.TestCase):
         with open(DEFAULT_INPUT_FULL, "r", encoding="utf-8") as fh:
             orig = fh.read()
 
-        proc = subprocess.run(
-            [PYTHON_EXEC, KEYBINDINGS_CORPUS_PY, "-c", DEFAULT_INPUT_FULL],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=REPO_ROOT,
-        )
+        proc = self._run_corpus(["-c", DEFAULT_INPUT_FULL])
         self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
 
         emitted = proc.stdout.decode("utf-8")
@@ -122,19 +108,7 @@ class KeynavCommentsTests(unittest.TestCase):
         with open(DEFAULT_INPUT_FULL, "r", encoding="utf-8") as fh:
             orig = fh.read()
 
-        proc = subprocess.run(
-            [
-                PYTHON_EXEC,
-                KEYBINDINGS_CORPUS_PY,
-                "-c",
-                DEFAULT_INPUT_FULL,
-                "--add-context",
-                "editorTextFocus",
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=REPO_ROOT,
-        )
+        proc = self._run_corpus(["-c", DEFAULT_INPUT_FULL, "--add-context", "editorTextFocus"])
         self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
 
         emitted = proc.stdout.decode("utf-8")
