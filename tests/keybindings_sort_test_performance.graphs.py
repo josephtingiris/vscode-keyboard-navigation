@@ -18,9 +18,41 @@ from __future__ import annotations
 
 import argparse
 import csv
+import importlib
+import os
+
+from pathlib import Path
+
 import statistics
 import sys
-from pathlib import Path
+
+from typing import Any
+
+
+#
+# globals & constants
+#
+
+
+REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.surface.all.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.surface.vi.jsonc")
+
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
+
+
+#
+# functions
+#
+
+
+def import_pyplot() -> Any:
+    """Import matplotlib.pyplot lazily."""
+    try:
+        return importlib.import_module("matplotlib.pyplot")
+    except ImportError as exc:
+        raise RuntimeError("matplotlib is required") from exc
 
 
 def parse_args() -> argparse.Namespace:
@@ -69,7 +101,7 @@ def aggregate_median(rows: list[dict[str, str | float | int]], key: str) -> dict
 
 def save_histogram(rows: list[dict[str, str | float | int]], out_path: Path) -> None:
     """Save histogram for median runtime distribution."""
-    import matplotlib.pyplot as plt
+    plt = import_pyplot()
 
     values = [float(row["median_ms"]) for row in rows]
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -78,13 +110,13 @@ def save_histogram(rows: list[dict[str, str | float | int]], out_path: Path) -> 
     ax.set_xlabel("median runtime (ms)")
     ax.set_ylabel("count")
     fig.tight_layout()
-    fig.savefig(out_path, dpi=120)
+    fig.savefig(str(out_path), dpi=120)
     plt.close(fig)
 
 
 def save_group_sorting_chart(rows: list[dict[str, str | float | int]], out_path: Path) -> None:
     """Save bar chart for group_sorting median impact."""
-    import matplotlib.pyplot as plt
+    plt = import_pyplot()
 
     data = aggregate_median(rows, "group_sorting")
     labels = sorted(data.keys(), key=lambda key: data[key])
@@ -97,13 +129,13 @@ def save_group_sorting_chart(rows: list[dict[str, str | float | int]], out_path:
     ax.set_ylabel("median runtime (ms)")
     ax.tick_params(axis="x", rotation=20)
     fig.tight_layout()
-    fig.savefig(out_path, dpi=120)
+    fig.savefig(str(out_path), dpi=120)
     plt.close(fig)
 
 
 def save_when_grouping_chart(rows: list[dict[str, str | float | int]], out_path: Path) -> None:
     """Save bar chart for when_grouping median impact."""
-    import matplotlib.pyplot as plt
+    plt = import_pyplot()
 
     data = aggregate_median(rows, "when_grouping")
     labels = sorted(data.keys(), key=lambda key: data[key])
@@ -115,12 +147,18 @@ def save_when_grouping_chart(rows: list[dict[str, str | float | int]], out_path:
     ax.set_xlabel("when_grouping")
     ax.set_ylabel("median runtime (ms)")
     fig.tight_layout()
-    fig.savefig(out_path, dpi=120)
+    fig.savefig(str(out_path), dpi=120)
     plt.close(fig)
+
+
+#
+# main
+#
 
 
 def main() -> int:
     """Generate performance graphs from a benchmark CSV file."""
+
     args = parse_args()
     root = Path(__file__).resolve().parent.parent
     input_path = (root / args.input).resolve()
@@ -131,8 +169,8 @@ def main() -> int:
         return 2
 
     try:
-        import matplotlib  # noqa: F401
-    except ImportError:
+        import_pyplot()
+    except RuntimeError:
         print(
             "error: matplotlib is required. install in your active Python environment, "
             "or use 'python3 -m pip install --user matplotlib'",

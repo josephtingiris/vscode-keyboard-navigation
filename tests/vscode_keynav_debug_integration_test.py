@@ -1,20 +1,38 @@
 #!/usr/bin/env python3
-"""Integration test: run bin/keybindings-sort.py with debug flags and assert debug output."""
+"""
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
+run bin/keybindings-sort.py with debug flags and assert debug output.
+"""
+
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
-import os
+
+
+#
+# globals & constants
+#
+
+
+REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.surface.all.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.surface.vi.jsonc")
+
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
+
+
+#
+# main
+#
 
 
 def main() -> int:
-    script = os.path.join('..', 'bin', 'keybindings-sort.py')
-    if not os.path.exists(script):
-        print(f"error: {script} not found", file=sys.stderr)
-        return 2
-
     proc = subprocess.run(
-        [sys.executable, script, '--debug', '2', '--color', 'always'],
+        [sys.executable, KEYBINDINGS_SORT_PY, '--debug', '2', '--color', 'always'],
         input='[{"key":"a","when":"config.keyboardNavigation.enabled"}]\n',
         capture_output=True,
         text=True,
@@ -31,6 +49,7 @@ def main() -> int:
         print('stderr:', stderr, file=sys.stderr)
         return 4
     print('OK')
+
     return 0
 
 

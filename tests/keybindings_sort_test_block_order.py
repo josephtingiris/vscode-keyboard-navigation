@@ -15,9 +15,7 @@ Exit: test failure on any mismatch.
 
 from __future__ import annotations
 
-import json
 import os
-import re
 import subprocess
 import sys
 
@@ -36,7 +34,10 @@ from vscode_keynav import keybindings as _keybindings
 
 REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 
-KEYBINDINGS_SORT_PY = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "bin", "keybindings-sort.py"))
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.json")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.json")
+
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
 
 
 #
@@ -119,9 +120,9 @@ def _expected_order_modifier_first(keys: List[str]) -> List[str]:
 
 def _run_sorter(profile: str) -> str:
     cmd = [sys.executable, KEYBINDINGS_SORT_PY, "-w", profile]
-    ref_path = os.path.join(REPO_ROOT, "references", "keybindings.json")
-    if os.path.exists(ref_path):
-        with open(ref_path, "r", encoding="utf-8") as fh:
+
+    if os.path.exists(DEFAULT_INPUT_FULL):
+        with open(DEFAULT_INPUT_FULL, "r", encoding="utf-8") as fh:
             data = fh.read()
         proc = subprocess.run(cmd, input=data, capture_output=True, text=True, timeout=30)
     else:

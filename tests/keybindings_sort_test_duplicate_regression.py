@@ -13,27 +13,28 @@ comments or formatting.
 import os
 import subprocess
 import sys
-import unittest
+
 from textwrap import dedent
+
+import unittest
+
+
+#
+# globals & constants
+#
 
 
 REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
-SCRIPT = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
+
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.surface.all.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.surface.vi.jsonc")
+
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
 
 
-def run_sort(input_text: str, args: list[str] | None = None) -> subprocess.CompletedProcess[bytes]:
-    """Run keybindings-sort with text input and optional args."""
-
-    cmd = [sys.executable, SCRIPT]
-    if args:
-        cmd.extend(args)
-    return subprocess.run(
-        cmd,
-        input=input_text.encode("utf-8"),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        cwd=REPO_ROOT,
-    )
+#
+# classes
+#
 
 
 class KeybindingsSortDuplicateRegressionTests(unittest.TestCase):
@@ -57,7 +58,7 @@ class KeybindingsSortDuplicateRegressionTests(unittest.TestCase):
             """
         )
 
-        proc = run_sort(payload)
+        proc = _run_sort(payload)
         self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
         out = proc.stdout.decode("utf-8")
         self.assertEqual(out.count('"key": "ctrl+x"'), 1)
@@ -81,7 +82,7 @@ class KeybindingsSortDuplicateRegressionTests(unittest.TestCase):
             """
         )
 
-        proc = run_sort(payload, ["-o"])
+        proc = _run_sort(payload, ["-o"])
         self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
         out = proc.stdout.decode("utf-8")
         self.assertEqual(out.count('"key": "ctrl+x"'), 2)
@@ -105,7 +106,7 @@ class KeybindingsSortDuplicateRegressionTests(unittest.TestCase):
             """
         )
 
-        proc = run_sort(payload, ["-w", "focal-invariant", "-p", "when", "-s", "key", "-o"])
+        proc = _run_sort(payload, ["-w", "focal-invariant", "-p", "when", "-s", "key", "-o"])
         self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
         out = proc.stdout.decode("utf-8")
         self.assertEqual(out.count('"key": "alt+h"'), 2)
@@ -133,12 +134,37 @@ class KeybindingsSortDuplicateRegressionTests(unittest.TestCase):
             """
         )
 
-        proc = run_sort(payload, ["-w", "focal-invariant", "-p", "when", "-s", "key", "-o"])
+        proc = _run_sort(payload, ["-w", "focal-invariant", "-p", "when", "-s", "key", "-o"])
         self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
         out = proc.stdout.decode("utf-8")
         self.assertGreaterEqual(out.count("// DUPLICATE JSON object (json-hash="), 2)
         self.assertIn("// first", out)
         self.assertIn("// second", out)
+
+
+#
+# functions
+#
+
+
+def _run_sort(input_text: str, args: list[str] | None = None) -> subprocess.CompletedProcess[bytes]:
+    """Run keybindings-sort with text input and optional args."""
+
+    cmd = [sys.executable, KEYBINDINGS_SORT_PY]
+    if args:
+        cmd.extend(args)
+    return subprocess.run(
+        cmd,
+        input=input_text.encode("utf-8"),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=REPO_ROOT,
+    )
+
+
+#
+# main
+#
 
 
 if __name__ == "__main__":

@@ -8,28 +8,30 @@ Focused CLI tests for `bin/keybindings-duplicate.py`.
 import os
 import subprocess
 import sys
-import unittest
+
 from textwrap import dedent
 
+import unittest
 
-SCRIPT = os.path.normpath(
-    os.path.join(os.path.dirname(__file__), "..", "bin", "keybindings-duplicate.py")
-)
+
+#
+# globals & constants
+#
+
+
 REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.surface.all.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.surface.vi.jsonc")
 
-def run_dup(input_text: str, args: list[str] | None = None) -> subprocess.CompletedProcess[bytes]:
-    """Run the duplicate script with optional args and stdin input."""
-    cmd = [sys.executable, SCRIPT]
-    if args:
-        cmd.extend(args)
-    return subprocess.run(
-        cmd,
-        input=input_text.encode("utf-8"),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        cwd=REPO_ROOT,
-    )
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
+
+KEYBINDINGS_DUPLICATE_PY = os.path.join(REPO_ROOT, "bin", "keybindings-duplicate.py")
+
+
+#
+# classes
+#
 
 
 class KeybindingsDuplicateCliTests(unittest.TestCase):
@@ -37,7 +39,7 @@ class KeybindingsDuplicateCliTests(unittest.TestCase):
 
     def test_help_exits_99(self) -> None:
         proc = subprocess.run(
-            [sys.executable, SCRIPT, "--help"],
+            [sys.executable, KEYBINDINGS_DUPLICATE_PY, "--help"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             cwd=REPO_ROOT,
@@ -46,7 +48,7 @@ class KeybindingsDuplicateCliTests(unittest.TestCase):
         self.assertIn("usage:", proc.stdout.decode("utf-8").lower())
 
     def test_mismatched_from_to_exits_99(self) -> None:
-        proc = run_dup(
+        proc = _run_dup(
             "[]\n",
             ["-t", "left"],
         )
@@ -71,7 +73,7 @@ class KeybindingsDuplicateCliTests(unittest.TestCase):
             """
         )
 
-        proc = run_dup(data, ["-f", "h", "-t", "left", "-m", "alt", "-d"])
+        proc = _run_dup(data, ["-f", "h", "-t", "left", "-m", "alt", "-d"])
         self.assertEqual(proc.returncode, 0)
         out = proc.stdout.decode("utf-8")
         self.assertIn("// DUPLICATE object detected for alt+h/", out)
@@ -91,9 +93,28 @@ class KeybindingsDuplicateCliTests(unittest.TestCase):
             path = os.path.join(REPO_ROOT, rel_path)
             with open(path, "r", encoding="utf-8") as handle:
                 payload = handle.read()
-            proc = run_dup(payload, ["-f", "h,j,k,l", "-t", "left,down,up,right"])
+            proc = _run_dup(payload, ["-f", "h,j,k,l", "-t", "left,down,up,right"])
             self.assertEqual(proc.returncode, 0, msg=rel_path)
             self.assertIn("[", proc.stdout.decode("utf-8"), msg=rel_path)
+
+
+def _run_dup(input_text: str, args: list[str] | None = None) -> subprocess.CompletedProcess[bytes]:
+    """Run the duplicate script with optional args and stdin input."""
+    cmd = [sys.executable, KEYBINDINGS_DUPLICATE_PY]
+    if args:
+        cmd.extend(args)
+    return subprocess.run(
+        cmd,
+        input=input_text.encode("utf-8"),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=REPO_ROOT,
+    )
+
+
+#
+# main
+#
 
 
 if __name__ == "__main__":

@@ -10,12 +10,30 @@ This script performs lightweight assertions and exits non-zero on failure.
 from __future__ import annotations
 
 import io
+import os
 import sys
 
 from vscode_keynav import debug as _debug
 
 
-def run_unit_tests() -> None:
+#
+# globals & constants
+#
+
+
+REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.surface.all.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.surface.vi.jsonc")
+
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
+
+#
+# functions
+#
+
+
+def _run_unit_tests() -> None:
     # apply numeric level and target/category parsing
     _debug._apply_settings(["2", "target=can"], color="never")
     assert _debug._DEBUG_LEVEL == 2
@@ -50,9 +68,14 @@ def run_unit_tests() -> None:
     assert "\x1b[" in colored
 
 
+#
+# main
+#
+
+
 if __name__ == "__main__":
     try:
-        run_unit_tests()
+        _run_unit_tests()
     except AssertionError as exc:
         print(f"FAIL: {exc}")
         raise

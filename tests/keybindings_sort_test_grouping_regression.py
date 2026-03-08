@@ -2,41 +2,42 @@
 """
 (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
 
-Regression test: ensure `-w focal-invariant` groups simple `when` clauses first
-
-This test runs the sorter on the full `references/keybindings.json` and asserts
-that the first emitted `when` clause (ignoring comments) is the simple
-`config.keyboardNavigation.enabled` clause and that those entries appear
-grouped at the start of the when-list.
+ensure `-w focal-invariant` groups simple `when` clauses first
 """
 
 import os
+import py_compile
 import subprocess
 import sys
-import unittest
-import py_compile
 import re
+import unittest
+
+
+#
+# globals & constants
+#
 
 
 REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
-SCRIPT = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
-REFERENCE_INPUT = os.path.join(REPO_ROOT, "tests/data", "keybindings-test-data.jsonc")
+
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "tests", "data", "keybindings-test-data.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "tests", "data", "keybindings-test-data.jsonc")
+
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
 
 
-def run_sort_file(args: list[str]) -> subprocess.CompletedProcess[bytes]:
-    cmd = [sys.executable, SCRIPT]
-    cmd.extend(args)
-    with open(REFERENCE_INPUT, "rb") as fh:
-        return subprocess.run(cmd, input=fh.read(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=REPO_ROOT)
+#
+# classes
+#
 
 
 class KeybindingsSortGroupingRegression(unittest.TestCase):
     def test_when_grouping_focal_invariant_first_when(self):
         # ensure script compiles
-        py_compile.compile(SCRIPT, doraise=True)
+        py_compile.compile(KEYBINDINGS_SORT_PY, doraise=True)
 
         # rely on the when-grouping profile to set primary/secondary
-        proc = run_sort_file(["-w", "focal-invariant"])
+        proc = _run_sort_file(["-w", "focal-invariant"])
         self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
         out = proc.stdout.decode("utf-8")
 
@@ -48,10 +49,6 @@ class KeybindingsSortGroupingRegression(unittest.TestCase):
         self.assertEqual(when_lines[0], "config.keyboardNavigation.enabled")
 
         # ensure subsequent when clauses that include the same canonical left-id
-        # appear grouped (the first block of identical canonical values should
-        # include at least one compound when in this reference file).
-        # We'll check that all contiguous identical-left-id entries starting at
-        # index 0 have left-id 'config.keyboardNavigation.enabled'.
         def left_id(s: str) -> str:
             s = s.strip()
             while s.startswith("(") and s.endswith(")"):
@@ -67,6 +64,23 @@ class KeybindingsSortGroupingRegression(unittest.TestCase):
 
         # require at least one grouped item (the simple one plus at least one sibling)
         self.assertGreaterEqual(i, 1)
+
+
+#
+# functions
+#
+
+
+def _run_sort_file(args: list[str]) -> subprocess.CompletedProcess[bytes]:
+    cmd = [sys.executable, KEYBINDINGS_SORT_PY]
+    cmd.extend(args)
+    with open(DEFAULT_INPUT_FULL, "rb") as fh:
+        return subprocess.run(cmd, input=fh.read(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=REPO_ROOT)
+
+
+#
+# main
+#
 
 
 if __name__ == "__main__":

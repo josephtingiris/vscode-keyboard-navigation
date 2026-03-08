@@ -6,30 +6,48 @@ Integration tests for v0.0.2 corpus files against bin/keybindings-sort.py
 
 These are lightweight checks intended to run under `make test` quickly.
 """
+
 import os
 import subprocess
 import sys
 import traceback
 
+from vscode_keynav import io as _io
 
-def run_cmd(cmd, input_bytes=None):
-    proc = subprocess.run(cmd, input=input_bytes, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    return proc
+#
+# globals & constants
+#
 
 
-def test_corpus_roundtrip():
-    repo_root = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
-    script = os.path.join(repo_root, 'bin', 'keybindings-sort.py')
+REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.corpus.all.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.corpus.jsonc")
+
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
+
+
+#
+# classes
+#
+
+
+#
+# functions
+#
+
+
+def _test_corpus_roundtrip():
     variants = [
-        'keybindings.corpus.jsonc',
-        'keybindings.corpus.all.jsonc',
+        DEFAULT_INPUT_QUICK_SMALL,
         'keybindings.corpus.emacs.jsonc',
         'keybindings.corpus.kbm.jsonc',
         'keybindings.corpus.vi.jsonc',
+        DEFAULT_INPUT_FULL,
     ]
 
     for name in variants:
-        corpus = os.path.join(repo_root, 'references', name)
+        corpus = os.path.join(REPO_ROOT, 'references', name)
         print(f'CHECK {name}')
         if not os.path.exists(corpus):
             print('MISSING', corpus, file=sys.stderr)
@@ -37,7 +55,7 @@ def test_corpus_roundtrip():
         with open(corpus, 'rb') as f:
             data = f.read()
 
-        proc = run_cmd([sys.executable, script], input_bytes=data)
+        proc = _io._run_cmd([sys.executable, KEYBINDINGS_SORT_PY], input_bytes=data)
         if proc.returncode != 0:
             print(f'FAILED {name} rc={proc.returncode}', file=sys.stderr)
             print('STDERR:', proc.stderr.decode(), file=sys.stderr)
@@ -53,10 +71,15 @@ def test_corpus_roundtrip():
                 raise SystemExit(4)
 
 
+#
+# main
+#
+
+
 if __name__ == '__main__':
     try:
-        print('RUN test_corpus_roundtrip')
-        test_corpus_roundtrip()
+        print('RUN _test_corpus_roundtrip')
+        _test_corpus_roundtrip()
         print('OK')
         sys.exit(0)
     except SystemExit as e:

@@ -1,8 +1,37 @@
-from vscode_keynav import keybindings as _keybindings
-import re
+#!/usr/bin/env python3
+"""
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
+Test when block invariants.
+"""
+
 import json
-import subprocess
+import os
+
 from pathlib import Path
+
+import re
+import subprocess
+import sys
+
+from vscode_keynav import io as _io
+from vscode_keynav import keybindings as _keybindings
+
+#
+# globals & constants
+#
+
+
+REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "tests", "data", "keybindings-test-data.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "tests", "data", "keybindings-test-data.jsonc")
+
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
+
+#
+# functions
+#
 
 
 def strip_json_comments(s: str) -> str:
@@ -34,7 +63,6 @@ def extract_objects_from_jsonc(text: str):
 
 def parse_obj_text(obj_text: str):
     clean = strip_json_comments(obj_text)
-    # remove trailing commas before closing braces/brackets
     clean = re.sub(r',\s*([}\]])', r'\1', clean)
     try:
         return json.loads(clean)
@@ -43,12 +71,10 @@ def parse_obj_text(obj_text: str):
 
 
 def test_when_blocks_contiguous_and_modifier_first():
-    repo_root = Path(__file__).resolve().parents[1]
-    data_file = repo_root / 'tests' / 'data' / 'keybindings-test-data.jsonc'
-    sorter = repo_root / 'bin' / 'keybindings-sort.py'
+    with open(DEFAULT_INPUT_FULL, 'r', encoding='utf-8') as fh:
+        inp = fh.read()
 
-    inp = data_file.read_text(encoding='utf-8')
-    proc = subprocess.run(['python3', str(sorter), '-w', 'focal-invariant'], input=inp, text=True, capture_output=True)
+    proc = subprocess.run([sys.executable, str(KEYBINDINGS_SORT_PY), '-w', 'focal-invariant'], input=inp, text=True, capture_output=True)
     assert proc.returncode == 0, f"sorter failed: {proc.stderr}"
 
     out_text = proc.stdout
@@ -66,7 +92,7 @@ def test_when_blocks_contiguous_and_modifier_first():
             # skip unparsable objects
             continue
         keys.append(parsed.get('key', '') or '')
-        whens.append(parsed.get('when', '') or '')
+        whens.append(_io._normalize_whitespace(parsed.get('when', '') or ''))
 
     # contiguity: for each canonical when, occurrences must be contiguous
     idxs = {}
@@ -80,61 +106,10 @@ def test_when_blocks_contiguous_and_modifier_first():
             non_contig.append((k, len(arr), arr[0], arr[-1]))
     assert not non_contig, f"Found non-contiguous canonical when blocks: {non_contig[:10]}"
 
-    # in-block modifier-first: vekeybindings_sort_test_performance.graphs.pyy each contiguous block is ordered by the
+    # in-block modifier-first: each contiguous block is ordered by the
     # same key the sorter uses (mods_norm, token_seq, token_count).
-    CANONICAL_MOD_ORDER = ['ctrl', 'shift', 'alt', 'meta']
-
-    def _normalize_mods(mods: str) -> str:
-        parts = [p for p in mods.split('+') if p]
-        ordered = [p for p in CANONICAL_MOD_ORDER if p in parts]
-        others = sorted([p for p in parts if p not in ordered])
-        out = ordered + others
-        return '+'.join(out) + ('+' if out else '')
-
-    def _key_category_and_order(ch: str):
-        if not ch:
-            return (4, 0)
-        c0 = ch[0]
-        oc = ord(c0)
-        if c0.isalpha():
-            return (3, oc)
-        if c0.isdigit():
-            return (2, oc)
-        if oc >= 128:
-            try:
-                b = c0.encode('cp1252')
-                if b:
-                    return (1, b[0])
-            except Exception:
-                pass
-            return (1, oc)
-        return (0, oc)
-
     def _key_sort_tuple_from_key(key_raw: str):
-        if key_raw is None:
-            key_raw = ''
-        key_raw = str(key_raw)
-        if '+' in key_raw:
-            mods_part, base_part = key_raw.rsplit('+', 1)
-            if base_part == '':
-                base_part = '+'
-            mods_norm = _normalize_mods(mods_part)
-        else:
-            mods_norm = ''
-            base_part = key_raw
-
-        if base_part and all(ch == '+' for ch in base_part):
-            tokens = ['+']
-        else:
-            base_norm = _keybindings._normalize_key_for_compare(base_part)
-            tokens = [t for t in base_norm.split() if t != '']
-
-        token_seq = []
-        for t in tokens:
-            cat, order_key = _key_category_and_order(t)
-            token_seq.append((cat, order_key, t.encode('utf-8')))
-
-        return (mods_norm.encode('utf-8'), token_seq, len(tokens))
+        return _keybindings._group_sort_tuple_from_key_string(key_raw)
 
     i = 0
     violations = []
@@ -152,3 +127,12 @@ def test_when_blocks_contiguous_and_modifier_first():
             violations.append((whens[i], i, j - 1, keys_block[:8], [t.decode('utf-8', errors='ignore') if isinstance(t, bytes) else t for t in tuples[:8]]))
         i = j
     assert not violations, f"Modifier-first ordering violated in {len(violations)} blocks; sample: {violations[:5]}"
+
+#
+# main
+#
+
+
+if __name__ == "__main__":
+    test_when_blocks_contiguous_and_modifier_first()
+    print("OK")

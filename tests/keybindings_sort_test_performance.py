@@ -20,16 +20,30 @@ from __future__ import annotations
 import argparse
 import itertools
 import json
+import os
+
+from pathlib import Path
+
 import statistics
 import subprocess
 import sys
 import time
-from pathlib import Path
+
 from typing import Any
 
 
-PRIMARY_VALS = ["key", "when"]
-SECONDARY_VALS: list[str | None] = [None, "key", "when"]
+#
+# globals & constants
+#
+
+
+REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.surface.all.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.surface.vi.jsonc")
+
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
+
 GROUP_SORTING_VALS = [
     "alpha",
     "beta",
@@ -39,8 +53,10 @@ GROUP_SORTING_VALS = [
     "positive",
     "negative",
 ]
-WHEN_GROUPING_VALS = ["none", "config-first", "focal-invariant"]
+
 OBJECT_CLONES_VALS = [False, True]
+
+PRIMARY_VALS = ["key", "when"]
 
 QUICK_CASES: list[tuple[str, str | None, str, str, bool]] = [
     ("key", "when", "alpha", "none", False),
@@ -51,10 +67,21 @@ QUICK_CASES: list[tuple[str, str | None, str, str, bool]] = [
     ("when", None, "negative", "none", True),
 ]
 
+SECONDARY_VALS: list[str | None] = [None, "key", "when"]
+
 SMALL_GROUP_SORTING_VALS = ["alpha", "natural", "positive-natural", "negative-natural"]
 SMALL_WHEN_GROUPING_VALS = ["none", "focal-invariant"]
-DEFAULT_INPUT_QUICK_SMALL = "references/keybindings.surface.vi.jsonc"
-DEFAULT_INPUT_FULL = "references/keybindings.surface.all.jsonc"
+
+WHEN_GROUPING_VALS = ["none", "config-first", "focal-invariant"]
+
+#
+# classes
+#
+
+
+#
+# functions
+#
 
 
 def build_combos(mode: str) -> list[tuple[str, str | None, str, str, bool]]:

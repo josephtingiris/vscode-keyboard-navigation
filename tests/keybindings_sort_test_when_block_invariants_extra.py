@@ -1,14 +1,43 @@
-import re
+#!/usr/bin/env python3
+"""
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
+Test when block invariants (extras).
+"""
+
 import json
-import subprocess
+import os
+
 from pathlib import Path
+
+import re
+import subprocess
+import sys
+
+from vscode_keynav import io as _io
 from vscode_keynav import keybindings as _keybindings
 
 
-def strip_json_comments(s: str) -> str:
-    s = re.sub(r'//.*?\n', '\n', s)
-    s = re.sub(r'/\*.*?\*/', '', s, flags=re.S)
-    return s
+#
+# globals & constants
+#
+
+
+REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.surface.all.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.surface.vi.jsonc")
+
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
+
+#
+# classes
+#
+
+
+#
+# functions
+#
 
 
 def normalize_key_for_compare(key_value: str) -> str:
@@ -36,7 +65,7 @@ def extract_objects_from_jsonc(text: str):
 
 
 def parse_obj_text(obj_text: str):
-    clean = strip_json_comments(obj_text)
+    clean = _keybindings._strip_json_comments(obj_text)
     clean = re.sub(r',\s*([}\]])', r'\1', clean)
     try:
         return json.loads(clean)
@@ -45,12 +74,10 @@ def parse_obj_text(obj_text: str):
 
 
 def test_when_block_invariants_extra():
-    repo_root = Path(__file__).resolve().parents[1]
-    data_file = repo_root / 'tests' / 'data' / 'keybindings-test-data.jsonc'
-    sorter = repo_root / 'bin' / 'keybindings-sort.py'
+    with open(DEFAULT_INPUT_FULL, 'r', encoding='utf-8') as fh:
+        inp = fh.read()
 
-    inp = data_file.read_text(encoding='utf-8')
-    proc = subprocess.run(['python3', str(sorter), '-w', 'focal-invariant'], input=inp, text=True, capture_output=True)
+    proc = subprocess.run(['python3', KEYBINDINGS_SORT_PY, '-w', 'focal-invariant'], input=inp, text=True, capture_output=True)
     assert proc.returncode == 0, proc.stderr
 
     out_text = proc.stdout
@@ -64,7 +91,7 @@ def test_when_block_invariants_extra():
         if p is None:
             continue
         parsed_objs.append((o, p))
-        whens.append(p.get('when', '') or '')
+        whens.append(_io._normalize_whitespace(p.get('when', '') or ''))
 
     # contiguity
     idxs = {}
@@ -73,60 +100,9 @@ def test_when_block_invariants_extra():
     bad = [(k, arr) for k, arr in idxs.items() if arr and (arr[-1] - arr[0] + 1) != len(arr)]
     assert not bad, f"Non-contiguous whens: {bad[:5]}"
 
-    # in-block ordering: compare against sorter's key tuple logic
-    CANONICAL_MOD_ORDER = ['ctrl', 'shift', 'alt', 'meta']
-
-    def _normalize_mods(mods: str) -> str:
-        parts = [p for p in mods.split('+') if p]
-        ordered = [p for p in CANONICAL_MOD_ORDER if p in parts]
-        others = sorted([p for p in parts if p not in ordered])
-        out = ordered + others
-        return '+'.join(out) + ('+' if out else '')
-
-    def _key_category_and_order(ch: str):
-        if not ch:
-            return (4, 0)
-        c0 = ch[0]
-        oc = ord(c0)
-        if c0.isalpha():
-            return (3, oc)
-        if c0.isdigit():
-            return (2, oc)
-        if oc >= 128:
-            try:
-                b = c0.encode('cp1252')
-                if b:
-                    return (1, b[0])
-            except Exception:
-                pass
-            return (1, oc)
-        return (0, oc)
-
+    # in-block ordering: delegate to package comparator generator
     def _key_sort_tuple_from_key(key_raw: str):
-        if key_raw is None:
-            key_raw = ''
-        key_raw = str(key_raw)
-        if '+' in key_raw:
-            mods_part, base_part = key_raw.rsplit('+', 1)
-            if base_part == '':
-                base_part = '+'
-            mods_norm = _normalize_mods(mods_part)
-        else:
-            mods_norm = ''
-            base_part = key_raw
-
-        if base_part and all(ch == '+' for ch in base_part):
-            tokens = ['+']
-        else:
-            base_norm = normalize_key_for_compare(base_part)
-            tokens = [t for t in base_norm.split() if t != '']
-
-        token_seq = []
-        for t in tokens:
-            cat, order_key = _key_category_and_order(t)
-            token_seq.append((cat, order_key, t.encode('utf-8')))
-
-        return (mods_norm.encode('utf-8'), token_seq, len(tokens))
+        return _keybindings._group_sort_tuple_from_key_string(key_raw)
 
     i = 0
     n = len(whens)
@@ -143,3 +119,11 @@ def test_when_block_invariants_extra():
             viol.append((whens[i], i, j - 1, keys_block[:6]))
         i = j
     assert not viol, f"In-block ordering violations: {viol[:5]}"
+
+
+#
+# main
+#
+
+
+sys.path.insert(0, os.path.join(REPO_ROOT, "src"))

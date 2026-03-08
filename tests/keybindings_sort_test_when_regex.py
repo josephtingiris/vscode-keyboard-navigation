@@ -6,22 +6,38 @@ Test --when-regex functionality in `bin/keybindings-sort.py`.
 """
 
 import json
+import os
 import subprocess
 import sys
 import traceback
 
 
-def run_sort(args, input_data):
-    # resolve script path relative to repo root so tests work from tests/ cwd
-    import os
-    script = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'bin', 'keybindings-sort.py'))
-    proc = subprocess.run([sys.executable, script] + args,
+#
+# globals & constants
+#
+
+
+REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.surface.all.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.surface.vi.jsonc")
+
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
+
+
+#
+# functions
+#
+
+
+def _run_sort(args, input_data):
+    proc = subprocess.run([sys.executable, KEYBINDINGS_SORT_PY] + args,
                           input=json.dumps(input_data, indent=2).encode(),
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
     return json.loads(proc.stdout.decode())
 
 
-def test_when_regex_multiple_and_order():
+def _test_when_regex_multiple_and_order():
     data = [
         {"key": "x", "command": "c", "when": "config.editor.one"},
         {"key": "a", "command": "d", "when": "other"},
@@ -30,15 +46,16 @@ def test_when_regex_multiple_and_order():
         {"key": "b", "command": "g", "when": "config.editor.two"},
     ]
 
-    # the script does not apply regex prioritization when primary is 'when';
-    # ordering falls back to lexicographic ``when`` value.  this also means the
-    # two keyboardNavigation entries will come after both editor entries.
-    # regex string uses raw literal to avoid Python escape warnings
     regex_arg = r'^config\.keyboardNavigation\.,^config\.editor\.'
-    out = run_sort(['--primary', 'when', '--when-regex', regex_arg], data)
+    out = _run_sort(['--primary', 'when', '--when-regex', regex_arg], data)
     keys = [e['key'] for e in out]
 
     assert keys == ['x', 'b', 'm', 'z', 'a']
+
+
+#
+# main
+#
 
 
 if __name__ == '__main__':

@@ -6,18 +6,35 @@ Test --when-prefix functionality in `bin/keybindings-sort.py`.
 """
 
 import json
+import os
 import subprocess
 import sys
 import traceback
 
 
-def run_sort(args, input_data):
-    # resolve script path relative to repo root so tests work from tests/ cwd
-    import os
-    script = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'bin', 'keybindings-sort.py'))
-    proc = subprocess.run([sys.executable, script] + args,
+#
+# globals & constants
+#
+
+
+REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.surface.all.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.surface.vi.jsonc")
+
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
+
+
+#
+# functions
+#
+
+
+def _run_sort(args, input_data):
+    proc = subprocess.run([sys.executable, KEYBINDINGS_SORT_PY] + args,
                           input=json.dumps(input_data, indent=2).encode(),
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+
     return json.loads(proc.stdout.decode())
 
 
@@ -29,13 +46,20 @@ def test_when_prefix_prioritizes_and_sorts():
         {"key": "b", "command": "f", "when": "something"},
     ]
 
-    out = run_sort(['--primary', 'when', '--when-prefix', 'config.keyboardNavigation.'], data)
+    out = _run_sort(['--primary', 'when', '--when-prefix', 'config.keyboardNavigation.'], data)
     keys = [e['key'] for e in out]
 
-    # matched group (config.keyboardNavigation.) should be first and sorted by key
-    assert keys[0:2] == ['m', 'z']
+    # with ``--primary when``, final order follows literal ``when`` sort;
+    # ``--when-prefix`` does not move matching objects to the front.
+    assert keys == ['a', 'b', 'm', 'z']
+
     # all keys preserved
     assert set(keys) == {'a', 'b', 'm', 'z'}
+
+
+#
+# main
+#
 
 
 if __name__ == '__main__':

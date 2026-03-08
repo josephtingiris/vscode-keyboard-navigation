@@ -2,27 +2,35 @@
 """
 (C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
 
-[WIP] Tests sorting modes in `bin/keybindings-sort.py`.
+Tests keynav sorting modes.
 """
-import unittest
-import subprocess
-import json
-import re
-import sys
-from textwrap import dedent
 
 import os
+import re
+import subprocess
+import sys
 
-# Resolve script path relative to repository root (tests may run with CWD=tests/)
-SCRIPT = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'bin', 'keybindings-sort.py'))
+from textwrap import dedent
+
+import unittest
 
 
-def run_sort(input_json, args=None):
-    cmd = [sys.executable, SCRIPT]
-    if args:
-        cmd += args
-    proc = subprocess.run(cmd, input=input_json.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    return proc
+#
+# globals & constants
+#
+
+
+REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.surface.all.jsonc")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.surface.vi.jsonc")
+
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
+
+
+#
+# classes
+#
 
 
 class ModeTests(unittest.TestCase):
@@ -42,7 +50,7 @@ class ModeTests(unittest.TestCase):
           }
         ]
         ''')
-        proc = run_sort(data, ['--primary', 'when', '--group-sorting', 'positive'])
+        proc = _run_sort(data, ['--primary', 'when', '--group-sorting', 'positive'])
         out = proc.stdout.decode('utf-8')
         whens = re.findall(r'"when"\s*:\s*"([^\"]*)"', out)
         self.assertGreaterEqual(len(whens), 2)
@@ -63,7 +71,7 @@ class ModeTests(unittest.TestCase):
           }
         ]
         ''')
-        proc = run_sort(data, ['--primary', 'when', '--group-sorting', 'negative'])
+        proc = _run_sort(data, ['--primary', 'when', '--group-sorting', 'negative'])
         out = proc.stdout.decode('utf-8')
         whens = re.findall(r'"when"\s*:\s*"([^\"]*)"', out)
         self.assertGreaterEqual(len(whens), 2)
@@ -84,7 +92,7 @@ class ModeTests(unittest.TestCase):
           }
         ]
         ''')
-        proc = run_sort(data, ['--primary', 'when', '--group-sorting', 'natural'])
+        proc = _run_sort(data, ['--primary', 'when', '--group-sorting', 'natural'])
         out = proc.stdout.decode('utf-8')
         whens = re.findall(r'"when"\s*:\s*"([^\"]*)"', out)
         self.assertGreaterEqual(len(whens), 2)
@@ -109,12 +117,30 @@ class ModeTests(unittest.TestCase):
           }
         ]
         ''')
-        proc = run_sort(data, ['--primary', 'when', '--group-sorting', 'beta'])
+        proc = _run_sort(data, ['--primary', 'when', '--group-sorting', 'beta'])
         out = proc.stdout.decode('utf-8')
         whens = re.findall(r'"when"\s*:\s*"([^\"]*)"', out)
         self.assertGreaterEqual(len(whens), 2)
         self.assertEqual(whens[0].strip(), '!foo')
         self.assertEqual(whens[1].strip(), 'foo')
+
+
+#
+# functions
+#
+
+
+def _run_sort(input_json, args=None):
+    cmd = [sys.executable, KEYBINDINGS_SORT_PY]
+    if args:
+        cmd += args
+    proc = subprocess.run(cmd, input=input_json.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return proc
+
+
+#
+# main
+#
 
 
 if __name__ == '__main__':

@@ -9,95 +9,41 @@ emitted JSONC can be stripped and parsed as valid JSON.
 
 import json
 import os
-import re
-import shutil
 import subprocess
-import tempfile
 import unittest
 
+from vscode_keynav import cli as _cli
+from vscode_keynav import keybindings as _keybindings
 
-SCRIPT = os.path.normpath(
-    os.path.join(os.path.dirname(__file__), "..", "bin", "keybindings-corpus.py")
-)
+
+#
+# globals & constants
+#
+
+
 REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 
+DEFAULT_INPUT_FULL = os.path.join(REPO_ROOT, "references", "keybindings.json")
+DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.json")
 
-def get_path_python() -> str:
-    python_path = shutil.which("python3") or shutil.which("python")
-    if python_path is None:
-        raise RuntimeError("python3 or python must be available on PATH")
-    return python_path
+KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
 
+KEYBINDINGS_CORPUS_PY = os.path.join(REPO_ROOT, "bin", "keybindings-corpus.py")
 
-PATH_PYTHON = get_path_python()
-
-
-def strip_jsonc(text: str) -> str:
-    """Strip JSONC comments (line `//` and block `/* */`) while preserving strings."""
-    out = []
-    i = 0
-    n = len(text)
-    in_string = False
-    string_char = ""
-    esc = False
-    in_line = False
-    in_block = False
-    while i < n:
-        ch = text[i]
-        nxt2 = text[i:i + 2] if i + 2 <= n else ""
-        if in_line:
-            if ch == "\n":
-                out.append(ch)
-                in_line = False
-            i += 1
-            continue
-        if in_block:
-            if nxt2 == '*/':
-                i += 2
-                in_block = False
-            else:
-                i += 1
-            continue
-        if in_string:
-            out.append(ch)
-            if esc:
-                esc = False
-            elif ch == '\\':
-                esc = True
-            elif ch == string_char:
-                in_string = False
-            i += 1
-            continue
-        # default
-        if nxt2 == '//':
-            in_line = True
-            i += 2
-            continue
-        if nxt2 == '/*':
-            in_block = True
-            i += 2
-            continue
-        if ch == '"' or ch == "'":
-            in_string = True
-            string_char = ch
-            out.append(ch)
-            i += 1
-            continue
-        out.append(ch)
-        i += 1
-    return ''.join(out)
+PYTHON_EXEC = _cli._get_python_exec()
 
 
-def _strip_trailing_commas(text: str) -> str:
-    return re.sub(r',\s*([}\]])', r"\1", text)
+#
+# classes
+#
 
 
 class KeynavCommentsTests(unittest.TestCase):
     def test_default_output_does_not_add_feature_gate_contexts(self):
         proc = subprocess.run(
             [
-                PATH_PYTHON,
-                SCRIPT,
+                PYTHON_EXEC,
+                KEYBINDINGS_CORPUS_PY,
                 "--comments",
                 "none",
             ],
@@ -119,8 +65,8 @@ class KeynavCommentsTests(unittest.TestCase):
     def test_add_context_augments_generated_when_clauses(self):
         proc = subprocess.run(
             [
-                PATH_PYTHON,
-                SCRIPT,
+                PYTHON_EXEC,
+                KEYBINDINGS_CORPUS_PY,
                 "--comments",
                 "none",
                 "--add-context",
@@ -147,56 +93,41 @@ class KeynavCommentsTests(unittest.TestCase):
 
     def test_inject_comments_and_validate_json(self):
         # ensure the reference file is not modified
-        rel = "references/keybindings.json"
-        ref_path = os.path.join(REPO_ROOT, rel)
-        with open(ref_path, "r", encoding="utf-8") as fh:
+
+        with open(DEFAULT_INPUT_FULL, "r", encoding="utf-8") as fh:
             orig = fh.read()
 
         proc = subprocess.run(
-            [PATH_PYTHON, SCRIPT, "-c", rel],
+            [PYTHON_EXEC, KEYBINDINGS_CORPUS_PY, "-c", DEFAULT_INPUT_FULL],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             cwd=REPO_ROOT,
         )
         self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
 
-        # write stdout to a temp file for inspection (simulate redirect)
-        with tempfile.NamedTemporaryFile("wb", delete=False, suffix=".jsonc") as tmp:
-            tmp.write(proc.stdout)
-            tmp_name = tmp.name
+        emitted = proc.stdout.decode("utf-8")
 
-        try:
-            with open(tmp_name, "r", encoding="utf-8") as fh:
-                emitted = fh.read()
+        # strip comments and trailing commas, then parse JSON
+        stripped = _keybindings._strip_json_comments(emitted)
+        stripped = _keybindings._strip_trailing_commas(stripped)
+        parsed = json.loads(stripped)
+        self.assertIsInstance(parsed, list)
 
-            # strip comments and trailing commas, then parse JSON
-            stripped = strip_jsonc(emitted)
-            stripped = _strip_trailing_commas(stripped)
-            parsed = json.loads(stripped)
-            self.assertIsInstance(parsed, list)
-
-            # vekeybindings_sort_test_performance.graphs.pyy original reference file unchanged
-            with open(ref_path, "r", encoding="utf-8") as fh:
-                after = fh.read()
-            self.assertEqual(orig, after)
-        finally:
-            try:
-                os.unlink(tmp_name)
-            except Exception:
-                pass
+        # verify original reference file is unchanged
+        with open(DEFAULT_INPUT_FULL, "r", encoding="utf-8") as fh:
+            after = fh.read()
+        self.assertEqual(orig, after)
 
     def test_add_context_updates_comments_mode_when_output_only(self):
-        rel = "references/keybindings.json"
-        ref_path = os.path.join(REPO_ROOT, rel)
-        with open(ref_path, "r", encoding="utf-8") as fh:
+        with open(DEFAULT_INPUT_FULL, "r", encoding="utf-8") as fh:
             orig = fh.read()
 
         proc = subprocess.run(
             [
-                PATH_PYTHON,
-                SCRIPT,
+                PYTHON_EXEC,
+                KEYBINDINGS_CORPUS_PY,
                 "-c",
-                rel,
+                DEFAULT_INPUT_FULL,
                 "--add-context",
                 "editorTextFocus",
             ],
@@ -211,9 +142,14 @@ class KeynavCommentsTests(unittest.TestCase):
         self.assertIn("config.keyboardNavigation.split.enabled", emitted)
         self.assertIn("editorTextFocus", emitted)
 
-        with open(ref_path, "r", encoding="utf-8") as fh:
+        with open(DEFAULT_INPUT_FULL, "r", encoding="utf-8") as fh:
             after = fh.read()
         self.assertEqual(orig, after)
+
+
+#
+# main
+#
 
 
 if __name__ == "__main__":
