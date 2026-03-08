@@ -14,84 +14,27 @@ from typing import List, Tuple
 NUMBER_SPLIT_RE = re.compile(r"(\d+)")
 WHEN_TERM_SPLIT_RE = re.compile(r"\s*&&\s*|\s*\|\|\s*")
 
+# JSONC / object helpers used by CLI and other tools
+COMMENT_RE = re.compile(r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)', re.DOTALL | re.MULTILINE)
+TRAILING_COMMA_RE = re.compile(r',\s*([}\]])')
+OBJ_RE = re.compile(r'\{.*\}', re.DOTALL)
+KEY_EXTRACT_RE = re.compile(r'"key"\s*:\s*"((?:\\.|[^"\\])*)"')
+WHEN_EXTRACT_RE = re.compile(r'"when"\s*:\s*"((?:\\.|[^"\\])*)"')
+
+# caches
+CACHE_JSON_OBJECT: dict = {}
+CACHE_SORTABLE_WHEN: dict = {}
+
 # caches
 CACHE_NATURAL_KEY: dict = {}
 CACHE_NATURAL_KEY_CS: dict = {}
 CACHE_WHEN_SPECIFICITY: dict = {}
 
+#
+# classes
+#
 
-def _canonicalize_when(when_val: str) -> str:
-    """Return a stable, operand-level canonical form of a when expression."""
-
-    if not when_val:
-        return ""
-    parts = [p.strip() for p in WHEN_TERM_SPLIT_RE.split(when_val) if p and p.strip()]
-    return ' && '.join(sorted(set(parts)))
-
-
-def _key_tail_literal(key_value: str) -> str:
-    """Return the last literal part of a key description (e.g. 'ctrl+k' -> 'k')."""
-
-    cleaned = str(key_value).strip().lower()
-    if not cleaned:
-        return ""
-    final = cleaned.split()[-1]
-    bits = [bit.strip() for bit in final.split('+') if bit.strip()]
-    if not bits:
-        return ""
-    return bits[-1]
-
-
-def _normalize_key(k: str | None) -> str:
-    """Normalize a key string by trimming whitespace and decoding escapes."""
-
-    if k is None:
-        return ""
-    nk = str(k).strip()
-    try:
-        if "\\u" in nk or "\\x" in nk:
-            nk = nk.encode('utf-8').decode('unicode_escape')
-    except Exception:
-        pass
-    return nk
-
-
-def _normalize_key_for_compare(key_value: str) -> str:
-    """Return a lowercase, trimmed form of a key suitable for comparisons."""
-
-    if not key_value:
-        return ""
-    return key_value.strip().lower()
-
-
-def _parse_jsonc(text: str):
-    """Parse JSONC text by removing comments and trailing commas then loading JSON."""
-
-    t = re.sub(r"//.*?$", "", text, flags=re.M)
-    t = re.sub(r"/\*.*?\*/", "", t, flags=re.S)
-    t = re.sub(r",\s*([}\]])", r"\1", t)
-    return json.loads(t)
-
-
-def _split_when_contexts(expr: str | None) -> List[str]:
-    """Split a when expression into individual && contexts and return them."""
-
-    if not expr:
-        return []
-
-    normalized = str(expr).strip()
-    if not normalized:
-        return []
-
-    normalized = re.sub(r"^\s*&&\s*", "", normalized)
-    normalized = re.sub(r"\s*&&\s*$", "", normalized)
-    if not normalized:
-        return []
-
-    return [part.strip() for part in re.split(r"\s*&&\s*", normalized) if part.strip()]
-
-
-# AST node classes used by the token/parse functions
+# AST when node classes used by the token/parse functions
 
 
 class WhenNode:
@@ -152,6 +95,10 @@ class WhenOr(WhenNode):
             parts.append(s)
         return ' || '.join(parts)
 
+
+#
+# functions
+#
 
 def _render_when_node(node: WhenNode) -> str:
     """Render a WhenNode AST back to its string form while preserving parentheses."""
@@ -278,6 +225,77 @@ def _tokenize_when(expr: str):
     return tokens
 
 
+def _canonicalize_when(when_val: str) -> str:
+    """Return a stable, operand-level canonical form of a when expression."""
+
+    if not when_val:
+        return ""
+    parts = [p.strip() for p in WHEN_TERM_SPLIT_RE.split(when_val) if p and p.strip()]
+    return ' && '.join(sorted(set(parts)))
+
+
+def _key_tail_literal(key_value: str) -> str:
+    """Return the last literal part of a key description (e.g. 'ctrl+k' -> 'k')."""
+
+    cleaned = str(key_value).strip().lower()
+    if not cleaned:
+        return ""
+    final = cleaned.split()[-1]
+    bits = [bit.strip() for bit in final.split('+') if bit.strip()]
+    if not bits:
+        return ""
+    return bits[-1]
+
+
+def _normalize_key(k: str | None) -> str:
+    """Normalize a key string by trimming whitespace and decoding escapes."""
+
+    if k is None:
+        return ""
+    nk = str(k).strip()
+    try:
+        if "\\u" in nk or "\\x" in nk:
+            nk = nk.encode('utf-8').decode('unicode_escape')
+    except Exception:
+        pass
+    return nk
+
+
+def _normalize_key_for_compare(key_value: str) -> str:
+    """Return a lowercase, trimmed form of a key suitable for comparisons."""
+
+    if not key_value:
+        return ""
+    return key_value.strip().lower()
+
+
+def _parse_jsonc(text: str):
+    """Parse JSONC text by removing comments and trailing commas then loading JSON."""
+
+    t = re.sub(r"//.*?$", "", text, flags=re.M)
+    t = re.sub(r"/\*.*?\*/", "", t, flags=re.S)
+    t = re.sub(r",\s*([}\]])", r"\1", t)
+    return json.loads(t)
+
+
+def _split_when_contexts(expr: str | None) -> List[str]:
+    """Split a when expression into individual && contexts and return them."""
+
+    if not expr:
+        return []
+
+    normalized = str(expr).strip()
+    if not normalized:
+        return []
+
+    normalized = re.sub(r"^\s*&&\s*", "", normalized)
+    normalized = re.sub(r"\s*&&\s*$", "", normalized)
+    if not normalized:
+        return []
+
+    return [part.strip() for part in re.split(r"\s*&&\s*", normalized) if part.strip()]
+
+
 def _parse_when(expr: str) -> WhenNode:
     """Parse a when expression into a WhenNode AST representing its logical structure."""
 
@@ -398,3 +416,114 @@ def _natural_key_case_sensitive(s):
     except Exception:
         pass
     return out
+
+
+def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+    """Return a canonicalized when string suitable for stable sorting, preserving negation."""
+
+    if not when_val:
+        return ''
+
+    cache_key = (
+        when_val,
+        mode,
+        negation_mode,
+        None if when_prefixes is None else tuple(when_prefixes),
+        None if when_regexes is None else tuple(when_regexes),
+    )
+
+    cached = CACHE_SORTABLE_WHEN.get(cache_key)
+    if cached is not None:
+        return cached
+
+    # preserve negation for stable sorting by canonicalizing using package canonicalizer
+    when = _canonicalize_when(when_val)
+
+    try:
+        CACHE_SORTABLE_WHEN[cache_key] = when
+    except Exception:
+        pass
+
+    return when
+
+
+def _strip_json_comments(text):
+    """Strip JavaScript-style comments from JSONC text while preserving string literals."""
+
+    def _replacer(match):
+        s = match.group(0)
+        if s.startswith('/'):
+            return ''
+        return s
+
+    return COMMENT_RE.sub(_replacer, text)
+
+
+def _strip_trailing_commas(text):
+    """Remove trailing commas from JSON/JSONC text."""
+
+    return TRAILING_COMMA_RE.sub(r"\1", text)
+
+
+def _decode_json_string_literal(raw: str) -> str:
+    """Decode the inner text of a JSON string literal into a Python string."""
+
+    try:
+        return json.loads('"' + raw + '"')
+    except Exception:
+        try:
+            return bytes(raw, 'utf-8').decode('unicode_escape')
+        except Exception:
+            return raw
+
+
+def _parse_object(obj_text: str):
+    """Parse an object text (including braces) into a dict, caching results where possible."""
+
+    if not obj_text:
+        return None
+
+    m = OBJ_RE.search(obj_text)
+    if not m:
+        return None
+
+    obj_str = m.group(0)
+    cached = CACHE_JSON_OBJECT.get(obj_str)
+    if cached is not None:
+        return cached
+
+    try:
+        clean = _strip_json_comments(obj_str)
+        clean = _strip_trailing_commas(clean)
+        parsed = json.loads(clean)
+        try:
+            CACHE_JSON_OBJECT[obj_str] = parsed
+        except Exception:
+            pass
+        return parsed
+    except Exception:
+        return None
+
+
+def _extract_literal_key_from_object(obj_text: str) -> str:
+    """Return the decoded literal `key` value from an object text or empty string."""
+
+    match = KEY_EXTRACT_RE.search(obj_text)
+    if not match:
+        return ''
+    return _decode_json_string_literal(match.group(1))
+
+
+def _extract_literal_when_from_object(obj_text: str) -> str:
+    """Return the decoded literal `when` value from an object text or empty string."""
+
+    match = WHEN_EXTRACT_RE.search(obj_text)
+    if not match:
+        return ''
+    return _decode_json_string_literal(match.group(1))
+
+
+def _extract_key_when_from_object(obj_text: str) -> Tuple[str, str]:
+    """Return a tuple of literal `(key, when)` values extracted from an object text."""
+
+    return (_extract_literal_key_from_object(obj_text), _extract_literal_when_from_object(obj_text))

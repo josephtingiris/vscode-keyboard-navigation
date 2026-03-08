@@ -378,7 +378,7 @@ def _assemble_sorted_output(
                     return (0, oc)
 
                 def _key_sort_tuple_from_object(obj_text: str):
-                    key_raw = _extract_literal_key_from_object(obj_text) or ''
+                    key_raw = _keybindings._extract_literal_key_from_object(obj_text) or ''
 
                     # detect a trailing '+' (e.g., 'alt++')
                     if '+' in key_raw:
@@ -881,18 +881,6 @@ def _contains_focus_token_in_object(obj_text: str) -> bool:
     return bool(_get_run_obj_match_info(obj_text).get('has_focus', False))
 
 
-def _decode_json_string_literal(raw: str) -> str:
-    """Decode JSON string literal inner text to a Python string value."""
-
-    try:
-        return json.loads('"' + raw + '"')
-    except Exception:
-        try:
-            return bytes(raw, 'utf-8').decode('unicode_escape')
-        except Exception:
-            return raw
-
-
 def _embed_duplicate_comment_in_object(obj_text: str, duplicate_comment: str) -> str:
     """Insert a 'duplicate' line comment immediately inside an object's opening brace."""
 
@@ -937,37 +925,10 @@ def _embed_duplicate_comment_in_object(obj_text: str, duplicate_comment: str) ->
     return ''.join(lines)
 
 
-def _extract_key_when_from_object(obj_text: str) -> Tuple[str, str]:
-    """Return the literal `key` and `when` values extracted from an object text."""
-
-    info = _get_run_obj_info(obj_text)
-    return (info.get('key', ''), info.get('when', ''))
-
-
-def _extract_literal_key_from_object(obj_text: str) -> str:
-    """Return the literal (decoded) `key` string found in the object text or empty string."""
-
-    match = KEY_EXTRACT_RE.search(obj_text)
-    if not match:
-        return ''
-
-    return _decode_json_string_literal(match.group(1))
-
-
-def _extract_literal_when_from_object(obj_text: str) -> str:
-    """Return the literal (decoded) `when` string found in the object text or empty string."""
-
-    match = WHEN_EXTRACT_RE.search(obj_text)
-    if not match:
-        return ''
-
-    return _decode_json_string_literal(match.group(1))
-
-
 def _extract_modifiers_from_object(obj_text: str) -> tuple[tuple[str, ...], str]:
     """Return the modifier tuple and literal key token from the object key string."""
 
-    key_raw = _extract_literal_key_from_object(obj_text) or ''
+    key_raw = _keybindings._extract_literal_key_from_object(obj_text) or ''
     norm = _normalize_key_for_compare(key_raw)
     first = norm.split()[0] if norm else ''
     parts = [p for p in first.split('+') if p]
@@ -1405,7 +1366,7 @@ def _get_run_obj_duplicate_info(obj_text: str) -> tuple[str, str, str]:
         except Exception:
             json_canonical = ''
     else:
-        json_only = _strip_trailing_commas(_strip_json_comments(obj_text)).strip()
+        json_only = _keybindings._strip_trailing_commas(_keybindings._strip_json_comments(obj_text)).strip()
         try:
             parsed = json.loads(json_only)
             json_canonical = json.dumps(parsed, separators=(",", ":"), ensure_ascii=False)
@@ -1435,7 +1396,7 @@ def _get_run_obj_info(
     if info is not None:
         return info
 
-    parsed = _parse_object(obj_text)
+    parsed = _keybindings._parse_object(obj_text)
     key_val = ''
     when_val = ''
     canonical_when = ''
@@ -1457,7 +1418,7 @@ def _get_run_obj_info(
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         )
-        sortable_when = _sortable_when_key(
+        sortable_when = _keybindings._sortable_when_key(
             when_val,
             mode=grouping_mode,
             negation_mode=negation_mode,
@@ -1491,7 +1452,7 @@ def _get_run_obj_match_info(obj_text: str) -> dict:
 
     when_val = info.get('when', '')
     if not when_val:
-        when_val = _extract_literal_when_from_object(obj_text)
+        when_val = _keybindings._extract_literal_when_from_object(obj_text)
 
     left_ids: list[str] = []
     prefix_idxs: set[int] = set()
@@ -1687,7 +1648,7 @@ def _normalize_operand(text: str) -> str:
 def _normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple[str, bool]:
     """Canonicalize the `when` value inside an object text and return (new_text, changed)."""
 
-    parsed = _parse_object(obj_text)
+    parsed = _keybindings._parse_object(obj_text)
     if not parsed:
         return obj_text, False
 
@@ -1781,33 +1742,6 @@ def _object_has_trailing_comma(obj_text: str) -> bool:
                 return False
 
     return False
-
-
-def _parse_object(obj_text: str):
-    """Parse an object text (including braces) into a dict and cache the result."""
-
-    if not obj_text:
-        return None
-
-    # use the raw object string (including comments) as cache key
-    m = OBJ_RE.search(obj_text)
-    if not m:
-        return None
-
-    obj_str = m.group(0)
-    cached = CACHE_JSON_OBJECT.get(obj_str)
-
-    if cached is not None:
-        return cached
-
-    try:
-        clean = _strip_json_comments(obj_str)
-        clean = _strip_trailing_commas(clean)
-        parsed = json.loads(clean)
-        CACHE_JSON_OBJECT[obj_str] = parsed
-        return parsed
-    except Exception:
-        return None
 
 
 def _parse_when_prefixes(parser: argparse.ArgumentParser, raw_prefixes: str | None) -> list[str]:
@@ -1907,12 +1841,12 @@ def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode:
     groups_list = list(sorted_groups)
     i = 0
     while i < len(groups_list):
-        raw_when = _extract_literal_when_from_object(groups_list[i][1]) or ''
+        raw_when = _keybindings._extract_literal_when_from_object(groups_list[i][1]) or ''
         norm_when = _normalize_whitespace(raw_when)
         j = i + 1
 
         while j < len(groups_list):
-            next_when = _extract_literal_when_from_object(groups_list[j][1]) or ''
+            next_when = _keybindings._extract_literal_when_from_object(groups_list[j][1]) or ''
             if _normalize_whitespace(next_when) != norm_when:
                 break
             j += 1
@@ -1921,7 +1855,7 @@ def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode:
             slice_pairs = groups_list[i:j]
 
             def _mods_lit_from_pair(pair: tuple[str, str]) -> tuple[tuple[str, ...], str]:
-                key_raw = _extract_literal_key_from_object(pair[1]) or ''
+                key_raw = _keybindings._extract_literal_key_from_object(pair[1]) or ''
                 norm = _normalize_key_for_compare(key_raw)
                 first = norm.split()[0] if norm else ''
                 parts = [p for p in first.split('+') if p]
@@ -2031,9 +1965,9 @@ def _sort_groups_for_primary_when(
         when_val = info.get('when', '')
         canonical = info.get('canonical', '')
         if not key_val:
-            key_val = _extract_literal_key_from_object(pair[1])
+            key_val = _keybindings._extract_literal_key_from_object(pair[1])
         if not when_val:
-            when_val = _extract_literal_when_from_object(pair[1])
+            when_val = _keybindings._extract_literal_when_from_object(pair[1])
             if not canonical:
                 canonical = when_val
         decorated.append((key_val, when_val, canonical, pair))
@@ -2089,7 +2023,7 @@ def _sort_groups_for_primary_when(
     sorted_groups = [row[3] for row in decorated]
 
     for idx, pair in enumerate(sorted_groups):
-        key_val, when_val = _extract_key_when_from_object(pair[1])
+        key_val, when_val = _keybindings._extract_key_when_from_object(pair[1])
         try:
             canonical = _canonicalize_when(
                 when_val,
@@ -2140,23 +2074,23 @@ def _sort_groups_for_primary_when(
 
     i = 0
     while i < len(sorted_groups):
-        _, raw_when = _extract_key_when_from_object(sorted_groups[i][1])
+        _, raw_when = _keybindings._extract_key_when_from_object(sorted_groups[i][1])
         if not raw_when:
-            raw_when = _extract_literal_when_from_object(sorted_groups[i][1])
+            raw_when = _keybindings._extract_literal_when_from_object(sorted_groups[i][1])
 
         normalized_when = _normalize_whitespace(raw_when)
         j = i + 1
         while j < len(sorted_groups):
-            _, next_when = _extract_key_when_from_object(sorted_groups[j][1])
+            _, next_when = _keybindings._extract_key_when_from_object(sorted_groups[j][1])
             if not next_when:
-                next_when = _extract_literal_when_from_object(sorted_groups[j][1])
+                next_when = _keybindings._extract_literal_when_from_object(sorted_groups[j][1])
             if _normalize_whitespace(next_when) != normalized_when:
                 break
             j += 1
 
         if j - i > 1 and negation_mode not in ('positive', 'negative'):
             slice_pairs = sorted_groups[i:j]
-            slice_pairs.sort(key=lambda pair: _keybindings._natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
+            slice_pairs.sort(key=lambda pair: _keybindings._natural_key_case_sensitive(_keybindings._extract_literal_key_from_object(pair[1])))
             sorted_groups[i:j] = slice_pairs
 
         i = j
@@ -2216,72 +2150,6 @@ def _sort_groups_with_grouping_mode(
     for rank in sorted(buckets.keys(), reverse=True):
         final_groups.extend(buckets[rank])
     return final_groups
-
-
-def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
-    """Return a canonicalized when string suitable for stable sorting (preserving negation)."""
-
-    if not when_val:
-        return ''
-
-    cache_key = (
-        when_val,
-        mode,
-        negation_mode,
-        None if when_prefixes is None else tuple(when_prefixes),
-        None if when_regexes is None else tuple(when_regexes),
-    )
-
-    cached = CACHE_SORTABLE_WHEN.get(cache_key)
-
-    if cached is not None:
-        return cached
-
-    # per-run fast path
-    try:
-        run_key = (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes))
-        if RUN_CACHE_CONTEXT == run_key:
-            srun = RUN_SORTABLE_CACHE.get(when_val)
-            if srun is not None:
-                return srun
-    except Exception:
-        pass
-
-    # preserve negation for stable sorting
-    when = _canonicalize_when(when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
-
-    try:
-        CACHE_SORTABLE_WHEN[cache_key] = when
-    except Exception:
-        pass
-
-    try:
-        if RUN_CACHE_CONTEXT == (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes)):
-            RUN_SORTABLE_CACHE[when_val] = when
-    except Exception:
-        pass
-
-    return when
-
-
-def _strip_json_comments(text):
-    """Strip JavaScript-style comments from JSONC text, preserving string literals."""
-
-    def _replacer(match):
-        s = match.group(0)
-        if s.startswith('/'):
-            return ''
-        return s
-
-    return COMMENT_RE.sub(_replacer, text)
-
-
-def _strip_trailing_commas(text):
-    """Remove trailing commas from JSON-like object/array text."""
-
-    text = TRAILING_COMMA_RE.sub(r'\1', text)
-
-    return text
 
 
 def _strip_when_sorted_comment(comment_text: str, when_changed: bool) -> str:
@@ -2498,7 +2366,7 @@ def main(argv: List[str] | None = None) -> int:
                 for pair, sig in sig_map.items():
                     _, r_sig = sig
                     info = _get_run_obj_info(pair[1])
-                    when_val = info.get('when', '') or _extract_literal_when_from_object(pair[1])
+                    when_val = info.get('when', '') or _keybindings._extract_literal_when_from_object(pair[1])
                     if when_val and 'terminal' in when_val:
                         _debug._echo(1, 'group', when_val, f"REGEX_SAMPLE: p_sig={sig[0]} r_sig={r_sig} key={info.get('key', '')!r}")
                         sample_count += 1
@@ -2524,13 +2392,13 @@ def main(argv: List[str] | None = None) -> int:
                     block,
                     key=lambda pair: (
                         _canonicalize_when(
-                            _extract_key_when_from_object(pair[1])[1] or _extract_literal_when_from_object(pair[1]),
+                            _keybindings._extract_key_when_from_object(pair[1])[1] or _keybindings._extract_literal_when_from_object(pair[1]),
                             mode=grouping_mode,
                             negation_mode=negation_mode,
                             when_prefixes=when_prefixes,
                             when_regexes=when_regexes,
                         ),
-                        _keybindings._natural_key_case_sensitive(_normalize_key_for_compare(_extract_key_when_from_object(pair[1])[0])),
+                        _keybindings._natural_key_case_sensitive(_normalize_key_for_compare(_keybindings._extract_key_when_from_object(pair[1])[0])),
                     ),
                 )
             except Exception:
