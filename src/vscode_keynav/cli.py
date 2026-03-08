@@ -27,6 +27,7 @@ def _flag_present(raw_argv: list[str], names: list[str]) -> bool:
     for name in names:
         if name in raw_argv:
             return True
+
     return False
 
 
@@ -34,12 +35,15 @@ def _make_common_parser(prog: str | None = None) -> argparse.ArgumentParser:
     """Create and return a common ArgumentParser preconfigured with standard options."""
 
     p = argparse.ArgumentParser(prog=prog)
-    p.add_argument("-i", "--input", help="input file (defaults to stdin)", default="-")
-    p.add_argument("-o", "--output", help="output file (defaults to stdout)", default="-")
-    p.add_argument("--encoding", help="file encoding", default="utf-8")
+
+    # p.add_argument("-i", "--input", help="input file (defaults to stdin)", default="-")
+    # p.add_argument("-o", "--output", help="output file (defaults to stdout)", default="-")
+    # p.add_argument("--encoding", help="file encoding", default="utf-8")
+
     p.add_argument("--dry-run", action="store_true", help="don't write output")
     p.add_argument("-v", "--verbose", action="count", default=0, help="increase verbosity")
-    p.add_argument("--add-context", action="store_true", help="add feature-gate context when generating corpus")
+
+    # p.add_argument("--add-context", action="store_true", help="add feature-gate context when generating corpus")
 
     return p
 
