@@ -1414,7 +1414,7 @@ def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | 
         _keybindings.RUN_MATCH_CACHE = {}
     try:
         # clear package-level canonicalizer LRU cache
-        _keybindings._canonicalize_when_cache_clear()
+        _keybindings._clear_lru_when_cache()
     except Exception:
         pass
 
