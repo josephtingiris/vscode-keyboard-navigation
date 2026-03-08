@@ -70,23 +70,15 @@ from vscode_keynav import debug as _debug
 from vscode_keynav import io as _io
 from vscode_keynav import keybindings as _keybindings
 
-# global modifier order, i.e. ctrl+shift, ctrl+shift+alt, ctrl+shift+alt+meta
 
-CANONICAL_MODIFIER_ORDER = ['ctrl', 'shift', 'alt', 'meta']
+#
+# globals & constants
+#
 
-# color default output value, options: 'auto'|'always'|'never'
 
-COLOR: str = 'auto'
+# profile defaults for `--when-grouping` values; actual arg values always override these
 
-# debug defaults
-
-DEBUG_LEVEL: int = 0  # off
-DEBUG_TARGET_CATEGORY: str | None = None  # set vial --debug target=['when', 'ordered', 'canonicalize', ...]
-DEBUG_TARGET_WHEN: str = ""  # set via --debug when=
-
-# profile defaults for `--when-grouping` values; arg values always override these
-
-WHEN_GROUPING_PROFILES = {
+_WHEN_GROUPING_PROFILES = {
     'focal-invariant': {
         'primary': 'when',
         'secondary': 'key',
@@ -108,31 +100,14 @@ WHEN_GROUPING_PROFILES = {
 #
 
 
-def _apply_debug_settings(debug_specs: list[str] | None, color: str) -> None:
-    """Configure global debug filters and color mode."""
-
-    # delegate to shared debug module and mirror selected values locally
-    _debug._apply_settings(debug_specs, color)
-
-    try:
-        # mirror values so existing module references continue to work
-        global COLOR, DEBUG_LEVEL, DEBUG_TARGET_WHEN, DEBUG_TARGET_CATEGORY
-        COLOR = _debug._COLOR
-        DEBUG_LEVEL = _debug._DEBUG_LEVEL
-        DEBUG_TARGET_WHEN = _debug._DEBUG_TARGET_WHEN
-        DEBUG_TARGET_CATEGORY = _debug._DEBUG_TARGET_CATEGORY
-    except Exception:
-        pass
-
-
 def _apply_when_grouping_profile(args: argparse.Namespace, raw_argv: list[str]) -> None:
     """Apply a when-grouping profile to set appropriate default argument values."""
 
     sel_profile = args.when_grouping
-    if sel_profile not in WHEN_GROUPING_PROFILES:
+    if sel_profile not in _WHEN_GROUPING_PROFILES:
         return
 
-    profile = WHEN_GROUPING_PROFILES[sel_profile]
+    profile = _WHEN_GROUPING_PROFILES[sel_profile]
 
     if not _cli._flag_present(raw_argv, ['-p', '--primary']) and profile.get('primary') is not None:
         args.primary = profile['primary']
@@ -293,8 +268,9 @@ def _assemble_sorted_output(
                     return (mods_norm.encode('utf-8'), token_seq, len(tokens))
 
                 def _normalize_mods(mods: str) -> str:
+                    modifier_order = ['ctrl', 'shift', 'alt', 'meta']
                     parts = [p for p in mods.split('+') if p]
-                    ordered = [p for p in CANONICAL_MODIFIER_ORDER if p in parts]
+                    ordered = [p for p in modifier_order if p in parts]
                     others = sorted([p for p in parts if p not in ordered])
                     out = ordered + others
                     return '+'.join(out) + ('+' if out else '')
@@ -367,186 +343,6 @@ def _assemble_final_output(
     return _keybindings._remove_blank_lines(text)
 
 
-def _sort_groups_for_primary_when(
-    sorted_groups: list[tuple[str, str]],
-    grouping_mode: str,
-    negation_mode: str,
-    when_prefixes: list | None = None,
-    when_regexes: list | None = None,
-) -> list[tuple[str, str]]:
-    """Sort by `--primary when` derived keys and apply grouping heuristics."""
-
-    decorated: list[tuple[str, str, str, tuple[str, str]]] = []
-    for pair in sorted_groups:
-        info = _keybindings._get_run_obj_info(
-            pair[1],
-            grouping_mode=grouping_mode,
-            negation_mode=negation_mode,
-            when_prefixes=when_prefixes,
-            when_regexes=when_regexes,
-        )
-        key_val = info.get('key', '')
-        when_val = info.get('when', '')
-        canonical = info.get('canonical', '')
-        if not key_val:
-            key_val = _keybindings._extract_literal_key_from_object(pair[1])
-        if not when_val:
-            when_val = _keybindings._extract_literal_when_from_object(pair[1])
-            if not canonical:
-                canonical = when_val
-        decorated.append((key_val, when_val, canonical, pair))
-
-    for key_val, when_val, canonical, _pair in decorated:
-        if not canonical:
-            canonical = when_val
-
-        if DEBUG_LEVEL > 0:
-            normalized = _keybindings._normalize_key_for_compare(key_val)
-            try:
-                natural = _keybindings._natural_key(normalized)
-            except Exception:
-                natural = normalized
-            _debug._echo(
-                2,
-                'sort',
-                when_val,
-                f"DEBUG_SORT: raw_key={key_val!r} normalized={normalized!r} natural_key={natural!r} when_raw={when_val!r} when_canonical={canonical!r}",
-            )
-
-    decorated.sort(
-        key=lambda row: (
-            row[2],
-            row[1],
-            _keybindings._natural_key_case_sensitive(row[0]),
-        )
-    )
-
-    if grouping_mode == 'focal-invariant':
-        non_focus_rows = []
-        focus_rows = []
-        for row in decorated:
-            when_val = row[1] or ''
-            try:
-                match_info = _keybindings._get_run_obj_match_info(row[3][1])
-                found_focus = bool(match_info.get('has_focus', False))
-                for left_id in match_info.get('left_ids', ()):
-                    try:
-                        if 'terminal' in left_id or 'keyboardNavigation' in left_id:
-                            _debug._echo(1, 'group', when_val, f"SIG_PART: left_id={left_id!r}")
-                    except Exception:
-                        pass
-
-                if found_focus:
-                    focus_rows.append(row)
-                else:
-                    non_focus_rows.append(row)
-            except Exception:
-                non_focus_rows.append(row)
-        decorated = non_focus_rows + focus_rows
-
-    sorted_groups = [row[3] for row in decorated]
-
-    for idx, pair in enumerate(sorted_groups):
-        key_val, when_val = _keybindings._extract_key_when_from_object(pair[1])
-        try:
-            canonical = _keybindings._canonicalize_when(
-                when_val,
-                mode=grouping_mode,
-                negation_mode=negation_mode,
-                when_prefixes=when_prefixes,
-                when_regexes=when_regexes,
-            )
-        except Exception:
-            canonical = when_val
-
-        if DEBUG_LEVEL > 0:
-            normalized = _keybindings._normalize_key_for_compare(key_val)
-            _debug._echo(1, 'ordered', canonical, f"DEBUG_ORDERED: idx={idx} raw_key={key_val!r} normalized={normalized!r}")
-
-    #
-    # stable-partition when prefixes and/or regexes into three contiguous regions,
-    # following this order:
-    #  1. clauses matching any when_prefix (any operand),
-    #  2. clauses matching any when_regex (any operand) but not matching prefixes,
-    #  3. all remaining clauses.
-    #
-
-    if when_prefixes or when_regexes:
-        matched_prefix: list[tuple[str, str]] = []
-        matched_regex: list[tuple[str, str]] = []
-        others: list[tuple[str, str]] = []
-        for pair in sorted_groups:
-            match_info = _keybindings._get_run_obj_match_info(pair[1])
-            found_prefix = bool(match_info.get('prefix_idxs'))
-            found_regex = bool(match_info.get('regex_idxs'))
-
-            if found_regex:
-                matched_regex.append(pair)
-            elif found_prefix:
-                matched_prefix.append(pair)
-            else:
-                others.append(pair)
-
-        if matched_prefix or matched_regex:
-            _debug._echo(
-                1,
-                'group',
-                None,
-                f"partitioned primary-when: prefix={len(matched_prefix)} regex={len(matched_regex)} others={len(others)}",
-            )
-            sorted_groups = matched_prefix + matched_regex + others
-
-    i = 0
-    while i < len(sorted_groups):
-        _, raw_when = _keybindings._extract_key_when_from_object(sorted_groups[i][1])
-        if not raw_when:
-            raw_when = _keybindings._extract_literal_when_from_object(sorted_groups[i][1])
-
-        normalized_when = _io._normalize_whitespace(raw_when)
-        j = i + 1
-        while j < len(sorted_groups):
-            _, next_when = _keybindings._extract_key_when_from_object(sorted_groups[j][1])
-            if not next_when:
-                next_when = _keybindings._extract_literal_when_from_object(sorted_groups[j][1])
-            if _io._normalize_whitespace(next_when) != normalized_when:
-                break
-            j += 1
-
-        if j - i > 1 and negation_mode not in ('positive', 'negative'):
-            slice_pairs = sorted_groups[i:j]
-            slice_pairs.sort(key=lambda pair: _keybindings._natural_key_case_sensitive(_keybindings._extract_literal_key_from_object(pair[1])))
-            sorted_groups[i:j] = slice_pairs
-
-        i = j
-
-    return sorted_groups
-
-
-def _sort_groups_initial(
-    normalized_groups: list[tuple[str, str]],
-    primary_order: str,
-    secondary_order: str | None,
-    grouping_mode: str,
-    negation_mode: str,
-    when_prefixes: list | None = None,
-    when_regexes: list | None = None,
-) -> list[tuple[str, str]]:
-    """Perform the initial stable sort of normalized groups using extract_sort_keys logic."""
-
-    return sorted(
-        normalized_groups,
-        key=lambda pair: _keybindings._extract_sort_keys_from_object(
-            pair[1],
-            primary=primary_order,
-            secondary=secondary_order,
-            grouping=grouping_mode,
-            negation_mode=negation_mode,
-            when_prefixes=when_prefixes,
-            when_regexes=when_regexes,
-        ),
-    )
-
-
 def _sort_groups_with_grouping_mode(
     sorted_groups: list[tuple[str, str]],
     grouping_mode: str,
@@ -579,9 +375,6 @@ def _sort_groups_with_grouping_mode(
 #
 # main
 #
-
-
-_render_when_node = _keybindings._render_when_node
 
 
 def main(argv: List[str] | None = None) -> int:
@@ -646,7 +439,7 @@ def main(argv: List[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
 
-    _apply_debug_settings(args.debug, args.color)
+    _debug._apply_settings(args.debug, args.color)
 
     try:
         _debug._echo(2, 'init', None, 'debugging enabled')
@@ -677,7 +470,7 @@ def main(argv: List[str] | None = None) -> int:
         when_regexes=when_regexes,
     )
 
-    sorted_groups = _sort_groups_initial(
+    sorted_groups = _keybindings._sort_groups_initial(
         normalized_groups,
         primary_order,
         secondary_order,
@@ -699,7 +492,7 @@ def main(argv: List[str] | None = None) -> int:
         sorted_groups = _keybindings._partition_focus_groups_to_end(sorted_groups)
 
     if primary_order == 'when':
-        sorted_groups = _sort_groups_for_primary_when(
+        sorted_groups = _keybindings._sort_groups_for_primary_when(
             sorted_groups,
             grouping_mode,
             negation_mode,
