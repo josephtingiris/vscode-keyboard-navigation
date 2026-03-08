@@ -15,6 +15,11 @@ from .keybindings import _canonicalize_when, _key_tail_literal
 #
 
 
+#
+# functions
+#
+
+
 def _augment_when_clause(base_when: str, contexts: List[str]) -> str:
     """Augment a base when clause by OR-ing the provided context clauses."""
 
