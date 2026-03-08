@@ -1741,6 +1741,28 @@ def _replace_when_literal_match(
     return match.group(1) + escaped + match.group(3)
 
 
+def _replace_when_literals(
+    text: str,
+    grouping_mode: str,
+    negation_mode: str,
+    when_prefixes: list | None = None,
+    when_regexes: list | None = None,
+) -> str:
+    """Replace all `when` string literals inside JSONC text with their canonical forms."""
+
+    return re.sub(
+        r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")',
+        lambda match: _replace_when_literal_match(
+            match,
+            grouping_mode,
+            negation_mode,
+            when_prefixes=when_prefixes,
+            when_regexes=when_regexes,
+        ),
+        text,
+    )
+
+
 def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Return a canonicalized when string suitable for stable sorting, preserving negation."""
 

@@ -367,28 +367,6 @@ def _assemble_final_output(
     return _keybindings._remove_blank_lines(text)
 
 
-def _replace_when_literals(
-    text: str,
-    grouping_mode: str,
-    negation_mode: str,
-    when_prefixes: list | None = None,
-    when_regexes: list | None = None,
-) -> str:
-    """Replace all `when` string literals inside JSONC text with their canonical forms."""
-
-    return re.sub(
-        r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")',
-        lambda match: _keybindings._replace_when_literal_match(
-            match,
-            grouping_mode,
-            negation_mode,
-            when_prefixes=when_prefixes,
-            when_regexes=when_regexes,
-        ),
-        text,
-    )
-
-
 def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
     """Initialize and clear per-run caches for the current run parameter context."""
 
