@@ -2,4 +2,4 @@
 
 Expose small, stable helpers here where appropriate.
 """
-__all__ = ["io"]
+__all__ = ["io", "keybindings", "corpus"]
