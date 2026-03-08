@@ -289,7 +289,7 @@ def _assemble_sorted_output(
                     if base_part and all(ch == '+' for ch in base_part):
                         tokens = ['+']
                     else:
-                        base_norm = _normalize_key_for_compare(base_part)
+                        base_norm = _keybindings._normalize_key_for_compare(base_part)
                         tokens = [t for t in base_norm.split() if t != '']
 
                     # build token comparator sequence: (category_rank, bytes)
@@ -566,7 +566,7 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
 
         # special-case: when primary is key and secondary is when, ensure strict key-first ordering by returning a simple tuple: (rank, key, when_specificity, when_sortable)
         if primary == 'key' and secondary == 'when':
-            norm = _normalize_key_for_compare(key_val)
+            norm = _keybindings._normalize_key_for_compare(key_val)
             key_token = _keybindings._natural_key(norm)
             spec = _keybindings._when_specificity(when_val)
             when_token = _keybindings._natural_key_case_sensitive(sortable_when)
@@ -661,7 +661,7 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                 # this makes matched groups easier to inspect
                 if match_rank != 9999:
                     # prefer normalized key ordering for stability: modifiers normalized
-                    norm_key = _normalize_key_for_compare(key_val)
+                    norm_key = _keybindings._normalize_key_for_compare(key_val)
                     tokens.append(_keybindings._natural_key(norm_key))
                     tokens.append(spec_key)
                     tokens.append(grouping)
@@ -677,7 +677,7 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
 
         def append_key():
             # use normalized key comparison (consistent modifier ordering)
-            norm = _normalize_key_for_compare(key_val)
+            norm = _keybindings._normalize_key_for_compare(key_val)
             tokens.append(_keybindings._natural_key(norm))
 
         # primary
@@ -791,11 +791,11 @@ def _first_when_group_rank(
     left_id = left.split()[0]
 
     if mode == 'focal-invariant':
-        if any(_matches_when_entry(left_id, entry) for entry in _keybindings.FOCUS_TOKENS):
+        if any(_keybindings._matches_when_entry(left_id, entry) for entry in _keybindings.FOCUS_TOKENS):
             return 1  # Focus tokens have the highest priority
         if any(left_id.startswith(prefix) for prefix in _keybindings.POSITIONAL_TOKENS):
             return 2  # Positional tokens are next in priority
-        if any(_matches_when_entry(left_id, entry) for entry in _keybindings.VISIBILITY_TOKENS):
+        if any(_keybindings._matches_when_entry(left_id, entry) for entry in _keybindings.VISIBILITY_TOKENS):
             return 3  # Visibility tokens follow
         if left_id.startswith('config.'):
             return 4  # Config tokens are lower priority
@@ -803,11 +803,11 @@ def _first_when_group_rank(
 
     if left_id.startswith('config.'):
         return 1
-    if any(_matches_when_entry(left_id, entry) for entry in _keybindings.FOCUS_TOKENS):
+    if any(_keybindings._matches_when_entry(left_id, entry) for entry in _keybindings.FOCUS_TOKENS):
         return 2
     if any(left_id.startswith(prefix) for prefix in _keybindings.POSITIONAL_TOKENS):
         return 3
-    if any(_matches_when_entry(left_id, entry) for entry in _keybindings.VISIBILITY_TOKENS):
+    if any(_keybindings._matches_when_entry(left_id, entry) for entry in _keybindings.VISIBILITY_TOKENS):
         return 4
     return 5
 
@@ -951,6 +951,7 @@ def _get_run_obj_match_info(obj_text: str) -> dict:
 
 def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]], str]:
     """Split a JSON array body into a list of (leading_comments, object_text) pairs and trailing comments."""
+
     groups: list[tuple[str, str]] = []
     comments = ''
     n = len(array_text)
@@ -1030,42 +1031,6 @@ def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]]
 
     trailing_comments = txt[comments_start:]
     return groups, trailing_comments
-
-
-def _matches_when_entry(left: str, entry: str) -> bool:
-    """Return True if the left identifier matches the when-entry pattern (supports prefixes and <viewId>)."""
-
-    if entry.endswith('.'):
-        return left.startswith(entry)
-    if '<viewId>' in entry:
-        prefix, suffix = entry.split('<viewId>', 1)
-        return left.startswith(prefix) and left.endswith(suffix)
-    return left == entry
-
-
-def _normalize_key_for_compare(key_value):
-    """Lightweight normalization for key sorting."""
-
-    if not key_value:
-        return ""
-    key_value = str(key_value).strip().lower()
-    if not key_value:
-        return ""
-
-    chords = [p for p in key_value.split() if p.strip()]
-    out_chords = []
-    for chord in chords:
-        parts = [b.strip() for b in chord.split("+") if b.strip()]
-        if not parts:
-            continue
-        lit = parts[-1]
-        mods = sorted(parts[:-1])
-        if mods:
-            out_chords.append("+".join(mods + [lit]))
-        else:
-            out_chords.append(lit)
-
-    return " ".join(out_chords)
 
 
 def _normalize_operand(text: str) -> str:
@@ -1281,12 +1246,12 @@ def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode:
 
             def _mods_lit_from_pair(pair: tuple[str, str]) -> tuple[tuple[str, ...], str]:
                 key_raw = _keybindings._extract_literal_key_from_object(pair[1]) or ''
-                norm = _normalize_key_for_compare(key_raw)
+                norm = _keybindings._normalize_key_for_compare(key_raw)
                 first = norm.split()[0] if norm else ''
                 parts = [p for p in first.split('+') if p]
                 mods = tuple(parts[:-1]) if len(parts) > 1 else tuple()
                 lit = parts[-1] if parts else ''
-                lit_key = _normalize_key_for_compare(lit)
+                lit_key = _keybindings._normalize_key_for_compare(lit)
                 return (mods, lit_key)
 
             slice_pairs.sort(key=lambda pair: _mods_lit_from_pair(pair))
@@ -1427,7 +1392,7 @@ def _sort_groups_for_primary_when(
             canonical = when_val
 
         if DEBUG_LEVEL > 0:
-            normalized = _normalize_key_for_compare(key_val)
+            normalized = _keybindings._normalize_key_for_compare(key_val)
             try:
                 natural = _keybindings._natural_key(normalized)
             except Exception:
@@ -1486,7 +1451,7 @@ def _sort_groups_for_primary_when(
             canonical = when_val
 
         if DEBUG_LEVEL > 0:
-            normalized = _normalize_key_for_compare(key_val)
+            normalized = _keybindings._normalize_key_for_compare(key_val)
             _debug._echo(1, 'ordered', canonical, f"DEBUG_ORDERED: idx={idx} raw_key={key_val!r} normalized={normalized!r}")
 
     #
@@ -1845,7 +1810,7 @@ def main(argv: List[str] | None = None) -> int:
                             when_prefixes=when_prefixes,
                             when_regexes=when_regexes,
                         ),
-                        _keybindings._natural_key_case_sensitive(_normalize_key_for_compare(_keybindings._extract_key_when_from_object(pair[1])[0])),
+                        _keybindings._natural_key_case_sensitive(_keybindings._normalize_key_for_compare(_keybindings._extract_key_when_from_object(pair[1])[0])),
                     ),
                 )
             except Exception:

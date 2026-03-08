@@ -684,6 +684,18 @@ def _matches_entry(left: str, entry: str) -> bool:
     return left == entry
 
 
+def _matches_when_entry(left: str, entry: str) -> bool:
+    """Return True if the left identifier matches the when-entry pattern (supports prefixes and <viewId>)."""
+
+    if entry.endswith('.'):
+        return left.startswith(entry)
+    if '<viewId>' in entry:
+        prefix, suffix = entry.split('<viewId>', 1)
+        return left.startswith(prefix) and left.endswith(suffix)
+
+    return left == entry
+
+
 def _natural_key(s):
     """Return a locale-independent natural-sort key (a list of ints and strings) for sorting."""
 
@@ -737,12 +749,28 @@ def _normalize_key(k: str | None) -> str:
 
 
 def _normalize_key_for_compare(key_value: str) -> str:
-    """Return a lowercase, trimmed form of a key suitable for comparisons."""
+    """Lightweight normalization for key sorting."""
 
     if not key_value:
         return ""
+    key_value = str(key_value).strip().lower()
+    if not key_value:
+        return ""
 
-    return key_value.strip().lower()
+    chords = [p for p in key_value.split() if p.strip()]
+    out_chords = []
+    for chord in chords:
+        parts = [b.strip() for b in chord.split("+") if b.strip()]
+        if not parts:
+            continue
+        lit = parts[-1]
+        mods = sorted(parts[:-1])
+        if mods:
+            out_chords.append("+".join(mods + [lit]))
+        else:
+            out_chords.append(lit)
+
+    return " ".join(out_chords)
 
 
 def _parse_jsonc(text: str):
