@@ -181,6 +181,51 @@ class WhenOr(WhenNode):
 #
 
 
+def _canonicalize_modifiers(mods_part: str) -> str:
+    """Return a canonical modifier ordering string for tests and stable comparisons."""
+
+    if not mods_part:
+        return ''
+
+    modifier_order = ['ctrl', 'shift', 'alt', 'meta']
+    parts = [p for p in mods_part.split('+') if p]
+    ordered = [p for p in modifier_order if p in parts]
+    others = sorted([p for p in parts if p not in ordered])
+    out = ordered + others
+
+    return '+'.join(out) + ('+' if out else '')
+
+
+def _key_category_and_order_for_grouping(ch: str) -> tuple[int, int]:
+    """Return (category, order_key) used by grouping-level key sorting.
+
+    Categories:
+      0 = primary ASCII special (printable non-alnum, ord < 128)
+      1 = extended special (ord >= 128)
+      2 = digit
+      3 = letter
+      4 = empty/unknown
+    """
+
+    if not ch:
+        return (4, 0)
+    c0 = ch[0]
+    oc = ord(c0)
+    if c0.isalpha():
+        return (3, oc)
+    if c0.isdigit():
+        return (2, oc)
+    if oc >= 128:
+        try:
+            b = c0.encode('cp1252')
+            if b:
+                return (1, b[0])
+        except Exception:
+            pass
+        return (1, oc)
+    return (0, oc)
+
+
 def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Return canonicalized when entry from an LRU cache."""
 
@@ -1297,6 +1342,34 @@ def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]]
 
     trailing_comments = txt[comments_start:]
     return groups, trailing_comments
+
+
+def _group_sort_tuple_from_key_string(key_raw: str):
+    """Return the sort tuple used when sorting items inside a canonical `when` group."""
+
+    # detect a trailing '+' (e.g., 'alt++')
+    if '+' in key_raw:
+        mods_part, base_part = key_raw.rsplit('+', 1)
+        if base_part == '':
+            base_part = '+'
+        mods_norm = _canonicalize_modifiers(mods_part)
+    else:
+        mods_norm = ''
+        base_part = key_raw
+
+    # handle '+' literal
+    if base_part and all(ch == '+' for ch in base_part):
+        tokens = ['+']
+    else:
+        base_norm = _normalize_key_for_compare(base_part)
+        tokens = [t for t in base_norm.split() if t != '']
+
+    token_seq = []
+    for t in tokens:
+        cat, order_key = _key_category_and_order_for_grouping(t)
+        token_seq.append((cat, order_key, t.encode('utf-8')))
+
+    return (mods_norm.encode('utf-8'), token_seq, len(tokens))
 
 
 def _key_tail_literal(key_value: str) -> str:

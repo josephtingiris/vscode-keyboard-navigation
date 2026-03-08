@@ -199,82 +199,6 @@ def _assemble_sorted_output(
                 hash_map = {}
                 jsonhash_to_indices = {}
 
-                def _key_category_and_order(ch: str) -> tuple[int, int]:
-
-                    #
-                    # return (category, order_key) where category is:
-                    #
-                    # 0 = primary ASCII special (printable non-alnum, ord < 128)
-                    # 1 = extended special (ord >= 128)
-                    # 2 = digit
-                    # 3 = letter
-                    # 4 = empty/unknown
-                    #
-                    # order_key is an int used to order within the category:
-                    #
-                    # - for ASCII specials: the ASCII code of first char
-                    # - for extended specials: attempt CP1252 byte value (Alt-code) falling back to Unicode codepoint
-                    # - for digits/letters: the Unicode codepoint of first char
-                    #
-
-                    if not ch:
-                        return (4, 0)
-                    c0 = ch[0]
-                    oc = ord(c0)
-                    if c0.isalpha():
-                        return (3, oc)
-                    if c0.isdigit():
-                        return (2, oc)
-                    # extended (non-ascii) specials
-                    if oc >= 128:
-                        # try to map to CP1252 byte value (common Alt-code mapping on Windows)
-                        try:
-                            b = c0.encode('cp1252')
-                            if b:
-                                return (1, b[0])
-                        except Exception:
-                            pass
-                        return (1, oc)
-                    # primary ASCII special
-                    return (0, oc)
-
-                def _key_sort_tuple_from_object(obj_text: str):
-                    key_raw = _keybindings._extract_literal_key_from_object(obj_text) or ''
-
-                    # detect a trailing '+' (e.g., 'alt++')
-                    if '+' in key_raw:
-                        mods_part, base_part = key_raw.rsplit('+', 1)
-                        if base_part == '':
-                            base_part = '+'
-                        mods_norm = _normalize_mods(mods_part)
-                    else:
-                        mods_norm = ''
-                        base_part = key_raw
-
-                    # handle '+' before normalization
-                    if base_part and all(ch == '+' for ch in base_part):
-                        tokens = ['+']
-                    else:
-                        base_norm = _keybindings._normalize_key_for_compare(base_part)
-                        tokens = [t for t in base_norm.split() if t != '']
-
-                    # build token comparator sequence: (category_rank, bytes)
-                    token_seq = []
-                    for t in tokens:
-                        cat, order_key = _key_category_and_order(t)
-                        token_seq.append((cat, order_key, t.encode('utf-8')))
-
-                    # final sort tuple: normalized mods (bytewise), token_seq, token_count
-                    return (mods_norm.encode('utf-8'), token_seq, len(tokens))
-
-                def _normalize_mods(mods: str) -> str:
-                    modifier_order = ['ctrl', 'shift', 'alt', 'meta']
-                    parts = [p for p in mods.split('+') if p]
-                    ordered = [p for p in modifier_order if p in parts]
-                    others = sorted([p for p in parts if p not in ordered])
-                    out = ordered + others
-                    return '+'.join(out) + ('+' if out else '')
-
                 # compute hashes and collect json-hash groups
                 for idx_e, (_comments, obj_text, _canonical) in enumerate(entries):
                     full_h, json_h, json_canonical = _keybindings._get_run_obj_duplicate_info(obj_text)
@@ -293,8 +217,8 @@ def _assemble_sorted_output(
                             dup_comment = f'// DUPLICATE JSON object (json-hash={json_h})'
                             entries[i] = (c, _keybindings._embed_duplicate_comment_in_object(o, dup_comment), entry_canonical)
 
-                # now sort entries by comparator derived from their key strings
-                entries.sort(key=lambda pair: _key_sort_tuple_from_object(pair[1]))
+                # sort by comparator derived from the key strings
+                entries.sort(key=lambda pair: _keybindings._group_sort_tuple_from_key_string(_keybindings._extract_literal_key_from_object(pair[1]) or ''))
             new_rendered.extend(entries)
 
         rendered_groups = new_rendered
