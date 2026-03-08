@@ -1399,11 +1399,22 @@ def _normalize_key_for_compare(key_value: str) -> str:
     chords = [p for p in key_value.split() if p.strip()]
     out_chords = []
     for chord in chords:
-        parts = [b.strip() for b in chord.split("+") if b.strip()]
+        raw_parts = chord.split("+")
+        parts = [p.strip() for p in raw_parts]
         if not parts:
             continue
-        lit = parts[-1]
-        mods = sorted(parts[:-1])
+
+        # detect literal '+' (trailing plus) when the last token is empty
+        if parts and parts[-1] == "":
+            lit = '+'
+            mods_part = parts[:-1]
+        else:
+            lit = parts[-1]
+            mods_part = parts[:-1]
+
+        # filter out any empty modifier tokens and sort modifiers for stable ordering
+        mods = sorted([m for m in mods_part if m])
+
         if mods:
             out_chords.append("+".join(mods + [lit]))
         else:
