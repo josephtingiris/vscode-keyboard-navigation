@@ -10,6 +10,7 @@ from pathlib import Path
 
 import re
 import sys
+import subprocess
 
 from typing import Optional, Union, Pattern
 
@@ -58,6 +59,12 @@ def _read_input_text(path: Union[str, Path, None]) -> Optional[str]:
     if not sys.stdin.isatty():
         return sys.stdin.read()
     return None
+
+
+def _run_cmd(cmd, input_bytes=None):
+    """Run a command."""
+
+    return subprocess.run(cmd, input=input_bytes, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 
 def _write_output_text(path: Union[str, Path, None], text: str) -> None:
