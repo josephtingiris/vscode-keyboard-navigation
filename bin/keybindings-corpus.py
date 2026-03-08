@@ -48,6 +48,7 @@ import hashlib
 import inspect
 import os
 import re
+from vscode_keynav.keybindings import normalize_key as _normalize_key, split_when_contexts as _split_when_contexts
 
 # MODIFIERS
 
@@ -319,21 +320,6 @@ def _normalize_key(k: str | None) -> str:
         pass
     return nk
 
-
-def _split_when_contexts(expr: str | None) -> List[str]:
-    if not expr:
-        return []
-
-    normalized = expr.strip()
-    if not normalized:
-        return []
-
-    normalized = re.sub(r"^\s*&&\s*", "", normalized)
-    normalized = re.sub(r"\s*&&\s*$", "", normalized)
-    if not normalized:
-        return []
-
-    return [part.strip() for part in re.split(r"\s*&&\s*", normalized) if part.strip()]
 
 
 def _tags_for(

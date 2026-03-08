@@ -36,3 +36,39 @@ def key_tail_literal(key_value: str) -> str:
     if not bits:
         return ""
     return bits[-1]
+
+
+def normalize_key(k: str | None) -> str:
+    """Return a normalized key literal for reliable membership tests.
+
+    Strips surrounding whitespace and decodes common escape sequences
+    such as "\\uXXXX" or "\\x.." when present. Returns an empty
+    string for None or invalid inputs.
+    """
+    if k is None:
+        return ""
+    nk = str(k).strip()
+    try:
+        if "\\u" in nk or "\\x" in nk:
+            nk = nk.encode('utf-8').decode('unicode_escape')
+    except Exception:
+        pass
+    return nk
+
+
+def split_when_contexts(expr: str | None) -> list[str]:
+    if not expr:
+        return []
+
+    normalized = expr.strip()
+    if not normalized:
+        return []
+
+    import re
+
+    normalized = re.sub(r"^\s*&&\s*", "", normalized)
+    normalized = re.sub(r"\s*&&\s*$", "", normalized)
+    if not normalized:
+        return []
+
+    return [part.strip() for part in re.split(r"\s*&&\s*", normalized) if part.strip()]
