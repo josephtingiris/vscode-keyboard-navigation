@@ -122,68 +122,14 @@ RUN_OBJ_INFO_CACHE: dict = {}
 
 DEFAULT_WHEN_PREFIXES = []
 
-# global token groups used for heuristics
+# Use token groups and maps from the package to avoid duplicate definitions.
+FOCUS_TOKENS = _keybindings.FOCUS_TOKENS
+POSITIONAL_TOKENS = _keybindings.POSITIONAL_TOKENS
+VISIBILITY_TOKENS = _keybindings.VISIBILITY_TOKENS
 
-FOCUS_TOKENS = [
-    # primary (order matters!)
-    'auxiliaryBarFocus',
-    'terminalFocus',
-    'sideBarFocus',
-    'statusBarFocused',
-    'panelFocus',
-    'editorFocus',
-    # secondary
-    'agentSessionsViewerFocused',
-    'editorTextFocus',
-    'inputFocus',
-    'inQuickInput',
-    'listFocus',
-    'notificationFocus',
-    'textInputFocus',
-]
-
-POSITIONAL_TOKENS = [
-    # primary (order matters!)
-    'config.workbench.activityBar.location',
-    'config.workbench.sideBar.location',
-    'panel.location',
-    'panelPosition',
-    # secondary
-    'activeAuxiliary',
-    'activeEditor',
-    'activePanel',
-    'activeViewlet',
-    'focusedView',
-    'breadcrumbsActive',
-    'breadcrumbsPossible',
-    'config.keyboardNavigation.juke.enabled',
-    'config.keyboardNavigation.highlights.enabled',
-    'config.keyboardNavigation.terminal.enabled',
-]
-
-VISIBILITY_TOKENS = [
-    'chatIsEnabled',
-    'auxiliaryBarVisible',
-    'editorVisible',
-    'panelVisible',
-    # secondary
-    'agentSessionsViewerVisible',
-    'notificationCenterVisible',
-    'notificationToastsVisible',
-    'outline.visible',
-    'searchViewletVisible',
-    'sideBarVisible',
-    'terminalVisible',
-    'timeline.visible',
-    'view.<viewId>.visible',
-    'webviewFindWidgetVisible',
-]
-
-# precomputed token ordering maps for performance
-
-FOCUS_TOKENS_MAP = {t: i for i, t in enumerate(FOCUS_TOKENS)}
-POSITIONAL_TOKENS_MAP = {t: i for i, t in enumerate(POSITIONAL_TOKENS)}
-VISIBILITY_TOKENS_MAP = {t: i for i, t in enumerate(VISIBILITY_TOKENS)}
+FOCUS_TOKENS_MAP = _keybindings.FOCUS_TOKENS_MAP
+POSITIONAL_TOKENS_MAP = _keybindings.POSITIONAL_TOKENS_MAP
+VISIBILITY_TOKENS_MAP = _keybindings.VISIBILITY_TOKENS_MAP
 
 # profile defaults for `--when-grouping` values; arg values always override these
 
