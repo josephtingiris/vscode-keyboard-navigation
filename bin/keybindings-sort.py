@@ -371,7 +371,7 @@ def _finalize_processed_output(
     return _remove_blank_lines(text)
 
 
-def _normalize_operand(text: str) -> str:
+def _normalize_whitespace(text: str) -> str:
     """Normalize whitespace in an operand and collapse runs to single spaces."""
 
     collapsed = _io._WHITESPACE_RE.sub(' ', text).strip()
