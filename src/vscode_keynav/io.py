@@ -44,6 +44,7 @@ def __getattr__(name: str):
         compiled = re.compile(pattern, flags)
         globals()[name] = compiled
         return compiled
+
     raise AttributeError(name)
 
 

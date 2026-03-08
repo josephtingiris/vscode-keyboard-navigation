@@ -13,10 +13,6 @@ from functools import lru_cache
 
 from vscode_keynav import io as _io
 
-# Simple helpers and constants (compiled regexes centralized in _io)
-NUMBER_SPLIT_RE = _io._NUMBER_SPLIT_RE
-WHEN_TERM_SPLIT_RE = _io._WHEN_TERM_SPLIT_RE
-
 # token groups and maps used by canonicalization heuristics
 FOCUS_TOKENS = [
     'auxiliaryBarFocus',
@@ -81,14 +77,6 @@ RUN_SORTABLE_CACHE: dict = {}
 RUN_OBJ_INFO_CACHE: dict = {}
 RUN_MATCH_CACHE: dict = {}
 OPERAND_MATCH_CACHE: dict = {}
-
-
-# JSONC / object helpers used by CLI and other tools (centralized compiled regexes)
-COMMENT_RE = _io._COMMENT_RE
-TRAILING_COMMA_RE = _io._TRAILING_COMMA_RE
-OBJ_RE = _io._OBJ_RE
-KEY_EXTRACT_RE = _io._KEY_EXTRACT_RE
-WHEN_EXTRACT_RE = _io._WHEN_EXTRACT_RE
 
 # caches
 CACHE_JSON_OBJECT: dict = {}
@@ -851,7 +839,7 @@ def _when_specificity(when_val: str) -> Tuple[int]:
     if not key:
         res = (0,)
     else:
-        term_count = len(WHEN_TERM_SPLIT_RE.split(key.strip()))
+        term_count = len(_io._WHEN_TERM_SPLIT_RE.split(key.strip()))
         res = (term_count,)
     try:
         CACHE_WHEN_SPECIFICITY[key] = res
@@ -867,7 +855,7 @@ def _natural_key(s):
     cached = CACHE_NATURAL_KEY.get(key)
     if cached is not None:
         return cached
-    parts = NUMBER_SPLIT_RE.split(key)
+    parts = _io._NUMBER_SPLIT_RE.split(key)
     out = [int(text) if text.isdigit() else text.lower() for text in parts]
     try:
         CACHE_NATURAL_KEY[key] = out
@@ -883,7 +871,7 @@ def _natural_key_case_sensitive(s):
     cached = CACHE_NATURAL_KEY_CS.get(key)
     if cached is not None:
         return cached
-    parts = NUMBER_SPLIT_RE.split(key)
+    parts = _io._NUMBER_SPLIT_RE.split(key)
     out = [int(text) if text.isdigit() else text for text in parts]
     try:
         CACHE_NATURAL_KEY_CS[key] = out
@@ -930,13 +918,13 @@ def _strip_json_comments(text):
             return ''
         return s
 
-    return COMMENT_RE.sub(_replacer, text)
+    return _io._COMMENT_RE.sub(_replacer, text)
 
 
 def _strip_trailing_commas(text):
     """Remove trailing commas from JSON/JSONC text."""
 
-    return TRAILING_COMMA_RE.sub(r"\1", text)
+    return _io._TRAILING_COMMA_RE.sub(r"\1", text)
 
 
 def _decode_json_string_literal(raw: str) -> str:
@@ -970,7 +958,7 @@ def _parse_object(obj_text: str):
     if not obj_text:
         return None
 
-    m = OBJ_RE.search(obj_text)
+    m = _io._OBJ_RE.search(obj_text)
     if not m:
         return None
 
@@ -995,7 +983,7 @@ def _parse_object(obj_text: str):
 def _extract_literal_key_from_object(obj_text: str) -> str:
     """Return the decoded literal `key` value from an object text or empty string."""
 
-    match = KEY_EXTRACT_RE.search(obj_text)
+    match = _io._KEY_EXTRACT_RE.search(obj_text)
     if not match:
         return ''
     return _decode_json_string_literal(match.group(1))
@@ -1004,7 +992,7 @@ def _extract_literal_key_from_object(obj_text: str) -> str:
 def _extract_literal_when_from_object(obj_text: str) -> str:
     """Return the decoded literal `when` value from an object text or empty string."""
 
-    match = WHEN_EXTRACT_RE.search(obj_text)
+    match = _io._WHEN_EXTRACT_RE.search(obj_text)
     if not match:
         return ''
     return _decode_json_string_literal(match.group(1))
@@ -1051,7 +1039,7 @@ def _get_run_obj_match_info(obj_text: str) -> dict:
     has_focus = False
 
     try:
-        parts = WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
+        parts = _io._WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
         for part in parts:
             token = part.strip()
             if not token:
