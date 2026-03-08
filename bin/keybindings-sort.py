@@ -367,39 +367,6 @@ def _assemble_final_output(
     return _keybindings._remove_blank_lines(text)
 
 
-def _replace_when_literal_match(
-    match,
-    grouping_mode: str,
-    negation_mode: str,
-    when_prefixes: list | None = None,
-    when_regexes: list | None = None,
-) -> str:
-    """Replace a `when` literal match with its canonicalized, JSON-escaped value."""
-
-    inner = match.group(2)
-
-    try:
-        unescaped = json.loads('"' + inner + '"')
-    except Exception:
-        unescaped = inner
-
-    canonical = _keybindings._canonicalize_when(
-        unescaped,
-        mode=grouping_mode,
-        negation_mode=negation_mode,
-        when_prefixes=when_prefixes,
-        when_regexes=when_regexes,
-    )
-
-    try:
-        escaped = json.dumps(canonical)[1:-1]
-    except Exception:
-        escaped = canonical.replace('\\', '\\\\').replace('"', '\\"')
-
-    escaped = escaped.replace('\n', '\\n').replace('\r', '\\r')
-    return match.group(1) + escaped + match.group(3)
-
-
 def _replace_when_literals(
     text: str,
     grouping_mode: str,
@@ -411,7 +378,7 @@ def _replace_when_literals(
 
     return re.sub(
         r'("when"\s*:\s*")((?:\\.|[^"\\])*)(")',
-        lambda match: _replace_when_literal_match(
+        lambda match: _keybindings._replace_when_literal_match(
             match,
             grouping_mode,
             negation_mode,
