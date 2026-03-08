@@ -34,8 +34,9 @@ from vscode_keynav import keybindings as _keybindings
 #
 
 
-KEYBINDINGS_SORT_PY = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "bin", "keybindings-sort.py"))
 REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+KEYBINDINGS_SORT_PY = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "bin", "keybindings-sort.py"))
 
 
 #
