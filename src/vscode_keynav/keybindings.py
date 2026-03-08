@@ -14,6 +14,68 @@ from typing import List, Tuple
 NUMBER_SPLIT_RE = re.compile(r"(\d+)")
 WHEN_TERM_SPLIT_RE = re.compile(r"\s*&&\s*|\s*\|\|\s*")
 
+# token groups and maps used by canonicalization heuristics
+FOCUS_TOKENS = [
+    'auxiliaryBarFocus',
+    'terminalFocus',
+    'sideBarFocus',
+    'statusBarFocused',
+    'panelFocus',
+    'editorFocus',
+    'agentSessionsViewerFocused',
+    'editorTextFocus',
+    'inputFocus',
+    'inQuickInput',
+    'listFocus',
+    'notificationFocus',
+    'textInputFocus',
+]
+
+POSITIONAL_TOKENS = [
+    'config.workbench.activityBar.location',
+    'config.workbench.sideBar.location',
+    'panel.location',
+    'panelPosition',
+    'activeAuxiliary',
+    'activeEditor',
+    'activePanel',
+    'activeViewlet',
+    'focusedView',
+    'breadcrumbsActive',
+    'breadcrumbsPossible',
+    'config.keyboardNavigation.juke.enabled',
+    'config.keyboardNavigation.highlights.enabled',
+    'config.keyboardNavigation.terminal.enabled',
+]
+
+VISIBILITY_TOKENS = [
+    'chatIsEnabled',
+    'auxiliaryBarVisible',
+    'editorVisible',
+    'panelVisible',
+    'agentSessionsViewerVisible',
+    'notificationCenterVisible',
+    'notificationToastsVisible',
+    'outline.visible',
+    'searchViewletVisible',
+    'sideBarVisible',
+    'terminalVisible',
+    'timeline.visible',
+    'view.<viewId>.visible',
+    'webviewFindWidgetVisible',
+]
+
+# precomputed maps
+FOCUS_TOKENS_MAP = {t: i for i, t in enumerate(FOCUS_TOKENS)}
+POSITIONAL_TOKENS_MAP = {t: i for i, t in enumerate(POSITIONAL_TOKENS)}
+VISIBILITY_TOKENS_MAP = {t: i for i, t in enumerate(VISIBILITY_TOKENS)}
+
+# caches used by canonicalizer
+CACHE_CANONICALIZE_WHEN: dict = {}
+RUN_CACHE_CONTEXT = None
+RUN_CANONICAL_CACHE: dict = {}
+
+
 # JSONC / object helpers used by CLI and other tools
 COMMENT_RE = re.compile(r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)', re.DOTALL | re.MULTILINE)
 TRAILING_COMMA_RE = re.compile(r',\s*([}\]])')
@@ -225,13 +287,306 @@ def _tokenize_when(expr: str):
     return tokens
 
 
-def _canonicalize_when(when_val: str) -> str:
-    """Return a stable, operand-level canonical form of a when expression."""
+def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+    """Produce a canonical string for a `when` clause with grouping and negation modes."""
+
+    def _clear_parens(node: WhenNode):
+        node.parens = False
+        if isinstance(node, WhenLeaf):
+            return
+        if isinstance(node, WhenNot):
+            _clear_parens(node.child)
+            return
+        if isinstance(node, WhenAnd) or isinstance(node, WhenOr):
+            for c in node.children:
+                _clear_parens(c)
+
+    def _group_rank(text: str) -> int:
+        left = _left_identifier(text)
+
+        if when_prefixes:
+            for pref in when_prefixes:
+                if not pref:
+                    continue
+                if left == pref:
+                    return 0
+
+        if when_regexes:
+            for pat in when_regexes:
+                try:
+                    if pat.search(left):
+                        return 0
+                except Exception:
+                    try:
+                        if re.search(pat, left):
+                            return 0
+                    except Exception:
+                        continue
+
+        if mode == 'none':
+            return 1
+
+        if mode == 'focal-invariant':
+            if _is_focus(left):
+                return 1
+            if any(left.startswith(p) for p in POSITIONAL_TOKENS):
+                return 2
+            if _is_visibility(left):
+                return 3
+            if left.startswith('config.'):
+                return 4
+            return 5
+
+        if left.startswith('config.'):
+            return 1
+        if any(left.startswith(p) for p in POSITIONAL_TOKENS):
+            return 2
+        if _is_focus(left):
+            return 3
+        if _is_visibility(left):
+            return 4
+        return 5
+
+    def _is_focus(left: str) -> bool:
+        return any(_matches_entry(left, entry) for entry in FOCUS_TOKENS)
+
+    def _is_visibility(left: str) -> bool:
+        return any(_matches_entry(left, entry) for entry in VISIBILITY_TOKENS)
+
+    def _left_identifier(text: str) -> str:
+        t = text.strip()
+        while t.startswith('(') and t.endswith(')'):
+            t = t[1:-1].strip()
+        if t.startswith('!'):
+            t = t[1:].lstrip()
+        if not t:
+            return t
+        return t.split()[0]
+
+    def _matches_entry(left: str, entry: str) -> bool:
+        if entry.endswith('.'):
+            return left.startswith(entry)
+        if '<viewId>' in entry:
+            prefix, suffix = entry.split('<viewId>', 1)
+            return left.startswith(prefix) and left.endswith(suffix)
+        return left == entry
+
+    def _sort_and_nodes(node: WhenNode):
+        if isinstance(node, WhenAnd):
+            for child in node.children:
+                _sort_and_nodes(child)
+            indexed = list(enumerate(node.children))
+
+            prioritized = []
+            picked = set()
+
+            def _left_id_of(item_node):
+                tok = _render_when_node(item_node)
+                lid = _left_identifier(tok)
+                return lid
+
+            if when_prefixes:
+                for pref in when_prefixes:
+                    matches = []
+                    for idx, child in indexed:
+                        if idx in picked:
+                            continue
+                        lid = _left_id_of(child)
+                        if lid == pref:
+                            matches.append((idx, child))
+
+                    if matches:
+                        matches.sort(key=lambda t: _natural_key_case_sensitive(_render_when_node(t[1])))
+                        for m in matches:
+                            prioritized.append(m[1])
+                            picked.add(m[0])
+
+            if when_regexes:
+                for pat in when_regexes:
+                    matches = []
+                    for idx, child in indexed:
+                        if idx in picked:
+                            continue
+                        lid = _left_id_of(child)
+                        try:
+                            ok = pat.search(lid)
+                        except Exception:
+                            try:
+                                ok = re.search(pat, lid)
+                            except Exception:
+                                ok = False
+                        if ok:
+                            matches.append((idx, child))
+
+                    if matches:
+                        matches.sort(key=lambda t: _natural_key_case_sensitive(_render_when_node(t[1])))
+                        for m in matches:
+                            prioritized.append(m[1])
+                            picked.add(m[0])
+
+            if negation_mode == 'beta':
+                nm = 'positive-natural'
+            else:
+                nm = negation_mode
+
+            if negation_mode == 'alpha':
+                indexed.sort(key=_sort_key)
+                sorted_children = [it[1] for it in indexed]
+            else:
+                def render_base_and_flag(child):
+                    tok = _render_when_node(child)
+                    base = tok.strip()
+                    while base.startswith('(') and base.endswith(')'):
+                        base = base[1:-1].strip()
+                    is_neg = base.startswith('!')
+                    if is_neg:
+                        base = base[1:].lstrip()
+                    return base, is_neg, tok
+
+                items_with_keys = []
+                for idx, child in indexed:
+                    base, is_neg, tok = render_base_and_flag(child)
+                    base_key = _natural_key(base)
+                    grp = _group_rank(tok)
+                    lid = _left_id_of(child)
+                    f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
+
+                    if nm == 'natural':
+                        items_with_keys.append((idx, child, (grp, f_rank, base_key, idx, tok)))
+                        continue
+
+                    if nm == 'positive-natural':
+                        neg_sort = 0 if not is_neg else 1
+                        items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key, idx, tok)))
+                        continue
+
+                    if nm == 'negative-natural':
+                        neg_sort = 0 if is_neg else 1
+                        items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key, idx, tok)))
+                        continue
+
+                    if nm == 'positive':
+                        neg_sort = 0 if not is_neg else 1
+                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
+                        base_key_cs = _natural_key_case_sensitive(base)
+                        items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
+                        continue
+
+                    if nm == 'negative':
+                        neg_sort = 0 if is_neg else 1
+                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
+                        base_key_cs = _natural_key_case_sensitive(base)
+                        items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
+                        continue
+
+                    neg_sort = 0
+                    items_with_keys.append((idx, child, (grp, neg_sort, base_key, idx, tok)))
+
+                items_with_keys.sort(key=lambda t: t[2])
+                sorted_children = [it[1] for it in items_with_keys]
+
+            if prioritized:
+                prioritized_tokens = [_render_when_node(p) for p in prioritized]
+                remaining = [c for c in sorted_children if _render_when_node(c) not in set(prioritized_tokens)]
+                merged = prioritized + remaining
+            else:
+                merged = sorted_children
+
+            unique: list[WhenNode] = []
+            seen = set()
+            for c in merged:
+                tok = _render_when_node(c)
+                if tok in seen:
+                    continue
+                seen.add(tok)
+                unique.append(c)
+            node.children = unique
+
+        elif isinstance(node, WhenOr):
+            for child in node.children:
+                _sort_and_nodes(child)
+
+            items: list[WhenNode] = []
+            for c in node.children:
+                if isinstance(c, WhenOr):
+                    items.extend(c.children)
+                else:
+                    items.append(c)
+
+            indexed = list(enumerate(items))
+            indexed.sort(key=lambda it: (_natural_key_case_sensitive(_render_when_node(it[1])), it[0]))
+            sorted_children = [it[1] for it in indexed]
+
+            unique: list[WhenNode] = []
+            seen = set()
+            for c in sorted_children:
+                tok = _render_when_node(c)
+                if tok in seen:
+                    continue
+                seen.add(tok)
+                unique.append(c)
+            node.children = unique
+        elif isinstance(node, WhenNot):
+            _sort_and_nodes(node.child)
+
+    def _sort_key(idx_and_node):
+        idx, node = idx_and_node
+        token = _render_when_node(node)
+        order_token = token[1:] if token.startswith('!') else token
+        left_id = _left_identifier(token)
+        sub_rank = FOCUS_TOKENS_MAP.get(left_id, POSITIONAL_TOKENS_MAP.get(left_id, VISIBILITY_TOKENS_MAP.get(left_id, 9999)))
+        if negation_mode == 'alpha':
+            return (_group_rank(token), sub_rank, _natural_key_case_sensitive(order_token), idx)
+        return (_group_rank(token), _natural_key_case_sensitive(order_token), idx)
 
     if not when_val:
-        return ""
-    parts = [p.strip() for p in WHEN_TERM_SPLIT_RE.split(when_val) if p and p.strip()]
-    return ' && '.join(sorted(set(parts)))
+        return ''
+
+    cache_key = (
+        when_val,
+        mode,
+        negation_mode,
+        None if when_prefixes is None else tuple(when_prefixes),
+        None if when_regexes is None else tuple(when_regexes),
+    )
+
+    cached = CACHE_CANONICALIZE_WHEN.get(cache_key)
+    if cached is not None:
+        return cached
+
+    try:
+        run_key = (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes))
+        if RUN_CACHE_CONTEXT == run_key:
+            cached_run = RUN_CANONICAL_CACHE.get(when_val)
+            if cached_run is not None:
+                return cached_run
+    except Exception:
+        pass
+
+    focus_tokens = FOCUS_TOKENS
+    positional_tokens = POSITIONAL_TOKENS
+    visibility_tokens = VISIBILITY_TOKENS
+
+    ast = _parse_when(when_val)
+
+    _sort_and_nodes(ast)
+
+    _clear_parens(ast)
+
+    result = _render_when_node(ast)
+
+    try:
+        CACHE_CANONICALIZE_WHEN[cache_key] = result
+    except Exception:
+        pass
+
+    try:
+        if RUN_CACHE_CONTEXT == (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes)):
+            RUN_CANONICAL_CACHE[when_val] = result
+    except Exception:
+        pass
+
+    return result
 
 
 def _key_tail_literal(key_value: str) -> str:

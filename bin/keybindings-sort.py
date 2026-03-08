@@ -469,402 +469,7 @@ def _assemble_sorted_output(
     return ''.join(out_parts)
 
 
-def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
-    """Produce a canonical string for a `when` clause."""
-
-    def _clear_parens(node: WhenNode):
-        node.parens = False
-        if isinstance(node, WhenLeaf):
-            return
-        if isinstance(node, WhenNot):
-            _clear_parens(node.child)
-            return
-        if isinstance(node, WhenAnd) or isinstance(node, WhenOr):
-            for c in node.children:
-                _clear_parens(c)
-
-    def _group_rank(text: str) -> int:
-        left = _left_identifier(text)
-
-        if when_prefixes:
-            for pref in when_prefixes:
-                if not pref:
-                    continue
-                # literal exact-match against the left identifier
-                if left == pref:
-                    return 0
-
-        if when_regexes:
-            for pat in when_regexes:
-                try:
-                    if pat.search(left):
-                        return 0
-                except Exception:
-                    # if a string pattern was provided that wasn't compiled, fall back to a simple substring match
-                    try:
-                        if re.search(pat, left):
-                            return 0
-                    except Exception:
-                        continue
-
-        # 'config-first' Group order: config.* -> positional prefixes -> focus -> visibility -> other
-        # 'focal-invariant' Group order: focus -> positional prefixes -> visibility -> config.* -> other
-        # 'none' disables grouping by returning the same rank for all tokens.
-
-        if mode == 'none':
-            return 1
-
-        if mode == 'focal-invariant':
-            if _is_focus(left):
-                return 1
-            if any(left.startswith(p) for p in positional_tokens):
-                return 2
-            if _is_visibility(left):
-                return 3
-            if left.startswith('config.'):
-                return 4
-            return 5
-
-        # config-first behavior
-        if left.startswith('config.'):
-            return 1
-        if any(left.startswith(p) for p in positional_tokens):
-            return 2
-        if _is_focus(left):
-            return 3
-        if _is_visibility(left):
-            return 4
-        return 5
-
-    def _is_focus(left: str) -> bool:
-        return any(_matches_entry(left, entry) for entry in focus_tokens)
-
-    def _is_visibility(left: str) -> bool:
-        return any(_matches_entry(left, entry) for entry in visibility_tokens)
-
-    def _left_identifier(text: str) -> str:
-        t = text.strip()
-        while t.startswith('(') and t.endswith(')'):
-            t = t[1:-1].strip()
-        if t.startswith('!'):
-            t = t[1:].lstrip()
-        if not t:
-            return t
-        return t.split()[0]
-
-    def _matches_entry(left: str, entry: str) -> bool:
-        if entry.endswith('.'):
-            return left.startswith(entry)
-        if '<viewId>' in entry:
-            prefix, suffix = entry.split('<viewId>', 1)
-            return left.startswith(prefix) and left.endswith(suffix)
-        return left == entry
-
-    def _sort_and_nodes(node: WhenNode):
-        if isinstance(node, WhenAnd):
-            for child in node.children:
-                _sort_and_nodes(child)
-            indexed = list(enumerate(node.children))
-
-            # prioritize operands
-            prioritized = []
-            picked = set()
-
-            # get left identifier for an item
-            def _left_id_of(item_node):
-                tok = _render_when_node(item_node)
-                lid = _left_identifier(tok)
-                return lid
-
-            if when_prefixes:
-                for pref in when_prefixes:
-                    matches = []
-                    for idx, child in indexed:
-                        if idx in picked:
-                            continue
-                        lid = _left_id_of(child)
-                        if lid == pref:
-                            matches.append((idx, child))
-
-                    if matches:
-                        # alphabetical order for multiples
-                        matches.sort(key=lambda t: _keybindings._natural_key_case_sensitive(
-                            _render_when_node(t[1])))
-                        for m in matches:
-                            prioritized.append(m[1])
-                            picked.add(m[0])
-
-            if when_regexes:
-                for pat in when_regexes:
-                    matches = []
-                    for idx, child in indexed:
-                        if idx in picked:
-                            continue
-                        lid = _left_id_of(child)
-                        try:
-                            ok = pat.search(lid)
-                        except Exception:
-                            try:
-                                ok = re.search(pat, lid)
-                            except Exception:
-                                ok = False
-                        if ok:
-                            matches.append((idx, child))
-
-                    if matches:
-                        matches.sort(key=lambda t: _keybindings._natural_key_case_sensitive(
-                            _render_when_node(t[1])))
-                        for m in matches:
-                            prioritized.append(m[1])
-                            picked.add(m[0])
-
-            if negation_mode == 'beta':
-                # alias: 'beta' points to positive-natural
-                nm = 'positive-natural'
-            else:
-                nm = negation_mode
-
-            if negation_mode == 'alpha':
-                # use existing group-aware _sort_key
-                indexed.sort(key=_sort_key)
-                sorted_children = [it[1] for it in indexed]
-            else:
-                # for natural/positive/negative/beta: sort by rendered token base
-                def render_base_and_flag(child):
-                    tok = _render_when_node(child)
-                    base = tok.strip()
-                    # strip surrounding parentheses
-                    while base.startswith('(') and base.endswith(')'):
-                        base = base[1:-1].strip()
-                    is_neg = base.startswith('!')
-                    if is_neg:
-                        base = base[1:].lstrip()
-                    return base, is_neg, tok
-
-                items_with_keys = []
-                for idx, child in indexed:
-                    base, is_neg, tok = render_base_and_flag(child)
-
-                    # natural-style comparison: use _natural_key (case-insensitive)
-                    base_key = _keybindings._natural_key(base)
-
-                    # always preserve grouping as the primary key so sorting does not move operands between buckets.
-                    grp = _group_rank(tok)
-
-                    # compute a combined sub-rank if this token belongs to a known ordered identifier
-                    lid = _left_id_of(child)
-                    f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
-
-                    # natural mode: ignore negation and sort by group then base_key
-                    if nm == 'natural':
-                        items_with_keys.append(
-                            (idx, child, (grp, f_rank, base_key, idx, tok)))
-                        continue
-
-                    # positive-natural / negative-natural: existing "alpha/natural"-style
-                    if nm == 'positive-natural':
-                        neg_sort = 0 if not is_neg else 1
-                        items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key, idx, tok)))
-                        continue
-
-                    if nm == 'negative-natural':
-                        neg_sort = 0 if is_neg else 1
-                        items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key, idx, tok)))
-                        continue
-
-                    # positive / negative: preserve original list order within positive/negative groups
-                    if nm == 'positive':
-                        neg_sort = 0 if not is_neg else 1
-                        # use token-list ordering (focus/positional/visibility) as sub-rank
-                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
-                        base_key_cs = _keybindings._natural_key_case_sensitive(base)
-                        items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
-                        continue
-
-                    if nm == 'negative':
-                        neg_sort = 0 if is_neg else 1
-                        f_rank = FOCUS_TOKENS_MAP.get(lid, POSITIONAL_TOKENS_MAP.get(lid, VISIBILITY_TOKENS_MAP.get(lid, 9999)))
-                        base_key_cs = _keybindings._natural_key_case_sensitive(base)
-                        items_with_keys.append((idx, child, (grp, neg_sort, f_rank, base_key_cs, idx, tok)))
-                        continue
-
-                    # default fallback
-                    neg_sort = 0
-                    items_with_keys.append((idx, child, (grp, neg_sort, base_key, idx, tok)))
-
-                items_with_keys.sort(key=lambda t: t[2])
-                sorted_children = [it[1] for it in items_with_keys]
-
-            if prioritized:
-                prioritized_tokens = [_render_when_node(p) for p in prioritized]
-                remaining = [c for c in sorted_children if _render_when_node(c) not in set(prioritized_tokens)]
-                merged = prioritized + remaining
-            else:
-                merged = sorted_children
-
-            unique: list[WhenNode] = []
-            seen = set()
-            for c in merged:
-                tok = _render_when_node(c)
-                if tok in seen:
-                    continue
-                seen.add(tok)
-                unique.append(c)
-            node.children = unique
-
-        elif isinstance(node, WhenOr):
-            # recurse first
-            for child in node.children:
-                _sort_and_nodes(child)
-
-            # flatten nested ORs (commutative) and collect items
-            items: list[WhenNode] = []
-            for c in node.children:
-                if isinstance(c, WhenOr):
-                    items.extend(c.children)
-                else:
-                    items.append(c)
-
-            # sort OR operands deterministically so equivalent ASTs render the same
-            indexed = list(enumerate(items))
-            indexed.sort(key=lambda it: (_keybindings._natural_key_case_sensitive(_render_when_node(it[1])), it[0]))
-            sorted_children = [it[1] for it in indexed]
-
-            # remove duplicates while preserving sorted order
-            unique: list[WhenNode] = []
-            seen = set()
-            for c in sorted_children:
-                tok = _render_when_node(c)
-                if tok in seen:
-                    continue
-                seen.add(tok)
-                unique.append(c)
-            node.children = unique
-        elif isinstance(node, WhenNot):
-            _sort_and_nodes(node.child)
-
-    def _sort_key(idx_and_node):
-        idx, node = idx_and_node
-        token = _render_when_node(node)
-
-        # strip leading '!' for ordering token but keep for grouping rank
-        order_token = token[1:] if token.startswith('!') else token
-
-        # compute left identifier and a combined sub-rank preference
-        left_id = _left_identifier(token)
-
-        # prefer focus_order, then positional_order, then visibility_order
-        sub_rank = FOCUS_TOKENS_MAP.get(left_id, POSITIONAL_TOKENS_MAP.get(left_id, VISIBILITY_TOKENS_MAP.get(left_id, 9999)))
-
-        # default alpha behavior: preserve _group_rank and use natural-sensitive ordering
-        if negation_mode == 'alpha':
-            return (_group_rank(token), sub_rank, _keybindings._natural_key_case_sensitive(order_token), idx)
-
-        return (_group_rank(token), _keybindings._natural_key_case_sensitive(order_token), idx)
-
-    # end defs
-
-    """
-        TBD: these contexts need to be better tested before being fully integrated, especially with the focal-invariant mode:
-        'view.',
-        'view.<viewId>.visible',
-        'view.container.',
-        'viewContainer.',
-        'workbench.panel.',
-        'workbench.view.',
-    """
-
-    # empty gets nothing
-    if not when_val:
-        return ''
-
-    # memoization: avoid repeated expensive parsing of identical inputs
-    cache_key = (
-        when_val,
-        mode,
-        negation_mode,
-        None if when_prefixes is None else tuple(when_prefixes),
-        None if when_regexes is None else tuple(when_regexes),
-    )
-
-    # key: (when_val, mode, negation_mode, when_prefixes_tuple_or_None, when_regexes_tuple_or_None)
-    cached = CACHE_CANONICALIZE_WHEN.get(cache_key)
-
-    # return cached key
-    if cached is not None:
-        return cached
-
-    # return per-run cache
-    try:
-        run_key = (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes))
-        if RUN_CACHE_CONTEXT == run_key:
-            cached_run = RUN_CANONICAL_CACHE.get(when_val)
-            if cached_run is not None:
-                return cached_run
-    except Exception:
-        pass
-
-    focus_tokens = FOCUS_TOKENS
-    positional_tokens = POSITIONAL_TOKENS
-    visibility_tokens = VISIBILITY_TOKENS
-
-    # build tree
-    ast = _keybindings._parse_when(when_val)
-    try:
-        # debug: dump top-level AND operand ordering before/after sort for inspection
-        if DEBUG_LEVEL > 0:
-            if isinstance(ast, WhenAnd):
-                for i, c in enumerate(ast.children):
-                    try:
-                        tok = _render_when_node(c)
-                    except Exception:
-                        tok = str(c)
-                    _debug._echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: idx={i} token={tok!r}")
-            else:
-                try:
-                    _debug._echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: node={_render_when_node(ast)!r}")
-                except Exception:
-                    _debug._echo(2, 'canonicalize', when_val, f"DBG_CANON_PRE: node={ast!r}")
-    except Exception:
-        pass
-
-    # sort tree
-    _sort_and_nodes(ast)
-
-    try:
-        if DEBUG_LEVEL > 0:
-            if isinstance(ast, WhenAnd):
-                for i, c in enumerate(ast.children):
-                    try:
-                        tok = _render_when_node(c)
-                    except Exception:
-                        tok = str(c)
-                    _debug._echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: idx={i} token={tok!r}")
-            else:
-                try:
-                    _debug._echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: node={_render_when_node(ast)!r}")
-                except Exception:
-                    _debug._echo(2, 'canonicalize', when_val, f"DBG_CANON_POST: node={ast!r}")
-    except Exception:
-        pass
-
-    _clear_parens(ast)
-
-    result = _render_when_node(ast)
-
-    try:
-        CACHE_CANONICALIZE_WHEN[cache_key] = result
-    except Exception:
-        pass
-
-    # populate per-run cache
-    try:
-        if RUN_CACHE_CONTEXT == (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes)):
-            RUN_CANONICAL_CACHE[when_val] = result
-    except Exception:
-        pass
-
-    return result
+# canonicalization moved to package: use _keybindings._canonicalize_when(...)
 
 
 def _color_enabled() -> bool:
@@ -1411,7 +1016,7 @@ def _get_run_obj_info(
             when_val = ''
 
     if when_val:
-        canonical_when = _canonicalize_when(
+        canonical_when = _keybindings._canonicalize_when(
             when_val,
             mode=grouping_mode,
             negation_mode=negation_mode,
@@ -1649,14 +1254,14 @@ def _normalize_when_in_object(obj_text: str, mode: str = 'config-first', negatio
     """Canonicalize the `when` value inside an object text and return (new_text, changed)."""
 
     parsed = _keybindings._parse_object(obj_text)
-    if not parsed:
+    if not parsed or 'when' not in parsed:
         return obj_text, False
 
     when_val = parsed.get('when')
     if not when_val:
         return obj_text, False
 
-    normalized = _canonicalize_when(
+    normalized = _keybindings._canonicalize_when(
         str(when_val), mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
     if normalized == when_val:
         return obj_text, False
@@ -1888,7 +1493,7 @@ def _replace_when_literal_match(
     except Exception:
         unescaped = inner
 
-    canonical = _canonicalize_when(
+    canonical = _keybindings._canonicalize_when(
         unescaped,
         mode=grouping_mode,
         negation_mode=negation_mode,
@@ -2025,7 +1630,7 @@ def _sort_groups_for_primary_when(
     for idx, pair in enumerate(sorted_groups):
         key_val, when_val = _keybindings._extract_key_when_from_object(pair[1])
         try:
-            canonical = _canonicalize_when(
+            canonical = _keybindings._canonicalize_when(
                 when_val,
                 mode=grouping_mode,
                 negation_mode=negation_mode,
@@ -2265,6 +1870,12 @@ def main(argv: List[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     _apply_debug_settings(args.debug, args.color)
+
+    try:
+        _debug._echo(2, 'init', None, 'debugging enabled')
+    except Exception:
+        pass
+
     _apply_when_grouping_profile(args, argv)
 
     primary_order = args.primary
@@ -2391,7 +2002,7 @@ def main(argv: List[str] | None = None) -> int:
                 return sorted(
                     block,
                     key=lambda pair: (
-                        _canonicalize_when(
+                        _keybindings._canonicalize_when(
                             _keybindings._extract_key_when_from_object(pair[1])[1] or _keybindings._extract_literal_when_from_object(pair[1]),
                             mode=grouping_mode,
                             negation_mode=negation_mode,
