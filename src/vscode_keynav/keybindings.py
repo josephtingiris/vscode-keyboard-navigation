@@ -1483,6 +1483,28 @@ def _normalize_when_in_object(obj_text: str, mode: str = 'config-first', negatio
     return new_obj, True
 
 
+def _object_has_trailing_comma(obj_text: str) -> bool:
+    """Return True if an object text ends with a trailing comma after its closing brace."""
+
+    lines = obj_text.rstrip().splitlines()
+    found_closing = False
+
+    for line in reversed(lines):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if not found_closing and stripped.endswith('}'):  # first closing brace
+            found_closing = True
+            continue
+        if found_closing:
+            if stripped.startswith(','):
+                return True
+            elif stripped and not stripped.startswith('//') and not stripped.startswith('/*'):
+                return False
+
+    return False
+
+
 def _parse_jsonc(text: str):
     """Parse JSONC text by removing comments and trailing commas then loading JSON."""
 

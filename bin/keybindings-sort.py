@@ -341,7 +341,7 @@ def _assemble_sorted_output(
             obj_out = obj_out[:idx + 1] + after_clean
 
         out_parts.append(obj_out)
-        if not is_last and not _object_has_trailing_comma(obj_out):
+        if not is_last and not _keybindings._object_has_trailing_comma(obj_out):
             out_parts.append(',')
         out_parts.append('\n')
 
@@ -369,28 +369,6 @@ def _assemble_final_output(
     """Perform final output cleanup on the assembled JSONC text (e.g. remove blank lines)."""
 
     return _remove_blank_lines(text)
-
-
-def _object_has_trailing_comma(obj_text: str) -> bool:
-    """Return True if an object text ends with a trailing comma after its closing brace."""
-
-    lines = obj_text.rstrip().splitlines()
-    found_closing = False
-
-    for line in reversed(lines):
-        stripped = line.strip()
-        if not stripped:
-            continue
-        if not found_closing and stripped.endswith('}'):  # first closing brace
-            found_closing = True
-            continue
-        if found_closing:
-            if stripped.startswith(','):
-                return True
-            elif stripped and not stripped.startswith('//') and not stripped.startswith('/*'):
-                return False
-
-    return False
 
 
 def _parse_when_prefixes(parser: argparse.ArgumentParser, raw_prefixes: str | None) -> list[str]:
