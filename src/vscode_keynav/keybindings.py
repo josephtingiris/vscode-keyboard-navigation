@@ -1669,6 +1669,45 @@ def _render_when_node(node: WhenNode) -> str:
     return inner
 
 
+def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode: str) -> list[tuple[str, str]]:
+    """Within equal when groups, reorder objects deterministically by key."""
+
+    if negation_mode in ('positive', 'negative'):
+        return sorted_groups
+    groups_list = list(sorted_groups)
+    i = 0
+    while i < len(groups_list):
+        raw_when = _extract_literal_when_from_object(groups_list[i][1]) or ''
+        norm_when = _io._normalize_whitespace(raw_when)
+        j = i + 1
+
+        while j < len(groups_list):
+            next_when = _extract_literal_when_from_object(groups_list[j][1]) or ''
+            if _io._normalize_whitespace(next_when) != norm_when:
+                break
+            j += 1
+
+        if j - i > 1:
+            slice_pairs = groups_list[i:j]
+
+            def _mods_lit_from_pair(pair: tuple[str, str]) -> tuple[tuple[str, ...], str]:
+                key_raw = _extract_literal_key_from_object(pair[1]) or ''
+                norm = _normalize_key_for_compare(key_raw)
+                first = norm.split()[0] if norm else ''
+                parts = [p for p in first.split('+') if p]
+                mods = tuple(parts[:-1]) if len(parts) > 1 else tuple()
+                lit = parts[-1] if parts else ''
+                lit_key = _normalize_key_for_compare(lit)
+                return (mods, lit_key)
+
+            slice_pairs.sort(key=lambda pair: _mods_lit_from_pair(pair))
+            groups_list[i:j] = slice_pairs
+
+        i = j
+
+    return groups_list
+
+
 def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Return a canonicalized when string suitable for stable sorting, preserving negation."""
 
