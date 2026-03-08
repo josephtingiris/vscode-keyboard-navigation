@@ -19,8 +19,6 @@ from typing import Optional, Union, Pattern
 #
 
 
-# prefer adding more parsing/formatting regexes here rather than scattering them across multiple modules
-
 _BLANK_LINES_RE = re.compile(r'(?m)^[ \t]*\n+', 0)
 _COMMENT_RE = re.compile(r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)', re.DOTALL | re.MULTILINE)
 _KEY_RE = re.compile(r'"key"\s*:\s*"((?:[^"\\]|\\.)*)"')

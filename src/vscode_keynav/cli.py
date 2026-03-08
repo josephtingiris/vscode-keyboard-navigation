@@ -7,7 +7,9 @@ VS Code Keyboard Navigation common cli functions.
 from __future__ import annotations
 
 import argparse
+
 import re
+import shutil
 import sys
 
 from typing import Callable
@@ -34,6 +36,16 @@ def _flag_present(raw_argv: list[str], names: list[str]) -> bool:
             return True
 
     return False
+
+
+def _get_python_exec() -> str:
+    """Return the python executable path or an error if no python executable is found."""
+
+    python_path = shutil.which("python3") or shutil.which("python")
+    if python_path is None:
+        raise RuntimeError("python3 or python must be available on PATH")
+
+    return python_path
 
 
 def _make_common_parser(prog: str | None = None) -> argparse.ArgumentParser:

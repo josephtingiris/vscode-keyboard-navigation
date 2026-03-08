@@ -23,10 +23,6 @@ from vscode_keynav import io as _io
 #
 
 
-# CLI-level per-run caches to avoid repeated parsing/regex work across hot loops
-_CLI__RUN_OBJ_INFO_CACHE: dict = {}
-_CLI_RUN_OBJ_MATCH_CACHE: dict = {}
-
 # token groups and maps used by canonicalization heuristics
 
 _FOCUS_TOKENS = [
@@ -94,6 +90,9 @@ _CACHE_NATURAL_KEY: dict = {}
 _CACHE_NATURAL_KEY_CS: dict = {}
 _CACHE_SORTABLE_WHEN: dict = {}
 _CACHE_WHEN_SPECIFICITY: dict = {}
+
+_CLI_RUN_OBJ_INFO_CACHE: dict = {}
+_CLI_RUN_OBJ_MATCH_CACHE: dict = {}
 
 _OPERAND_MATCH_CACHE: dict = {}
 
@@ -1123,7 +1122,7 @@ def _get_run_obj_info(
     # prefer a CLI-local cache keyed by object text and current run context
     run_ctx = _RUN_CACHE_CONTEXT if _RUN_CACHE_CONTEXT else None
     cache_key = (obj_text, run_ctx)
-    info = _CLI__RUN_OBJ_INFO_CACHE.get(cache_key)
+    info = _CLI_RUN_OBJ_INFO_CACHE.get(cache_key)
     if info is not None:
         return info
 
@@ -1131,7 +1130,7 @@ def _get_run_obj_info(
     info = _RUN_OBJ_INFO_CACHE.get(obj_text)
     if info is not None:
         try:
-            _CLI__RUN_OBJ_INFO_CACHE[cache_key] = info
+            _CLI_RUN_OBJ_INFO_CACHE[cache_key] = info
         except Exception:
             pass
         return info
@@ -1179,7 +1178,7 @@ def _get_run_obj_info(
     except Exception:
         pass
     try:
-        _CLI__RUN_OBJ_INFO_CACHE[cache_key] = info
+        _CLI_RUN_OBJ_INFO_CACHE[cache_key] = info
     except Exception:
         pass
 
@@ -1852,7 +1851,7 @@ def _replace_when_literals(
 def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
     """Initialize and clear per-run caches for the current run parameter context."""
 
-    global _CLI__RUN_OBJ_INFO_CACHE, _CLI_RUN_OBJ_MATCH_CACHE
+    global _CLI_RUN_OBJ_INFO_CACHE, _CLI_RUN_OBJ_MATCH_CACHE
     global _RUN_CACHE_CONTEXT, _RUN_CANONICAL_CACHE, _RUN_SORTABLE_CACHE, _RUN_OBJ_INFO_CACHE, _RUN_MATCH_CACHE
 
     _RUN_CACHE_CONTEXT = (
@@ -1874,9 +1873,9 @@ def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | 
     except Exception:
         _RUN_OBJ_INFO_CACHE = {}
     try:
-        _CLI__RUN_OBJ_INFO_CACHE.clear()
+        _CLI_RUN_OBJ_INFO_CACHE.clear()
     except Exception:
-        _CLI__RUN_OBJ_INFO_CACHE = {}
+        _CLI_RUN_OBJ_INFO_CACHE = {}
     try:
         _CLI_RUN_OBJ_MATCH_CACHE.clear()
     except Exception:
@@ -2148,7 +2147,64 @@ def _split_when_contexts(expr: str | None) -> List[str]:
     return [part.strip() for part in re.split(r"\s*&&\s*", normalized) if part.strip()]
 
 
-def _strip_json_comments(text):
+def _strip_json_comments(text: str) -> str:
+    """Strip JSONC comments (line `//` and block `/* */`) while preserving strings."""
+
+    out = []
+    i = 0
+    n = len(text)
+    in_string = False
+    string_char = ""
+    esc = False
+    in_line = False
+    in_block = False
+    while i < n:
+        ch = text[i]
+        nxt2 = text[i:i + 2] if i + 2 <= n else ""
+        if in_line:
+            if ch == "\n":
+                out.append(ch)
+                in_line = False
+            i += 1
+            continue
+        if in_block:
+            if nxt2 == '*/':
+                i += 2
+                in_block = False
+            else:
+                i += 1
+            continue
+        if in_string:
+            out.append(ch)
+            if esc:
+                esc = False
+            elif ch == '\\':
+                esc = True
+            elif ch == string_char:
+                in_string = False
+            i += 1
+            continue
+        # default
+        if nxt2 == '//':
+            in_line = True
+            i += 2
+            continue
+        if nxt2 == '/*':
+            in_block = True
+            i += 2
+            continue
+        if ch == '"' or ch == "'":
+            in_string = True
+            string_char = ch
+            out.append(ch)
+            i += 1
+            continue
+        out.append(ch)
+        i += 1
+    return ''.join(out)
+
+
+def _strip_json_comments_re(text):
     """Strip JavaScript-style comments from JSONC text while preserving string literals."""
 
     def _replacer(match):
