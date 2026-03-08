@@ -1631,6 +1631,33 @@ def _partition_focus_groups_to_end(sorted_groups: list[tuple[str, str]]) -> list
     return non_focus + focus
 
 
+def _remove_blank_lines(text: str) -> str:
+    """Remove empty lines that are not present in comments."""
+
+    lines = text.splitlines(keepends=True)
+    out_lines: list[str] = []
+    in_block = False
+
+    for line in lines:
+        if in_block:
+            out_lines.append(line)
+            if '*/' in line:
+                in_block = False
+            continue
+
+        if '/*' in line:
+            out_lines.append(line)
+            if '*/' not in line:
+                in_block = True
+            continue
+
+        if line.strip() == '':
+            continue
+        out_lines.append(line)
+
+    return ''.join(out_lines)
+
+
 def _render_when_node(node: WhenNode) -> str:
     """Render a WhenNode AST back to its string form while preserving parentheses."""
 
