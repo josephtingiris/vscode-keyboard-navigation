@@ -1763,6 +1763,49 @@ def _replace_when_literals(
     )
 
 
+def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
+    """Initialize and clear per-run caches for the current run parameter context."""
+
+    global _CLI_RUN_OBJ_INFO_CACHE, _CLI_RUN_OBJ_MATCH_CACHE
+    global RUN_CACHE_CONTEXT, RUN_CANONICAL_CACHE, RUN_SORTABLE_CACHE, RUN_OBJ_INFO_CACHE, RUN_MATCH_CACHE
+
+    RUN_CACHE_CONTEXT = (
+        mode,
+        negation_mode,
+        None if when_prefixes is None else tuple(when_prefixes),
+        None if when_regexes is None else tuple(when_regexes),
+    )
+    try:
+        RUN_CANONICAL_CACHE.clear()
+    except Exception:
+        RUN_CANONICAL_CACHE = {}
+    try:
+        RUN_SORTABLE_CACHE.clear()
+    except Exception:
+        RUN_SORTABLE_CACHE = {}
+    try:
+        RUN_OBJ_INFO_CACHE.clear()
+    except Exception:
+        RUN_OBJ_INFO_CACHE = {}
+    try:
+        _CLI_RUN_OBJ_INFO_CACHE.clear()
+    except Exception:
+        _CLI_RUN_OBJ_INFO_CACHE = {}
+    try:
+        _CLI_RUN_OBJ_MATCH_CACHE.clear()
+    except Exception:
+        _CLI_RUN_OBJ_MATCH_CACHE = {}
+    try:
+        RUN_MATCH_CACHE.clear()
+    except Exception:
+        RUN_MATCH_CACHE = {}
+    try:
+        # clear package-level canonicalizer LRU cache
+        _clear_lru_when_cache()
+    except Exception:
+        pass
+
+
 def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Return a canonicalized when string suitable for stable sorting, preserving negation."""
 

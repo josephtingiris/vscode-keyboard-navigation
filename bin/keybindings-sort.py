@@ -367,47 +367,6 @@ def _assemble_final_output(
     return _keybindings._remove_blank_lines(text)
 
 
-def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
-    """Initialize and clear per-run caches for the current run parameter context."""
-
-    global _CLI_RUN_OBJ_INFO_CACHE, _CLI_RUN_OBJ_MATCH_CACHE
-    _keybindings.RUN_CACHE_CONTEXT = (
-        mode,
-        negation_mode,
-        None if when_prefixes is None else tuple(when_prefixes),
-        None if when_regexes is None else tuple(when_regexes),
-    )
-    try:
-        _keybindings.RUN_CANONICAL_CACHE.clear()
-    except Exception:
-        _keybindings.RUN_CANONICAL_CACHE = {}
-    try:
-        _keybindings.RUN_SORTABLE_CACHE.clear()
-    except Exception:
-        _keybindings.RUN_SORTABLE_CACHE = {}
-    try:
-        _keybindings.RUN_OBJ_INFO_CACHE.clear()
-    except Exception:
-        _keybindings.RUN_OBJ_INFO_CACHE = {}
-    try:
-        _keybindings._CLI_RUN_OBJ_INFO_CACHE.clear()
-    except Exception:
-        _keybindings._CLI_RUN_OBJ_INFO_CACHE = {}
-    try:
-        _keybindings._CLI_RUN_OBJ_MATCH_CACHE.clear()
-    except Exception:
-        _keybindings._CLI_RUN_OBJ_MATCH_CACHE = {}
-    try:
-        _keybindings.RUN_MATCH_CACHE.clear()
-    except Exception:
-        _keybindings.RUN_MATCH_CACHE = {}
-    try:
-        # clear package-level canonicalizer LRU cache
-        _keybindings._clear_lru_when_cache()
-    except Exception:
-        pass
-
-
 def _sort_groups_for_primary_when(
     sorted_groups: list[tuple[str, str]],
     grouping_mode: str,
@@ -704,7 +663,7 @@ def main(argv: List[str] | None = None) -> int:
     when_prefixes = _cli._parse_when_prefixes(parser, args.when_prefix)
     when_regexes = _cli._parse_when_regexes(parser, args.when_regex)
 
-    _set_run_cache_context(grouping_mode, negation_mode, when_prefixes, when_regexes)
+    _keybindings._set_run_cache_context(grouping_mode, negation_mode, when_prefixes, when_regexes)
 
     raw = sys.stdin.read()
     preamble, array_text, postamble = _keybindings._extract_preamble_postamble(raw)
