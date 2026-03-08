@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from random import Random
+
 import re
 import sys
 import subprocess
@@ -41,6 +43,12 @@ _WHITESPACE_RE = re.compile(r"\s+", 0)
 #
 # functions
 #
+
+
+def _hex4(rng: Random) -> str:
+    "Return a deterministic 4 characer hex id."
+
+    return f"{rng.randint(0, 0xFFFF):04x}"
 
 
 def _normalize_whitespace(text: str) -> str:
