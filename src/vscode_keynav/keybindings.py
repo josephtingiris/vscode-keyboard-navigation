@@ -6,6 +6,7 @@ VS Code Keyboard Navigation common keybindings.json functions.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 
@@ -1026,6 +1027,41 @@ def _first_when_group_rank(
     if any(_matches_when_entry(left_id, entry) for entry in VISIBILITY_TOKENS):
         return 4
     return 5
+
+
+def _get_run_obj_duplicate_info(obj_text: str) -> tuple[str, str, str]:
+    """Return per-run cached duplicate-detection fingerprints for an object text."""
+
+    info = _get_run_obj_info(obj_text)
+
+    full_hash = info.get('full_hash')
+    json_hash = info.get('json_hash')
+    json_canonical = info.get('json_canonical')
+    if full_hash and json_hash and json_canonical is not None:
+        return (full_hash, json_hash, json_canonical)
+
+    parsed = info.get('parsed')
+    if parsed is not None:
+        try:
+            json_canonical = json.dumps(parsed, separators=(",", ":"), ensure_ascii=False)
+        except Exception:
+            json_canonical = ''
+    else:
+        json_only = _strip_trailing_commas(_strip_json_comments(obj_text)).strip()
+        try:
+            parsed = json.loads(json_only)
+            json_canonical = json.dumps(parsed, separators=(",", ":"), ensure_ascii=False)
+        except Exception:
+            json_canonical = json_only
+
+    full_hash = hashlib.sha256(obj_text.encode('utf-8')).hexdigest()
+    json_hash = hashlib.sha256(json_canonical.encode('utf-8')).hexdigest()
+
+    info['full_hash'] = full_hash
+    info['json_hash'] = json_hash
+    info['json_canonical'] = json_canonical
+
+    return (full_hash, json_hash, json_canonical)
 
 
 def _get_run_obj_info(
