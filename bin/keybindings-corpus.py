@@ -41,7 +41,6 @@ import json
 import sys
 import argparse
 
-from random import Random
 from itertools import combinations
 from typing import List, Tuple
 from collections import Counter
@@ -96,10 +95,6 @@ def _emit_record(key_str, command_str, when_str, comment_tags):
     parts.append(f'    "when": {json.dumps(when_str)}')
     parts.append("  }")
     return "\n".join(parts)
-
-
-def _hex4(rng: Random) -> str:
-    return f"{rng.randint(0, 0xFFFF):04x}"
 
 
 def _init_directional_groups(selected: str, letter_groups: dict) -> None:
