@@ -11,6 +11,15 @@ import sys
 
 from typing import Callable
 
+#
+# globals & constants
+#
+
+
+#
+# functions
+#
+
 
 def _make_common_parser(prog: str | None = None) -> argparse.ArgumentParser:
     """Create and return a common ArgumentParser preconfigured with standard options."""
@@ -22,6 +31,7 @@ def _make_common_parser(prog: str | None = None) -> argparse.ArgumentParser:
     p.add_argument("--dry-run", action="store_true", help="don't write output")
     p.add_argument("-v", "--verbose", action="count", default=0, help="increase verbosity")
     p.add_argument("--add-context", action="store_true", help="add feature-gate context when generating corpus")
+
     return p
 
 
@@ -29,6 +39,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     """Parse and return CLI arguments using the common parser."""
 
     parser = _make_common_parser()
+
     return parser.parse_args(argv)
 
 

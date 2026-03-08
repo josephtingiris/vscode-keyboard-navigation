@@ -10,11 +10,22 @@ import sys
 
 from typing import Iterable, List
 
+
+#
+# globals & constants
+#
+
+
 # public configuration
 COLOR: str = "auto"
 DEBUG_LEVEL: int = 0
 DEBUG_TARGET_CATEGORY: str | None = None
 DEBUG_TARGET_WHEN: str = ""
+
+
+#
+# functions
+#
 
 
 def _apply_settings(debug_specs: Iterable[str] | None, color: str = "auto") -> None:

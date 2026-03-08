@@ -8,12 +8,19 @@ from __future__ import annotations
 
 import json
 import re
+
 from typing import List, Tuple
+
 from functools import lru_cache
 
 from vscode_keynav import io as _io
 
+#
+# globals & constants
+#
+
 # token groups and maps used by canonicalization heuristics
+
 FOCUS_TOKENS = [
     'auxiliaryBarFocus',
     'terminalFocus',
@@ -65,38 +72,36 @@ VISIBILITY_TOKENS = [
 ]
 
 # precomputed maps
+
 FOCUS_TOKENS_MAP = {t: i for i, t in enumerate(FOCUS_TOKENS)}
 POSITIONAL_TOKENS_MAP = {t: i for i, t in enumerate(POSITIONAL_TOKENS)}
 VISIBILITY_TOKENS_MAP = {t: i for i, t in enumerate(VISIBILITY_TOKENS)}
 
-# caches used by canonicalizer
+# re-usable caches
+
 CACHE_CANONICALIZE_WHEN: dict = {}
-RUN_CACHE_CONTEXT = None
-RUN_CANONICAL_CACHE: dict = {}
-RUN_SORTABLE_CACHE: dict = {}
-RUN_OBJ_INFO_CACHE: dict = {}
-RUN_MATCH_CACHE: dict = {}
-OPERAND_MATCH_CACHE: dict = {}
-
-# caches
+CACHE_DECODED_JSON_LITERAL: dict = {}
 CACHE_JSON_OBJECT: dict = {}
-CACHE_SORTABLE_WHEN: dict = {}
-
-# caches
 CACHE_NATURAL_KEY: dict = {}
 CACHE_NATURAL_KEY_CS: dict = {}
+CACHE_SORTABLE_WHEN: dict = {}
 CACHE_WHEN_SPECIFICITY: dict = {}
 
-# cache for decoded JSON string literals
-CACHE_DECODED_JSON_LITERAL: dict = {}
+OPERAND_MATCH_CACHE: dict = {}
 
-# (no module-level match-info cache here)
+RUN_CACHE_CONTEXT = None
+RUN_CANONICAL_CACHE: dict = {}
+RUN_MATCH_CACHE: dict = {}
+RUN_OBJ_INFO_CACHE: dict = {}
+RUN_SORTABLE_CACHE: dict = {}
+
+
 #
 # classes
 #
 
-# AST when node classes used by the token/parse functions
 
+# AST when node
 
 class WhenNode:
     def __init__(self, parens: bool = False):
@@ -113,11 +118,13 @@ class WhenAnd(WhenNode):
 
     def _to_str(self) -> str:
         parts: list[str] = []
+
         for c in self.children:
             s = _render_when_node(c)
             if isinstance(c, WhenOr):
                 s = f'({s})'
             parts.append(s)
+
         return ' && '.join(parts)
 
 
@@ -137,8 +144,10 @@ class WhenNot(WhenNode):
 
     def _to_str(self) -> str:
         child_str = self.child._to_str()
+
         if isinstance(self.child, (WhenAnd, WhenOr)) and not self.child.parens:
             child_str = f'({child_str})'
+
         return f'!{child_str}'
 
 
@@ -149,11 +158,13 @@ class WhenOr(WhenNode):
 
     def _to_str(self) -> str:
         parts: list[str] = []
+
         for c in self.children:
             s = _render_when_node(c)
             if isinstance(c, WhenAnd):
                 s = f'({s})'
             parts.append(s)
+
         return ' || '.join(parts)
 
 
@@ -161,206 +172,37 @@ class WhenOr(WhenNode):
 # functions
 #
 
-def _render_when_node(node: WhenNode) -> str:
-    """Render a WhenNode AST back to its string form while preserving parentheses."""
 
-    inner = node._to_str()
-    if node.parens:
-        return f'({inner})'
-    return inner
+def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+    """Return canonicalized when entry from an LRU cache."""
 
+    when_prefixes_tpl = None if when_prefixes is None else tuple(when_prefixes)
 
-def _tokenize_when(expr: str):
-    """Tokenize a when expression into operand and operator tokens for parsing."""
-
-    tokens = []
-    buf = ''
-    i = 0
-    n = len(expr)
-    in_single = False
-    in_double = False
-    in_regex = False
-    regex_escape = False
-    prev_nonspace = ''
-
-    def _flush_buf():
-        nonlocal buf
-        if buf.strip():
-            tokens.append(('OPERAND', re.sub(r'\s+', ' ', buf).strip()))
-        buf = ''
-
-    while i < n:
-        ch = expr[i]
-
-        if in_single:
-            buf += ch
-            if ch == '\\':
-                if i + 1 < n:
-                    buf += expr[i + 1]
-                    i += 1
-            elif ch == "'":
-                in_single = False
-            i += 1
-            continue
-
-        if in_double:
-            buf += ch
-            if ch == '\\':
-                if i + 1 < n:
-                    buf += expr[i + 1]
-                    i += 1
-            elif ch == '"':
-                in_double = False
-            i += 1
-            continue
-
-        if in_regex:
-            buf += ch
-            if regex_escape:
-                regex_escape = False
-            elif ch == '\\':
-                regex_escape = True
-            elif ch == '/':
-                in_regex = False
-            i += 1
-            continue
-
-        if ch.isspace():
-            buf += ch
-            i += 1
-            continue
-
-        if ch == "'":
-            in_single = True
-            buf += ch
-            i += 1
-            continue
-
-        if ch == '"':
-            in_double = True
-            buf += ch
-            i += 1
-            continue
-
-        if ch == '/' and prev_nonspace == '~':
-            in_regex = True
-            buf += ch
-            i += 1
-            continue
-
-        if expr.startswith('&&', i) or expr.startswith('||', i):
-            _flush_buf()
-            tokens.append(('OP', expr[i:i + 2]))
-            i += 2
-            prev_nonspace = ''
-            continue
-
-        if ch in '()':
-            _flush_buf()
-            tokens.append(('OP', ch))
-            i += 1
-            prev_nonspace = ch
-            continue
-
-        if ch == '!':
-            nxt = expr[i + 1] if i + 1 < n else ''
-            if nxt == '=':
-                buf += ch
-                i += 1
-                prev_nonspace = ch
-                continue
-            if not buf.strip():
-                _flush_buf()
-                tokens.append(('OP', '!'))
-                i += 1
-                prev_nonspace = '!'
-                continue
-
-        buf += ch
-        if not ch.isspace():
-            prev_nonspace = ch
-        i += 1
-
-    _flush_buf()
-
-    return tokens
-
-
-def _matches_entry(left: str, entry: str) -> bool:
-    """Return True if the left identifier matches the when-entry pattern.
-
-    Supports literal equality, prefix entries ending with '.' and '<viewId>' placeholders.
-    """
-
-    if entry.endswith('.'):
-        return left.startswith(entry)
-    if '<viewId>' in entry:
-        prefix, suffix = entry.split('<viewId>', 1)
-        return left.startswith(prefix) and left.endswith(suffix)
-    return left == entry
-
-
-def _operand_match_signature(token: str, run_ctx) -> tuple[str, bool, tuple[int, ...], tuple[int, ...]]:
-    """Compute and cache a small signature for a single operand token under a run context.
-
-    Returns (left_id, has_focus, prefix_idxs_tuple, regex_idxs_tuple).
-    """
-
-    cache_key = (token, run_ctx)
-    cached = OPERAND_MATCH_CACHE.get(cache_key)
-    if cached is not None:
-        return cached
-
-    t = token.strip()
-    while t.startswith('(') and t.endswith(')'):
-        t = t[1:-1].strip()
-    if not t:
-        res = ('', False, (), ())
-        try:
-            OPERAND_MATCH_CACHE[cache_key] = res
-        except Exception:
-            pass
-        return res
-
-    left = t[1:].lstrip() if t.startswith('!') else t
-    left_id = left.split()[0] if left else ''
-
-    has_focus = any(_matches_entry(left_id, entry) for entry in FOCUS_TOKENS) if left_id else False
-
-    prefix_idxs: set[int] = set()
-    regex_idxs: set[int] = set()
-
-    run_prefixes = run_ctx[2] if run_ctx else None
-    if run_prefixes:
-        for idx, prefix in enumerate(run_prefixes):
+    if when_regexes is None:
+        when_regexes_tpl = None
+    else:
+        def _rx_to_str(r):
             try:
-                if left_id.startswith(prefix):
-                    prefix_idxs.add(idx)
+                return r.pattern if hasattr(r, 'pattern') else str(r)
             except Exception:
-                continue
+                return str(r)
 
-    run_regexes = run_ctx[3] if run_ctx else None
-    if run_regexes:
-        for idx, rx in enumerate(run_regexes):
-            try:
-                if hasattr(rx, 'search'):
-                    if rx.search(left_id):
-                        regex_idxs.add(idx)
-                else:
-                    if str(rx) in left_id:
-                        regex_idxs.add(idx)
-            except Exception:
-                continue
+        when_regexes_tpl = tuple(_rx_to_str(r) for r in when_regexes)
 
-    res = (left_id, has_focus, tuple(sorted(prefix_idxs)), tuple(sorted(regex_idxs)))
-    try:
-        OPERAND_MATCH_CACHE[cache_key] = res
-    except Exception:
-        pass
-    return res
+    return _canonicalize_when_cached(when_val, mode, negation_mode, when_prefixes_tpl, when_regexes_tpl)
 
 
-def _canonicalize_when_impl(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+@lru_cache(maxsize=65536)
+def _canonicalize_when_cached(when_val: str, mode: str, negation_mode: str, when_prefixes_tpl: tuple | None, when_regexes_tpl: tuple | None) -> str:
+    """Internal canonicalize implementation (LRU caching)."""
+
+    when_prefixes = None if when_prefixes_tpl is None else list(when_prefixes_tpl)
+    when_regexes = None if when_regexes_tpl is None else list(when_regexes_tpl)
+
+    return _canonicalize_when_not_cached(when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+
+
+def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Internal canonicalize implementation (no LRU caching)."""
 
     def _clear_parens(node: WhenNode):
@@ -662,38 +504,138 @@ def _canonicalize_when_impl(when_val: str, mode: str = 'config-first', negation_
     return result
 
 
-# LRU-cached wrapper for the canonicalizer. Use tuples for hashable args.
-@lru_cache(maxsize=65536)
-def _canonicalize_when_cached(when_val: str, mode: str, negation_mode: str, when_prefixes_tpl: tuple | None, when_regexes_tpl: tuple | None) -> str:
-    when_prefixes = None if when_prefixes_tpl is None else list(when_prefixes_tpl)
-    when_regexes = None if when_regexes_tpl is None else list(when_regexes_tpl)
-    return _canonicalize_when_impl(when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
-
-
-def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
-    """Public canonicalize entry that leverages an LRU cache for hot repeated calls."""
-    when_prefixes_tpl = None if when_prefixes is None else tuple(when_prefixes)
-    # when_regexes may contain compiled patterns; convert to pattern strings for hashing
-    if when_regexes is None:
-        when_regexes_tpl = None
-    else:
-        def _rx_to_str(r):
-            try:
-                return r.pattern if hasattr(r, 'pattern') else str(r)
-            except Exception:
-                return str(r)
-
-        when_regexes_tpl = tuple(_rx_to_str(r) for r in when_regexes)
-
-    return _canonicalize_when_cached(when_val, mode, negation_mode, when_prefixes_tpl, when_regexes_tpl)
-
-
-def _canonicalize_when_cache_clear() -> None:
+def _clear_lru_when_cache() -> None:
     """Clear the LRU cache used by the canonicalizer."""
+
     try:
         _canonicalize_when_cached.cache_clear()
     except Exception:
         pass
+
+
+def _decode_json_string_literal(raw: str) -> str:
+    """Decode the inner text of a JSON string literal into a Python string."""
+
+    if raw is None:
+        return ''
+
+    cached = CACHE_DECODED_JSON_LITERAL.get(raw)
+    if cached is not None:
+        return cached
+
+    try:
+        val = json.loads('"' + raw + '"')
+    except Exception:
+        try:
+            val = bytes(raw, 'utf-8').decode('unicode_escape')
+        except Exception:
+            val = raw
+
+    try:
+        CACHE_DECODED_JSON_LITERAL[raw] = val
+    except Exception:
+        pass
+    return val
+
+
+def _extract_key_when_from_object(obj_text: str) -> Tuple[str, str]:
+    """Return a tuple of literal `(key, when)` values extracted from an object text."""
+
+    return (_extract_literal_key_from_object(obj_text), _extract_literal_when_from_object(obj_text))
+
+
+def _extract_literal_key_from_object(obj_text: str) -> str:
+    """Return the decoded literal `key` value from an object text or empty string."""
+
+    match = _io._KEY_EXTRACT_RE.search(obj_text)
+    if not match:
+        return ''
+    return _decode_json_string_literal(match.group(1))
+
+
+def _extract_literal_when_from_object(obj_text: str) -> str:
+    """Return the decoded literal `when` value from an object text or empty string."""
+
+    match = _io._WHEN_EXTRACT_RE.search(obj_text)
+
+    if not match:
+        return ''
+
+    return _decode_json_string_literal(match.group(1))
+
+
+def _get_run_obj_match_info(obj_text: str) -> dict:
+    """Return per-run cached focus/prefix/regex match signatures for an object text."""
+
+    # respect the package run context when caching
+    run_ctx = RUN_CACHE_CONTEXT if RUN_CACHE_CONTEXT else None
+    cache_key = (obj_text, run_ctx)
+    cached = RUN_MATCH_CACHE.get(cache_key)
+
+    if cached is not None:
+        return cached
+
+    # attempt to reuse parsed object info if available
+    parsed = RUN_OBJ_INFO_CACHE.get(obj_text)
+
+    if parsed is None:
+        parsed = _parse_object(obj_text)
+
+    when_val = ''
+
+    if parsed is not None:
+        try:
+            when_val = str(parsed.get('when', ''))
+        except Exception:
+            when_val = ''
+
+    if not when_val:
+        when_val = _extract_literal_when_from_object(obj_text)
+
+    left_ids: list[str] = []
+    prefix_idxs: set[int] = set()
+    regex_idxs: set[int] = set()
+    has_focus = False
+
+    try:
+        parts = _io._WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
+        for part in parts:
+            token = part.strip()
+            if not token:
+                continue
+
+            left_id, op_has_focus, op_prefixes, op_regexes = _operand_match_signature(token, RUN_CACHE_CONTEXT)
+            if not left_id:
+                continue
+
+            left_ids.append(left_id)
+
+            if not has_focus and op_has_focus:
+                has_focus = True
+            for idx in op_prefixes:
+                prefix_idxs.add(idx)
+            for idx in op_regexes:
+                regex_idxs.add(idx)
+
+    except Exception:
+        left_ids = []
+        prefix_idxs = set()
+        regex_idxs = set()
+        has_focus = False
+
+    match_info = {
+        'left_ids': tuple(left_ids),
+        'has_focus': has_focus,
+        'prefix_idxs': tuple(sorted(prefix_idxs)),
+        'regex_idxs': tuple(sorted(regex_idxs)),
+    }
+
+    try:
+        RUN_MATCH_CACHE[cache_key] = match_info
+    except Exception:
+        pass
+
+    return match_info
 
 
 def _key_tail_literal(key_value: str) -> str:
@@ -709,12 +651,63 @@ def _key_tail_literal(key_value: str) -> str:
     return bits[-1]
 
 
+def _matches_entry(left: str, entry: str) -> bool:
+    """Return True if the left identifier matches the when-entry pattern."""
+
+    if entry.endswith('.'):
+        return left.startswith(entry)
+
+    if '<viewId>' in entry:
+        prefix, suffix = entry.split('<viewId>', 1)
+        return left.startswith(prefix) and left.endswith(suffix)
+
+    return left == entry
+
+
+def _natural_key(s):
+    """Return a locale-independent natural-sort key (a list of ints and strings) for sorting."""
+
+    key = str(s)
+    cached = CACHE_NATURAL_KEY.get(key)
+    if cached is not None:
+        return cached
+    parts = _io._NUMBER_SPLIT_RE.split(key)
+    out = [int(text) if text.isdigit() else text.lower() for text in parts]
+
+    try:
+        CACHE_NATURAL_KEY[key] = out
+    except Exception:
+        pass
+
+    return out
+
+
+def _natural_key_case_sensitive(s):
+    """Return a case-sensitive natural-sort key for the string."""
+
+    key = str(s)
+    cached = CACHE_NATURAL_KEY_CS.get(key)
+
+    if cached is not None:
+        return cached
+    parts = _io._NUMBER_SPLIT_RE.split(key)
+    out = [int(text) if text.isdigit() else text for text in parts]
+
+    try:
+        CACHE_NATURAL_KEY_CS[key] = out
+    except Exception:
+        pass
+
+    return out
+
+
 def _normalize_key(k: str | None) -> str:
     """Normalize a key string by trimming whitespace and decoding escapes."""
 
     if k is None:
         return ""
     nk = str(k).strip()
+
     try:
         if "\\u" in nk or "\\x" in nk:
             nk = nk.encode('utf-8').decode('unicode_escape')
@@ -728,6 +721,7 @@ def _normalize_key_for_compare(key_value: str) -> str:
 
     if not key_value:
         return ""
+
     return key_value.strip().lower()
 
 
@@ -740,22 +734,32 @@ def _parse_jsonc(text: str):
     return json.loads(t)
 
 
-def _split_when_contexts(expr: str | None) -> List[str]:
-    """Split a when expression into individual && contexts and return them."""
+def _parse_object(obj_text: str):
+    """Parse an object text (including braces) into a dict, caching results where possible."""
 
-    if not expr:
-        return []
+    if not obj_text:
+        return None
 
-    normalized = str(expr).strip()
-    if not normalized:
-        return []
+    m = _io._OBJ_RE.search(obj_text)
+    if not m:
+        return None
 
-    normalized = re.sub(r"^\s*&&\s*", "", normalized)
-    normalized = re.sub(r"\s*&&\s*$", "", normalized)
-    if not normalized:
-        return []
+    obj_str = m.group(0)
+    cached = CACHE_JSON_OBJECT.get(obj_str)
+    if cached is not None:
+        return cached
 
-    return [part.strip() for part in re.split(r"\s*&&\s*", normalized) if part.strip()]
+    try:
+        clean = _strip_json_comments(obj_str)
+        clean = _strip_trailing_commas(clean)
+        parsed = json.loads(clean)
+        try:
+            CACHE_JSON_OBJECT[obj_str] = parsed
+        except Exception:
+            pass
+        return parsed
+    except Exception:
+        return None
 
 
 def _parse_when(expr: str) -> WhenNode:
@@ -829,55 +833,15 @@ def _parse_when(expr: str) -> WhenNode:
     return _parse_or()
 
 
-def _when_specificity(when_val: str) -> Tuple[int]:
-    """Return a heuristic specificity tuple for a when clause (fewer terms is broader)."""
+def _render_when_node(node: WhenNode) -> str:
+    """Render a WhenNode AST back to its string form while preserving parentheses."""
 
-    key = '' if when_val is None else str(when_val)
-    cached = CACHE_WHEN_SPECIFICITY.get(key)
-    if cached is not None:
-        return cached
-    if not key:
-        res = (0,)
-    else:
-        term_count = len(_io._WHEN_TERM_SPLIT_RE.split(key.strip()))
-        res = (term_count,)
-    try:
-        CACHE_WHEN_SPECIFICITY[key] = res
-    except Exception:
-        pass
-    return res
+    inner = node._to_str()
 
+    if node.parens:
+        return f'({inner})'
 
-def _natural_key(s):
-    """Return a locale-independent natural-sort key (a list of ints and strings) for sorting."""
-
-    key = str(s)
-    cached = CACHE_NATURAL_KEY.get(key)
-    if cached is not None:
-        return cached
-    parts = _io._NUMBER_SPLIT_RE.split(key)
-    out = [int(text) if text.isdigit() else text.lower() for text in parts]
-    try:
-        CACHE_NATURAL_KEY[key] = out
-    except Exception:
-        pass
-    return out
-
-
-def _natural_key_case_sensitive(s):
-    """Return a case-sensitive natural-sort key for the string."""
-
-    key = str(s)
-    cached = CACHE_NATURAL_KEY_CS.get(key)
-    if cached is not None:
-        return cached
-    parts = _io._NUMBER_SPLIT_RE.split(key)
-    out = [int(text) if text.isdigit() else text for text in parts]
-    try:
-        CACHE_NATURAL_KEY_CS[key] = out
-    except Exception:
-        pass
-    return out
+    return inner
 
 
 def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
@@ -909,6 +873,24 @@ def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode:
     return when
 
 
+def _split_when_contexts(expr: str | None) -> List[str]:
+    """Split a when expression into individual && contexts and return them."""
+
+    if not expr:
+        return []
+
+    normalized = str(expr).strip()
+    if not normalized:
+        return []
+
+    normalized = re.sub(r"^\s*&&\s*", "", normalized)
+    normalized = re.sub(r"\s*&&\s*$", "", normalized)
+    if not normalized:
+        return []
+
+    return [part.strip() for part in re.split(r"\s*&&\s*", normalized) if part.strip()]
+
+
 def _strip_json_comments(text):
     """Strip JavaScript-style comments from JSONC text while preserving string literals."""
 
@@ -927,151 +909,196 @@ def _strip_trailing_commas(text):
     return _io._TRAILING_COMMA_RE.sub(r"\1", text)
 
 
-def _decode_json_string_literal(raw: str) -> str:
-    """Decode the inner text of a JSON string literal into a Python string."""
+def _tokenize_when(expr: str):
+    """Tokenize a when expression into operand and operator tokens for parsing."""
 
-    if raw is None:
-        return ''
+    tokens = []
+    buf = ''
+    i = 0
+    n = len(expr)
+    in_single = False
+    in_double = False
+    in_regex = False
+    regex_escape = False
+    prev_nonspace = ''
 
-    cached = CACHE_DECODED_JSON_LITERAL.get(raw)
+    def _flush_buf():
+        nonlocal buf
+        if buf.strip():
+            tokens.append(('OPERAND', re.sub(r'\s+', ' ', buf).strip()))
+        buf = ''
+
+    while i < n:
+        ch = expr[i]
+
+        if in_single:
+            buf += ch
+            if ch == '\\':
+                if i + 1 < n:
+                    buf += expr[i + 1]
+                    i += 1
+            elif ch == "'":
+                in_single = False
+            i += 1
+            continue
+
+        if in_double:
+            buf += ch
+            if ch == '\\':
+                if i + 1 < n:
+                    buf += expr[i + 1]
+                    i += 1
+            elif ch == '"':
+                in_double = False
+            i += 1
+            continue
+
+        if in_regex:
+            buf += ch
+            if regex_escape:
+                regex_escape = False
+            elif ch == '\\':
+                regex_escape = True
+            elif ch == '/':
+                in_regex = False
+            i += 1
+            continue
+
+        if ch.isspace():
+            buf += ch
+            i += 1
+            continue
+
+        if ch == "'":
+            in_single = True
+            buf += ch
+            i += 1
+            continue
+
+        if ch == '"':
+            in_double = True
+            buf += ch
+            i += 1
+            continue
+
+        if ch == '/' and prev_nonspace == '~':
+            in_regex = True
+            buf += ch
+            i += 1
+            continue
+
+        if expr.startswith('&&', i) or expr.startswith('||', i):
+            _flush_buf()
+            tokens.append(('OP', expr[i:i + 2]))
+            i += 2
+            prev_nonspace = ''
+            continue
+
+        if ch in '()':
+            _flush_buf()
+            tokens.append(('OP', ch))
+            i += 1
+            prev_nonspace = ch
+            continue
+
+        if ch == '!':
+            nxt = expr[i + 1] if i + 1 < n else ''
+            if nxt == '=':
+                buf += ch
+                i += 1
+                prev_nonspace = ch
+                continue
+            if not buf.strip():
+                _flush_buf()
+                tokens.append(('OP', '!'))
+                i += 1
+                prev_nonspace = '!'
+                continue
+
+        buf += ch
+        if not ch.isspace():
+            prev_nonspace = ch
+        i += 1
+
+    _flush_buf()
+
+    return tokens
+
+
+def _when_specificity(when_val: str) -> Tuple[int]:
+    """Return a heuristic specificity tuple for a when clause (fewer terms is broader)."""
+
+    key = '' if when_val is None else str(when_val)
+    cached = CACHE_WHEN_SPECIFICITY.get(key)
     if cached is not None:
         return cached
-
+    if not key:
+        res = (0,)
+    else:
+        term_count = len(_io._WHEN_TERM_SPLIT_RE.split(key.strip()))
+        res = (term_count,)
     try:
-        val = json.loads('"' + raw + '"')
-    except Exception:
-        try:
-            val = bytes(raw, 'utf-8').decode('unicode_escape')
-        except Exception:
-            val = raw
-
-    try:
-        CACHE_DECODED_JSON_LITERAL[raw] = val
+        CACHE_WHEN_SPECIFICITY[key] = res
     except Exception:
         pass
-    return val
+    return res
 
 
-def _parse_object(obj_text: str):
-    """Parse an object text (including braces) into a dict, caching results where possible."""
+def _operand_match_signature(token: str, run_ctx) -> tuple[str, bool, tuple[int, ...], tuple[int, ...]]:
+    """Compute and cache a small signature for a single operand token under a run context.
 
-    if not obj_text:
-        return None
-
-    m = _io._OBJ_RE.search(obj_text)
-    if not m:
-        return None
-
-    obj_str = m.group(0)
-    cached = CACHE_JSON_OBJECT.get(obj_str)
-    if cached is not None:
-        return cached
-
-    try:
-        clean = _strip_json_comments(obj_str)
-        clean = _strip_trailing_commas(clean)
-        parsed = json.loads(clean)
-        try:
-            CACHE_JSON_OBJECT[obj_str] = parsed
-        except Exception:
-            pass
-        return parsed
-    except Exception:
-        return None
-
-
-def _extract_literal_key_from_object(obj_text: str) -> str:
-    """Return the decoded literal `key` value from an object text or empty string."""
-
-    match = _io._KEY_EXTRACT_RE.search(obj_text)
-    if not match:
-        return ''
-    return _decode_json_string_literal(match.group(1))
-
-
-def _extract_literal_when_from_object(obj_text: str) -> str:
-    """Return the decoded literal `when` value from an object text or empty string."""
-
-    match = _io._WHEN_EXTRACT_RE.search(obj_text)
-    if not match:
-        return ''
-    return _decode_json_string_literal(match.group(1))
-
-
-def _extract_key_when_from_object(obj_text: str) -> Tuple[str, str]:
-    """Return a tuple of literal `(key, when)` values extracted from an object text."""
-
-    return (_extract_literal_key_from_object(obj_text), _extract_literal_when_from_object(obj_text))
-
-
-def _get_run_obj_match_info(obj_text: str) -> dict:
-    """Return per-run cached focus/prefix/regex match signatures for an object text.
-
-    This mirrors the CLI's match-info computation but lives in the package so
-    callers can benefit from a shared per-run cache (`RUN_MATCH_CACHE`).
+    Returns (left_id, has_focus, prefix_idxs_tuple, regex_idxs_tuple).
     """
 
-    # Respect the package run context when caching
-    run_ctx = RUN_CACHE_CONTEXT if RUN_CACHE_CONTEXT else None
-    cache_key = (obj_text, run_ctx)
-    cached = RUN_MATCH_CACHE.get(cache_key)
+    cache_key = (token, run_ctx)
+    cached = OPERAND_MATCH_CACHE.get(cache_key)
     if cached is not None:
         return cached
 
-    # Attempt to reuse parsed object info if available
-    parsed = RUN_OBJ_INFO_CACHE.get(obj_text)
-    if parsed is None:
-        parsed = _parse_object(obj_text)
-
-    when_val = ''
-    if parsed is not None:
+    t = token.strip()
+    while t.startswith('(') and t.endswith(')'):
+        t = t[1:-1].strip()
+    if not t:
+        res = ('', False, (), ())
         try:
-            when_val = str(parsed.get('when', ''))
+            OPERAND_MATCH_CACHE[cache_key] = res
         except Exception:
-            when_val = ''
+            pass
+        return res
 
-    if not when_val:
-        when_val = _extract_literal_when_from_object(obj_text)
+    left = t[1:].lstrip() if t.startswith('!') else t
+    left_id = left.split()[0] if left else ''
 
-    left_ids: list[str] = []
+    has_focus = any(_matches_entry(left_id, entry) for entry in FOCUS_TOKENS) if left_id else False
+
     prefix_idxs: set[int] = set()
     regex_idxs: set[int] = set()
-    has_focus = False
 
-    try:
-        parts = _io._WHEN_TERM_SPLIT_RE.split(str(when_val).strip()) if when_val else []
-        for part in parts:
-            token = part.strip()
-            if not token:
+    run_prefixes = run_ctx[2] if run_ctx else None
+    if run_prefixes:
+        for idx, prefix in enumerate(run_prefixes):
+            try:
+                if left_id.startswith(prefix):
+                    prefix_idxs.add(idx)
+            except Exception:
                 continue
 
-            left_id, op_has_focus, op_prefixes, op_regexes = _operand_match_signature(token, RUN_CACHE_CONTEXT)
-            if not left_id:
+    run_regexes = run_ctx[3] if run_ctx else None
+    if run_regexes:
+        for idx, rx in enumerate(run_regexes):
+            try:
+                if hasattr(rx, 'search'):
+                    if rx.search(left_id):
+                        regex_idxs.add(idx)
+                else:
+                    if str(rx) in left_id:
+                        regex_idxs.add(idx)
+            except Exception:
                 continue
 
-            left_ids.append(left_id)
-            if not has_focus and op_has_focus:
-                has_focus = True
-            for idx in op_prefixes:
-                prefix_idxs.add(idx)
-            for idx in op_regexes:
-                regex_idxs.add(idx)
-    except Exception:
-        left_ids = []
-        prefix_idxs = set()
-        regex_idxs = set()
-        has_focus = False
-
-    match_info = {
-        'left_ids': tuple(left_ids),
-        'has_focus': has_focus,
-        'prefix_idxs': tuple(sorted(prefix_idxs)),
-        'regex_idxs': tuple(sorted(regex_idxs)),
-    }
-
+    res = (left_id, has_focus, tuple(sorted(prefix_idxs)), tuple(sorted(regex_idxs)))
     try:
-        RUN_MATCH_CACHE[cache_key] = match_info
+        OPERAND_MATCH_CACHE[cache_key] = res
     except Exception:
         pass
-
-    return match_info
+    return res

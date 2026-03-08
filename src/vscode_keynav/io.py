@@ -13,6 +13,10 @@ import sys
 
 from typing import Optional, Union
 
+#
+# globals & constants
+#
+
 
 # NOTE: prefer adding more parsing/formatting helpers here rather than scattering regexes across multiple modules.
 
@@ -32,6 +36,11 @@ _RE_PATTERNS = {
     '_KEY_EXTRACT_RE': (r'"key"\s*:\s*"((?:\\.|[^"\\])*)"', 0),
     '_WHEN_EXTRACT_RE': (r'"when"\s*:\s*"((?:\\.|[^"\\])*)"', 0),
 }
+
+
+#
+# functions
+#
 
 
 def __getattr__(name: str):
