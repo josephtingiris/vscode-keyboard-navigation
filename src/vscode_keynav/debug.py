@@ -1,4 +1,7 @@
-"""Debug and ANSI color helpers extracted from keybindings-sort.
+"""
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
+Debug and ANSI color helpers extracted from keybindings-sort.
 
 This module provides minimal debug configuration and filtered debug
 output helpers so other modules can call `debug.echo(...)` uniformly.

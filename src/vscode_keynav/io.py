@@ -1,5 +1,8 @@
-from __future__ import annotations
+"""
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+"""
 
+from __future__ import annotations
 from pathlib import Path
 import sys
 from typing import Optional, Union

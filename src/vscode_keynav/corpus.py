@@ -1,5 +1,8 @@
-from __future__ import annotations
+"""
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+"""
 
+from __future__ import annotations
 from typing import Any, Dict, List
 
 from .keybindings import canonicalize_when, key_tail_literal

@@ -64,6 +64,7 @@ import json
 import argparse
 import hashlib
 from typing import List, Tuple
+from vscode_keynav import debug as _dbg
 
 # global memoization cache for canonicalized when results
 
@@ -286,41 +287,17 @@ class WhenOr(WhenNode):
 
 def _apply_debug_settings(debug_specs: list[str] | None, color: str) -> None:
     """Configure global debug filters and color mode."""
-
-    global DEBUG_LEVEL, DEBUG_TARGET_WHEN, DEBUG_TARGET_CATEGORY, COLOR
-
-    COLOR = color
-    DEBUG_LEVEL = 0
-    DEBUG_TARGET_WHEN = ''
-    DEBUG_TARGET_CATEGORY = None
-
-    if not debug_specs:
-        return
-
-    max_level = 0
-    for spec in debug_specs:
-        if spec is None:
-            spec = '1'
-        spec = str(spec).strip()
-
-        if re.fullmatch(r'\d+', spec):
-            max_level = max(max_level, int(spec))
-            continue
-
-        if '=' in spec:
-            key, value = spec.split('=', 1)
-            key = key.strip().lower()
-            value = value.strip().strip('"').strip("'")
-            if key == 'when':
-                DEBUG_TARGET_WHEN = value
-            elif key in ('target', 'category'):
-                DEBUG_TARGET_CATEGORY = value
-            elif key == 'level' and re.fullmatch(r'\d+', value):
-                max_level = max(max_level, int(value))
-
-    if max_level == 0:
-        max_level = 1
-    DEBUG_LEVEL = max_level
+    # delegate to shared debug module and mirror selected values locally
+    _dbg.apply_debug_settings(debug_specs, color)
+    try:
+        # mirror values so existing module references continue to work
+        global COLOR, DEBUG_LEVEL, DEBUG_TARGET_WHEN, DEBUG_TARGET_CATEGORY
+        COLOR = _dbg.COLOR
+        DEBUG_LEVEL = _dbg.DEBUG_LEVEL
+        DEBUG_TARGET_WHEN = _dbg.DEBUG_TARGET_WHEN
+        DEBUG_TARGET_CATEGORY = _dbg.DEBUG_TARGET_CATEGORY
+    except Exception:
+        pass
 
 
 def _apply_when_grouping_profile(args: argparse.Namespace, raw_argv: list[str]) -> None:
@@ -951,14 +928,8 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
 
 def _color_enabled() -> bool:
     """Return True if ANSI coloring should be enabled for stderr output."""
-
-    if COLOR == 'never':
-        return False
-    if COLOR == 'always':
-        return True
     try:
-        # auto (default)
-        return sys.stderr.isatty()
+        return _dbg._color_enabled()
     except Exception:
         return False
 
@@ -971,40 +942,16 @@ def _contains_focus_token_in_object(obj_text: str) -> bool:
 
 def _debug_color(text: str, level: int) -> str:
     """Wrap debug text in ANSI color codes according to the debug level."""
-
-    if not _color_enabled():
+    try:
+        return _dbg._debug_color(text, level)
+    except Exception:
         return text
-
-    # simple level -> color mapping
-    colors = {
-        1: '\x1b[33m',
-        2: '\x1b[36m',
-        3: '\x1b[35m',
-        4: '\x1b[34m',
-    }
-
-    code = colors.get(level, '\x1b[37m')
-    return f"{code}{text}\x1b[0m"
 
 
 def _debug_echo(level: int, category: str, when_val: str | None, msg: str) -> None:
     """Conditionally output a filtered, leveled debug message to stderr."""
-
-    if DEBUG_LEVEL <= 0:
-        return
-    if level > DEBUG_LEVEL:
-        return
-    if DEBUG_TARGET_CATEGORY and DEBUG_TARGET_CATEGORY != 'all' and category != DEBUG_TARGET_CATEGORY:
-        return
-    if DEBUG_TARGET_WHEN:
-        if not when_val:
-            return
-        if when_val != DEBUG_TARGET_WHEN:
-            return
-    out = f"[DEBUG:{level}:{category}] {msg}"
-    out = _debug_color(out, level)
     try:
-        sys.stderr.write(out + '\n')
+        _dbg.echo(level, category, when_val, msg)
     except Exception:
         pass
 

@@ -1,4 +1,7 @@
-"""CLI helpers shared by bin scripts.
+"""
+(C) 2026 Joseph Tingiris (joseph.tingiris@gmail.com)
+
+CLI helpers shared by bin scripts.
 
 Provide a common argument parser and a small run wrapper so scripts
 can share consistent flags (input/output, dry-run, verbose, add-context).
