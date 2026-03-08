@@ -22,7 +22,7 @@ from vscode_keynav import io as _io
 #
 
 # CLI-level per-run caches to avoid repeated parsing/regex work across hot loops
-_CLI_RUN_OBJ_INFO_CACHE: dict = {}
+_CLI__RUN_OBJ_INFO_CACHE: dict = {}
 _CLI_RUN_OBJ_MATCH_CACHE: dict = {}
 
 # token groups and maps used by canonicalization heuristics
@@ -85,21 +85,21 @@ _VISIBILITY_TOKENS_MAP = {t: i for i, t in enumerate(_VISIBILITY_TOKENS)}
 
 # re-usable caches
 
-CACHE_CANONICALIZE_WHEN: dict = {}
-CACHE_DECODED_JSON_LITERAL: dict = {}
-CACHE_JSON_OBJECT: dict = {}
-CACHE_NATURAL_KEY: dict = {}
-CACHE_NATURAL_KEY_CS: dict = {}
-CACHE_SORTABLE_WHEN: dict = {}
-CACHE_WHEN_SPECIFICITY: dict = {}
+_CACHE_CANONICALIZE_WHEN: dict = {}
+_CACHE_DECODED_JSON_LITERAL: dict = {}
+_CACHE_JSON_OBJECT: dict = {}
+_CACHE_NATURAL_KEY: dict = {}
+_CACHE_NATURAL_KEY_CS: dict = {}
+_CACHE_SORTABLE_WHEN: dict = {}
+_CACHE_WHEN_SPECIFICITY: dict = {}
 
-OPERAND_MATCH_CACHE: dict = {}
+_OPERAND_MATCH_CACHE: dict = {}
 
-RUN_CACHE_CONTEXT = None
-RUN_CANONICAL_CACHE: dict = {}
-RUN_MATCH_CACHE: dict = {}
-RUN_OBJ_INFO_CACHE: dict = {}
-RUN_SORTABLE_CACHE: dict = {}
+_RUN_CACHE_CONTEXT = None
+_RUN_CANONICAL_CACHE: dict = {}
+_RUN_MATCH_CACHE: dict = {}
+_RUN_OBJ_INFO_CACHE: dict = {}
+_RUN_SORTABLE_CACHE: dict = {}
 
 
 #
@@ -471,14 +471,14 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
         None if when_regexes is None else tuple(when_regexes),
     )
 
-    cached = CACHE_CANONICALIZE_WHEN.get(cache_key)
+    cached = _CACHE_CANONICALIZE_WHEN.get(cache_key)
     if cached is not None:
         return cached
 
     try:
         run_key = (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes))
-        if RUN_CACHE_CONTEXT == run_key:
-            cached_run = RUN_CANONICAL_CACHE.get(when_val)
+        if _RUN_CACHE_CONTEXT == run_key:
+            cached_run = _RUN_CANONICAL_CACHE.get(when_val)
             if cached_run is not None:
                 return cached_run
     except Exception:
@@ -497,13 +497,13 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
     result = _render_when_node(ast)
 
     try:
-        CACHE_CANONICALIZE_WHEN[cache_key] = result
+        _CACHE_CANONICALIZE_WHEN[cache_key] = result
     except Exception:
         pass
 
     try:
-        if RUN_CACHE_CONTEXT == (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes)):
-            RUN_CANONICAL_CACHE[when_val] = result
+        if _RUN_CACHE_CONTEXT == (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes)):
+            _RUN_CANONICAL_CACHE[when_val] = result
     except Exception:
         pass
 
@@ -531,7 +531,7 @@ def _decode_json_string_literal(raw: str) -> str:
     if raw is None:
         return ''
 
-    cached = CACHE_DECODED_JSON_LITERAL.get(raw)
+    cached = _CACHE_DECODED_JSON_LITERAL.get(raw)
     if cached is not None:
         return cached
 
@@ -544,7 +544,7 @@ def _decode_json_string_literal(raw: str) -> str:
             val = raw
 
     try:
-        CACHE_DECODED_JSON_LITERAL[raw] = val
+        _CACHE_DECODED_JSON_LITERAL[raw] = val
     except Exception:
         pass
     return val
@@ -1074,17 +1074,17 @@ def _get_run_obj_info(
     """Return per-run cached object metadata for the current sorting context."""
 
     # prefer a CLI-local cache keyed by object text and current run context
-    run_ctx = RUN_CACHE_CONTEXT if RUN_CACHE_CONTEXT else None
+    run_ctx = _RUN_CACHE_CONTEXT if _RUN_CACHE_CONTEXT else None
     cache_key = (obj_text, run_ctx)
-    info = _CLI_RUN_OBJ_INFO_CACHE.get(cache_key)
+    info = _CLI__RUN_OBJ_INFO_CACHE.get(cache_key)
     if info is not None:
         return info
 
     # fall back to package-level per-object cache (by raw obj_text)
-    info = RUN_OBJ_INFO_CACHE.get(obj_text)
+    info = _RUN_OBJ_INFO_CACHE.get(obj_text)
     if info is not None:
         try:
-            _CLI_RUN_OBJ_INFO_CACHE[cache_key] = info
+            _CLI__RUN_OBJ_INFO_CACHE[cache_key] = info
         except Exception:
             pass
         return info
@@ -1128,11 +1128,11 @@ def _get_run_obj_info(
     }
 
     try:
-        RUN_OBJ_INFO_CACHE[obj_text] = info
+        _RUN_OBJ_INFO_CACHE[obj_text] = info
     except Exception:
         pass
     try:
-        _CLI_RUN_OBJ_INFO_CACHE[cache_key] = info
+        _CLI__RUN_OBJ_INFO_CACHE[cache_key] = info
     except Exception:
         pass
 
@@ -1143,15 +1143,15 @@ def _get_run_obj_match_info(obj_text: str) -> dict:
     """Return per-run cached focus/prefix/regex match signatures for an object text."""
 
     # respect the package run context when caching
-    run_ctx = RUN_CACHE_CONTEXT if RUN_CACHE_CONTEXT else None
+    run_ctx = _RUN_CACHE_CONTEXT if _RUN_CACHE_CONTEXT else None
     cache_key = (obj_text, run_ctx)
-    cached = RUN_MATCH_CACHE.get(cache_key)
+    cached = _RUN_MATCH_CACHE.get(cache_key)
 
     if cached is not None:
         return cached
 
     # attempt to reuse parsed object info if available
-    parsed = RUN_OBJ_INFO_CACHE.get(obj_text)
+    parsed = _RUN_OBJ_INFO_CACHE.get(obj_text)
 
     if parsed is None:
         parsed = _parse_object(obj_text)
@@ -1179,7 +1179,7 @@ def _get_run_obj_match_info(obj_text: str) -> dict:
             if not token:
                 continue
 
-            left_id, op_has_focus, op_prefixes, op_regexes = _operand_match_signature(token, RUN_CACHE_CONTEXT)
+            left_id, op_has_focus, op_prefixes, op_regexes = _operand_match_signature(token, _RUN_CACHE_CONTEXT)
             if not left_id:
                 continue
 
@@ -1206,7 +1206,7 @@ def _get_run_obj_match_info(obj_text: str) -> dict:
     }
 
     try:
-        RUN_MATCH_CACHE[cache_key] = match_info
+        _RUN_MATCH_CACHE[cache_key] = match_info
     except Exception:
         pass
 
@@ -1339,14 +1339,14 @@ def _natural_key(s):
     """Return a locale-independent natural-sort key (a list of ints and strings) for sorting."""
 
     key = str(s)
-    cached = CACHE_NATURAL_KEY.get(key)
+    cached = _CACHE_NATURAL_KEY.get(key)
     if cached is not None:
         return cached
     parts = _io._NUMBER_SPLIT_RE.split(key)
     out = [int(text) if text.isdigit() else text.lower() for text in parts]
 
     try:
-        CACHE_NATURAL_KEY[key] = out
+        _CACHE_NATURAL_KEY[key] = out
     except Exception:
         pass
 
@@ -1357,7 +1357,7 @@ def _natural_key_case_sensitive(s):
     """Return a case-sensitive natural-sort key for the string."""
 
     key = str(s)
-    cached = CACHE_NATURAL_KEY_CS.get(key)
+    cached = _CACHE_NATURAL_KEY_CS.get(key)
 
     if cached is not None:
         return cached
@@ -1365,7 +1365,7 @@ def _natural_key_case_sensitive(s):
     out = [int(text) if text.isdigit() else text for text in parts]
 
     try:
-        CACHE_NATURAL_KEY_CS[key] = out
+        _CACHE_NATURAL_KEY_CS[key] = out
     except Exception:
         pass
 
@@ -1525,7 +1525,7 @@ def _parse_object(obj_text: str):
         return None
 
     obj_str = m.group(0)
-    cached = CACHE_JSON_OBJECT.get(obj_str)
+    cached = _CACHE_JSON_OBJECT.get(obj_str)
     if cached is not None:
         return cached
 
@@ -1534,7 +1534,7 @@ def _parse_object(obj_text: str):
         clean = _strip_trailing_commas(clean)
         parsed = json.loads(clean)
         try:
-            CACHE_JSON_OBJECT[obj_str] = parsed
+            _CACHE_JSON_OBJECT[obj_str] = parsed
         except Exception:
             pass
         return parsed
@@ -1766,39 +1766,39 @@ def _replace_when_literals(
 def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
     """Initialize and clear per-run caches for the current run parameter context."""
 
-    global _CLI_RUN_OBJ_INFO_CACHE, _CLI_RUN_OBJ_MATCH_CACHE
-    global RUN_CACHE_CONTEXT, RUN_CANONICAL_CACHE, RUN_SORTABLE_CACHE, RUN_OBJ_INFO_CACHE, RUN_MATCH_CACHE
+    global _CLI__RUN_OBJ_INFO_CACHE, _CLI_RUN_OBJ_MATCH_CACHE
+    global _RUN_CACHE_CONTEXT, _RUN_CANONICAL_CACHE, _RUN_SORTABLE_CACHE, _RUN_OBJ_INFO_CACHE, _RUN_MATCH_CACHE
 
-    RUN_CACHE_CONTEXT = (
+    _RUN_CACHE_CONTEXT = (
         mode,
         negation_mode,
         None if when_prefixes is None else tuple(when_prefixes),
         None if when_regexes is None else tuple(when_regexes),
     )
     try:
-        RUN_CANONICAL_CACHE.clear()
+        _RUN_CANONICAL_CACHE.clear()
     except Exception:
-        RUN_CANONICAL_CACHE = {}
+        _RUN_CANONICAL_CACHE = {}
     try:
-        RUN_SORTABLE_CACHE.clear()
+        _RUN_SORTABLE_CACHE.clear()
     except Exception:
-        RUN_SORTABLE_CACHE = {}
+        _RUN_SORTABLE_CACHE = {}
     try:
-        RUN_OBJ_INFO_CACHE.clear()
+        _RUN_OBJ_INFO_CACHE.clear()
     except Exception:
-        RUN_OBJ_INFO_CACHE = {}
+        _RUN_OBJ_INFO_CACHE = {}
     try:
-        _CLI_RUN_OBJ_INFO_CACHE.clear()
+        _CLI__RUN_OBJ_INFO_CACHE.clear()
     except Exception:
-        _CLI_RUN_OBJ_INFO_CACHE = {}
+        _CLI__RUN_OBJ_INFO_CACHE = {}
     try:
         _CLI_RUN_OBJ_MATCH_CACHE.clear()
     except Exception:
         _CLI_RUN_OBJ_MATCH_CACHE = {}
     try:
-        RUN_MATCH_CACHE.clear()
+        _RUN_MATCH_CACHE.clear()
     except Exception:
-        RUN_MATCH_CACHE = {}
+        _RUN_MATCH_CACHE = {}
     try:
         # clear package-level canonicalizer LRU cache
         _clear_lru_when_cache()
@@ -1820,7 +1820,7 @@ def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode:
         None if when_regexes is None else tuple(when_regexes),
     )
 
-    cached = CACHE_SORTABLE_WHEN.get(cache_key)
+    cached = _CACHE_SORTABLE_WHEN.get(cache_key)
     if cached is not None:
         return cached
 
@@ -1828,7 +1828,7 @@ def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode:
     when = _canonicalize_when(when_val)
 
     try:
-        CACHE_SORTABLE_WHEN[cache_key] = when
+        _CACHE_SORTABLE_WHEN[cache_key] = when
     except Exception:
         pass
 
@@ -2000,7 +2000,7 @@ def _when_specificity(when_val: str) -> Tuple[int]:
     """Return a heuristic specificity tuple for a when clause (fewer terms is broader)."""
 
     key = '' if when_val is None else str(when_val)
-    cached = CACHE_WHEN_SPECIFICITY.get(key)
+    cached = _CACHE_WHEN_SPECIFICITY.get(key)
     if cached is not None:
         return cached
     if not key:
@@ -2009,7 +2009,7 @@ def _when_specificity(when_val: str) -> Tuple[int]:
         term_count = len(_io._WHEN_TERM_SPLIT_RE.split(key.strip()))
         res = (term_count,)
     try:
-        CACHE_WHEN_SPECIFICITY[key] = res
+        _CACHE_WHEN_SPECIFICITY[key] = res
     except Exception:
         pass
     return res
@@ -2022,7 +2022,7 @@ def _operand_match_signature(token: str, run_ctx) -> tuple[str, bool, tuple[int,
     """
 
     cache_key = (token, run_ctx)
-    cached = OPERAND_MATCH_CACHE.get(cache_key)
+    cached = _OPERAND_MATCH_CACHE.get(cache_key)
     if cached is not None:
         return cached
 
@@ -2032,7 +2032,7 @@ def _operand_match_signature(token: str, run_ctx) -> tuple[str, bool, tuple[int,
     if not t:
         res = ('', False, (), ())
         try:
-            OPERAND_MATCH_CACHE[cache_key] = res
+            _OPERAND_MATCH_CACHE[cache_key] = res
         except Exception:
             pass
         return res
@@ -2069,7 +2069,7 @@ def _operand_match_signature(token: str, run_ctx) -> tuple[str, bool, tuple[int,
 
     res = (left_id, has_focus, tuple(sorted(prefix_idxs)), tuple(sorted(regex_idxs)))
     try:
-        OPERAND_MATCH_CACHE[cache_key] = res
+        _OPERAND_MATCH_CACHE[cache_key] = res
     except Exception:
         pass
     return res
