@@ -121,124 +121,6 @@ def _init_directional_groups(selected: str, letter_groups: dict) -> None:
         globals()[var_name] = current
 
 
-# Use `_normalize_key` from the `vscode_keynav.keybindings` package
-
-
-def _tags_for(
-    key: str,
-    mod: str = "",
-    when_clause: str | None = None,
-    command: str | None = None,
-    existing_comments: str | None = None,
-) -> List[str]:
-    if not when_clause or "config.keyboardNavigation.enabled" not in when_clause:
-        return []
-
-    ordered_tags: List[str] = ["[keynav]"]
-    dynamic_tags: set[str] = set()
-
-    key_norm = _keybindings._normalize_key(key)
-
-    nav_group_clauses = {
-        name
-        for name in _corpus._LETTER_GROUPS
-        if f"config.keyboardNavigation.keys.letters == '{name}'" in when_clause
-    }
-
-    for tag, keys in _corpus._DIRECTIONAL_KEY_TAGS.items():
-        if key_norm not in keys:
-            continue
-        if key_norm in _corpus._ARROW_GROUP or key_norm in _corpus._PUNCTUATION_GROUP:
-            dynamic_tags.add(tag)
-            continue
-        if any(key_norm in _corpus._LETTER_GROUPS[name] for name in nav_group_clauses):
-            dynamic_tags.add(tag)
-
-    if "config.keyboardNavigation.keys.arrows" in when_clause:
-        dynamic_tags.add("(arrow)")
-
-    for name in _corpus._LETTER_GROUPS:
-        clause = f"config.keyboardNavigation.keys.letters == '{name}'"
-        if clause in when_clause:
-            dynamic_tags.add(f"({name})")
-
-    if key_norm in _corpus._FOLD_GROUP:
-        dynamic_tags.add("(fold)")
-    if key_norm in _corpus._JUKE_GROUP:
-        dynamic_tags.add("(juke)")
-    if key_norm in _corpus._SPLIT_GROUP:
-        dynamic_tags.add("(split)")
-    if key_norm in _corpus._SPLIT_HORIZONTAL_GROUP:
-        dynamic_tags.add("(horizontal)")
-    if key_norm in _corpus._SPLIT_VERTICAL_GROUP:
-        dynamic_tags.add("(vertical)")
-
-    if "config.keyboardNavigation.chords.debug" in when_clause:
-        dynamic_tags.add("(debug)")
-    if "config.keyboardNavigation.chords.action" in when_clause:
-        dynamic_tags.add("(action)")
-    if "config.keyboardNavigation.chords.extension" in when_clause:
-        dynamic_tags.add("(extension)")
-
-    if command and "corpus" in command.lower():
-        dynamic_tags.add("(corpus)")
-
-    if existing_comments and "corpus" in existing_comments.lower():
-        dynamic_tags.add("(corpus)")
-
-    if existing_comments and "(map)" in existing_comments.lower():
-        dynamic_tags.add("(map)")
-
-    if command and command.strip().lower() == "-noop":
-        dynamic_tags.add("(pass)")
-
-    if command and command.strip().lower() == "noop":
-        dynamic_tags.add("(block)")
-
-    fin_entry = _corpus._FIN_TAGS.get(mod)
-    if fin_entry:
-        color_tag, meta_tags = fin_entry
-        if color_tag:
-            dynamic_tags.add(color_tag)
-        if meta_tags:
-            for t in meta_tags:
-                dynamic_tags.add(t)
-
-    if when_clause and "config.keyboardNavigation.chords." in when_clause:
-        dynamic_tags.add("(chord)")
-
-    # context-based tags: map substrings or regexes in the when-clause to tags
-    if when_clause:
-        for pattern, tag in _corpus._WHEN_TAG_SELECTORS:
-            if pattern.startswith("/") and pattern.endswith("/"):
-                regex = pattern[1:-1]
-                try:
-                    if re.search(regex, when_clause):
-                        dynamic_tags.add(tag)
-                except re.error:
-                    # ignore bad regexes; should probably emit a warning here ...
-                    pass
-            else:
-                # avoid matching negated occurrences like '!editorFocus'
-                try:
-                    # search for whole-word occurrence not immediately preceded by '!'
-                    regex = rf"(?<!\!)\b{re.escape(pattern)}\b"
-                    if re.search(regex, when_clause):
-                        dynamic_tags.add(tag)
-                except re.error:
-                    # fallback to simple substring match on regex error
-                    if pattern in when_clause:
-                        dynamic_tags.add(tag)
-
-    ordered_tags.extend([tag for tag in _corpus._TAG_ORDER if tag in dynamic_tags])
-
-    # append any remaining dynamic tags not listed in TAG_ORDER, sorted alphabetically
-    remaining = sorted(t for t in dynamic_tags if t not in _corpus._TAG_ORDER)
-    ordered_tags.extend(remaining)
-
-    return ordered_tags
-
-
 def _when_for(key, mod: str = ""):
     parts = ["config.keyboardNavigation.enabled"]
     seen = set()
@@ -741,7 +623,7 @@ def main(argv: List[str] | None = None) -> int:
                 when_val,
                 add_context_arg,
             )
-            tags = _tags_for(
+            tags = _corpus._tags_for(
                 literal_key,
                 mod,
                 effective_when,
@@ -1266,7 +1148,7 @@ def main(argv: List[str] | None = None) -> int:
         globals()["_EXTENSION_GROUP"] = {_select_adaptive_key_local(EXTENSION_GROUP_ORIG, _corpus._ALTERNATE_EXTENSION_KEY)}
 
         cmd = f"(corpus) {k} {assigned[idx]}"
-        tags = _tags_for(key, mod, w, command=cmd)
+        tags = _corpus._tags_for(key, mod, w, command=cmd)
         comment_tags = tags if tags else []
         records[idx] = (k, w, comment_tags)
 

@@ -6,9 +6,11 @@ VS Code Keyboard Navigation common corpus functions.
 
 from __future__ import annotations
 
+import re
+
 from typing import Any, Dict, List
 
-from .keybindings import _canonicalize_when, _key_tail_literal
+from .keybindings import _canonicalize_when, _key_tail_literal, _normalize_key
 
 
 #
@@ -163,21 +165,118 @@ def _augment_when_clause(base_when: str, contexts: List[str]) -> str:
     return f"({base_when}) && ({ctx_clause})"
 
 
-def _tags_for(obj: Dict[str, Any]) -> List[str]:
-    """Return a list of simple tags for a keybinding object (command, key-tail, and when)."""
+def _tags_for(
+    key: str,
+    mod: str = "",
+    when_clause: str | None = None,
+    command: str | None = None,
+    existing_comments: str | None = None,
+) -> List[str]:
+    """Return a list of tags for a keybinding object (command, key-tail, and when)."""
 
-    tags: List[str] = []
-    if not isinstance(obj, dict):
-        return tags
-    if "command" in obj:
-        tags.append(f"cmd:{obj.get('command')}")
-    if "key" in obj:
-        tail = _key_tail_literal(obj.get("key", ""))
-        if tail:
-            tags.append(f"key-tail:{tail}")
-    when = obj.get("when") or obj.get("whenExpr") or ""
-    if when:
-        can = _canonicalize_when(str(when))
-        if can:
-            tags.append(f"when:{can}")
-    return tags
+    if not when_clause or "config.keyboardNavigation.enabled" not in when_clause:
+        return []
+
+    ordered_tags: List[str] = ["[keynav]"]
+    dynamic_tags: set[str] = set()
+
+    key_norm = _normalize_key(key)
+
+    nav_group_clauses = {
+        name
+        for name in _LETTER_GROUPS
+        if f"config.keyboardNavigation.keys.letters == '{name}'" in when_clause
+    }
+
+    for tag, keys in _DIRECTIONAL_KEY_TAGS.items():
+        if key_norm not in keys:
+            continue
+        if key_norm in _ARROW_GROUP or key_norm in _PUNCTUATION_GROUP:
+            dynamic_tags.add(tag)
+            continue
+        if any(key_norm in _LETTER_GROUPS[name] for name in nav_group_clauses):
+            dynamic_tags.add(tag)
+
+    if "config.keyboardNavigation.keys.arrows" in when_clause:
+        dynamic_tags.add("(arrow)")
+
+    for name in _LETTER_GROUPS:
+        clause = f"config.keyboardNavigation.keys.letters == '{name}'"
+        if clause in when_clause:
+            dynamic_tags.add(f"({name})")
+
+    if key_norm in _FOLD_GROUP:
+        dynamic_tags.add("(fold)")
+    if key_norm in _JUKE_GROUP:
+        dynamic_tags.add("(juke)")
+    if key_norm in _SPLIT_GROUP:
+        dynamic_tags.add("(split)")
+    if key_norm in _SPLIT_HORIZONTAL_GROUP:
+        dynamic_tags.add("(horizontal)")
+    if key_norm in _SPLIT_VERTICAL_GROUP:
+        dynamic_tags.add("(vertical)")
+
+    if "config.keyboardNavigation.chords.debug" in when_clause:
+        dynamic_tags.add("(debug)")
+    if "config.keyboardNavigation.chords.action" in when_clause:
+        dynamic_tags.add("(action)")
+    if "config.keyboardNavigation.chords.extension" in when_clause:
+        dynamic_tags.add("(extension)")
+
+    if command and "corpus" in command.lower():
+        dynamic_tags.add("(corpus)")
+
+    if existing_comments and "corpus" in existing_comments.lower():
+        dynamic_tags.add("(corpus)")
+
+    if existing_comments and "(map)" in existing_comments.lower():
+        dynamic_tags.add("(map)")
+
+    if command and command.strip().lower() == "-noop":
+        dynamic_tags.add("(pass)")
+
+    if command and command.strip().lower() == "noop":
+        dynamic_tags.add("(block)")
+
+    fin_entry = _FIN_TAGS.get(mod)
+    if fin_entry:
+        color_tag, meta_tags = fin_entry
+        if color_tag:
+            dynamic_tags.add(color_tag)
+        if meta_tags:
+            for t in meta_tags:
+                dynamic_tags.add(t)
+
+    if when_clause and "config.keyboardNavigation.chords." in when_clause:
+        dynamic_tags.add("(chord)")
+
+    # context-based tags: map substrings or regexes in the when-clause to tags
+    if when_clause:
+        for pattern, tag in _WHEN_TAG_SELECTORS:
+            if pattern.startswith("/") and pattern.endswith("/"):
+                regex = pattern[1:-1]
+                try:
+                    if re.search(regex, when_clause):
+                        dynamic_tags.add(tag)
+                except re.error:
+                    # ignore bad regexes; should probably emit a warning here ...
+                    pass
+            else:
+                # avoid matching negated occurrences like '!editorFocus'
+                try:
+                    # search for whole-word occurrence not immediately preceded by '!'
+                    regex = rf"(?<!\!)\b{re.escape(pattern)}\b"
+                    if re.search(regex, when_clause):
+                        dynamic_tags.add(tag)
+                except re.error:
+                    # fallback to simple substring match on regex error
+                    if pattern in when_clause:
+                        dynamic_tags.add(tag)
+
+    ordered_tags.extend([tag for tag in _TAG_ORDER if tag in dynamic_tags])
+
+    # append any remaining dynamic tags not listed in TAG_ORDER, sorted alphabetically
+    remaining = sorted(t for t in dynamic_tags if t not in _TAG_ORDER)
+    ordered_tags.extend(remaining)
+
+    return ordered_tags
