@@ -59,7 +59,6 @@ Exit codes
 """
 
 import argparse
-import hashlib
 import json
 import sys
 import re
