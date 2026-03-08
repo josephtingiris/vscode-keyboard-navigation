@@ -7,6 +7,7 @@
 /.vscode/**/workspaceStorage
 /.vscode/*bak*
 __pycache__/
+backup/
 dist/
 node_modules/
 out/
