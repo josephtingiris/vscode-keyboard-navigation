@@ -371,33 +371,6 @@ def _finalize_processed_output(
     return _remove_blank_lines(text)
 
 
-def _get_run_obj_match_info(obj_text: str) -> dict:
-    """Return per-run cached focus and prefix or regex match signatures for an object text."""
-
-    run_ctx = _keybindings.RUN_CACHE_CONTEXT if _keybindings.RUN_CACHE_CONTEXT else None
-    cache_key = (obj_text, run_ctx)
-    cached = _keybindings._CLI_RUN_OBJ_MATCH_CACHE.get(cache_key)
-    if cached is not None:
-        return cached
-
-    # delegate to package-level implementation which has its own per-run cache
-    try:
-        pkg_match = _keybindings._get_run_obj_match_info(obj_text)
-        try:
-            _keybindings._CLI_RUN_OBJ_MATCH_CACHE[cache_key] = pkg_match
-        except Exception:
-            pass
-        return pkg_match
-    except Exception:
-        # on any failure, fall back to a conservative empty signature
-        empty = {'left_ids': (), 'has_focus': False, 'prefix_idxs': (), 'regex_idxs': ()}
-        try:
-            _keybindings._CLI_RUN_OBJ_MATCH_CACHE[cache_key] = empty
-        except Exception:
-            pass
-        return empty
-
-
 def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]], str]:
     """Split a JSON array body into a list of (leading_comments, object_text) pairs and trailing comments."""
 
@@ -790,7 +763,7 @@ def _sort_groups_for_primary_when(
         for row in decorated:
             when_val = row[1] or ''
             try:
-                match_info = _get_run_obj_match_info(row[3][1])
+                match_info = _keybindings._get_run_obj_match_info(row[3][1])
                 found_focus = bool(match_info.get('has_focus', False))
                 for left_id in match_info.get('left_ids', ()):
                     try:
@@ -839,7 +812,7 @@ def _sort_groups_for_primary_when(
         matched_regex: list[tuple[str, str]] = []
         others: list[tuple[str, str]] = []
         for pair in sorted_groups:
-            match_info = _get_run_obj_match_info(pair[1])
+            match_info = _keybindings._get_run_obj_match_info(pair[1])
             found_prefix = bool(match_info.get('prefix_idxs'))
             found_regex = bool(match_info.get('regex_idxs'))
 
@@ -1082,7 +1055,7 @@ def main(argv: List[str] | None = None) -> int:
     if when_prefixes or when_regexes:
         # helper: compute matched prefix indices and regex indices for an object
         def _match_signature(pair: tuple[str, str]):
-            match_info = _get_run_obj_match_info(pair[1])
+            match_info = _keybindings._get_run_obj_match_info(pair[1])
             return (
                 match_info.get('prefix_idxs', ()),
                 match_info.get('regex_idxs', ()),
