@@ -2,7 +2,11 @@ LICENSE
 README.md
 pyproject.toml
 src/vscode_keynav/__init__.py
+src/vscode_keynav/cli.py
+src/vscode_keynav/corpus.py
+src/vscode_keynav/debug.py
 src/vscode_keynav/io.py
+src/vscode_keynav/keybindings.py
 src/vscode_keynav.egg-info/PKG-INFO
 src/vscode_keynav.egg-info/SOURCES.txt
 src/vscode_keynav.egg-info/dependency_links.txt
