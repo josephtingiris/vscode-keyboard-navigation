@@ -13,6 +13,7 @@ import subprocess
 import unittest
 
 from vscode_keynav import cli as _cli
+from vscode_keynav import io as _io
 from vscode_keynav import keybindings as _keybindings
 
 
@@ -85,8 +86,7 @@ class KeynavCommentsTests(unittest.TestCase):
     def test_inject_comments_and_validate_json(self):
         # ensure the reference file is not modified
 
-        with open(DEFAULT_INPUT_FULL, "r", encoding="utf-8") as fh:
-            orig = fh.read()
+        orig = _io._read_input_text(DEFAULT_INPUT_FULL)
 
         proc = self._run_corpus(["-c", DEFAULT_INPUT_FULL])
         self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
@@ -100,13 +100,11 @@ class KeynavCommentsTests(unittest.TestCase):
         self.assertIsInstance(parsed, list)
 
         # verify original reference file is unchanged
-        with open(DEFAULT_INPUT_FULL, "r", encoding="utf-8") as fh:
-            after = fh.read()
+        after = _io._read_input_text(DEFAULT_INPUT_FULL)
         self.assertEqual(orig, after)
 
     def test_add_context_updates_comments_mode_when_output_only(self):
-        with open(DEFAULT_INPUT_FULL, "r", encoding="utf-8") as fh:
-            orig = fh.read()
+        orig = _io._read_input_text(DEFAULT_INPUT_FULL)
 
         proc = self._run_corpus(["-c", DEFAULT_INPUT_FULL, "--add-context", "editorTextFocus"])
         self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
@@ -116,8 +114,7 @@ class KeynavCommentsTests(unittest.TestCase):
         self.assertIn("config.keyboardNavigation.split.enabled", emitted)
         self.assertIn("editorTextFocus", emitted)
 
-        with open(DEFAULT_INPUT_FULL, "r", encoding="utf-8") as fh:
-            after = fh.read()
+        after = _io._read_input_text(DEFAULT_INPUT_FULL)
         self.assertEqual(orig, after)
 
 
