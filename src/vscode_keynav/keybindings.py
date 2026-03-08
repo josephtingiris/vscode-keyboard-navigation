@@ -1213,6 +1213,90 @@ def _get_run_obj_match_info(obj_text: str) -> dict:
     return match_info
 
 
+def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]], str]:
+    """Split a JSON array body into a list of (leading_comments, object_text) pairs and trailing comments."""
+
+    groups: list[tuple[str, str]] = []
+    comments = ''
+    n = len(array_text)
+    i = 0
+    comments_start = 0
+    obj_start = None
+    depth = 0
+
+    in_line = False
+    in_block = False
+    in_str = False
+    esc = False
+    str_char = ''
+
+    append = groups.append
+    txt = array_text
+
+    while i < n:
+        ch = txt[i]
+        nxt = txt[i + 1] if i + 1 < n else ''
+
+        if in_line:
+            if ch == '\n':
+                in_line = False
+            i += 1
+            continue
+        if in_block:
+            if ch == '*' and nxt == '/':
+                in_block = False
+                i += 2
+            else:
+                i += 1
+            continue
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == '\\':
+                esc = True
+            elif ch == str_char:
+                in_str = False
+            i += 1
+            continue
+
+        if ch == '/' and nxt == '/':
+            in_line = True
+            i += 2
+            continue
+        if ch == '/' and nxt == '*':
+            in_block = True
+            i += 2
+            continue
+        if ch == '"' or ch == "'":
+            in_str = True
+            str_char = ch
+            i += 1
+            continue
+
+        if obj_start is None:
+            if ch == '{':
+                comments = txt[comments_start:i]
+                obj_start = i
+                depth = 1
+            i += 1
+            continue
+
+        if ch == '{':
+            depth += 1
+        elif ch == '}':
+            depth -= 1
+            if depth == 0:
+                obj_end = i + 1
+                obj_text = txt[obj_start:obj_end]
+                append((comments, obj_text))
+                obj_start = None
+                comments_start = obj_end
+        i += 1
+
+    trailing_comments = txt[comments_start:]
+    return groups, trailing_comments
+
+
 def _key_tail_literal(key_value: str) -> str:
     """Return the last literal part of a key description (e.g. 'ctrl+k' -> 'k')."""
 
