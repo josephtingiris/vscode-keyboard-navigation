@@ -280,3 +280,56 @@ def _tags_for(
     ordered_tags.extend(remaining)
 
     return ordered_tags
+
+
+def _when_for(
+    key: str,
+    mod: str = "",
+    *,
+    allowed_letter_keys: set[str] | None = None,
+    selected_nav_group: str | None = None,
+    debug_group: set[str] | None = None,
+    action_group: set[str] | None = None,
+    extension_group: set[str] | None = None,
+) -> str:
+    """Compute a when-clause for `key`/`mod`.
+
+    Accepts optional runtime state instead of reading module globals so callers
+    (such as the CLI script) can pass their current selections.
+    """
+
+    parts = ["config.keyboardNavigation.enabled"]
+    seen = set()
+
+    def _add(cond: str) -> None:
+        if cond not in seen:
+            parts.append(cond)
+            seen.add(cond)
+
+    key_norm = _normalize_key(key)
+
+    if key_norm in _ARROW_GROUP:
+        _add("config.keyboardNavigation.keys.arrows")
+
+    allowed = allowed_letter_keys if allowed_letter_keys is not None else globals().get("_ALLOWED_LETTER_KEYS", set())
+    for name, group in _LETTER_GROUPS.items():
+        if key_norm in group and key_norm in allowed:
+            _add(f"config.keyboardNavigation.keys.letters == '{name}'")
+
+    # qualify a chord when it's a valid combination defined in MODIFIERS_SINGLE or MODIFIERS_MULTI
+    def _qualify_chord(chord_set, chord_name: str) -> None:
+        allowed_mods = set(_MODIFIERS_SINGLE) | set(_MODIFIERS_MULTI)
+        if mod not in allowed_mods:
+            return
+        if key_norm in chord_set:
+            _add(f"config.keyboardNavigation.chords.{chord_name}")
+            sel = selected_nav_group if selected_nav_group is not None else globals().get("_SELECTED_NAV_GROUP")
+            if sel and sel != "none":
+                _add(f"config.keyboardNavigation.keys.letters == '{sel}'")
+
+    # use provided chord groups or fall back to module globals
+    _qualify_chord(set(debug_group if debug_group is not None else globals().get("_DEBUG_GROUP", set())), 'debug')
+    _qualify_chord(set(action_group if action_group is not None else globals().get("_ACTION_GROUP", set())), 'action')
+    _qualify_chord(set(extension_group if extension_group is not None else globals().get("_EXTENSION_GROUP", set())), 'extension')
+
+    return " && ".join(parts)
