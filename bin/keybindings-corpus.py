@@ -126,7 +126,9 @@ def _init_directional_groups(selected: str, letter_groups: dict) -> None:
 #
 
 
-def main(argv: List[str] | None = None) -> int:
+def _main(argv: List[str] | None = None) -> int:
+    """Run the keybindings-corpus CLI and return an exit code."""
+
     argv = sys.argv[1:] if argv is None else argv
 
     parser = argparse.ArgumentParser(
@@ -171,7 +173,9 @@ def main(argv: List[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     # determine selected letter-group from a when-clause
-    def sel_from_when(when_val: str) -> str:
+    def _sel_from_when(when_val: str) -> str:
+        """Return the selected navigation group name from a when-clause."""
+
         for name in _corpus._LETTER_GROUPS.keys():
             if f"config.keyboardNavigation.keys.letters == '{name}'" in when_val:
                 return name
@@ -198,7 +202,8 @@ def main(argv: List[str] | None = None) -> int:
             return 2
 
         # strip JSONC comments (state-machine)
-        def strip_jsonc(text: str) -> str:
+        def _strip_jsonc(text: str) -> str:
+            """Remove JSONC comments from text leaving valid JSON content."""
             out = []
             i = 0
             n = len(text)
@@ -488,7 +493,7 @@ def main(argv: List[str] | None = None) -> int:
 
         # parse the JSONC into JSON
         try:
-            stripped = strip_jsonc(original_text)
+            stripped = _strip_jsonc(original_text)
             stripped = _strip_trailing_commas(stripped)
             parsed = json.loads(stripped)
         except Exception as e:
@@ -553,7 +558,7 @@ def main(argv: List[str] | None = None) -> int:
                 mod = ''
                 literal_key = key_val
 
-            sel = sel_from_when(when_val)
+            sel = _sel_from_when(when_val)
 
             globals()["_SELECTED_NAV_GROUP"] = sel
             if sel == 'none':
@@ -839,7 +844,8 @@ def main(argv: List[str] | None = None) -> int:
     DEBUG_GROUP_ORIG = set(_corpus._DEBUG_GROUP)
     EXTENSION_GROUP_ORIG = set(_corpus._EXTENSION_GROUP)
 
-    def generate_records_for_mode(mode: str) -> List[Tuple[str, str, List[str]]]:
+    def _generate_records_for_mode(mode: str) -> List[Tuple[str, str, List[str]]]:
+        """Generate corpus records for the given navigation mode."""
         globals()["_SELECTED_NAV_GROUP"] = mode
         if mode == "none":
             globals()["_ALLOWED_LETTER_KEYS"] = set()
@@ -1030,7 +1036,7 @@ def main(argv: List[str] | None = None) -> int:
     seen_pairs = set()
     records: List[Tuple[str, str, List[str]]] = []
     for mode in modes:
-        for rec in generate_records_for_mode(mode):
+        for rec in _generate_records_for_mode(mode):
             pair = (rec[0], rec[1])
             if pair in seen_pairs:
                 continue
@@ -1117,7 +1123,7 @@ def main(argv: List[str] | None = None) -> int:
             mod = ""
             key = k
 
-        sel = sel_from_when(w)
+        sel = _sel_from_when(w)
 
         globals()["_SELECTED_NAV_GROUP"] = sel
         if sel == 'none':
@@ -1163,4 +1169,4 @@ def main(argv: List[str] | None = None) -> int:
 
 
 if __name__ == '__main__':
-    raise SystemExit(main())
+    raise SystemExit(_main())
