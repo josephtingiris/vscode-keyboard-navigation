@@ -10,7 +10,7 @@ import hashlib
 import json
 import re
 
-from typing import List, Tuple
+from typing import List, Tuple, overload, Sequence, Optional
 
 from functools import lru_cache
 
@@ -1259,10 +1259,20 @@ def _get_run_obj_match_info(obj_text: str) -> dict:
     return match_info
 
 
+@overload
 def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]], str]:
+    ...
+
+
+@overload
+def _group_objects_with_comments(array_text: str, base_line: int) -> Tuple[List[Tuple[str, str, int]], str]:
+    ...
+
+
+def _group_objects_with_comments(array_text: str, base_line: Optional[int] = None) -> Tuple[List[Tuple[str, str]], str] | Tuple[List[Tuple[str, str, int]], str]:
     """Split a JSON array body into a list of (leading_comments, object_text) pairs and trailing comments."""
 
-    groups: list[tuple[str, str]] = []
+    groups: list[tuple] = []
     comments = ''
     n = len(array_text)
     i = 0
@@ -1334,7 +1344,12 @@ def _group_objects_with_comments(array_text: str) -> Tuple[List[Tuple[str, str]]
             if depth == 0:
                 obj_end = i + 1
                 obj_text = txt[obj_start:obj_end]
-                append((comments, obj_text))
+                if base_line is None:
+                    append((comments, obj_text))
+                else:
+                    # include a start line for each object as a third element: `(leading_comments, object_text, start_line)`.
+                    start_line = base_line + txt[:obj_start].count('\n')
+                    append((comments, obj_text, start_line))
                 obj_start = None
                 comments_start = obj_end
         i += 1
