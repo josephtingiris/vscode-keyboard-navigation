@@ -84,7 +84,7 @@ _WHEN_GROUPING_PROFILES = {
         'secondary': 'key',
         'group_sorting': 'positive',
         'when_prefix': 'config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters',
-        'when_regex': 'config.keyboardNavigation.(.*).enabled,config.keyboardNavigation.chords'
+        'when_regex': 'config.keyboardNavigation.chords'
     },
     'config-first': {
         # example defaults for config-first
