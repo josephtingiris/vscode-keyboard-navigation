@@ -1,5 +1,5 @@
 {
-  "version": "0.0.21",
+  "version": "0.0.22",
   "name": "keyboard-navigation",
   "description": "An opinionated keyboard grammar extension that focuses on easily and quickly navigating the workbench UI.",
   "displayName": "Keyboard Navigation",
@@ -113,6 +113,11 @@
           "enum": ["default", "left", "right"],
           "default": "default",
           "description": "Preferred orientation hint ('default' will use the VS Code defaults)."
+        },
+        "keyboardNavigation.split.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable split window & pane navigation."
         },
         "keyboardNavigation.terminal.enabled": {
           "type": "boolean",
