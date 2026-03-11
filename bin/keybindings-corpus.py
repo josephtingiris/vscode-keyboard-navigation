@@ -201,276 +201,6 @@ def _main(argv: List[str] | None = None) -> int:
             print(f"error: failed to read '{fname}': {e}", file=sys.stderr)
             return 2
 
-        # strip JSONC comments (state-machine)
-        def _strip_jsonc(text: str) -> str:
-            """Remove JSONC comments from text leaving valid JSON content."""
-            out = []
-            i = 0
-            n = len(text)
-            in_string = False
-            string_char = ''
-            esc = False
-            in_line = False
-            in_block = False
-            while i < n:
-                ch = text[i]
-                nxt2 = text[i:i + 2] if i + 2 <= n else ''
-                if in_line:
-                    if ch == '\n':
-                        out.append(ch)
-                        in_line = False
-                    i += 1
-                    continue
-                if in_block:
-                    if nxt2 == '*/':
-                        i += 2
-                        in_block = False
-                    else:
-                        i += 1
-                    continue
-                if in_string:
-                    out.append(ch)
-                    if esc:
-                        esc = False
-                    elif ch == '\\':
-                        esc = True
-                    elif ch == string_char:
-                        in_string = False
-                    i += 1
-                    continue
-                # default
-                if nxt2 == '//':
-                    in_line = True
-                    i += 2
-                    continue
-                if nxt2 == '/*':
-                    in_block = True
-                    i += 2
-                    continue
-                if ch == '"' or ch == "'":
-                    in_string = True
-                    string_char = ch
-                    out.append(ch)
-                    i += 1
-                    continue
-                out.append(ch)
-                i += 1
-            return ''.join(out)
-
-        def _extract_preamble_postamble(text: str):
-            i = 0
-            n = len(text)
-            in_string = False
-            string_char = ''
-            esc = False
-            in_line_comment = False
-            in_block_comment = False
-            start = -1
-
-            # find opening bracket, skipping comments and strings
-            while i < n:
-                ch = text[i]
-                next2 = text[i:i + 2] if i + 2 <= n else ''
-
-                if in_line_comment:
-                    if ch == '\n':
-                        in_line_comment = False
-                    i += 1
-                    continue
-                if in_block_comment:
-                    if next2 == '*/':
-                        in_block_comment = False
-                        i += 2
-                    else:
-                        i += 1
-                    continue
-                if next2 == '//':
-                    in_line_comment = True
-                    i += 2
-                    continue
-                if next2 == '/*':
-                    in_block_comment = True
-                    i += 2
-                    continue
-                if ch == '"' or ch == "'":
-                    in_string = True
-                    string_char = ch
-                    i += 1
-                    continue
-                if ch == '[':
-                    start = i
-                    break
-                i += 1
-
-            if start == -1:
-                return None
-
-            # find matching closing bracket
-            depth = 1
-            i = start + 1
-            in_string = False
-            string_char = ''
-            esc = False
-            in_line_comment = False
-            in_block_comment = False
-            end = -1
-
-            while i < n:
-                ch = text[i]
-                next2 = text[i:i + 2] if i + 2 <= n else ''
-
-                if in_line_comment:
-                    if ch == '\n':
-                        in_line_comment = False
-                    i += 1
-                    continue
-                if in_block_comment:
-                    if next2 == '*/':
-                        in_block_comment = False
-                        i += 2
-                    else:
-                        i += 1
-                    continue
-                if in_string:
-                    if esc:
-                        esc = False
-                    elif ch == '\\':
-                        esc = True
-                    elif ch == string_char:
-                        in_string = False
-                    i += 1
-                    continue
-
-                # not in string/comment
-                if next2 == '//':
-                    in_line_comment = True
-                    i += 2
-                    continue
-                if next2 == '/*':
-                    in_block_comment = True
-                    i += 2
-                    continue
-                if ch == '"' or ch == "'":
-                    in_string = True
-                    string_char = ch
-                    i += 1
-                    continue
-                if ch == '[':
-                    depth += 1
-                elif ch == ']':
-                    depth -= 1
-                    if depth == 0:
-                        end = i
-                        break
-                i += 1
-
-            if end == -1:
-                return None
-
-            preamble = text[:start]
-            postamble = text[end + 1:]
-            array_text = text[start + 1:end]  # exclude [ and ]
-
-            return preamble, array_text, postamble
-
-        def _group_objects_with_comments(array_text: str, base_line: int = 1):
-            """Split a JSON array body into a list of (leading_comments, object_text, start_line) tuples and trailing comments."""
-
-            groups: list[tuple[str, str, int]] = []
-            n = len(array_text)
-            i = 0
-            comments_start = 0
-            obj_start: int | None = None
-            depth = 0
-            comments = ''
-            obj_start_line = base_line
-
-            in_string = False
-            string_char = ''
-            esc = False
-            in_line_comment = False
-            in_block_comment = False
-
-            current_line = base_line
-
-            while i < n:
-                ch = array_text[i]
-                next2 = array_text[i:i + 2] if i + 2 <= n else ''
-
-                if in_line_comment:
-                    if ch == '\n':
-                        in_line_comment = False
-                    i += 1
-                    current_line += 1 if ch == '\n' else 0
-                    continue
-
-                if in_block_comment:
-                    if next2 == '*/':
-                        in_block_comment = False
-                        i += 2
-                        current_line += 2 if '\n' in next2 else 0
-                    else:
-                        if ch == '\n':
-                            current_line += 1
-                        i += 1
-                    continue
-
-                if in_string:
-                    if esc:
-                        esc = False
-                    elif ch == '\\':
-                        esc = True
-                    elif ch == string_char:
-                        in_string = False
-                    if ch == '\n':
-                        current_line += 1
-                    i += 1
-                    continue
-
-                if next2 == '//':
-                    in_line_comment = True
-                    i += 2
-                    continue
-
-                if next2 == '/*':
-                    in_block_comment = True
-                    i += 2
-                    continue
-
-                if ch == '"' or ch == "'":
-                    in_string = True
-                    string_char = ch
-                    i += 1
-                    continue
-
-                if obj_start is None:
-                    if ch == '{':
-                        comments = array_text[comments_start:i]
-                        obj_start = i
-                        depth = 1
-                        obj_start_line = current_line
-                    i += 1
-                    if ch == '\n':
-                        current_line += 1
-                    continue
-
-                if ch == '{':
-                    depth += 1
-                elif ch == '}':
-                    depth -= 1
-                    if depth == 0:
-                        obj_end = i + 1
-                        obj_text = array_text[obj_start:obj_end]
-                        groups.append((comments, obj_text, obj_start_line))
-                        obj_start = None
-                        comments_start = obj_end
-                if ch == '\n':
-                    current_line += 1
-                i += 1
-
-            trailing_comments = array_text[comments_start:]
-            return groups, trailing_comments
-
         def _preview_for_error(obj, src_text: str | None = None, max_len: int = 1000) -> str:
             if src_text:
                 text = src_text.strip()
@@ -489,11 +219,12 @@ def _main(argv: List[str] | None = None) -> int:
 
         # remove trailing commas (safe)
         def _strip_trailing_commas(text: str) -> str:
-            return re.sub(r',\s*([}\]])', r"\1", text)
+            """Delegate to package trailing-comma stripper."""
+            return _keybindings._strip_trailing_commas(text)
 
         # parse the JSONC into JSON
         try:
-            stripped = _strip_jsonc(original_text)
+            stripped = _keybindings._strip_json_comments(original_text)
             stripped = _strip_trailing_commas(stripped)
             parsed = json.loads(stripped)
         except Exception as e:
@@ -506,14 +237,14 @@ def _main(argv: List[str] | None = None) -> int:
                 f"error: top-level JSON value in '{fname}' is not an array", file=sys.stderr)
             return 2
 
-        preamble_res = _extract_preamble_postamble(original_text)
+        preamble_res = _keybindings._extract_preamble_postamble(original_text)
         if not preamble_res:
             print(
                 f"error: could not locate top-level array in '{fname}'", file=sys.stderr)
             return 2
         preamble, array_text, postamble = preamble_res
         array_start_line = preamble.count('\n') + 1
-        groups, trailing_comments = _group_objects_with_comments(array_text, base_line=array_start_line)
+        groups, trailing_comments = _keybindings._group_objects_with_comments(array_text, base_line=array_start_line)
         if len(groups) != len(parsed):
             print(
                 f"error: mismatch between parsed array length ({len(parsed)}) and detected object groups ({len(groups)}) in '{fname}'", file=sys.stderr)
