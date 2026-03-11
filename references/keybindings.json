@@ -3063,7 +3063,6 @@ Notes:
     "key": "shift+alt+,",
     "command": "shift+alt+, 4823",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && config.keyboardNavigation.juke.enabled && activeEditorIsReadonly && editorIsOpen"
-    // [note] settings editor, keyboard shortcuts, et al
   },
   {
     // [keynav] (right) (vi) (juke) (move) (1) (red) (A) (immutable)
@@ -29296,8 +29295,10 @@ Notes:
   {
     // [keynav] (map) (right) (vi) (juke) (move) (1) (red) (A) (editor) (text)
     "key": "shift+alt+.",
-    "command": "shift+alt+. 5e3b",
+    "command": "workbench.action.focusAuxiliaryBar",
+    // "command": "shift+alt+. 5e3b",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.keyboardNavigation.juke.enabled"
+    // "0.0.3": "workbench.action.focusAuxiliaryBar",
   },
   {
     // [keynav] (map) (left) (vi) (juke) (move) (1) (red) (A) (editor) (text)
@@ -31314,18 +31315,16 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && config.keyboardNavigation.juke.enabled"
   },
   {
-    // [keynav] (map) (left) (vi) (juke) (move) (1) (red) (A) (editor) (text)
     "key": "shift+alt+,",
     "command": "workbench.action.focusSideBar",
-    // "command": "shift+alt+, 63c9",
+    // "command": "shift+alt+, 7b2e",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && config.keyboardNavigation.juke.enabled"
     // "0.0.3": "workbench.action.focusSideBar",
   },
   {
-    // [keynav] (map) (right) (vi) (juke) (move) (1) (red) (A) (editor) (text)
     "key": "shift+alt+.",
     "command": "workbench.action.focusAuxiliaryBar",
-    // "command": "shift+alt+. e133",
+    // "command": "shift+alt+. 2e3b",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && config.keyboardNavigation.juke.enabled"
     // "0.0.3": "workbench.action.focusAuxiliaryBar",
   },
@@ -47559,10 +47558,10 @@ Notes:
   {
     // [keynav] (map) (left) (vi) (juke) (move) (1) (red) (A) (panel) (editor) (pass)
     "key": "shift+alt+,",
-    "command": "-noop",
+    "command": "workbench.action.focusSideBar",
     // "command": "shift+alt+, 1ec4",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && editorFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && config.keyboardNavigation.juke.enabled"
-    // "0.0.3": "-noop",
+    // "0.0.3": "workbench.action.focusSideBar",
   },
   {
     // [keynav] (map) (right) (vi) (juke) (move) (1) (red) (A) (panel) (editor)
@@ -49594,16 +49593,18 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && editorFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && config.keyboardNavigation.juke.enabled"
   },
   {
-    // [keynav] (map) (left) (vi) (juke) (move) (1) (red) (A) (panel) (editor)
     "key": "shift+alt+,",
-    "command": "shift+alt+, 4cd6",
+    "command": "workbench.action.focusSideBar",
+    // "command": "shift+alt+, 3ec4",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && editorFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && config.keyboardNavigation.juke.enabled"
+    // "0.0.3": "workbench.action.focusSideBar",
   },
   {
-    // [keynav] (map) (right) (vi) (juke) (move) (1) (red) (A) (panel) (editor)
     "key": "shift+alt+.",
-    "command": "shift+alt+. 050a",
+    // "command": "shift+alt+. a603",
+    "command": "workbench.action.focusAuxiliaryBar",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && panelFocus && editorFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && config.keyboardNavigation.juke.enabled"
+    // "0.0.3": "workbench.action.focusAuxiliaryBar",
   },
   {
     // [keynav] (map) (left) (vi) (juke) (move) (1) (red) (A) (panel) (editor)
@@ -76185,14 +76186,18 @@ Notes:
   {
     // [keynav] (left) (vi) (juke) (move) (1) (red) (A) (panel) (terminal)
     "key": "shift+alt+,",
-    "command": "shift+alt+, 7653",
+    "command": "workbench.action.focusSideBar",
+    // "command": "shift+alt+, 7653",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && panelFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && config.keyboardNavigation.juke.enabled && config.keyboardNavigation.terminal.enabled"
+    // "0.0.3": "workbench.action.focusSideBar",
   },
   {
     // [keynav] (right) (vi) (juke) (move) (1) (red) (A) (panel) (terminal)
     "key": "shift+alt+.",
-    "command": "shift+alt+. 4b3e",
+    "command": "workbench.action.focusAuxiliaryBar",
+    // "command": "shift+alt+. 4b3e",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus && panelFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && config.keyboardNavigation.juke.enabled && config.keyboardNavigation.terminal.enabled"
+    // "0.0.3": "workbench.action.focusAuxiliaryBar",
   },
   {
     // [keynav] (left) (vi) (juke) (move) (1) (red) (A) (panel) (terminal)
