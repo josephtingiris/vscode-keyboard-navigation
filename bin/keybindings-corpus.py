@@ -246,8 +246,7 @@ def _main(argv: List[str] | None = None) -> int:
         array_start_line = preamble.count('\n') + 1
         groups, trailing_comments = _keybindings._group_objects_with_comments(array_text, base_line=array_start_line)
         if len(groups) != len(parsed):
-            print(
-                f"error: mismatch between parsed array length ({len(parsed)}) and detected object groups ({len(groups)}) in '{fname}'", file=sys.stderr)
+            print(f"error: mismatch between parsed array length ({len(parsed)}) and detected object groups ({len(groups)}) in '{fname}'", file=sys.stderr)
             return 2
 
         # compute transformed when values and comment lines for each object
