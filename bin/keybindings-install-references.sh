@@ -100,10 +100,14 @@ validate_json() {
 
 vscode_user_home() {
     local vscode_home=""
-    if [ -n "${WSL_DISTRO_NAME}" ]; then
-        vscode_home=$(which wslconfig.exe 2> /dev/null | grep AppData | awk -F\/AppData '{print $1}')
+    if [ ${WSL_WINDOWS_HOME} ] && [ -d "${WSL_WINDOWS_HOME}" ]; then
+        vscode_home="${WSL_WINDOWS_HOME}"
     else
-        vscode_home="${HOME}"
+        if [ -n "${WSL_DISTRO_NAME}" ]; then
+            vscode_home=$(which wslconfig.exe 2> /dev/null | grep AppData | awk -F\/AppData '{print $1}')
+        else
+            vscode_home="${HOME}"
+        fi
     fi
     echo "${vscode_home}"
 }
