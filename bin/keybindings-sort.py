@@ -76,7 +76,7 @@ from vscode_keynav import keybindings as _keybindings
 #
 
 
-# profile defaults for `--when-grouping` values; actual arg values always override these
+# profile defaults for `--when-grouping` value; actual arg values always override profile values
 
 _WHEN_GROUPING_PROFILES = {
     'focal-invariant': {
@@ -90,7 +90,7 @@ _WHEN_GROUPING_PROFILES = {
         # example defaults for config-first
         'primary': 'key',
         'secondary': 'when',
-        'group_sorting': 'alpha',
+        'group_sorting': 'alphanumeric',
         'when_prefix': None,
     }
 }
@@ -103,6 +103,7 @@ _WHEN_GROUPING_PROFILES = {
 def _apply_when_grouping_profile(args: argparse.Namespace, raw_argv: list[str]) -> None:
     """Apply a when-grouping profile to set appropriate default argument values."""
 
+    # name the profiles after the --when-grouping value
     sel_profile = args.when_grouping
     if sel_profile not in _WHEN_GROUPING_PROFILES:
         return
@@ -112,16 +113,16 @@ def _apply_when_grouping_profile(args: argparse.Namespace, raw_argv: list[str]) 
     if not _cli._flag_present(raw_argv, ['-p', '--primary']) and profile.get('primary') is not None:
         args.primary = profile['primary']
 
-    if not _cli._flag_present(raw_argv, ['-s', '--secondary']):
+    if not _cli._flag_present(raw_argv, ['-s', '--secondary']) and profile.get('secondary') is not None:
         args.secondary = profile.get('secondary')
 
     if not _cli._flag_present(raw_argv, ['-g', '--group-sorting']) and profile.get('group_sorting') is not None:
         args.group_sorting = profile['group_sorting']
 
-    if not _cli._flag_present(raw_argv, ['-P', '--when-prefix']):
+    if not _cli._flag_present(raw_argv, ['-P', '--when-prefix']) and profile.get('when_prefix') is not None:
         args.when_prefix = profile.get('when_prefix')
 
-    if not _cli._flag_present(raw_argv, ['-R', '--when-regex']):
+    if not _cli._flag_present(raw_argv, ['-R', '--when-regex']) and profile.get('when_regex') is not None:
         args.when_regex = profile.get('when_regex')
 
 
@@ -284,8 +285,8 @@ def main(argv: List[str] | None = None) -> int:
                         help="Secondary sort field (default: none)")
 
     parser.add_argument('--group-sorting', '-g', dest='group_sorting',
-                        choices=['alpha', 'beta', 'natural', 'positive-natural', 'negative-natural', 'positive', 'negative'], default='alpha',
-                        help="Group sorting mode: pre-defined ording algorithms for when clauses (default: alpha)")
+                        choices=['alphanumeric', 'natural', 'positive-natural', 'negative-natural', 'positive', 'negative'], default='positive-natural',
+                        help="Group sorting mode: pre-defined ording algorithms for when clauses (default: positive-natural)")
 
     parser.add_argument('--when-grouping', '-w', dest='when_grouping',
                         choices=['none', 'config-first', 'focal-invariant'], default='none',

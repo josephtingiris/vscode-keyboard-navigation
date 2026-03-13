@@ -225,7 +225,7 @@ def _key_category_and_order_for_grouping(ch: str) -> tuple[int, int]:
     return (0, oc)
 
 
-def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Return canonicalized when entry from an LRU cache."""
 
     when_prefixes_tpl = None if when_prefixes is None else tuple(when_prefixes)
@@ -254,7 +254,7 @@ def _canonicalize_when_cached(when_val: str, mode: str, negation_mode: str, when
     return _canonicalize_when_not_cached(when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
 
 
-def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', negation_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Internal canonicalize implementation (no LRU caching)."""
 
     def _clear_parens(node: WhenNode):
