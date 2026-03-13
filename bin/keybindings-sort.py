@@ -285,8 +285,8 @@ def main(argv: List[str] | None = None) -> int:
                         help="Secondary sort field (default: none)")
 
     parser.add_argument('--group-sorting', '-g', dest='group_sorting',
-                        choices=['alphanumeric', 'natural', 'positive-natural', 'negative-natural', 'positive', 'negative'], default='positive-natural',
-                        help="Group sorting mode: pre-defined ording algorithms for when clauses (default: positive-natural)")
+                        choices=['alphanumeric', 'natural', 'positive-natural', 'negative-natural', 'positive', 'negative', 'lexicographic', 'specificity'], default='lexicographic',
+                        help="Group sorting mode: pre-defined ordering algorithms for when clauses (default: lexicographic). Use 'specificity' to prefer term-count specificity as a tie-break.")
 
     parser.add_argument('--when-grouping', '-w', dest='when_grouping',
                         choices=['none', 'config-first', 'focal-invariant'], default='none',

@@ -836,12 +836,16 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                 if first_when_token.startswith('!'):
                     first_when_token = first_when_token[1:].lstrip()
 
-        # special-case: when primary is key and secondary is when, ensure strict key-first ordering by returning a simple tuple: (rank, key, when_specificity, when_sortable)
         if primary == 'key' and secondary == 'when':
             norm = _normalize_key_for_compare(key_val)
             key_token = _natural_key(norm)
-            spec = _when_specificity(when_val)
             when_token = _natural_key_case_sensitive(sortable_when)
+
+            if negation_mode == 'lexicographic':
+                return (0, key_token, when_token)
+
+            # default: term specificity
+            spec = _when_specificity(when_val)
             return (0, key_token, spec, when_token)
 
         tokens = []
@@ -935,12 +939,15 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                     # prefer normalized key ordering for stability: modifiers normalized
                     norm_key = _normalize_key_for_compare(key_val)
                     tokens.append(_natural_key(norm_key))
-                    tokens.append(spec_key)
+                    # include specificity only when requested (non-lexicographic modes keep original behaviour)
+                    if negation_mode != 'lexicographic':
+                        tokens.append(spec_key)
                     tokens.append(grouping)
                 else:
-                    # default behavior: include first_when token so grouping remains primary, then specificity and grouping ordering
+                    # default behavior: include first_when token so grouping remains primary, then optionally specificity and grouping ordering
                     tokens.append(first_key)
-                    tokens.append(spec_key)
+                    if negation_mode != 'lexicographic':
+                        tokens.append(spec_key)
                     tokens.append(grouping)
                 return
 
