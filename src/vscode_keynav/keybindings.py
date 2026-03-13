@@ -225,7 +225,7 @@ def _key_category_and_order_for_grouping(ch: str) -> tuple[int, int]:
     return (0, oc)
 
 
-def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha-numeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Return canonicalized when entry from an LRU cache."""
 
     when_prefixes_tpl = None if when_prefixes is None else tuple(when_prefixes)
@@ -254,7 +254,7 @@ def _canonicalize_when_cached(when_val: str, mode: str, negation_mode: str, when
     return _canonicalize_when_not_cached(when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
 
 
-def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', negation_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha-numeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Internal canonicalize implementation (no LRU caching)."""
 
     def _clear_parens(node: WhenNode):
@@ -391,12 +391,9 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
                             prioritized.append(m[1])
                             picked.add(m[0])
 
-            if negation_mode == 'beta':
-                nm = 'positive-natural'
-            else:
-                nm = negation_mode
+            nm = negation_mode
 
-            if negation_mode == 'alpha':
+            if negation_mode == 'alpha-numeric':
                 indexed.sort(key=_sort_key)
                 sorted_children = [it[1] for it in indexed]
             else:
@@ -502,7 +499,7 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
         order_token = token[1:] if token.startswith('!') else token
         left_id = _left_identifier(token)
         sub_rank = _FOCUS_TOKENS_MAP.get(left_id, _POSITIONAL_TOKENS_MAP.get(left_id, _VISIBILITY_TOKENS_MAP.get(left_id, 9999)))
-        if negation_mode == 'alpha':
+        if negation_mode == 'alpha-numeric':
             return (_group_rank(token), sub_rank, _natural_key_case_sensitive(order_token), idx)
         return (_group_rank(token), _natural_key_case_sensitive(order_token), idx)
 
@@ -804,7 +801,7 @@ def _extract_preamble_postamble(text):
     return text[:start], text[start + 1:end], text[end + 1:]
 
 
-def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondary: str | None = None, grouping: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple:
+def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondary: str | None = None, grouping: str = 'config-first', negation_mode: str = 'alpha-numeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple:
     """Return a computed stable sort key tuple for the object text."""
 
     info = _get_run_obj_info(
@@ -895,12 +892,12 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                     spec_key = _when_specificity(when_val)
 
                 tokens.append(match_rank)
-                if negation_mode == 'alpha':
+                if negation_mode == 'alpha-numeric':
                     grouping = _natural_key_case_sensitive(sortable_when)
                 elif negation_mode == 'natural':
                     base = sortable_when.lstrip('!')
                     grouping = _natural_key(base)
-                elif negation_mode in ('positive', 'beta', 'positive-natural'):
+                elif negation_mode in ('positive', 'positive-natural'):
                     # positive-natural: prefer non-negated then natural base ordering
                     is_neg = 1 if sortable_when.startswith('!') else 0
                     base = sortable_when.lstrip('!')
@@ -1113,7 +1110,7 @@ def _get_run_obj_duplicate_info(obj_text: str) -> tuple[str, str, str]:
 def _get_run_obj_info(
     obj_text: str,
     grouping_mode: str = 'config-first',
-    negation_mode: str = 'alpha',
+    negation_mode: str = 'alpha-numeric',
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> dict:
@@ -1512,7 +1509,7 @@ def _normalize_key_for_compare(key_value: str) -> str:
     return " ".join(out_chords)
 
 
-def _normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple[str, bool]:
+def _normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alpha-numeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple[str, bool]:
     """Canonicalize the `when` value inside an object text and return (new_text, changed)."""
 
     parsed = _parse_object(obj_text)
@@ -2115,7 +2112,7 @@ def _sort_groups_with_grouping_mode(
     return final_groups
 
 
-def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alpha-numeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Return a canonicalized when string suitable for stable sorting, preserving negation."""
 
     if not when_val:

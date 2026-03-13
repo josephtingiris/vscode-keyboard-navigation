@@ -99,12 +99,9 @@ class ModeTests(unittest.TestCase):
         self.assertEqual(whens[0].strip(), 'view10')
         self.assertEqual(whens[1].strip(), 'view2')
 
-    def test_beta_aliases_positive(self):
-        # ``beta`` is an alias for ``positive`` when sorting tokens inside a
-        # ``when`` clause, but this has no effect when ``--primary when`` is
-        # used because the final ordering is controlled by the literal
-        # ``when`` string.  We therefore only assert that the input order is
-        # maintained.
+    def test_positive_aliases_positive(self):
+      # ``positive`` group-sorting (formerly aliased by ``beta``) prefers
+      # positive ordering when sorting tokens inside a ``when`` clause.
         data = dedent('''
         [
           {
@@ -117,7 +114,7 @@ class ModeTests(unittest.TestCase):
           }
         ]
         ''')
-        proc = _run_sort(data, ['--primary', 'when', '--group-sorting', 'beta'])
+        proc = _run_sort(data, ['--primary', 'when', '--group-sorting', 'positive'])
         out = proc.stdout.decode('utf-8')
         whens = re.findall(r'"when"\s*:\s*"([^\"]*)"', out)
         self.assertGreaterEqual(len(whens), 2)
