@@ -79,19 +79,19 @@ from vscode_keynav import keybindings as _keybindings
 # profile defaults for `--when-grouping` value; actual arg values always override profile values
 
 _WHEN_GROUPING_PROFILES = {
+    'config-first': {
+        'primary': 'key',
+        'secondary': 'when',
+        'group_sorting': 'alphanumeric',
+        'when_prefix': None,
+        'when_regex': None,
+    },
     'focal-invariant': {
         'primary': 'when',
         'secondary': 'key',
         'group_sorting': 'positive',
         'when_prefix': 'config.keyboardNavigation.enabled,config.keyboardNavigation.keys.letters',
         'when_regex': 'config.keyboardNavigation.chords'
-    },
-    'config-first': {
-        # example defaults for config-first
-        'primary': 'key',
-        'secondary': 'when',
-        'group_sorting': 'alphanumeric',
-        'when_prefix': None,
     }
 }
 
