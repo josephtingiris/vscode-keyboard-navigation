@@ -45,7 +45,7 @@ DEFAULT_INPUT_QUICK_SMALL = os.path.join(REPO_ROOT, "references", "keybindings.s
 KEYBINDINGS_SORT_PY = os.path.join(REPO_ROOT, "bin", "keybindings-sort.py")
 
 GROUP_SORTING_VALS = [
-    "alpha-numeric",
+    "alphanumeric",
     "natural",
     "positive-natural",
     "negative-natural",
@@ -58,7 +58,7 @@ OBJECT_CLONES_VALS = [False, True]
 PRIMARY_VALS = ["key", "when"]
 
 QUICK_CASES: list[tuple[str, str | None, str, str, bool]] = [
-    ("key", "when", "alpha-numeric", "none", False),
+    ("key", "when", "alphanumeric", "none", False),
     ("key", "when", "positive-natural", "focal-invariant", False),
     ("key", "when", "negative-natural", "focal-invariant", True),
     ("when", "key", "natural", "focal-invariant", False),
@@ -68,7 +68,7 @@ QUICK_CASES: list[tuple[str, str | None, str, str, bool]] = [
 
 SECONDARY_VALS: list[str | None] = [None, "key", "when"]
 
-SMALL_GROUP_SORTING_VALS = ["alpha-numeric", "natural", "positive-natural", "negative-natural"]
+SMALL_GROUP_SORTING_VALS = ["alphanumeric", "natural", "positive-natural", "negative-natural"]
 SMALL_WHEN_GROUPING_VALS = ["none", "focal-invariant"]
 
 WHEN_GROUPING_VALS = ["none", "config-first", "focal-invariant"]

@@ -19,7 +19,7 @@ Options
 - `--primary, -p` — primary sort field (`key` or `when`).
 - `--secondary, -s` — optional secondary sort field.
 - `--when-grouping, -w` — grouping mode (`none`, `config-first`, `focal-invariant`).
-- `--group-sorting, -g` — how to sort tokens inside a when-group (alpha-numeric, natural, positive, negative, ...).
+- `--group-sorting, -g` — how to sort tokens inside a when-group (alphanumeric, natural, positive, negative, ...).
 - `--object-clones, -o` — display perfectly identical duplicate objects (default: omitted/False, clone objects are hidden).
 - `--color, -c` — control ANSI coloring of debug output: `auto` (default), `always`, `never`.
 - `--debug, -d` — repeatable flag to enable debug output and supply filters. Values may be a numeric level (e.g. `3`), `when=EXPR`, or `target=NAME`/`category=NAME`.
@@ -90,7 +90,7 @@ _WHEN_GROUPING_PROFILES = {
         # example defaults for config-first
         'primary': 'key',
         'secondary': 'when',
-        'group_sorting': 'alpha-numeric',
+        'group_sorting': 'alphanumeric',
         'when_prefix': None,
     }
 }
@@ -285,7 +285,7 @@ def main(argv: List[str] | None = None) -> int:
                         help="Secondary sort field (default: none)")
 
     parser.add_argument('--group-sorting', '-g', dest='group_sorting',
-                        choices=['alpha-numeric', 'natural', 'positive-natural', 'negative-natural', 'positive', 'negative'], default='positive-natural',
+                        choices=['alphanumeric', 'natural', 'positive-natural', 'negative-natural', 'positive', 'negative'], default='positive-natural',
                         help="Group sorting mode: pre-defined ording algorithms for when clauses (default: positive-natural)")
 
     parser.add_argument('--when-grouping', '-w', dest='when_grouping',
