@@ -225,7 +225,7 @@ def _key_category_and_order_for_grouping(ch: str) -> tuple[int, int]:
     return (0, oc)
 
 
-def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+def _canonicalize_when(when_val: str, mode: str = 'config-first', sorting_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Return canonicalized when entry from an LRU cache."""
 
     when_prefixes_tpl = None if when_prefixes is None else tuple(when_prefixes)
@@ -241,20 +241,20 @@ def _canonicalize_when(when_val: str, mode: str = 'config-first', negation_mode:
 
         when_regexes_tpl = tuple(_rx_to_str(r) for r in when_regexes)
 
-    return _canonicalize_when_cached(when_val, mode, negation_mode, when_prefixes_tpl, when_regexes_tpl)
+    return _canonicalize_when_cached(when_val, mode, sorting_mode, when_prefixes_tpl, when_regexes_tpl)
 
 
 @lru_cache(maxsize=65536)
-def _canonicalize_when_cached(when_val: str, mode: str, negation_mode: str, when_prefixes_tpl: tuple | None, when_regexes_tpl: tuple | None) -> str:
+def _canonicalize_when_cached(when_val: str, mode: str, sorting_mode: str, when_prefixes_tpl: tuple | None, when_regexes_tpl: tuple | None) -> str:
     """Internal canonicalize implementation (LRU caching)."""
 
     when_prefixes = None if when_prefixes_tpl is None else list(when_prefixes_tpl)
     when_regexes = None if when_regexes_tpl is None else list(when_regexes_tpl)
 
-    return _canonicalize_when_not_cached(when_val, mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+    return _canonicalize_when_not_cached(when_val, mode=mode, sorting_mode=sorting_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
 
 
-def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', negation_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', sorting_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Internal canonicalize implementation (no LRU caching)."""
 
     def _clear_parens(node: WhenNode):
@@ -391,9 +391,9 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
                             prioritized.append(m[1])
                             picked.add(m[0])
 
-            nm = negation_mode
+            nm = sorting_mode
 
-            if negation_mode == 'alphanumeric':
+            if sorting_mode == 'alphanumeric':
                 indexed.sort(key=_sort_key)
                 sorted_children = [it[1] for it in indexed]
             else:
@@ -499,7 +499,7 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
         order_token = token[1:] if token.startswith('!') else token
         left_id = _left_identifier(token)
         sub_rank = _FOCUS_TOKENS_MAP.get(left_id, _POSITIONAL_TOKENS_MAP.get(left_id, _VISIBILITY_TOKENS_MAP.get(left_id, 9999)))
-        if negation_mode == 'alphanumeric':
+        if sorting_mode == 'alphanumeric':
             return (_group_rank(token), sub_rank, _natural_key_case_sensitive(order_token), idx)
         return (_group_rank(token), _natural_key_case_sensitive(order_token), idx)
 
@@ -509,7 +509,7 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
     cache_key = (
         when_val,
         mode,
-        negation_mode,
+        sorting_mode,
         None if when_prefixes is None else tuple(when_prefixes),
         None if when_regexes is None else tuple(when_regexes),
     )
@@ -519,7 +519,7 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
         return cached
 
     try:
-        run_key = (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes))
+        run_key = (mode, sorting_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes))
         if _RUN_CACHE_CONTEXT == run_key:
             cached_run = _RUN_CANONICAL_CACHE.get(when_val)
             if cached_run is not None:
@@ -545,7 +545,7 @@ def _canonicalize_when_not_cached(when_val: str, mode: str = 'config-first', neg
         pass
 
     try:
-        if _RUN_CACHE_CONTEXT == (mode, negation_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes)):
+        if _RUN_CACHE_CONTEXT == (mode, sorting_mode, None if when_prefixes is None else tuple(when_prefixes), None if when_regexes is None else tuple(when_regexes)):
             _RUN_CANONICAL_CACHE[when_val] = result
     except Exception:
         pass
@@ -801,13 +801,13 @@ def _extract_preamble_postamble(text):
     return text[:start], text[start + 1:end], text[end + 1:]
 
 
-def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondary: str | None = None, grouping: str = 'config-first', negation_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple:
+def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondary: str | None = None, grouping: str = 'config-first', sorting_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple:
     """Return a computed stable sort key tuple for the object text."""
 
     info = _get_run_obj_info(
         obj_text,
         grouping_mode=grouping,
-        negation_mode=negation_mode,
+        sorting_mode=sorting_mode,
         when_prefixes=when_prefixes,
         when_regexes=when_regexes,
     )
@@ -841,7 +841,7 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
             key_token = _natural_key(norm)
             when_token = _natural_key_case_sensitive(sortable_when)
 
-            if negation_mode == 'lexicographic':
+            if sorting_mode == 'lexicographic':
                 return (0, key_token, when_token)
 
             # default: term specificity
@@ -896,18 +896,18 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                     spec_key = _when_specificity(when_val)
 
                 tokens.append(match_rank)
-                if negation_mode == 'alphanumeric':
+                if sorting_mode == 'alphanumeric':
                     grouping = _natural_key_case_sensitive(sortable_when)
-                elif negation_mode == 'natural':
+                elif sorting_mode == 'natural':
                     base = sortable_when.lstrip('!')
                     grouping = _natural_key(base)
-                elif negation_mode in ('positive', 'positive-natural'):
+                elif sorting_mode in ('positive', 'positive-natural'):
                     # positive-natural: prefer non-negated then natural base ordering
                     is_neg = 1 if sortable_when.startswith('!') else 0
                     base = sortable_when.lstrip('!')
 
                     # prioritize token-list ordering (FOCUS -> POSITIONAL -> VISIBILITY)
-                    if negation_mode == 'positive':
+                    if sorting_mode == 'positive':
                         # compute sub-rank based on the first_when_token
                         lid = first_when_token
                         if lid.startswith('(') and lid.endswith(')'):
@@ -918,10 +918,10 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                         grouping = (is_neg, f_rank, _natural_key_case_sensitive(base))
                     else:
                         grouping = (is_neg, _natural_key(base))
-                elif negation_mode in ('negative', 'negative-natural'):
+                elif sorting_mode in ('negative', 'negative-natural'):
                     is_neg = 0 if sortable_when.startswith('!') else 1
                     base = sortable_when.lstrip('!')
-                    if negation_mode == 'negative':
+                    if sorting_mode == 'negative':
                         lid = first_when_token
                         if lid.startswith('(') and lid.endswith(')'):
                             lid = lid[1:-1].strip()
@@ -940,13 +940,13 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
                     norm_key = _normalize_key_for_compare(key_val)
                     tokens.append(_natural_key(norm_key))
                     # include specificity only when requested (non-lexicographic modes keep original behaviour)
-                    if negation_mode != 'lexicographic':
+                    if sorting_mode != 'lexicographic':
                         tokens.append(spec_key)
                     tokens.append(grouping)
                 else:
                     # default behavior: include first_when token so grouping remains primary, then optionally specificity and grouping ordering
                     tokens.append(first_key)
-                    if negation_mode != 'lexicographic':
+                    if sorting_mode != 'lexicographic':
                         tokens.append(spec_key)
                     tokens.append(grouping)
                 return
@@ -995,7 +995,7 @@ def _extract_sort_keys_from_object(obj_text: str, primary: str = 'key', secondar
 def _first_when_group_rank(
     obj_text: str,
     mode: str,
-    negation_mode: str,
+    sorting_mode: str,
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> int:
@@ -1004,7 +1004,7 @@ def _first_when_group_rank(
     info = _get_run_obj_info(
         obj_text,
         grouping_mode=mode,
-        negation_mode=negation_mode,
+        sorting_mode=sorting_mode,
         when_prefixes=when_prefixes,
         when_regexes=when_regexes,
     )
@@ -1117,7 +1117,7 @@ def _get_run_obj_duplicate_info(obj_text: str) -> tuple[str, str, str]:
 def _get_run_obj_info(
     obj_text: str,
     grouping_mode: str = 'config-first',
-    negation_mode: str = 'alphanumeric',
+    sorting_mode: str = 'alphanumeric',
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> dict:
@@ -1157,14 +1157,14 @@ def _get_run_obj_info(
         canonical_when = _canonicalize_when(
             when_val,
             mode=grouping_mode,
-            negation_mode=negation_mode,
+            sorting_mode=sorting_mode,
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         )
         sortable_when = _sortable_when_key(
             when_val,
             mode=grouping_mode,
-            negation_mode=negation_mode,
+            sorting_mode=sorting_mode,
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         )
@@ -1516,7 +1516,7 @@ def _normalize_key_for_compare(key_value: str) -> str:
     return " ".join(out_chords)
 
 
-def _normalize_when_in_object(obj_text: str, mode: str = 'config-first', negation_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple[str, bool]:
+def _normalize_when_in_object(obj_text: str, mode: str = 'config-first', sorting_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> Tuple[str, bool]:
     """Canonicalize the `when` value inside an object text and return (new_text, changed)."""
 
     parsed = _parse_object(obj_text)
@@ -1528,7 +1528,7 @@ def _normalize_when_in_object(obj_text: str, mode: str = 'config-first', negatio
         return obj_text, False
 
     normalized = _canonicalize_when(
-        str(when_val), mode=mode, negation_mode=negation_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
+        str(when_val), mode=mode, sorting_mode=sorting_mode, when_prefixes=when_prefixes, when_regexes=when_regexes)
     if normalized == when_val:
         return obj_text, False
 
@@ -1773,10 +1773,10 @@ def _render_when_node(node: WhenNode) -> str:
     return inner
 
 
-def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode: str) -> list[tuple[str, str]]:
+def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], sorting_mode: str) -> list[tuple[str, str]]:
     """Within equal when groups, reorder objects deterministically by key."""
 
-    if negation_mode in ('positive', 'negative'):
+    if sorting_mode in ('positive', 'negative'):
         return sorted_groups
     groups_list = list(sorted_groups)
     i = 0
@@ -1815,7 +1815,7 @@ def _reorder_groups_by_when(sorted_groups: list[tuple[str, str]], negation_mode:
 def _replace_when_literal_match(
     match,
     grouping_mode: str,
-    negation_mode: str,
+    sorting_mode: str,
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> str:
@@ -1831,7 +1831,7 @@ def _replace_when_literal_match(
     canonical = _canonicalize_when(
         unescaped,
         mode=grouping_mode,
-        negation_mode=negation_mode,
+        sorting_mode=sorting_mode,
         when_prefixes=when_prefixes,
         when_regexes=when_regexes,
     )
@@ -1848,7 +1848,7 @@ def _replace_when_literal_match(
 def _replace_when_literals(
     text: str,
     grouping_mode: str,
-    negation_mode: str,
+    sorting_mode: str,
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> str:
@@ -1859,7 +1859,7 @@ def _replace_when_literals(
         lambda match: _replace_when_literal_match(
             match,
             grouping_mode,
-            negation_mode,
+            sorting_mode,
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         ),
@@ -1867,7 +1867,7 @@ def _replace_when_literals(
     )
 
 
-def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
+def _set_run_cache_context(mode: str, sorting_mode: str, when_prefixes: list | None, when_regexes: list | None) -> None:
     """Initialize and clear per-run caches for the current run parameter context."""
 
     global _CLI_RUN_OBJ_INFO_CACHE, _CLI_RUN_OBJ_MATCH_CACHE
@@ -1875,7 +1875,7 @@ def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | 
 
     _RUN_CACHE_CONTEXT = (
         mode,
-        negation_mode,
+        sorting_mode,
         None if when_prefixes is None else tuple(when_prefixes),
         None if when_regexes is None else tuple(when_regexes),
     )
@@ -1913,7 +1913,7 @@ def _set_run_cache_context(mode: str, negation_mode: str, when_prefixes: list | 
 def _sort_groups_for_primary_when(
     sorted_groups: list[tuple[str, str]],
     grouping_mode: str,
-    negation_mode: str,
+    sorting_mode: str,
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> list[tuple[str, str]]:
@@ -1924,7 +1924,7 @@ def _sort_groups_for_primary_when(
         info = _get_run_obj_info(
             pair[1],
             grouping_mode=grouping_mode,
-            negation_mode=negation_mode,
+            sorting_mode=sorting_mode,
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         )
@@ -1995,7 +1995,7 @@ def _sort_groups_for_primary_when(
             canonical = _canonicalize_when(
                 when_val,
                 mode=grouping_mode,
-                negation_mode=negation_mode,
+                sorting_mode=sorting_mode,
                 when_prefixes=when_prefixes,
                 when_regexes=when_regexes,
             )
@@ -2055,7 +2055,7 @@ def _sort_groups_for_primary_when(
                 break
             j += 1
 
-        if j - i > 1 and negation_mode not in ('positive', 'negative'):
+        if j - i > 1 and sorting_mode not in ('positive', 'negative'):
             slice_pairs = sorted_groups[i:j]
             slice_pairs.sort(key=lambda pair: _natural_key_case_sensitive(_extract_literal_key_from_object(pair[1])))
             sorted_groups[i:j] = slice_pairs
@@ -2070,7 +2070,7 @@ def _sort_groups_initial(
     primary_order: str,
     secondary_order: str | None,
     grouping_mode: str,
-    negation_mode: str,
+    sorting_mode: str,
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> list[tuple[str, str]]:
@@ -2083,7 +2083,7 @@ def _sort_groups_initial(
             primary=primary_order,
             secondary=secondary_order,
             grouping=grouping_mode,
-            negation_mode=negation_mode,
+            sorting_mode=sorting_mode,
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         ),
@@ -2093,7 +2093,7 @@ def _sort_groups_initial(
 def _sort_groups_with_grouping_mode(
     sorted_groups: list[tuple[str, str]],
     grouping_mode: str,
-    negation_mode: str,
+    sorting_mode: str,
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> list[tuple[str, str]]:
@@ -2107,7 +2107,7 @@ def _sort_groups_with_grouping_mode(
         rank = _first_when_group_rank(
             pair[1],
             grouping_mode,
-            negation_mode,
+            sorting_mode,
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         )
@@ -2119,7 +2119,7 @@ def _sort_groups_with_grouping_mode(
     return final_groups
 
 
-def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
+def _sortable_when_key(when_val: str, mode: str = 'config-first', sorting_mode: str = 'alphanumeric', when_prefixes: list | None = None, when_regexes: list | None = None) -> str:
     """Return a canonicalized when string suitable for stable sorting, preserving negation."""
 
     if not when_val:
@@ -2128,7 +2128,7 @@ def _sortable_when_key(when_val: str, mode: str = 'config-first', negation_mode:
     cache_key = (
         when_val,
         mode,
-        negation_mode,
+        sorting_mode,
         None if when_prefixes is None else tuple(when_prefixes),
         None if when_regexes is None else tuple(when_regexes),
     )
@@ -2448,7 +2448,7 @@ def _operand_match_signature(token: str, run_ctx) -> tuple[str, bool, tuple[int,
 def _with_normalized_when_groups(
     groups: list[tuple[str, str]],
     grouping_mode: str,
-    negation_mode: str,
+    sorting_mode: str,
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> list[tuple[str, str]]:
@@ -2460,7 +2460,7 @@ def _with_normalized_when_groups(
         obj_out, when_changed = _normalize_when_in_object(
             obj_out,
             mode=grouping_mode,
-            negation_mode=negation_mode,
+            sorting_mode=sorting_mode,
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         )
@@ -2472,7 +2472,7 @@ def _with_normalized_when_groups(
             _ = _get_run_obj_info(
                 obj_out,
                 grouping_mode=grouping_mode,
-                negation_mode=negation_mode,
+                sorting_mode=sorting_mode,
                 when_prefixes=when_prefixes,
                 when_regexes=when_regexes,
             )

@@ -132,7 +132,8 @@ def _assemble_sorted_output(
     trailing_comments: str,
     postamble: str,
     grouping_mode: str,
-    negation_mode: str,
+    sorting_mode: str,
+    when_canonical_mode: str | None = None,
     object_clones: bool = False,
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
@@ -151,7 +152,7 @@ def _assemble_sorted_output(
         info = _keybindings._get_run_obj_info(
             obj_out,
             grouping_mode=grouping_mode,
-            negation_mode=negation_mode,
+            sorting_mode=(when_canonical_mode if when_canonical_mode is not None else sorting_mode),
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         )
@@ -259,7 +260,7 @@ def _assemble_sorted_output(
 def _assemble_final_output(
     text: str,
     grouping_mode: str,
-    negation_mode: str,
+    sorting_mode: str,
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
 ) -> str:
@@ -342,12 +343,16 @@ def main(argv: List[str] | None = None) -> int:
     primary_order = args.primary
     secondary_order = args.secondary
     grouping_mode = args.when_grouping
-    negation_mode = args.group_sorting
+    sorting_mode = args.group_sorting
 
     when_prefixes = _cli._parse_when_prefixes(parser, args.when_prefix)
     when_regexes = _cli._parse_when_regexes(parser, args.when_regex)
 
-    _keybindings._set_run_cache_context(grouping_mode, negation_mode, when_prefixes, when_regexes)
+    flag_g = _cli._flag_present(argv, ['-g', '--group-sorting'])
+    flag_w = _cli._flag_present(argv, ['-w', '--when-grouping'])
+    profile_has_group_sorting = args.when_grouping in _WHEN_GROUPING_PROFILES and _WHEN_GROUPING_PROFILES[args.when_grouping].get('group_sorting') is not None
+
+    _keybindings._set_run_cache_context(grouping_mode, sorting_mode, when_prefixes, when_regexes)
 
     raw = sys.stdin.read()
     preamble, array_text, postamble = _keybindings._extract_preamble_postamble(raw)
@@ -356,7 +361,7 @@ def main(argv: List[str] | None = None) -> int:
     normalized_groups = _keybindings._with_normalized_when_groups(
         groups,
         grouping_mode,
-        negation_mode,
+        sorting_mode,
         when_prefixes=when_prefixes,
         when_regexes=when_regexes,
     )
@@ -366,15 +371,63 @@ def main(argv: List[str] | None = None) -> int:
         primary_order,
         secondary_order,
         grouping_mode,
-        negation_mode,
+        sorting_mode,
         when_prefixes=when_prefixes,
         when_regexes=when_regexes,
     )
 
+    # Stabilize ordering within identical `key` groups for the common
+    # lexicographic case when primary==key and secondary is when (or omitted).
+    # Do this only when no when-prefix/when-regex are in use and when grouping
+    # mode is `none` so we don't affect focal-invariant or other partitioning
+    # behaviors (they are handled elsewhere).
+    if (
+        primary_order == 'key'
+        and (secondary_order is None or secondary_order == 'when')
+        and grouping_mode == 'none'
+        and sorting_mode == 'lexicographic'
+        and not when_prefixes
+        and not when_regexes
+    ):
+        stabilized: list[tuple[str, str]] = []
+        i = 0
+        n = len(sorted_groups)
+
+        def _first_when_sort_tuple(pair: tuple[str, str]):
+            # return tuple used for intra-key sorting: (first_when_key, full_when_key)
+            obj_text = pair[1]
+            info = _keybindings._get_run_obj_info(obj_text, grouping_mode=grouping_mode, sorting_mode=sorting_mode)
+            canonical = info.get('canonical', '') or ''
+            parts = _keybindings._split_when_contexts(canonical)
+            first = parts[0] if parts else ''
+            first_key = _keybindings._natural_key_case_sensitive(first)
+            full_when = _keybindings._sortable_when_key(info.get('when', '') or '', grouping_mode, sorting_mode)
+            full_key = _keybindings._natural_key_case_sensitive(full_when)
+            return (first_key, full_key)
+
+        while i < n:
+            # collect contiguous run of same literal `key` (already grouped by initial sort)
+            j = i + 1
+            key_i = _keybindings._extract_literal_key_from_object(sorted_groups[i][1]) or ''
+            while j < n and (_keybindings._extract_literal_key_from_object(sorted_groups[j][1]) or '') == key_i:
+                j += 1
+
+            if j - i > 1:
+                run = sorted_groups[i:j]
+                # stable sort the run by first_when then full when (both natural-case-sensitive)
+                run.sort(key=lambda pair: _first_when_sort_tuple(pair))
+                stabilized.extend(run)
+            else:
+                stabilized.append(sorted_groups[i])
+
+            i = j
+
+        sorted_groups = stabilized
+
     sorted_groups = _keybindings._sort_groups_with_grouping_mode(
         sorted_groups,
         grouping_mode,
-        negation_mode,
+        sorting_mode,
         when_prefixes=when_prefixes,
         when_regexes=when_regexes,
     )
@@ -386,7 +439,7 @@ def main(argv: List[str] | None = None) -> int:
         sorted_groups = _keybindings._sort_groups_for_primary_when(
             sorted_groups,
             grouping_mode,
-            negation_mode,
+            sorting_mode,
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         )
@@ -466,7 +519,7 @@ def main(argv: List[str] | None = None) -> int:
                         _keybindings._canonicalize_when(
                             _keybindings._extract_key_when_from_object(pair[1])[1] or _keybindings._extract_literal_when_from_object(pair[1]),
                             mode=grouping_mode,
-                            negation_mode=negation_mode,
+                            sorting_mode=sorting_mode,
                             when_prefixes=when_prefixes,
                             when_regexes=when_regexes,
                         ),
@@ -564,7 +617,12 @@ def main(argv: List[str] | None = None) -> int:
 
         sorted_groups = final_list
 
-    sorted_groups = _keybindings._reorder_groups_by_when(sorted_groups, negation_mode)
+    sorted_groups = _keybindings._reorder_groups_by_when(sorted_groups, sorting_mode)
+
+    # Make canonicalization/rendering mode follow the chosen group-sorting.
+    # The user requested that canonicalization and sorting be controlled by
+    # the same flag; set `when_canonical_mode` to the active `sorting_mode`.
+    when_canonical_mode = sorting_mode
 
     final_text = _assemble_sorted_output(
         preamble,
@@ -572,7 +630,8 @@ def main(argv: List[str] | None = None) -> int:
         trailing_comments,
         postamble,
         grouping_mode,
-        negation_mode,
+        sorting_mode,
+        when_canonical_mode=when_canonical_mode,
         object_clones=args.object_clones,
         when_prefixes=when_prefixes,
         when_regexes=when_regexes,
@@ -581,7 +640,7 @@ def main(argv: List[str] | None = None) -> int:
     processed = _assemble_final_output(
         final_text,
         grouping_mode,
-        negation_mode,
+        sorting_mode,
         when_prefixes=when_prefixes,
         when_regexes=when_regexes,
     )
