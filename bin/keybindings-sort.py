@@ -175,7 +175,20 @@ def _assemble_sorted_output(
                     seen_fingerprints.add(obj_fingerprint)
                     continue
 
-                duplicate_comment = f'// DUPLICATE key: {key_val!r} when: {canonical_when!r}'
+                # use a stable, readable canonical when for duplicate annotations
+                # regardless of the active group-sorting mode (prefer alphanumeric)
+                try:
+                    comment_canonical = _keybindings._canonicalize_when(
+                        info.get('when', '') or '',
+                        mode=grouping_mode,
+                        sorting_mode='alphanumeric',
+                        when_prefixes=when_prefixes,
+                        when_regexes=when_regexes,
+                    )
+                except Exception:
+                    comment_canonical = canonical_when
+
+                duplicate_comment = f'// DUPLICATE key: {key_val!r} when: {comment_canonical!r}'
                 if is_exact_object_clone:
                     duplicate_comment += ' (exact object match)'
                 obj_out = _keybindings._embed_duplicate_comment_in_object(obj_out, duplicate_comment)
