@@ -133,7 +133,6 @@ def _assemble_sorted_output(
     postamble: str,
     grouping_mode: str,
     sorting_mode: str,
-    when_canonical_mode: str | None = None,
     object_clones: bool = False,
     when_prefixes: list | None = None,
     when_regexes: list | None = None,
@@ -152,7 +151,7 @@ def _assemble_sorted_output(
         info = _keybindings._get_run_obj_info(
             obj_out,
             grouping_mode=grouping_mode,
-            sorting_mode=(when_canonical_mode if when_canonical_mode is not None else sorting_mode),
+            sorting_mode=sorting_mode,
             when_prefixes=when_prefixes,
             when_regexes=when_regexes,
         )
@@ -175,13 +174,12 @@ def _assemble_sorted_output(
                     seen_fingerprints.add(obj_fingerprint)
                     continue
 
-                # use a stable, readable canonical when for duplicate annotations
-                # regardless of the active group-sorting mode (prefer alphanumeric)
+                # use the active sorting_mode for rendered canonical when
                 try:
                     comment_canonical = _keybindings._canonicalize_when(
                         info.get('when', '') or '',
                         mode=grouping_mode,
-                        sorting_mode='alphanumeric',
+                        sorting_mode=sorting_mode,
                         when_prefixes=when_prefixes,
                         when_regexes=when_regexes,
                     )
@@ -363,6 +361,7 @@ def main(argv: List[str] | None = None) -> int:
 
     flag_g = _cli._flag_present(argv, ['-g', '--group-sorting'])
     flag_w = _cli._flag_present(argv, ['-w', '--when-grouping'])
+
     profile_has_group_sorting = args.when_grouping in _WHEN_GROUPING_PROFILES and _WHEN_GROUPING_PROFILES[args.when_grouping].get('group_sorting') is not None
 
     _keybindings._set_run_cache_context(grouping_mode, sorting_mode, when_prefixes, when_regexes)
@@ -389,11 +388,7 @@ def main(argv: List[str] | None = None) -> int:
         when_regexes=when_regexes,
     )
 
-    # Stabilize ordering within identical `key` groups for the common
-    # lexicographic case when primary==key and secondary is when (or omitted).
-    # Do this only when no when-prefix/when-regex are in use and when grouping
-    # mode is `none` so we don't affect focal-invariant or other partitioning
-    # behaviors (they are handled elsewhere).
+    # stabilize ordering within primary `key` groups
     if (
         primary_order == 'key'
         and (secondary_order is None or secondary_order == 'when')
@@ -407,7 +402,6 @@ def main(argv: List[str] | None = None) -> int:
         n = len(sorted_groups)
 
         def _first_when_sort_tuple(pair: tuple[str, str]):
-            # return tuple used for intra-key sorting: (first_when_key, full_when_key)
             obj_text = pair[1]
             info = _keybindings._get_run_obj_info(obj_text, grouping_mode=grouping_mode, sorting_mode=sorting_mode)
             canonical = info.get('canonical', '') or ''
@@ -419,7 +413,6 @@ def main(argv: List[str] | None = None) -> int:
             return (first_key, full_key)
 
         while i < n:
-            # collect contiguous run of same literal `key` (already grouped by initial sort)
             j = i + 1
             key_i = _keybindings._extract_literal_key_from_object(sorted_groups[i][1]) or ''
             while j < n and (_keybindings._extract_literal_key_from_object(sorted_groups[j][1]) or '') == key_i:
@@ -427,7 +420,6 @@ def main(argv: List[str] | None = None) -> int:
 
             if j - i > 1:
                 run = sorted_groups[i:j]
-                # stable sort the run by first_when then full when (both natural-case-sensitive)
                 run.sort(key=lambda pair: _first_when_sort_tuple(pair))
                 stabilized.extend(run)
             else:
@@ -458,7 +450,7 @@ def main(argv: List[str] | None = None) -> int:
         )
 
     #
-    # last-step stable partition
+    # stable partition
     #
     # desired order:
     #
@@ -468,7 +460,7 @@ def main(argv: List[str] | None = None) -> int:
     #  3. objects with no prefix but with regex(es) (regex-only)
     #
 
-    # produce a deterministic ordering by prefix/regex combination signature.
+    # produce a deterministic ordering for when prefix/regex combination signature
     if when_prefixes or when_regexes:
         # helper: compute matched prefix indices and regex indices for an object
         def _match_signature(pair: tuple[str, str]):
@@ -632,11 +624,6 @@ def main(argv: List[str] | None = None) -> int:
 
     sorted_groups = _keybindings._reorder_groups_by_when(sorted_groups, sorting_mode)
 
-    # Make canonicalization/rendering mode follow the chosen group-sorting.
-    # The user requested that canonicalization and sorting be controlled by
-    # the same flag; set `when_canonical_mode` to the active `sorting_mode`.
-    when_canonical_mode = sorting_mode
-
     final_text = _assemble_sorted_output(
         preamble,
         sorted_groups,
@@ -644,7 +631,6 @@ def main(argv: List[str] | None = None) -> int:
         postamble,
         grouping_mode,
         sorting_mode,
-        when_canonical_mode=when_canonical_mode,
         object_clones=args.object_clones,
         when_prefixes=when_prefixes,
         when_regexes=when_regexes,

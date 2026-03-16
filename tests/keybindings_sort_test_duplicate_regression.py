@@ -86,7 +86,7 @@ class KeybindingsSortDuplicateRegressionTests(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
         out = proc.stdout.decode("utf-8")
         self.assertEqual(out.count('"key": "ctrl+x"'), 2)
-        self.assertIn("// DUPLICATE key: 'ctrl+x' when: 'editorTextFocus && !editorReadonly' (exact object match)", out)
+        self.assertIn("// DUPLICATE key: 'ctrl+x' when: '!editorReadonly && editorTextFocus' (exact object match)", out)
 
     def test_duplicate_pair_with_and_without_command_suffix_id_is_preserved(self) -> None:
         payload = dedent(
