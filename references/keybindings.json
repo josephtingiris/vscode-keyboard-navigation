@@ -1281,6 +1281,12 @@ Notes:
     // "0.0.3": "workbench.action.zoomIn",
   },
   {
+    "key": "ctrl+shift+alt+z",
+    "command": "ctrl+shift+alt+z 2082",
+    // "command": "workbench.action.zoomIn",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.split.enabled"
+  },
+  {
     // [keynav] (vi) (0) (self) (gold) (X)
     "key": "alt+`",
     "command": "workbench.action.terminal.toggleTerminal",
