@@ -133,7 +133,7 @@ _WHEN_CONTEXT_SELECTORS = [
 
 _WHEN_TAG_SELECTORS = [
     ("auxiliarBarFocus", "(secondary)"),
-    ("config.keyboardNavigation.terminal", "(terminal)"),
+    ("config.keyboardNavigation.terminal.enabled", "(terminal)"),
     ("config.keyboardNavigation.enabledMap", "(map)"),
     ("editorFocus", "(editor)"),
     ("editorTextFocus", "(editor)"),
