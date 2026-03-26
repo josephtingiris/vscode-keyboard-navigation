@@ -122,7 +122,7 @@ surfaces:
 	@for lkg in $(LETTER_KEY_GROUPS); do \
 		../bin/keybindings-merge.py keybindings.corpus.$$lkg.jsonc keybindings.map.$$lkg.jsonc --prefer left --out keybindings.merged.surface.$$lkg.jsonc 1> /dev/null; \
 		cat keybindings.merged.surface.$$lkg.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.$$lkg.jsonc; \
-		cat keybindings.surface.$$lkg.jsonc | keybindings-duplicate.py --detect --correct-duplicate-ids > keybindings.merged.surface.$$lkg.jsonc \
+		cat keybindings.surface.$$lkg.jsonc | keybindings-duplicate.py --detect --correct-duplicate-ids > keybindings.merged.surface.$$lkg.jsonc; \
 		cat keybindings.merged.surface.$$lkg.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.$$lkg.jsonc; \
 		rm -f keybindings.merged.surface.$$lkg.jsonc; \
 	done
