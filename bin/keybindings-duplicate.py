@@ -820,7 +820,7 @@ def insert_comments_inside_object(obj_text: str, comments: list[str]) -> str:
     if idx == -1:
         return s + "\n" + "\n".join(comments)
 
-    # determine indentation based on the line containing the last '}'
+    # indentation based on the line containing the last '}'
     nl = s.rfind("\n", 0, idx)
     if nl == -1:
         indent = ""
@@ -899,14 +899,13 @@ def extract_any_id(parsed_obj: dict | None, leading_comments: str, object_text: 
 def generate_unique_hex_id(used_ids: set[str], rng: random.Random, seed: str | None = None) -> str | None:
     """Generate a unique hex id.
 
-    If `seed` is provided, generate deterministic candidates by hashing
-    the seed (e.g. key+when) and taking slices of the hex digest. Fall
-    back to random generation if deterministic attempts collide.
+    If `seed` is provided, generate candidates by hashing the seed (e.g. key+when)
+    and taking slices of the hex digest. Fall back to random generation if attempts collide.
     """
 
     if seed:
         hexdigest = hashlib.sha256(seed.encode("utf-8")).hexdigest()
-        # try deterministic 4-char slices first, then 5-char slices.
+        # try 4-char slices first, then 5-char slices.
         for retry in range(ID_RETRY_LIMIT):
             length = 4 if retry < (ID_RETRY_LIMIT // 2) else 5
             max_start = len(hexdigest) - length + 1
@@ -916,12 +915,7 @@ def generate_unique_hex_id(used_ids: set[str], rng: random.Random, seed: str | N
                 used_ids.add(candidate)
                 return candidate
 
-    # fallback: random 4-hex ids (preserves original behavior)
-    for _ in range(ID_RETRY_LIMIT):
-        candidate = f"{rng.randint(0, 0xFFFF):04x}"
-        if candidate not in used_ids:
-            used_ids.add(candidate)
-            return candidate
+    # generation is consolidated into package _generate_key_id; no-op here
     return None
 
 
@@ -1030,8 +1024,9 @@ def build_emitted_objects(
                         combined_extra = " && ".join(auto_ctxs)
 
             generated_when = merge_when_clause("", combined_extra)
-            # deterministic seed based on generated key + when clause
-            generated_id = generate_unique_hex_id(used_ids, rng, seed=f"{generated_key}|{generated_when}")
+
+            # seed based on generated key + when clause
+            generated_id = _corpus._generate_key_id(used_ids, generated_key, generated_when)
             if generated_id is None:
                 failure = f"// FAILED generating id for {generated_key}/{generated_when}"
                 emitted.append(
@@ -1107,8 +1102,7 @@ def build_emitted_objects(
                         per_combined_extra = " && ".join(auto_ctxs)
 
             generated_when = merge_when_clause(source_when, per_combined_extra)
-            # deterministic seed based on generated key + when clause
-            generated_id = generate_unique_hex_id(used_ids, rng, seed=f"{generated_key}|{generated_when}")
+            generated_id = _corpus._generate_key_id(used_ids, generated_key, generated_when)
             if generated_id is None:
                 failure = f"// FAILED generating id for {generated_key}/{generated_when}"
                 emitted.append(
@@ -1148,7 +1142,7 @@ def build_emitted_objects(
     return emitted
 
 
-def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, detect: bool) -> str:
+def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, detect: bool, correct_duplicate_ids: bool = False) -> str:
     """Annotate and return final array-body text."""
 
     seen_pairs: set[tuple[str, str]] = set()
@@ -1194,13 +1188,24 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, de
             found_id = extract_any_id(item.parsed_obj, item.leading_comments, item.text)
             if found_id:
                 if found_id in seen_ids:
-                    comments.append(f"// DUPLICATE id {found_id} detected for {key_value}/{when_value}")
+                    if correct_duplicate_ids:
+                        new_id = _corpus._generate_key_id(used_ids, key_value, when_value)
+                        if new_id:
+                            pattern = re.compile(r"\b" + re.escape(found_id) + r"\b", flags=re.IGNORECASE)
+                            item.text = pattern.sub(new_id, item.text, count=1)
+
+                            if item.parsed_obj is not None and isinstance(item.parsed_obj.get("command", None), str):
+                                item.parsed_obj["command"] = pattern.sub(new_id, str(item.parsed_obj["command"]), count=1)
+                            seen_ids[new_id] = (key_value, when_value)
+                            # suppressed stderr output during automatic corrections
+                        else:
+                            comments.append(f"// FAILED generating id for duplicate {found_id} on {key_value}/{when_value}")
+                    else:
+                        comments.append(f"// DUPLICATE id {found_id} detected for {key_value}/{when_value}")
                 else:
                     seen_ids[found_id] = (key_value, when_value)
-                pass
             else:
-                # deterministic id preferred for stability based on key+when
-                new_id = generate_unique_hex_id(used_ids, rng, seed=f"{key_value}|{when_value}")
+                new_id = _corpus._generate_key_id(used_ids, key_value, when_value)
                 if new_id:
                     comments.append(f'// MISSING id: "command": "{key_value} {new_id}",')
 
@@ -1355,6 +1360,13 @@ def main(argv: List[str] | None = None) -> int:
         help="Run duplicate and id detection over final object set",
     )
     parser.add_argument(
+        "-c",
+        "--correct-duplicate-ids",
+        dest="correct_duplicate_ids",
+        action="store_true",
+        help="When detecting duplicate ids, replace duplicate ids with new unique ids instead of annotating",
+    )
+    parser.add_argument(
         "input",
         nargs="?",
         default=None,
@@ -1413,7 +1425,12 @@ def main(argv: List[str] | None = None) -> int:
         automatic_when_contexts=bool(getattr(args, "automatic_when_contexts", False)),
     )
 
-    rendered_body = annotate_and_render(emitted, trailing_comments, detect=args.detect)
+    rendered_body = annotate_and_render(
+        emitted,
+        trailing_comments,
+        detect=args.detect,
+        correct_duplicate_ids=bool(getattr(args, "correct_duplicate_ids", False)),
+    )
     output_text = f"{preamble}[{rendered_body}]{postamble}"
     sys.stdout.write(output_text)
     return 0

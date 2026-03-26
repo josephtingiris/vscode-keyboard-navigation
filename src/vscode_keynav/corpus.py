@@ -7,6 +7,7 @@ VS Code Keyboard Navigation common corpus functions.
 from __future__ import annotations
 
 import re
+import hashlib
 
 from typing import Any, Dict, List
 
@@ -16,6 +17,8 @@ from .keybindings import _canonicalize_when, _key_tail_literal, _normalize_key
 #
 # globals & constants
 #
+
+_GENERATED_KEY_IDS: set[str] = set()
 
 # corpus generation constants originally defined in bin/keybindings-corpus.py
 
@@ -163,6 +166,53 @@ def _augment_when_clause(base_when: str, contexts: List[str]) -> str:
     if not base_when or not base_when.strip():
         return ctx_clause
     return f"({base_when}) && ({ctx_clause})"
+
+
+def _generate_key_id(used_ids: set[str], key: str, when: str) -> str | None:
+    """Generate a deterministic (consistent) key ID.
+
+    Strategy:
+    - compute SHA256 of "{key}||{when}" and take first 4 hex chars as base
+    - on collision increment base (mod 0x10000) until unused
+    - fallback to a 12-char SHA prefix and ensure uniqueness by appending
+      a numeric suffix if necessary
+    """
+    h = hashlib.sha256(f"{key}||{when}".encode()).hexdigest()
+
+    # try 4-hex id first
+    base = int(h[:4], 16)
+    for delta in range(0x10000):
+        val = (base + delta) & 0xFFFF
+        candidate = f"{val:04x}"
+        if candidate not in used_ids and candidate not in _GENERATED_KEY_IDS:
+            used_ids.add(candidate)
+            _GENERATED_KEY_IDS.add(candidate)
+            return candidate
+
+    # fallback: use a 12-char SHA prefix
+    id12 = h[:12]
+    if id12 not in used_ids and id12 not in _GENERATED_KEY_IDS:
+        used_ids.add(id12)
+        _GENERATED_KEY_IDS.add(id12)
+        return id12
+
+    # if collision, append a numeric suffix until unique (bounded loop)
+    for suffix in range(1, 10000):
+        candidate = f"{id12}{suffix}"
+        if candidate not in used_ids and candidate not in _GENERATED_KEY_IDS:
+            used_ids.add(candidate)
+            _GENERATED_KEY_IDS.add(candidate)
+            return candidate
+
+    # last resort: try longer slices of the hash
+    for L in range(13, len(h) + 1):
+        candidate = h[:L]
+        if candidate not in used_ids and candidate not in _GENERATED_KEY_IDS:
+            used_ids.add(candidate)
+            _GENERATED_KEY_IDS.add(candidate)
+            return candidate
+
+    return None
 
 
 def _tags_for(

@@ -38,30 +38,85 @@ main() {
         usage
     fi
 
+    if [ ! -d "${VSCODE_KEYBINDINGS_TMP_DIR}" ]; then
+        mkdir -p "${VSCODE_KEYBINDINGS_TMP_DIR}"
+    fi
+
+    if [ ! -d "${VSCODE_KEYBINDINGS_TMP_DIR}" ]; then
+        aborting "'${VSCODE_KEYBINDINGS_TMP_DIR}' directory not found"
+    fi
+
+    if [ ! -w "${VSCODE_KEYBINDINGS_TMP_DIR}" ]; then
+        aborting "'${VSCODE_KEYBINDINGS_TMP_DIR}' directory not found writable"
+    fi
+
     echo
 
-    if type -t "${1}" > /dev/null 2>&1; then
-        "${@}"
+    if [ "$(type -t "${1}" 2>&1 | grep ^function$)" == 'function' ]; then
+        ${@}
     else
+        type -t "${1}"
         aborting "unknown command: ${1}"
     fi
 }
 
-# merge (force) an existing keybindings.json into the test surface, overwriting existing objects
-pipeline_references_keybindings_json_test_surface_ingest() {
-    echo rm -f m1.jsonc
+# add the canonical diagnostic surfaces into the references keybindings.json test surface, preserving the original base objects and their placements
+pipeline_references_test_surface_add() {
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+
+    local diagnostic_surface diagnostic_surfaces=()
+
+    diagnostic_surfaces+=("${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.surface.jsonc")
+    diagnostic_surfaces+=("${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.surface.vi.jsonc")
+
+    local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
+
+    echo tmp_file=${tmp_file}
+
+    for diagnostic_surface in "${diagnostic_surfaces[@]}"; do
+        echo "----"
+        echo "diagnostic_surface=${diagnostic_surface}"
+        echo
+
+        keybindings-merge.py --prefer left --base left --out "${tmp_file}" "${test_surface}" "${diagnostic_surface}"
+        cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
+        echo
+
+        rm -f "${tmp_file}" &> /dev/null
+    done
+
+    echo "Updating corpus comments ..."
+    keybindings-corpus.py --comments "${test_surface}" > "${tmp_file}"
+    cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
+    echo
+
+    echo "Annotating duplicates ..."
+    keybindings-duplicate.py --detect "${test_surface}" > "${tmp_file}"
+    cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
+
+    if type -P prettier &> /dev/null; then
+        echo
+        echo "Making it prettier ..."
+        prettier "${test_surface}" > "${tmp_file}"
+        cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
+    fi
+
+    rm -f "${tmp_file}" &> /dev/null
+    echo
 }
 
-# merge the canonical diagnostic surfaces into a single 'max' (very large) test surface, preserving the original base objects and their original placements
-pipeline_references_keybindings_json_test_surface_max() {
-    echo keybindings-merge.py --prefer left --base left --out m1.jsonc ${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json ${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.surface.vi.jsonc
-    echo keybindings-sort.py -w focal-invariant #< m1.jsonc > ${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json
-    echo rm -f m1.jsonc
+# ingest (merge) an existing keybindings.json array into the references keybindings.json test surface, overwriting existing objects
+pipeline_references_test_surface_ingest() {
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+
+    echo tmp_file=${tmp_file}
 }
 
-# remove all uniq diagnostic command objects from the test surface, leaving only the 'min' (very few) valid ones
-pipeline_references_keybindings_json_test_surface_min() {
-    echo rm -f m1.jsonc
+# remove all canonical diagnostic command objects from the references keybinding.json test surface, leaving only the valid command objects
+pipeline_references_test_surface_remove() {
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+
+    echo tmp_file=${tmp_file}
 }
 
 usage() {

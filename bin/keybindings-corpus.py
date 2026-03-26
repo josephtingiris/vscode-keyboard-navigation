@@ -182,7 +182,6 @@ def _main(argv: List[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
 
-    # determine selected letter-group from a when-clause
     def _sel_from_when(when_val: str) -> str:
         """Return the selected navigation group name from a when-clause."""
 
@@ -424,7 +423,6 @@ def _main(argv: List[str] | None = None) -> int:
             else:
                 insert_pos = line_start + 1
 
-            # determine indentation of the key line
             if insert_pos < len(out_text):
                 m_indent = re.match(r'[ \t]*', out_text[insert_pos:key_pos])
                 indentation = m_indent.group(0) if m_indent else ''
@@ -783,8 +781,6 @@ def _main(argv: List[str] | None = None) -> int:
             seen_pairs.add(pair)
             records.append(rec)
 
-    # compute deterministic per-record ids using SHA-256(key||when)
-
     if len(modes) == 1:
         augmented_records: List[Tuple[str, str, List[str]]] = []
         # avoid introducing exact duplicate (key,when) pairs when adding catch keys
@@ -798,48 +794,14 @@ def _main(argv: List[str] | None = None) -> int:
                     existing_pairs.add(catch_pair)
         records = augmented_records
 
-    id_fulls = [hashlib.sha256(f"{k}||{w}".encode()).hexdigest()
-                for (k, w, _) in records]
-    n = len(id_fulls)
+    assigned: List[str] = []
+    used_ids: set[str] = set()
+    for (k, w, _) in records:
+        idval = _corpus._generate_key_id(used_ids, k, w)
 
-    #
-    # preference: produce a 4-char hex id by taking the first
-    # 4 hex chars of the SHA and, on collision, increment that 4-char
-    # value (mod 0x10000) until an unused 4-char is found.
-    #
-
-    assigned: List[str | None] = [None] * n
-    seen_prefixes: set[str] = set()
-
-    for i, h in enumerate(id_fulls):
-        base = int(h[:4], 16)
-        found = False
-
-        # try all 65536 4-char possibilities
-        for delta in range(0x10000):
-            cand = (base + delta) & 0xFFFF
-            p = f"{cand:04x}"
-            if p not in seen_prefixes:
-                assigned[i] = p
-                seen_prefixes.add(p)
-                found = True
-                break
-        if not found:
-            assigned[i] = None
-
-    # fallback: original prefix-length algorithm (4..12) to resolve uniqueness
-    if any(a is None for a in assigned):
-        assigned2: List[str | None] = [None] * n
-        for L in range(4, 13):
-            prefixes = [h[:L] for h in id_fulls]
-            counts = Counter(prefixes)
-            for i, p in enumerate(prefixes):
-                if assigned2[i] is None and counts[p] == 1:
-                    assigned2[i] = p
-        for i in range(n):
-            if assigned2[i] is None:
-                assigned2[i] = id_fulls[i][:12]
-        assigned = assigned2
+        if idval is None:
+            raise RuntimeError("failed to generate unique id for record")
+        assigned.append(idval)
 
     # if comments_arg == 'none', emit pure JSON (no comments) and exit.
     if comments_arg == 'none':
