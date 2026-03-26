@@ -32,7 +32,8 @@ A_KEYBINDINGS_MAP_SIDEBAR_LOCATIONS=(left right)
 
 keybindings_map() {
     local make_mode=0
-    # parse optional flags (only --make for now)
+
+    # parse optional flags
     while [ "${1:-}" != "" ] && [[ "${1}" == --* ]]; do
         case "${1}" in
             --make)
@@ -87,9 +88,9 @@ keybindings_map() {
                     touch ${map_file}.${keybindings_map_letter_key_group}.jsonc
 
                     if [ "${keybindings_map_letter_key_group}" != "" ] && [ "${keybindings_map_letter_key_group}" != "none" ]; then
-                        keybindings-duplicate.py -F juke,split,${keybindings_map_letter_key_group} -m ${KEYBINDINGS_MAP_MODIFIERS} -w "${when_prefix} && config.workbench.sideBar.location == '${sl}' && panelPosition == '${pp}' && ${fc}" > ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc
+                        keybindings-duplicate.py -a -F juke,split,${keybindings_map_letter_key_group} -m ${KEYBINDINGS_MAP_MODIFIERS} -w "${when_prefix} && config.workbench.sideBar.location == '${sl}' && panelPosition == '${pp}' && ${fc}" > ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc
                     else
-                        keybindings-duplicate.py -F juke,split -m ${KEYBINDINGS_MAP_MODIFIERS} -w "${when_prefix} && config.workbench.sideBar.location == '${sl}' && panelPosition == '${pp}' && ${fc}" > ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc
+                        keybindings-duplicate.py -a -F juke,split -m ${KEYBINDINGS_MAP_MODIFIERS} -w "${when_prefix} && config.workbench.sideBar.location == '${sl}' && panelPosition == '${pp}' && ${fc}" > ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc
                     fi
 
                     keybindings_merge ${map_file}.${keybindings_map_letter_key_group}.jsonc ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc > ${map_file}.${keybindings_map_letter_key_group}.m2.jsonc
