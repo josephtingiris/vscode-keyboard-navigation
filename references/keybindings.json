@@ -1691,15 +1691,17 @@ Notes:
   {
     // [keynav] (left) (vi) (move) (1) (red) (A)
     "key": "shift+alt+h",
-    "command": "shift+alt+h f1ad",
+    "command": "workbench.action.focusSideBar",
+    // "command": "shift+alt+h f1ad",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && !activeEditorIsReadonly && editorIsOpen"
+    // "0.0.3": "workbench.action.focusSideBar",
   },
   {
-    // [keynav] (down) (vi) (move) (1) (red) (A)
     "key": "shift+alt+j",
-    // "command": "workbench.action.focusActiveEditorGroup",
-    "command": "shift+alt+j 13e9",
+    "command": "workbench.action.focusPanel",
+    // "command": "shift+alt+j 13e9",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && !activeEditorIsReadonly && editorIsOpen"
+    // "0.0.3": "workbench.action.focusPanel",
   },
   {
     // [keynav] (up) (vi) (move) (1) (red) (A)
@@ -1712,8 +1714,10 @@ Notes:
   {
     // [keynav] (right) (vi) (move) (1) (red) (A)
     "key": "shift+alt+l",
-    "command": "shift+alt+l 83ec",
+    "command": "workbench.action.focusAuxiliaryBar",
+    // "command": "shift+alt+l 83ec",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && !activeEditorIsReadonly && editorIsOpen"
+    // "0.0.3": "workbench.action.focusAuxiliaryBar",
   },
   {
     // [keynav] (vertical) (vi) (split) (0) (self) (gold) (X) (immutable)
@@ -1725,8 +1729,8 @@ Notes:
     // [keynav] (horizontal) (vi) (split) (0) (self) (gold) (X) (immutable)
     "key": "alt+-",
     "command": "alt+- 95f4",
-    "command": "workbench.action.splitEditorDown",
-    "command": "workbench.action.moveEditorToBelowGroup",
+    // "command": "workbench.action.splitEditorDown",
+    // "command": "workbench.action.moveEditorToBelowGroup",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && activeEditorIsReadonly && config.keyboardNavigation.split.enabled && editorIsOpen"
   },
   {
@@ -1901,8 +1905,6 @@ Notes:
     "key": "alt+,",
     "command": "alt+, 0abc",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && focusedView == '' && config.keyboardNavigation.juke.enabled && !activeEditorIsReadonly && editorIsOpen"
-    // [note] settings editor, keyboard shortcuts, et al
-    // [note] file not found?
   },
   {
     // [keynav] (right) (vi) (juke) (0) (self) (gold) (X)
@@ -22994,14 +22996,9 @@ Notes:
   },
   {
     "key": "alt+-",
-    "command": "alt+- d67f",
     "command": "workbench.action.newGroupBelow",
+    // "command": "alt+- d67f",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && !panelFocus && config.keyboardNavigation.split.enabled && multipleEditorGroups"
-  },
-  {
-    "key": "alt+-",
-    "command": "alt+- 91d9",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && config.keyboardNavigation.split.enabled"
   },
   {
     "key": "alt+h",
