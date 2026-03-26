@@ -114,17 +114,23 @@ surfaces:
 	# none
 	@../bin/keybindings-merge.py keybindings.corpus.jsonc keybindings.map.jsonc --prefer left --out keybindings.merged.surface.jsonc 1> /dev/null
 	@cat keybindings.merged.surface.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.jsonc
+	@cat keybindings.surface.jsonc | keybindings-duplicate.py --detect --correct-duplicate-ids > keybindings.merged.surface.jsonc
+	@cat keybindings.merged.surface.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.jsonc
 	@rm -f keybindings.merged.surface.jsonc
 
 	# letter-key groups
 	@for lkg in $(LETTER_KEY_GROUPS); do \
 		../bin/keybindings-merge.py keybindings.corpus.$$lkg.jsonc keybindings.map.$$lkg.jsonc --prefer left --out keybindings.merged.surface.$$lkg.jsonc 1> /dev/null; \
 		cat keybindings.merged.surface.$$lkg.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.$$lkg.jsonc; \
+		cat keybindings.surface.$$lkg.jsonc | keybindings-duplicate.py --detect --correct-duplicate-ids > keybindings.merged.surface.$$lkg.jsonc \
+		cat keybindings.merged.surface.$$lkg.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.$$lkg.jsonc; \
 		rm -f keybindings.merged.surface.$$lkg.jsonc; \
 	done
 
 	# all
 	@../bin/keybindings-merge.py keybindings.corpus.all.jsonc keybindings.map.all.jsonc --prefer left --out keybindings.merged.surface.all.jsonc 1> /dev/null
+	@cat keybindings.merged.surface.all.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.all.jsonc
+	@cat keybindings.surface.all.jsonc | keybindings-duplicate.py --detect --correct-duplicate-ids > keybindings.merged.surface.all.jsonc
 	@cat keybindings.merged.surface.all.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.all.jsonc
 	@rm -f keybindings.merged.surface.all.jsonc
 	@echo
