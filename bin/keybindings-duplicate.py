@@ -59,6 +59,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from vscode_keynav import io as _io
 from vscode_keynav import keybindings as _keybindings
+from vscode_keynav import corpus as _corpus
 
 
 ABORTING_EXIT_CODE = 1
@@ -974,6 +975,7 @@ def build_emitted_objects(
     modifiers: list[str],
     extra_when_clause: str,
     rng: random.Random,
+    automatic_when_contexts: bool = False,
 ) -> list[EmittedObject]:
     """Build output objects list including generated mappings."""
 
@@ -1010,7 +1012,24 @@ def build_emitted_objects(
 
     if not records:
         for _, generated_key in expanded_pairs:
-            generated_when = merge_when_clause("", extra_when_clause)
+            # derive automatic contexts for generated-only mode
+            combined_extra = extra_when_clause or ""
+            if automatic_when_contexts:
+                auto_ctxs: list[str] = []
+                key_norm = _keybindings._normalize_key(generated_key)
+                if key_norm in _corpus._JUKE_GROUP:
+                    auto_ctxs.append("config.keyboardNavigation.juke.enabled")
+                if key_norm in _corpus._SPLIT_GROUP:
+                    auto_ctxs.append("config.keyboardNavigation.split.enabled")
+                if "terminal" in (extra_when_clause or "").lower():
+                    auto_ctxs.append("config.keyboardNavigation.terminal.enabled")
+                if auto_ctxs:
+                    if combined_extra:
+                        combined_extra = " && ".join([combined_extra, " && ".join(auto_ctxs)])
+                    else:
+                        combined_extra = " && ".join(auto_ctxs)
+
+            generated_when = merge_when_clause("", combined_extra)
             # deterministic seed based on generated key + when clause
             generated_id = generate_unique_hex_id(used_ids, rng, seed=f"{generated_key}|{generated_when}")
             if generated_id is None:
@@ -1060,9 +1079,34 @@ def build_emitted_objects(
             continue
 
         source_when = str(record.parsed_obj.get("when", ""))
-        generated_when = merge_when_clause(source_when, extra_when_clause)
+        # build automatic contexts derived from the key/record when requested
+        combined_extra = extra_when_clause or ""
+        if automatic_when_contexts:
+            auto_ctxs = []
+            # compute per-generated-key below inside loop since key varies
 
         for generated_key in matching_targets:
+            # per-generated-key automatic contexts
+            per_combined_extra = combined_extra
+            if automatic_when_contexts:
+                key_norm = _keybindings._normalize_key(generated_key)
+                if key_norm in _corpus._JUKE_GROUP and "config.keyboardNavigation.juke.enabled" not in per_combined_extra:
+                    auto_ctxs = ["config.keyboardNavigation.juke.enabled"]
+                else:
+                    auto_ctxs = []
+                if key_norm in _corpus._SPLIT_GROUP and "config.keyboardNavigation.split.enabled" not in per_combined_extra:
+                    auto_ctxs.append("config.keyboardNavigation.split.enabled")
+                cmd_val = str(record.parsed_obj.get("command", ""))
+                if ("terminal" in source_when.lower() or "terminalfocus" in source_when.lower() or "terminal" in cmd_val.lower()):
+                    if "config.keyboardNavigation.terminal.enabled" not in per_combined_extra:
+                        auto_ctxs.append("config.keyboardNavigation.terminal.enabled")
+                if auto_ctxs:
+                    if per_combined_extra:
+                        per_combined_extra = " && ".join([per_combined_extra, " && ".join(auto_ctxs)])
+                    else:
+                        per_combined_extra = " && ".join(auto_ctxs)
+
+            generated_when = merge_when_clause(source_when, per_combined_extra)
             # deterministic seed based on generated key + when clause
             generated_id = generate_unique_hex_id(used_ids, rng, seed=f"{generated_key}|{generated_when}")
             if generated_id is None:
@@ -1302,6 +1346,15 @@ def main(argv: List[str] | None = None) -> int:
         help="Run duplicate and id detection over final object set",
     )
     parser.add_argument(
+        "-a",
+        "--automatic-when-contexts",
+        action="store_true",
+        help=(
+            "Automatically inject config.keyboardNavigation.*.enabled contexts\n"
+            "(juke/split/terminal) into generated/augmented when-clauses"
+        ),
+    )
+    parser.add_argument(
         "input",
         nargs="?",
         default=None,
@@ -1357,6 +1410,7 @@ def main(argv: List[str] | None = None) -> int:
         modifiers=modifiers,
         extra_when_clause=args.when,
         rng=rng,
+        automatic_when_contexts=bool(getattr(args, "automatic_when_contexts", False)),
     )
 
     rendered_body = annotate_and_render(emitted, trailing_comments, detect=args.detect)
