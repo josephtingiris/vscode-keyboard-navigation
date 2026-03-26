@@ -1340,12 +1340,6 @@ def main(argv: List[str] | None = None) -> int:
         help="When clause for generated entries",
     )
     parser.add_argument(
-        "-d",
-        "--detect",
-        action="store_true",
-        help="Run duplicate and id detection over final object set",
-    )
-    parser.add_argument(
         "-a",
         "--automatic-when-contexts",
         action="store_true",
@@ -1353,6 +1347,12 @@ def main(argv: List[str] | None = None) -> int:
             "Automatically inject config.keyboardNavigation.*.enabled contexts\n"
             "(juke/split/terminal) into generated/augmented when-clauses"
         ),
+    )
+    parser.add_argument(
+        "-d",
+        "--detect",
+        action="store_true",
+        help="Run duplicate and id detection over final object set",
     )
     parser.add_argument(
         "input",
