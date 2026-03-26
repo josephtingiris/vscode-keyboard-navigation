@@ -66,22 +66,32 @@ def _augment_when_clause(key: str, when_clause: str, extra_context: str | None =
 
     def _add_many(values: List[str]) -> None:
         for value in values:
-            if value not in seen:
-                parts.append(value)
-                seen.add(value)
+            if not value:
+                continue
+            v = value.strip()
+            if not v:
+                continue
+            if v in seen:
+                continue
+            parts.append(v)
+            seen.add(v)
 
     _add_many(_keybindings._split_when_contexts(when_clause))
 
-    if extra_context is None:
-        return " && ".join(parts)
-
+    # always consider corpus selectors (e.g., juke/split/arrows)
     key_norm = _keybindings._normalize_key(key)
-
     for group, context in _corpus._WHEN_CONTEXT_SELECTORS:
-        if key_norm in {str(g) for g in group}:
+        try:
+            group_set = set(group)
+        except Exception:
+            group_set = {g for g in group}
+        if key_norm in group_set:
             _add_many([context])
 
-    _add_many(_keybindings._split_when_contexts(extra_context))
+    # append caller-supplied extra contexts if present
+    if extra_context is not None:
+        _add_many(_keybindings._split_when_contexts(extra_context))
+
     return " && ".join(parts)
 
 
