@@ -87,10 +87,8 @@ Notes:
   },
   {
     // [keynav] (corpus) (0) (self) (gold) (X)
-    // [keynav] (corpus) (0) (self) (gold) (X) (pass)
     "key": "alt+a",
-    "command": "-noop",
-    // "command": "(corpus) alt+a 74ce",
+    "command": "(corpus) alt+a 74ce",
     "when": "config.keyboardNavigation.enabled"
   },
   {
