@@ -727,8 +727,8 @@ def _main(argv: List[str] | None = None) -> int:
                 emitted_whens.append(mode_when)
 
                 _EXTRA_WHENS: List[str] = [
-                    # "config.keyboardNavigation.terminal",
-                    # "!config.keyboardNavigation.terminal",
+                    # "config.keyboardNavigation.terminal.enabled",
+                    # "!config.keyboardNavigation.terminal.enabled",
                 ]
 
                 m = len(_EXTRA_WHENS)
