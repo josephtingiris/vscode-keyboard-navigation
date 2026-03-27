@@ -12,7 +12,6 @@ editorFocus && editorTextFocus && !panelFocus
 editorFocus && editorTextFocus && !panelFocus && (auxiliaryBarVisible || panelVisible || sideBarVisible)
 editorFocus && editorTextFocus && !panelFocus && multipleEditorGroups
 editorFocus && editorTextFocus && editorHasDocumentFormattingProvider && !editorReadonly && !inCompositeEditor
-editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'
 editorFocus && panelFocus
 panelFocus
 panelFocus && !editorFocus

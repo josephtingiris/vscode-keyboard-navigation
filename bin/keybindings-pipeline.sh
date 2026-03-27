@@ -107,6 +107,25 @@ references_test_surface_diagnostics_add() {
     echo
 }
 
+references_test_surface_diagnostics_build() {
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+
+    local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
+
+    local here="${PWD}"
+
+    cd "${VSCODE_KEYBINDINGS_DIR}"}
+
+    make corpora
+    make maps
+    make surfaces
+
+    keybindings-pipeline.sh references_test_surface_diagnostics_remove
+    keybindings-pipeline.sh references_test_surface_diagnostics_add
+
+    cd "${here}"
+}
+
 references_test_surface_diagnostics_expand() {
     local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
 
