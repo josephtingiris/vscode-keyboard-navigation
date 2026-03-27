@@ -1,4 +1,3 @@
-
 !auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && activeEditor != '' && focusedView == '' && activeEditorIsReadonly && editorIsOpen
 !auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && focusedView == '' && !activeEditorIsReadonly && editorIsOpen
 !auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && focusedView == '' && activeEditorIsReadonly && editorIsOpen

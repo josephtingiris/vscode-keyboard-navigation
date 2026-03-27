@@ -1,0 +1,451 @@
+[  {
+    "key": "alt+[",
+    "command": "alt+[ 4d77",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+[",
+    "command": "shift+alt+[ 576f",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+[",
+    "command": "ctrl+alt+[ 7952",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+[",
+    "command": "ctrl+alt+meta+[ 1572",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+[",
+    "command": "ctrl+shift+alt+[ 7502",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+{",
+    "command": "alt+{ dd6f",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+{",
+    "command": "shift+alt+{ 2dab",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+{",
+    "command": "ctrl+alt+{ 739d",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+{",
+    "command": "ctrl+alt+meta+{ 750a",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+{",
+    "command": "ctrl+shift+alt+{ 5020",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+;",
+    "command": "alt+; ed5f",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+;",
+    "command": "shift+alt+; 84be",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+;",
+    "command": "ctrl+alt+; ddd4",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+;",
+    "command": "ctrl+alt+meta+; 07ac",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+;",
+    "command": "ctrl+shift+alt+; 832d",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+,",
+    "command": "alt+, 9356",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+,",
+    "command": "shift+alt+, db9c",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+,",
+    "command": "ctrl+alt+, 056b",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+,",
+    "command": "ctrl+alt+meta+, 3e7a",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+,",
+    "command": "ctrl+shift+alt+, 3bec",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+]",
+    "command": "alt+] d1f3",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+]",
+    "command": "shift+alt+] 96ed",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+]",
+    "command": "ctrl+alt+] 2ed1",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+]",
+    "command": "ctrl+alt+meta+] 7ba1",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+]",
+    "command": "ctrl+shift+alt+] adce",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+}",
+    "command": "alt+} 0eda",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+}",
+    "command": "shift+alt+} b89e",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+}",
+    "command": "ctrl+alt+} 174d",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+}",
+    "command": "ctrl+alt+meta+} 58d9",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+}",
+    "command": "ctrl+shift+alt+} 1548",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+'",
+    "command": "alt+' 6e71",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+'",
+    "command": "shift+alt+' 643a",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+'",
+    "command": "ctrl+alt+' 8389",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+'",
+    "command": "ctrl+alt+meta+' 122c",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+'",
+    "command": "ctrl+shift+alt+' 02ae",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+.",
+    "command": "alt+. cacc",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+.",
+    "command": "shift+alt+. 8b6a",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+.",
+    "command": "ctrl+alt+. 3b01",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+.",
+    "command": "ctrl+alt+meta+. 334b",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+.",
+    "command": "ctrl+shift+alt+. 0f94",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+home",
+    "command": "alt+home 209d",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+home",
+    "command": "shift+alt+home c2ad",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+home",
+    "command": "ctrl+alt+home 36c1",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+home",
+    "command": "ctrl+alt+meta+home ffb0",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+home",
+    "command": "ctrl+shift+alt+home 11d9",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+pageup",
+    "command": "alt+pageup 07e1",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+pageup",
+    "command": "shift+alt+pageup dd0d",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+pageup",
+    "command": "ctrl+alt+pageup fed5",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+pageup",
+    "command": "ctrl+alt+meta+pageup 29f0",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+pageup",
+    "command": "ctrl+shift+alt+pageup f6e2",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+end",
+    "command": "alt+end 3178",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+end",
+    "command": "shift+alt+end 4826",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+end",
+    "command": "ctrl+alt+end 823d",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+end",
+    "command": "ctrl+alt+meta+end 197c",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+end",
+    "command": "ctrl+shift+alt+end 2da5",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+pagedown",
+    "command": "alt+pagedown e2dc",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+pagedown",
+    "command": "shift+alt+pagedown 0db7",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+pagedown",
+    "command": "ctrl+alt+pagedown 26b0",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+pagedown",
+    "command": "ctrl+alt+meta+pagedown dae8",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+pagedown",
+    "command": "ctrl+shift+alt+pagedown d1f1",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+-",
+    "command": "alt+- 585e",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+-",
+    "command": "shift+alt+- 37e5",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+-",
+    "command": "ctrl+alt+- d53b",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+-",
+    "command": "ctrl+alt+meta+- 592d",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+-",
+    "command": "ctrl+shift+alt+- ad73",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+_",
+    "command": "alt+_ 74c1",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+_",
+    "command": "shift+alt+_ a05b",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+_",
+    "command": "ctrl+alt+_ f0cf",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+_",
+    "command": "ctrl+alt+meta+_ 2a79",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+_",
+    "command": "ctrl+shift+alt+_ f07f",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+=",
+    "command": "alt+= bc5f",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+=",
+    "command": "shift+alt+= 4f7c",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+=",
+    "command": "ctrl+alt+= e4ff",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+=",
+    "command": "ctrl+alt+meta+= c4bb",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+=",
+    "command": "ctrl+shift+alt+= c1fd",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt++",
+    "command": "alt++ b5a7",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt++",
+    "command": "shift+alt++ 3a8e",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt++",
+    "command": "ctrl+alt++ 7567",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta++",
+    "command": "ctrl+alt+meta++ ebb1",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt++",
+    "command": "ctrl+shift+alt++ 797a",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+\\",
+    "command": "alt+\\ a140",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+\\",
+    "command": "shift+alt+\\ b44a",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+\\",
+    "command": "ctrl+alt+\\ ce4a",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+\\",
+    "command": "ctrl+alt+meta+\\ 5e4c",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+\\",
+    "command": "ctrl+shift+alt+\\ 29bf",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "alt+|",
+    "command": "alt+| 5057",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "shift+alt+|",
+    "command": "shift+alt+| 61da",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+|",
+    "command": "ctrl+alt+| ff10",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+alt+meta+|",
+    "command": "ctrl+alt+meta+| e89b",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  },
+  {
+    "key": "ctrl+shift+alt+|",
+    "command": "ctrl+shift+alt+| 3409",
+    "when": "config.keyboardNavigation.enabledMap && config.workbench.sideBar.location == 'left' && panelPosition == 'top' && editorFocus && editorTextFocus && neovim.init && neovim.mode != 'cmdline'"
+  }
+]

@@ -82,18 +82,8 @@ maps:
 	@for lkg in none $(LETTER_KEY_GROUPS); do \
 		../bin/keybindings-map.sh --make $$lkg; \
 	done
-
 	# all
-	@echo; \
-	echo '[]' > keybindings.map.all.jsonc; \
-	for mf in keybindings.map.*jsonc; do \
-		MAP_FILE="$$mf"; \
-		ls -lh $${MAP_FILE}; \
-		[[ "$${MAP_FILE}" == *"all.jsonc" ]] && continue; \
-		../bin/keybindings-merge.py $${MAP_FILE} keybindings.map.all.jsonc --out keybindings.map.all.tmp.jsonc 1> /dev/null; \
-		../bin/keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) < keybindings.map.all.tmp.jsonc > keybindings.map.all.jsonc; \
-		[ -f keybindings.map.all.tmp.jsonc ] && rm -f  keybindings.map.all.tmp.jsonc ]; \
-	done
+	@../bin/keybindings-map.sh --make all
 	@echo
 
 map: maps
