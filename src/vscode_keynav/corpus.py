@@ -172,46 +172,33 @@ def _generate_key_id(used_ids: set[str], key: str, when: str) -> str | None:
     """Generate a deterministic (consistent) key ID.
 
     Strategy:
-    - compute SHA256 of "{key}||{when}" and take first 4 hex chars as base
-    - on collision increment base (mod 0x10000) until unused
-    - fallback to a 12-char SHA prefix and ensure uniqueness by appending
-      a numeric suffix if necessary
+    - compute SHA256 of "{key}||{when}" and take first 5 hex chars as base
+    - on collision increment base (mod 0x100000) until unused
+    - if the primary 5-hex sequence collides, scan other 5-hex windows
+      from the digest to find an available id
+    - return None if unable to find a unique 5-hex id
     """
     h = hashlib.sha256(f"{key}||{when}".encode()).hexdigest()
 
-    # try 4-hex id first
-    base = int(h[:4], 16)
-    for delta in range(0x10000):
-        val = (base + delta) & 0xFFFF
-        candidate = f"{val:04x}"
+    # try 5-hex id first (deterministic incremental search)
+    base = int(h[:5], 16)
+    for delta in range(0x100000):
+        val = (base + delta) & 0xFFFFF
+        candidate = f"{val:05x}"
         if candidate not in used_ids and candidate not in _GENERATED_KEY_IDS:
             used_ids.add(candidate)
             _GENERATED_KEY_IDS.add(candidate)
             return candidate
 
-    # fallback: use a 12-char SHA prefix
-    id12 = h[:12]
-    if id12 not in used_ids and id12 not in _GENERATED_KEY_IDS:
-        used_ids.add(id12)
-        _GENERATED_KEY_IDS.add(id12)
-        return id12
-
-    # if collision, append a numeric suffix until unique (bounded loop)
-    for suffix in range(1, 10000):
-        candidate = f"{id12}{suffix}"
+    # if that somehow fails, scan other 5-hex windows from the digest
+    for start in range(1, len(h) - 5 + 1):
+        candidate = h[start : start + 5]
         if candidate not in used_ids and candidate not in _GENERATED_KEY_IDS:
             used_ids.add(candidate)
             _GENERATED_KEY_IDS.add(candidate)
             return candidate
 
-    # last resort: try longer slices of the hash
-    for L in range(13, len(h) + 1):
-        candidate = h[:L]
-        if candidate not in used_ids and candidate not in _GENERATED_KEY_IDS:
-            used_ids.add(candidate)
-            _GENERATED_KEY_IDS.add(candidate)
-            return candidate
-
+    # unable to generate a unique 5-hex id
     return None
 
 

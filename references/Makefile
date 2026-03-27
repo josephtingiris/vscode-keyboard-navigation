@@ -74,41 +74,56 @@ corpora:
 
 corpus: corpora
 
-maps:
+maps: maps-letter-key-groups maps-none maps-all
 	@echo "++ Updating references keybindings map files ..."
 	@echo
 
-	# none & letter-key groups
-	@for lkg in none $(LETTER_KEY_GROUPS); do \
-		../bin/keybindings-map.sh --make $$lkg; \
-	done
-	# all
+maps-all:
+	# maps-all
 	@../bin/keybindings-map.sh --make all
 	@echo
 
-map: maps
+maps-none:
+	# maps-none
+
+maps-letter-key-groups:
+	# maps-none + maps-letter-key groups
+	@for lkg in none $(LETTER_KEY_GROUPS); do \
+		../bin/keybindings-map.sh --make $$lkg; \
+	done
 
 maps-quick:
 	@echo "++ Running quick map generation (none + vi) ..."
 	@echo
-	# generate only a small representative subset to validate changes quickly
+
+	# generate only a small representative maps subset (for quick validation)
 	@../bin/keybindings-map.sh --make none
+
 	# there should not be any diffs
 	@git diff keybindings.map.jsonc
+
 	@echo
 
-surfaces:
+map: maps
+
+surfaces: surfaces-none surfaces-letter-key-groups surfaces-all
 	@echo "++ Updating references keybindings surface files ..."
 	@echo
 
-	# none
-	@../bin/keybindings-merge.py keybindings.corpus.jsonc keybindings.map.jsonc --prefer left --out keybindings.merged.surface.jsonc 1> /dev/null
-	@cat keybindings.merged.surface.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.jsonc
-	@cat keybindings.surface.jsonc | keybindings-duplicate.py --detect --correct-duplicate-ids > keybindings.merged.surface.jsonc
-	@cat keybindings.merged.surface.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.jsonc
-	@rm -f keybindings.merged.surface.jsonc
+surfaces-all:
+	# surfaces-all
+	@../bin/keybindings-merge.py keybindings.corpus.all.jsonc keybindings.map.all.jsonc --prefer left --out keybindings.merged.surface.all.jsonc 1> /dev/null
+	@cat keybindings.merged.surface.all.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.all.jsonc
+	@rm -f keybindings.merged.surface.all.jsonc
 
-	# letter-key groups
+	@cat keybindings.surface.all.jsonc | keybindings-duplicate.py --detect --correct-duplicate-ids > keybindings.deduped.surface.all.jsonc
+	@cat keybindings.deduped.surface.all.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.all.jsonc
+	@rm -f keybindings.merged.surface.all.jsonc
+
+	@echo
+
+surfaces-letter-key-groups:
+	# surfaces-letter-key groups
 	@for lkg in $(LETTER_KEY_GROUPS); do \
 		../bin/keybindings-merge.py keybindings.corpus.$$lkg.jsonc keybindings.map.$$lkg.jsonc --prefer left --out keybindings.merged.surface.$$lkg.jsonc 1> /dev/null; \
 		cat keybindings.merged.surface.$$lkg.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.$$lkg.jsonc; \
@@ -117,13 +132,13 @@ surfaces:
 		rm -f keybindings.merged.surface.$$lkg.jsonc; \
 	done
 
-	# all
-	@../bin/keybindings-merge.py keybindings.corpus.all.jsonc keybindings.map.all.jsonc --prefer left --out keybindings.merged.surface.all.jsonc 1> /dev/null
-	@cat keybindings.merged.surface.all.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.all.jsonc
-	@cat keybindings.surface.all.jsonc | keybindings-duplicate.py --detect --correct-duplicate-ids > keybindings.merged.surface.all.jsonc
-	@cat keybindings.merged.surface.all.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.all.jsonc
-	@rm -f keybindings.merged.surface.all.jsonc
-	@echo
+surfaces-none:
+	# surfaces-none
+	@../bin/keybindings-merge.py keybindings.corpus.jsonc keybindings.map.jsonc --prefer left --out keybindings.merged.surface.jsonc 1> /dev/null
+	@cat keybindings.merged.surface.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.jsonc
+	@cat keybindings.surface.jsonc | keybindings-duplicate.py --detect --correct-duplicate-ids > keybindings.merged.surface.jsonc
+	@cat keybindings.merged.surface.jsonc | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.surface.jsonc
+	@rm -f keybindings.merged.surface.jsonc
 
 surface: surfaces
 

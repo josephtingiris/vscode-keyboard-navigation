@@ -848,7 +848,8 @@ def extract_command_id(command_value: str) -> str | None:
 
     if not command_value:
         return None
-    match = re.search(r"\b([0-9a-fA-F]{4})\b", command_value)
+    # support 4-hex or 5-hex ids (prefer hex-only ids)
+    match = re.search(r"\b([0-9a-fA-F]{4,5})\b", command_value)
     if match:
         return match.group(1).lower()
     return None
@@ -870,8 +871,8 @@ def extract_commented_command_id(text: str | None) -> str | None:
 
     if not text:
         return None
-    # look for patterns like: "command": "(...) 1a2b"
-    matches = re.findall(r"""['"]command['"]\s*:\s*['"]([^'\"]*?([0-9a-fA-F]{4}))['"]""", text)
+    # look for patterns like: "command": "(...) 1a2b" or 5-hex ids
+    matches = re.findall(r"""['"]command['"]\s*:\s*['"]([^'\"]*?([0-9a-fA-F]{4,5}))['"]""", text)
     if matches:
         # matches is a list of tuples; take the last captured 4-hex group
         last = matches[-1]
@@ -916,7 +917,6 @@ def generate_unique_hex_id(used_ids: set[str], rng: random.Random, seed: str | N
                 used_ids.add(candidate)
                 return candidate
 
-    # generation is consolidated into package _generate_key_id; no-op here
     return None
 
 

@@ -80,7 +80,7 @@ keybindings_map() {
     rc=0
 
     if [ "${letter_key_groups}" == "all" ]; then
-        # all
+        # maps-all
 
         here="${PWD}"
 
@@ -100,11 +100,14 @@ keybindings_map() {
                 ${BIN_DIR}/keybindings-merge.py ${map_file} keybindings.map.all.jsonc --out keybindings.map.all.tmp.jsonc 1> /dev/null
                 [ ${rc} -eq 0 ] && rc=$?
 
-                cat keybindings.map.all.tmp.jsonc | ${BIN_DIR}/keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} 1> /dev/null > keybindings.map.all.jsonc
+                cat keybindings.map.all.tmp.jsonc | ${BIN_DIR}/keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} > keybindings.map.all.jsonc
                 [ ${rc} -eq 0 ] && rc=$?
             done
 
-            ${BIN_DIR}/keybindings-duplicate.py --detect --correct-duplicate-ids keybindings.map.all.tmp.jsonc | ${BIN_DIR}/keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} 1> /dev/null > keybindings.map.all.jsonc
+            ${BIN_DIR}/keybindings-duplicate.py --detect --correct-duplicate-ids keybindings.map.all.jsonc | ${BIN_DIR}/keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} > keybindings.map.all.tmp.jsonc
+            [ ${rc} -eq 0 ] && rc=$?
+
+            mv -f keybindings.map.all.tmp.jsonc keybindings.map.all.jsonc
             [ ${rc} -eq 0 ] && rc=$?
         fi
 
