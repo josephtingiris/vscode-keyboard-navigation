@@ -9,7 +9,25 @@
 
 # authoritative defaults; these are exported if sourced
 
-export A_KEYBINDINGS_MAP_FOCI=(auxiliaryBarFocus editorFocus 'editorFocus && editorTextFocus' 'editorFocus && panelFocus' panelFocus 'panelFocus && sideBarFocus' 'panelFocus && terminalFocus' statusBarFocused terminalFocus)
+if [ "${0}" == "${BASH_SOURCE}" ]; then
+    BIN_DIR="$(dirname "$(realpath ${0})")"
+else
+    BIN_DIR="$(dirname "$(realpath ${BASH_SOURCE[0]})")"
+fi
+
+TOP_DIR="${BIN_DIR%/*}"
+REFERENCES_DIR="${TOP_DIR}/references"
+
+KEYBINDINGS_MAP_FOCI_FILE="${REFERENCES_DIR}/keybindings.map.foci"
+
+if [ -w "${KEYBINDINGS_MAP_FOCI_FILE}" ]; then
+    sort -u "${KEYBINDINGS_MAP_FOCI_FILE}" -o "${KEYBINDINGS_MAP_FOCI_FILE}"
+    mapfile -t A_KEYBINDINGS_MAP_FOCI < "${KEYBINDINGS_MAP_FOCI_FILE}"
+else
+    A_KEYBINDINGS_MAP_FOCI=(auxiliaryBarFocus editorFocus 'editorFocus && editorTextFocus' 'editorFocus && panelFocus' panelFocus 'panelFocus && sideBarFocus' 'panelFocus && terminalFocus' statusBarFocused terminalFocus)
+fi
+export A_KEYBINDINGS_MAP_FOCI
+
 if [ "${KEYBINDINGS_MAP_FOCUS}" != "" ]; then
     export A_KEYBINDINGS_MAP_FOCI=("${KEYBINDINGS_MAP_FOCUS//\\/}")
 fi
@@ -84,7 +102,11 @@ keybindings_map() {
                     #echo "make map letter_key_group=${keybindings_map_letter_key_group} pp=$pp, sl=$sl"
 
                     for fc in "${A_KEYBINDINGS_MAP_FOCI[@]}"; do
-                        #echo "make map letter_key_group=${keybindings_map_letter_key_group} pp=$pp, sl=$sl, fc=$fc"
+                        [ "${fc}" == "" ] && continue
+                        [[ "${fc}" == "#"* ]] && continue
+
+                        echo "make map letter_key_group=${keybindings_map_letter_key_group} pp=$pp, sl=$sl, fc=$fc"
+                        #continue
 
                         touch ${map_file}.${keybindings_map_letter_key_group}.jsonc
 
@@ -94,7 +116,26 @@ keybindings_map() {
                             keybindings-duplicate.py -a -F juke,split -m ${KEYBINDINGS_MAP_MODIFIERS} -w "${when_prefix} && config.workbench.sideBar.location == '${sl}' && panelPosition == '${pp}' && ${fc}" > ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc
                         fi
 
-                        keybindings_merge ${map_file}.${keybindings_map_letter_key_group}.jsonc ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc > ${map_file}.${keybindings_map_letter_key_group}.m2.jsonc
+                        if [ -s "${map_file}.${keybindings_map_letter_key_group}.jsonc" ] && [ -s "${map_file}.${keybindings_map_letter_key_group}.m1.jsonc" ]; then
+                            keybindings_merge ${map_file}.${keybindings_map_letter_key_group}.jsonc ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc > ${map_file}.${keybindings_map_letter_key_group}.m2.jsonc
+                        else
+                            if [ ! -s "${map_file}.${keybindings_map_letter_key_group}.jsonc" ] && [ ! -s "${map_file}.${keybindings_map_letter_key_group}.m1.jsonc" ]; then
+                                echo "aborting, both files are zero in ${FUNCNAME} ${@}"
+                                exit 2
+                            fi
+
+                            if [ -s "${map_file}.${keybindings_map_letter_key_group}.jsonc" ]; then
+                                #echo this is not zero
+                                #ls -l "${map_file}.${keybindings_map_letter_key_group}.jsonc"
+                                cat "${map_file}.${keybindings_map_letter_key_group}.jsonc" > ${map_file}.${keybindings_map_letter_key_group}.m2.jsonc
+                            fi
+
+                            if [ -s "${map_file}.${keybindings_map_letter_key_group}.m1.jsonc" ]; then
+                                #echo this is not zero
+                                #ls -l "${map_file}.${keybindings_map_letter_key_group}.m1.jsonc"
+                                cat "${map_file}.${keybindings_map_letter_key_group}.m1.jsonc" > ${map_file}.${keybindings_map_letter_key_group}.m2.jsonc
+                            fi
+                        fi
 
                         mv -f ${map_file}.${keybindings_map_letter_key_group}.m2.jsonc ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc
                         mv -f ${map_file}.${keybindings_map_letter_key_group}.m1.jsonc ${map_file}.${keybindings_map_letter_key_group}.jsonc
@@ -132,7 +173,7 @@ keybindings_map() {
                 keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} < "${mf}.tmp" > "${dmf}"
                 if type -P prettier &> /dev/null; then
                     echo "make dmf = ${dmf} (prettier)"
-                    prettier "${dmf}" >  "${dmf}.tmp"
+                    prettier "${dmf}" > "${dmf}.tmp"
                     mv -f "${dmf}.tmp" "${dmf}"
                 fi
 
@@ -202,12 +243,12 @@ keybindings_merge() {
         if [ ${use_jq} -eq 1 ]; then
             # echo they are pure json, use jq
             # jq -s 'add' file1.json file2.json ...
-            jq -s 'add ' ${@} | keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} | jq -r .
+            #jq -s 'add ' ${@} | keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS} | jq -r .
+            #echo jq -s 'add ' ${@} >&2
+            jq -s 'add ' ${@} | jq -r . | keybindings-sort.py ${KEYBINDINGS_SORT_ARGUMENTS}
             return $?
         fi
     fi
-
-    # use keybindings-merge.py
 
     if [ ${merge_files} -le 1 ]; then
         printf "\nERROR: to merge, at least two input files are required\n\n" && return 3

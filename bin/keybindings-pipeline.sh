@@ -61,17 +61,18 @@ main() {
 }
 
 # add the canonical diagnostic surfaces into the references keybindings.json test surface, preserving the original base objects and their placements
-pipeline_references_test_surface_add() {
+references_test_surface_diagnostics_add() {
     local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+
+    local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
 
     local diagnostic_surface diagnostic_surfaces=()
 
     diagnostic_surfaces+=("${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.surface.jsonc")
     diagnostic_surfaces+=("${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.surface.vi.jsonc")
 
-    local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
-
     echo tmp_file=${tmp_file}
+    echo
 
     for diagnostic_surface in "${diagnostic_surfaces[@]}"; do
         echo "----"
@@ -96,27 +97,86 @@ pipeline_references_test_surface_add() {
 
     if type -P prettier &> /dev/null; then
         echo
-        echo "Making it prettier ..."
+        echo "Making ${test_surface} prettier ..."
         prettier "${test_surface}" > "${tmp_file}"
         cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
+        rm -f "${tmp_file}" &> /dev/null
     fi
 
     rm -f "${tmp_file}" &> /dev/null
     echo
 }
 
-# ingest (merge) an existing keybindings.json array into the references keybindings.json test surface, overwriting existing objects
-pipeline_references_test_surface_ingest() {
+references_test_surface_diagnostics_expand() {
     local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
 
     echo tmp_file=${tmp_file}
 }
 
 # remove all canonical diagnostic command objects from the references keybinding.json test surface, leaving only the valid command objects
-pipeline_references_test_surface_remove() {
+references_test_surface_diagnostics_remove() {
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+
+    local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
+
+    echo tmp_file=${tmp_file}
+    echo
+
+    echo "Removing diagnosticts from ${test_surface} ..."
+    cat "${test_surface}" | keybindings-remove-objects.py command '+' > "${tmp_file}"
+    cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
+    rm -f "${tmp_file}" &> /dev/null
+}
+
+# ingest (merge) an existing keybindings.json array into the references keybindings.json test surface, overwriting existing objects
+references_test_surface_ingest() {
     local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
 
     echo tmp_file=${tmp_file}
+}
+
+references_test_surface_foci_get() {
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+
+    local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
+
+    echo test_surface=${test_surface}, tmp_file=${tmp_file}
+
+    grep \"when\": "${test_surface}" |
+        sed -E \
+            -e 's/.*"when": "([^"]*)".*/\1/' \
+            -e "/config.keyboardNavigation.enabled/s///g" \
+            -e "/config.keyboardNavigation.keys.letters == 'emacs'/s///g" \
+            -e "/config.keyboardNavigation.keys.letters == 'kbm'/s///g" \
+            -e "/config.keyboardNavigation.keys.letters == 'vi'/s///g" \
+            -e "/config.keyboardNavigation.keys.arrows/s///g" \
+            -e "/config.keyboardNavigation.juke.enabled/s///g" \
+            -e "/config.keyboardNavigation.split.enabled/s///g" \
+            -e "/config.keyboardNavigation.terminal.enabled/s///g" \
+            -e "/config.keyboardNavigation.chords.action/s///g" \
+            -e "/config.keyboardNavigation.chords.debug/s///g" \
+            -e "/config.workbench.sideBar.location == 'bottom'/s///g" \
+            -e "/config.workbench.sideBar.location == 'left'/s///g" \
+            -e "/config.workbench.sideBar.location == 'right'/s///g" \
+            -e "/config.workbench.sideBar.location == 'top'/s///g" \
+            -e "/panelPosition == 'bottom'/s///g" \
+            -e "/panelPosition == 'left'/s///g" \
+            -e "/panelPosition == 'right'/s///g" \
+            -e "/panelPosition == 'top'/s///g" \
+            -e '/&&/s//@@/g' \
+            -e '/  */s// /g' \
+            -e '/^  */s///g' \
+            -e 's/[[:blank:]]*$//' |
+        sed \
+            -e '/@@ @@ @@/s//@@/g' \
+            -e '/@@ @@/s//@@/g' \
+            -e '/^@@ /s///g' \
+            -e '/ @@$/s///g' \
+            -e '/^@@$/s///g' \
+            -e '/@@/s//\&\&/g' \
+            -e 's/[[:blank:]]*$//' |
+        sort -u | grep '!'
+
 }
 
 usage() {
