@@ -32,7 +32,7 @@ LETTER_KEY_GROUPS ?= emacs kbm vi
 # map defaults; can be overridden via environment variables.
 # NOTE: env overrides may be shell-escaped word lists (for example values
 # exported from Bash arrays in etc/bash.d/keybindings-map.sh).
-KEYBINDINGS_MAP_FOCI ?= auxiliaryBarFocus editorFocus 'editorFocus && editorTextFocus' 'editorFocus && panelFocus' panelFocus 'panelFocus && sideBarFocus' 'panelFocus && terminalFocus' statusBarFocused terminalFocus
+KEYBINDINGS_MAP_FOCI ?= auxiliaryBarFocus editorFocus 'editorFocus && editorTextFocus' 'editorFocus && panelFocus' panelFocus 'panelFocus && sideBarFocus' 'panelFocus && terminalFocus' sideBarFocus  statusBarFocused terminalFocus
 KEYBINDINGS_MAP_MODIFIERS ?= alt,shift+alt,ctrl+alt,ctrl+alt+meta,ctrl+shift+alt
 KEYBINDINGS_MAP_PANEL_POSITIONS ?= top bottom left right
 KEYBINDINGS_MAP_SIDEBAR_LOCATIONS ?= left right
