@@ -61,12 +61,12 @@ class KeybindingsDuplicateCliTests(unittest.TestCase):
             [
               {
                 "key": "alt+h",
-                "command": "workbench.action.left a1b2",
+                "command": "workbench.action.left 0a1b2",
                 "when": "editorFocus && config.keyboardNavigation.enabled"
               },
               {
                 "key": "alt+h",
-                "command": "workbench.action.left a1b2",
+                "command": "workbench.action.left 0a1b2",
                 "when": "config.keyboardNavigation.enabled && editorFocus"
               }
             ]

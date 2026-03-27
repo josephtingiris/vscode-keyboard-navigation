@@ -42146,7 +42146,7 @@ Notes:
   {
     // [keynav] (map) (right) (vi) (juke) (warp) (3) (black) (C) (primary)
     "key": "ctrl+alt+meta+}",
-    "command": "ctrl+alt+meta+} ds21",
+    "command": "ctrl+alt+meta+} 0ds21",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && sideBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom'"
     // MISSING id: "command": "ctrl+alt+meta+} 0b936",
   },
