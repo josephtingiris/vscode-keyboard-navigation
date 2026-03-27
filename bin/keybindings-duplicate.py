@@ -47,16 +47,13 @@ Exit codes
 """
 
 from __future__ import annotations
-from typing import Any, List
+from typing import List
 
 import argparse
 import json
-import random
 import re
-import hashlib
 import sys
 from dataclasses import dataclass
-from pathlib import Path
 from vscode_keynav import io as _io
 from vscode_keynav import keybindings as _keybindings
 from vscode_keynav import corpus as _corpus
@@ -66,7 +63,6 @@ import signal
 ABORTING_EXIT_CODE = 1
 ERROR_EXIT_CODE = 2
 USAGE_EXIT_CODE = 99
-ID_RETRY_LIMIT = 100
 
 # update CORPUS_* from keybindings-corpus.py
 
@@ -106,13 +102,7 @@ DEFAULT_MODIFIERS = "alt,shift+alt,ctrl+alt"
 
 DEFAULT_WHEN_CLAUSE = "config.keyboardNavigation.enabled"
 
-# prefer json5 libraries
-_json5 = None
-try:
-    import json5 as _json5  # type: ignore
-    JSON_FLAVOR = "JSON5"
-except Exception:
-    JSON_FLAVOR = "JSONC"
+JSON_FLAVOR = "JSONC"
 
 
 @dataclass
@@ -136,531 +126,6 @@ class EmittedObject:
     leading_comments: str
     parse_error: str | None
     forced_comment: str | None = None
-
-
-class WhenNode:
-    """Base node type for when-expression AST."""
-
-    def __init__(self, parens: bool = False):
-        self.parens = parens
-
-    def to_str(self) -> str:
-        raise NotImplementedError
-
-
-class WhenLeaf(WhenNode):
-    """Leaf operand node."""
-
-    def __init__(self, text: str, parens: bool = False):
-        super().__init__(parens=parens)
-        self.text = text
-
-    def to_str(self) -> str:
-        return self.text
-
-
-class WhenNot(WhenNode):
-    """Unary negation node."""
-
-    def __init__(self, child: WhenNode, parens: bool = False):
-        super().__init__(parens=parens)
-        self.child = child
-
-    def to_str(self) -> str:
-        child_str = self.child.to_str()
-        if isinstance(self.child, (WhenAnd, WhenOr)) and not self.child.parens:
-            child_str = f"({child_str})"
-        return f"!{child_str}"
-
-
-class WhenAnd(WhenNode):
-    """AND-expression node."""
-
-    def __init__(self, children: list[WhenNode], parens: bool = False):
-        super().__init__(parens=parens)
-        self.children = children
-
-    def to_str(self) -> str:
-        return " && ".join([render_when_node(child) for child in self.children])
-
-
-class WhenOr(WhenNode):
-    """OR-expression node."""
-
-    def __init__(self, children: list[WhenNode], parens: bool = False):
-        super().__init__(parens=parens)
-        self.children = children
-
-    def to_str(self) -> str:
-        return " || ".join([render_when_node(child) for child in self.children])
-
-
-def render_when_node(node: WhenNode) -> str:
-    """Render an AST node back to string form."""
-
-    inner = node.to_str()
-    if node.parens:
-        return f"({inner})"
-    return inner
-
-
-def normalize_operand(text: str) -> str:
-    """Normalize whitespace within one when operand."""
-
-    return re.sub(r"\s+", " ", text).strip()
-
-
-def tokenize_when(expr: str) -> list[tuple[str, str]]:
-    """Tokenize a VS Code when expression while preserving strings/regex."""
-
-    tokens: list[tuple[str, str]] = []
-    buf = ""
-    i = 0
-    n = len(expr)
-    in_single = False
-    in_double = False
-    in_regex = False
-    regex_escape = False
-    prev_nonspace = ""
-
-    def flush_buf() -> None:
-        nonlocal buf
-        if buf.strip():
-            tokens.append(("OPERAND", normalize_operand(buf)))
-        buf = ""
-
-    while i < n:
-        ch = expr[i]
-
-        if in_single:
-            buf += ch
-            if ch == "\\":
-                if i + 1 < n:
-                    buf += expr[i + 1]
-                    i += 1
-            elif ch == "'":
-                in_single = False
-            i += 1
-            continue
-
-        if in_double:
-            buf += ch
-            if ch == "\\":
-                if i + 1 < n:
-                    buf += expr[i + 1]
-                    i += 1
-            elif ch == '"':
-                in_double = False
-            i += 1
-            continue
-
-        if in_regex:
-            buf += ch
-            if regex_escape:
-                regex_escape = False
-            elif ch == "\\":
-                regex_escape = True
-            elif ch == "/":
-                in_regex = False
-            i += 1
-            continue
-
-        if ch.isspace():
-            buf += ch
-            i += 1
-            continue
-
-        if ch == "'":
-            in_single = True
-            buf += ch
-            i += 1
-            continue
-
-        if ch == '"':
-            in_double = True
-            buf += ch
-            i += 1
-            continue
-
-        if ch == "/" and prev_nonspace == "~":
-            in_regex = True
-            buf += ch
-            i += 1
-            continue
-
-        if expr.startswith("&&", i) or expr.startswith("||", i):
-            flush_buf()
-            tokens.append(("OP", expr[i:i + 2]))
-            i += 2
-            prev_nonspace = ""
-            continue
-
-        if ch in "()":
-            flush_buf()
-            tokens.append(("OP", ch))
-            i += 1
-            prev_nonspace = ch
-            continue
-
-        if ch == "!":
-            nxt = expr[i + 1] if i + 1 < n else ""
-            if nxt == "=":
-                buf += ch
-                i += 1
-                prev_nonspace = ch
-                continue
-            if not buf.strip():
-                flush_buf()
-                tokens.append(("OP", "!"))
-                i += 1
-                prev_nonspace = "!"
-                continue
-
-        buf += ch
-        if not ch.isspace():
-            prev_nonspace = ch
-        i += 1
-
-    flush_buf()
-    return tokens
-
-
-def parse_when(expr: str) -> WhenNode:
-    """Parse a when expression into a small AST."""
-
-    tokens = tokenize_when(expr)
-    idx = 0
-
-    def peek() -> tuple[str, str] | None:
-        return tokens[idx] if idx < len(tokens) else None
-
-    def consume() -> tuple[str, str] | None:
-        nonlocal idx
-        token = tokens[idx] if idx < len(tokens) else None
-        idx += 1
-        return token
-
-    def parse_primary() -> WhenNode:
-        token = peek()
-        if not token:
-            return WhenLeaf("")
-        if token[0] == "OP" and token[1] == "(":
-            consume()
-            node = parse_or()
-            next_token = peek()
-            if next_token and next_token[0] == "OP" and next_token[1] == ")":
-                consume()
-                node.parens = True
-            return node
-        if token[0] == "OPERAND":
-            consume()
-            return WhenLeaf(token[1])
-        return WhenLeaf("")
-
-    def parse_unary() -> WhenNode:
-        token = peek()
-        if token and token[0] == "OP" and token[1] == "!":
-            consume()
-            return WhenNot(parse_unary())
-        return parse_primary()
-
-    def parse_and() -> WhenNode:
-        node = parse_unary()
-        children = [node]
-        while True:
-            token = peek()
-            if token and token[0] == "OP" and token[1] == "&&":
-                consume()
-                children.append(parse_unary())
-            else:
-                break
-        if len(children) == 1:
-            return children[0]
-        return WhenAnd(children)
-
-    def parse_or() -> WhenNode:
-        node = parse_and()
-        children = [node]
-        while True:
-            token = peek()
-            if token and token[0] == "OP" and token[1] == "||":
-                consume()
-                children.append(parse_and())
-            else:
-                break
-        if len(children) == 1:
-            return children[0]
-        return WhenOr(children)
-
-    return parse_or()
-
-
-# Use `canonicalize_when` from package
-
-
-def natural_key(text: str) -> list[object]:
-    """Natural sort helper."""
-
-    parts = re.split(r"(\d+)", text)
-    result: list[object] = []
-    for part in parts:
-        if part.isdigit():
-            result.append(int(part))
-        else:
-            result.append(part.lower())
-    return result
-
-
-def strip_json_comments(text: str) -> str:
-    """Remove JSONC comments while preserving strings."""
-
-    def replacer(match: re.Match[str]) -> str:
-        value = match.group(0)
-        if value.startswith("/"):
-            return ""
-        return value
-
-    pattern = r'("(?:\\.|[^"\\])*"|//.*?$|/\*.*?\*/)'  # string or comment
-    return re.sub(pattern, replacer, text, flags=re.DOTALL | re.MULTILINE)
-
-
-def strip_trailing_commas(text: str) -> str:
-    """Remove trailing commas before object/array endings."""
-
-    return re.sub(r",\s*([}\]])", r"\1", text)
-
-
-def extract_preamble_postamble(text: str) -> tuple[str, str, str]:
-    """Extract preamble, array-body, and postamble around top-level array."""
-
-    i = 0
-    n = len(text)
-    in_string = False
-    string_char = ""
-    esc = False
-    in_line_comment = False
-    in_block_comment = False
-    start = -1
-
-    while i < n:
-        ch = text[i]
-        next2 = text[i:i + 2] if i + 2 <= n else ""
-
-        if in_line_comment:
-            if ch == "\n":
-                in_line_comment = False
-            i += 1
-            continue
-        if in_block_comment:
-            if next2 == "*/":
-                in_block_comment = False
-                i += 2
-            else:
-                i += 1
-            continue
-        if in_string:
-            if esc:
-                esc = False
-            elif ch == "\\":
-                esc = True
-            elif ch == string_char:
-                in_string = False
-            i += 1
-            continue
-
-        if next2 == "//":
-            in_line_comment = True
-            i += 2
-            continue
-        if next2 == "/*":
-            in_block_comment = True
-            i += 2
-            continue
-        if ch in ('"', "'"):
-            in_string = True
-            string_char = ch
-            i += 1
-            continue
-        if ch == "[":
-            start = i
-            break
-        i += 1
-
-    if start == -1:
-        return "", text, ""
-
-    depth = 1
-    i = start + 1
-    in_string = False
-    string_char = ""
-    esc = False
-    in_line_comment = False
-    in_block_comment = False
-    end = -1
-
-    while i < n:
-        ch = text[i]
-        next2 = text[i:i + 2] if i + 2 <= n else ""
-
-        if in_line_comment:
-            if ch == "\n":
-                in_line_comment = False
-            i += 1
-            continue
-        if in_block_comment:
-            if next2 == "*/":
-                in_block_comment = False
-                i += 2
-            else:
-                i += 1
-            continue
-        if in_string:
-            if esc:
-                esc = False
-            elif ch == "\\":
-                esc = True
-            elif ch == string_char:
-                in_string = False
-            i += 1
-            continue
-
-        if next2 == "//":
-            in_line_comment = True
-            i += 2
-            continue
-        if next2 == "/*":
-            in_block_comment = True
-            i += 2
-            continue
-        if ch in ('"', "'"):
-            in_string = True
-            string_char = ch
-            i += 1
-            continue
-        if ch == "[":
-            depth += 1
-        elif ch == "]":
-            depth -= 1
-            if depth == 0:
-                end = i
-                break
-        i += 1
-
-    if end == -1:
-        return "", text, ""
-
-    preamble = text[:start]
-    array_text = text[start + 1:end]
-    postamble = text[end + 1:]
-    return preamble, array_text, postamble
-
-
-def group_objects_with_comments(array_text: str) -> tuple[list[tuple[str, str]], str]:
-    """Split array body into (leading_comments, object_text) groups."""
-    groups: list[tuple[str, str]] = []
-    i = 0
-    n = len(array_text)
-    leading_start = 0
-
-    def skip_whitespace_and_collect_leading(start: int) -> int:
-        # returns index of first non-leading char (start of object) and
-        # leaves leading comments as array_text[leading_start:that_index]
-        idx = start
-        while idx < n:
-            ch = array_text[idx]
-            # start of object
-            if ch == "{":
-                return idx
-            idx += 1
-        return idx
-
-    while i < n:
-        # find next object start
-        start = None
-        # collect leading comments up to next '{'
-        j = i
-        while j < n:
-            ch = array_text[j]
-            if ch == '{':
-                start = j
-                break
-            j += 1
-
-        if start is None:
-            # no more objects
-            break
-
-        leading = array_text[i:start]
-
-        # now find matching closing '}' handling strings and comments
-        idx = start
-        depth = 0
-        in_string = False
-        string_char = ''
-        esc = False
-        in_line_comment = False
-        in_block_comment = False
-
-        while idx < n:
-            ch = array_text[idx]
-            next2 = array_text[idx: idx + 2] if idx + 2 <= n else ''
-
-            if in_line_comment:
-                if ch == '\n':
-                    in_line_comment = False
-                idx += 1
-                continue
-            if in_block_comment:
-                if next2 == '*/':
-                    in_block_comment = False
-                    idx += 2
-                    continue
-                idx += 1
-                continue
-            if in_string:
-                if esc:
-                    esc = False
-                elif ch == '\\':
-                    esc = True
-                elif ch == string_char:
-                    in_string = False
-                idx += 1
-                continue
-
-            if next2 == '//':
-                in_line_comment = True
-                idx += 2
-                continue
-            if next2 == '/*':
-                in_block_comment = True
-                idx += 2
-                continue
-            if ch in ('"', "'"):
-                in_string = True
-                string_char = ch
-                idx += 1
-                continue
-
-            if ch == '{':
-                depth += 1
-            elif ch == '}':
-                depth -= 1
-                if depth == 0:
-                    # include up to and including this closing brace
-                    end = idx
-                    obj_text = array_text[start: end + 1]
-                    groups.append((leading, obj_text))
-                    i = end + 1
-                    break
-            idx += 1
-        else:
-            # unterminated object; treat rest as trailing comments
-            i = n
-            break
-
-    # any trailing text after last object
-    trailing = array_text[i:]
-    return groups, trailing
 
 
 def parse_comma_list(value: str) -> list[str]:
@@ -709,76 +174,13 @@ def build_mapping_pairs(from_keys: list[str], to_keys: list[str]) -> list[tuple[
     return pairs
 
 
-def parse_jsonc_object(obj_text: str) -> Any:
-    """Parse one object using JSON5 when available, else JSONC fallback."""
-    try:
-        if _json5 is not None:
-            return _json5.loads(obj_text)
-    except Exception:
-        pass
-
-    clean = strip_json_comments(obj_text)
-    clean = strip_trailing_commas(clean)
-    try:
-        return json.loads(clean)
-    except json.JSONDecodeError:
-        # attempt to recover
-        text = clean
-        start = text.find("{")
-        if start == -1:
-            raise
-
-        i = start
-        n = len(text)
-        depth = 0
-        in_string = False
-        esc = False
-        string_char = ""
-        while i < n:
-            ch = text[i]
-            if in_string:
-                if esc:
-                    esc = False
-                elif ch == "\\":
-                    esc = True
-                elif ch == string_char:
-                    in_string = False
-            else:
-                if ch == '"' or ch == "'":
-                    in_string = True
-                    string_char = ch
-                elif ch == "{":
-                    depth += 1
-                elif ch == "}":
-                    depth -= 1
-                    if depth == 0:
-                        obj_sub = text[start: i + 1]
-                        try:
-                            return json.loads(obj_sub)
-                        except Exception:
-                            break
-            i += 1
-
-        # couldn't recover, re-raise the original error
-        return json.loads(clean)
-
-
 def remove_trailing_object_comma(obj_text: str) -> str:
     """Remove a final comma after the object body if present."""
 
     return re.sub(r",\s*$", "", obj_text, count=1)
 
 
-def normalize_modifier(modifier: str) -> str:
-    """Normalize one modifier token."""
-
-    return modifier.strip().lower()
-
-
-# Use `normalize_key_for_compare` from package
-
-
-# Use `key_tail_literal` from package
+# Use normalize/canonicalize parsers from keynav package where available.
 
 
 def combine_modifier_and_key(modifier: str, key_literal: str) -> str:
@@ -897,29 +299,6 @@ def extract_any_id(parsed_obj: dict | None, leading_comments: str, object_text: 
     return extract_comment_id(leading_comments)
 
 
-def generate_unique_hex_id(used_ids: set[str], rng: random.Random, seed: str | None = None) -> str | None:
-    """Generate a unique hex id.
-
-    If `seed` is provided, generate candidates by hashing the seed (e.g. key+when)
-    and taking slices of the hex digest. Fall back to random generation if attempts collide.
-    """
-
-    if seed:
-        hexdigest = hashlib.sha256(seed.encode("utf-8")).hexdigest()
-
-        # try 5-character slices first, then 4-character slices as a fallback
-        for retry in range(ID_RETRY_LIMIT):
-            length = 5 if retry < (ID_RETRY_LIMIT // 2) else 4
-            max_start = len(hexdigest) - length + 1
-            start = (retry * length) % max_start
-            candidate = hexdigest[start: start + length].lower()
-            if candidate not in used_ids:
-                used_ids.add(candidate)
-                return candidate
-
-    return None
-
-
 def make_generated_object_text(key_value: str, when_value: str, command_value: str) -> str:
     """Render a generated keybinding object as JSONC text."""
 
@@ -933,16 +312,43 @@ def make_generated_object_text(key_value: str, when_value: str, command_value: s
     return "\n".join(lines) + "\n"
 
 
+def parse_record_object(obj_text: str) -> dict:
+    """Parse one keybinding object, preferring keynav parser and tolerating JSON5 syntax."""
+
+    parsed = _keybindings._parse_object(obj_text)
+    if isinstance(parsed, dict):
+        return parsed
+
+    cleaned = _keybindings._strip_trailing_commas(_keybindings._strip_json_comments(obj_text)).strip()
+    try:
+        reparsed = json.loads(cleaned)
+        if isinstance(reparsed, dict):
+            return reparsed
+    except Exception:
+        pass
+
+    try:
+        import json5  # type: ignore
+
+        reparsed = json5.loads(obj_text)
+        if isinstance(reparsed, dict):
+            return reparsed
+    except Exception:
+        pass
+
+    raise ValueError("unable to parse keybinding object")
+
+
 def load_records(array_text: str) -> tuple[list[ObjectRecord], str]:
     """Load grouped records from array text."""
 
-    groups, trailing_comments = group_objects_with_comments(array_text)
+    groups, trailing_comments = _keybindings._group_objects_with_comments(array_text)
     records: list[ObjectRecord] = []
 
     for leading_comments, object_text in groups:
         normalized_object_text = remove_trailing_object_comma(object_text)
         try:
-            parsed_obj = parse_jsonc_object(normalized_object_text)
+            parsed_obj = parse_record_object(normalized_object_text)
             records.append(
                 ObjectRecord(
                     leading_comments=leading_comments,
@@ -969,7 +375,6 @@ def build_emitted_objects(
     mapping_pairs: list[tuple[str, str]],
     modifiers: list[str],
     extra_when_clause: str,
-    rng: random.Random,
     automatic_when_contexts: bool = False,
 ) -> list[EmittedObject]:
     """Build output objects list including generated mappings."""
@@ -1035,11 +440,11 @@ def build_emitted_objects(
                         text=make_generated_object_text(
                             generated_key,
                             generated_when,
-                            f"{generated_key} xxxx",
+                            f"{generated_key} xxxxx",
                         ),
                         parsed_obj={
                             "key": generated_key,
-                            "command": f"{generated_key} xxxx",
+                            "command": f"{generated_key} xxxxx",
                             "when": generated_when,
                         },
                         leading_comments="",
@@ -1111,11 +516,11 @@ def build_emitted_objects(
                         text=make_generated_object_text(
                             generated_key,
                             generated_when,
-                            f"{generated_key} xxxx",
+                            f"{generated_key} xxxxx",
                         ),
                         parsed_obj={
                             "key": generated_key,
-                            "command": f"{generated_key} xxxx",
+                            "command": f"{generated_key} xxxxx",
                             "when": generated_when,
                         },
                         leading_comments="",
@@ -1160,7 +565,6 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, de
         if fid:
             used_ids.add(fid)
 
-    rng = random.Random()
     chunks: list[str] = []
 
     for item in emitted:
@@ -1419,16 +823,14 @@ def main(argv: List[str] | None = None) -> int:
         records = []
         trailing_comments = ""
     else:
-        preamble, array_text, postamble = extract_preamble_postamble(raw_text)
+        preamble, array_text, postamble = _keybindings._extract_preamble_postamble(raw_text)
         records, trailing_comments = load_records(array_text)
 
-    rng = random.Random()
     emitted = build_emitted_objects(
         records=records,
         mapping_pairs=mapping_pairs,
         modifiers=modifiers,
         extra_when_clause=args.when,
-        rng=rng,
         automatic_when_contexts=bool(getattr(args, "automatic_when_contexts", False)),
     )
 
