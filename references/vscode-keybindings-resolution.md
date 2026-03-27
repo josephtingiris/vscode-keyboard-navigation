@@ -12,7 +12,7 @@ When a key is pressed, VS Code evaluates keybinding rules using the following lo
 1. Rules are evaluated **from bottom to top** in the final resolved keybinding list.
 2. The first rule whose:
    - `key` matches, and
-   - `when` clause evaluates to `true`  
+   - `when` clause evaluates to `true`
      is selected.
 3. Once a matching rule is found, **no further rules are processed**.
 4. If the rule has a `command`, that command is executed.
@@ -53,14 +53,14 @@ There is no sub‑sorting of `when` clauses.
 
 # **4. The Keybinding Resolution Stack**
 
-VS Code constructs a single ordered list of all keybindings from multiple sources.  
+VS Code constructs a single ordered list of all keybindings from multiple sources.
 The order (top → bottom) is:
 
 1. **Built‑in defaults**
 2. **Built‑in extensions**
-3. **Marketplace extensions**  
+3. **Marketplace extensions**
    Loaded in deterministic extension‑load order
-4. **User `keybindings.json`**  
+4. **User `keybindings.json`**
    Always last
 
 Evaluation runs **bottom → top**, so the user’s keybindings always override everything else.
@@ -119,17 +119,17 @@ because it appears lower in the resolved keybinding list.
 ```json
 {
   "key": "ctrl+k",
-  "command": "doA",
+  "command": "godoA",
   "when": "editorTextFocus"
 },
 {
   "key": "ctrl+k",
-  "command": "doB",
+  "command": "godoB",
   "when": "editorTextFocus && !editorReadonly"
 },
 {
   "key": "ctrl+k",
-  "command": "doC",
+  "command": "godoC",
   "when": "editorTextFocus"
 }
 ```
