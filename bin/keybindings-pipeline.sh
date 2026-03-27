@@ -17,7 +17,7 @@ aborting() {
 }
 
 main() {
-    export VSCODE_KEYBINDINGS_BIN_DIR="${0%/*}"
+    export VSCODE_KEYBINDINGS_BIN_DIR="$(realpath "${0%/*}")"
 
     if [ -d "${VSCODE_KEYBINDINGS_BIN_DIR}"/../references ]; then
         export VSCODE_KEYBINDINGS_DIR="${VSCODE_KEYBINDINGS_BIN_DIR%/*}"
