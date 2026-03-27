@@ -110,7 +110,8 @@ class KeybindingsSortDuplicateRegressionTests(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, msg=proc.stderr.decode("utf-8"))
         out = proc.stdout.decode("utf-8")
         self.assertEqual(out.count('"key": "alt+h"'), 2)
-        self.assertIn('"command": "workbench.action.left a1b2"', out)
+        # allow either 4- or 5-hex ids in command suffix
+        self.assertRegex(out, r'"command":\s*"workbench\.action\.left\s+[0-9a-f]{4,5}"')
         self.assertIn('"command": "workbench.action.left"', out)
         self.assertIn("// DUPLICATE key: 'alt+h' when: 'config.keyboardNavigation.enabled && editorFocus'", out)
 

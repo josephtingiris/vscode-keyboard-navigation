@@ -61,15 +61,15 @@ corpora:
 	@echo
 
 	# none
-	@keybindings-corpus.py | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.jsonc
+	@keybindings-corpus.py -a | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.jsonc
 
 	# letter-key groups
 	@for lkg in $(LETTER_KEY_GROUPS); do \
-		../bin/keybindings-corpus.py -n $$lkg | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.$$lkg.jsonc; \
+		../bin/keybindings-corpus.py -a -n $$lkg | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.$$lkg.jsonc; \
 	done
 
 	# all
-	@keybindings-corpus.py -n all | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.all.jsonc
+	@keybindings-corpus.py -a -n all | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.all.jsonc
 	@echo
 
 corpus: corpora
@@ -81,7 +81,6 @@ maps: maps-letter-key-groups maps-none maps-all
 maps-all:
 	# maps-all
 	@../bin/keybindings-map.sh --make all
-	@echo
 
 maps-none:
 	# maps-none

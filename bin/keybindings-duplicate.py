@@ -844,11 +844,11 @@ def insert_comments_inside_object(obj_text: str, comments: list[str]) -> str:
 
 
 def extract_command_id(command_value: str) -> str | None:
-    """Extract preferred 4-hex id from command string."""
+    """Extract preferred 5 character hex id from command string (accepts 4 or 5 character ids)."""
 
     if not command_value:
         return None
-    # support 4-hex or 5-hex ids (prefer hex-only ids)
+
     match = re.search(r"\b([0-9a-fA-F]{4,5})\b", command_value)
     if match:
         return match.group(1).lower()
@@ -856,7 +856,7 @@ def extract_command_id(command_value: str) -> str | None:
 
 
 def extract_comment_id(comment_text: str) -> str | None:
-    """Extract fallback 4-5 char id from leading comments."""
+    """Extract fallback 4 or 5 character id from leading comments."""
 
     if not comment_text:
         return None
@@ -867,14 +867,13 @@ def extract_comment_id(comment_text: str) -> str | None:
 
 
 def extract_commented_command_id(text: str | None) -> str | None:
-    """Extract a 4-hex id from a commented or uncommented command inside text."""
+    """Extract a 4 or 5 character hex id from a commented or uncommented command inside text."""
 
     if not text:
         return None
-    # look for patterns like: "command": "(...) 1a2b" or 5-hex ids
     matches = re.findall(r"""['"]command['"]\s*:\s*['"]([^'\"]*?([0-9a-fA-F]{4,5}))['"]""", text)
     if matches:
-        # matches is a list of tuples; take the last captured 4-hex group
+        # matches is a list of tuples; take the last captured hex-group (4 or 5 chars)
         last = matches[-1]
         # last is (full_match_without_quotes, group_hex)
         return last[1].lower()
@@ -907,9 +906,10 @@ def generate_unique_hex_id(used_ids: set[str], rng: random.Random, seed: str | N
 
     if seed:
         hexdigest = hashlib.sha256(seed.encode("utf-8")).hexdigest()
-        # try 4-char slices first, then 5-char slices.
+
+        # try 5-character slices first, then 4-character slices as a fallback
         for retry in range(ID_RETRY_LIMIT):
-            length = 4 if retry < (ID_RETRY_LIMIT // 2) else 5
+            length = 5 if retry < (ID_RETRY_LIMIT // 2) else 4
             max_start = len(hexdigest) - length + 1
             start = (retry * length) % max_start
             candidate = hexdigest[start: start + length].lower()
@@ -1148,11 +1148,8 @@ def annotate_and_render(emitted: list[EmittedObject], trailing_comments: str, de
 
     seen_pairs: set[tuple[str, str]] = set()
     seen_ids: dict[str, tuple[str, str]] = {}
-    # collect ids already present in the emitted set (including generated ones)
-    # NOTE: avoid scanning arbitrary leading comments for 4/5-char tokens because
-    # that can pick up unrelated identifiers from prose. Only extract ids from
-    # the `command` field (preferred) or a commented `"command"` inside the
-    # object's own text.
+
+    # extract ids from the `command` field (preferred) or a commented `"command"` inside the object
     used_ids: set[str] = set()
     for itm in emitted:
         fid = None

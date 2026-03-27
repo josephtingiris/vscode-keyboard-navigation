@@ -39,7 +39,7 @@ Conventions:
     - if it is BELOW the active command:, then it is an old command that has been replaced but left for reference (lower is older)
   * 'command not found' pseudo command: placeholders:
     - are left in to help with debugging, sorting, and future key binding placements
-    - should contain the key and a 4-character UNIQUE identifier, i.e. 'alt+l jj4e' or 'alt+l 8df3'
+    - should contain the key and a 5-character UNIQUE identifier, i.e. 'alt+l 0jj4e' or 'alt+l 08df3'
 
 Comments:
 

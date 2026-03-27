@@ -77,9 +77,10 @@ class KeybindingsDuplicateCliTests(unittest.TestCase):
         self.assertEqual(proc.returncode, 0)
         out = proc.stdout.decode("utf-8")
         self.assertIn("// DUPLICATE object detected for alt+h/", out)
-        self.assertIn("// DUPLICATE id a1b2 detected for alt+h/", out)
+        # allow either 4- or 5-hex ids in the duplicate id diagnostic
+        self.assertRegex(out, r"// DUPLICATE id [0-9a-f]{4,5} detected for alt\+h/")
         self.assertRegex(out, r'"key":\s*"alt\+left"')
-        self.assertRegex(out, r'"command":\s*"alt\+left\s+[0-9a-f]{4}"')
+        self.assertRegex(out, r'"command":\s*"alt\+left\s+[0-9a-f]{4,5}"')
 
     def test_reference_inputs_smoke(self) -> None:
         files = [

@@ -78,15 +78,15 @@ def _augment_when_clause(key: str, when_clause: str, extra_context: str | None =
 
     _add_many(_keybindings._split_when_contexts(when_clause))
 
-    # always consider corpus selectors (e.g., juke/split/arrows)
-    key_norm = _keybindings._normalize_key(key)
-    for group, context in _corpus._WHEN_CONTEXT_SELECTORS:
-        try:
-            group_set = set(group)
-        except Exception:
-            group_set = {g for g in group}
-        if key_norm in group_set:
-            _add_many([context])
+    if extra_context is not None:
+        key_norm = _keybindings._normalize_key(key)
+        for group, context in _corpus._WHEN_CONTEXT_SELECTORS:
+            try:
+                group_set = set(group)
+            except Exception:
+                group_set = {g for g in group}
+            if key_norm in group_set:
+                _add_many([context])
 
     # append caller-supplied extra contexts if present
     if extra_context is not None:

@@ -46,9 +46,15 @@ _WHITESPACE_RE = re.compile(r"\s+", 0)
 
 
 def _hex4(rng: Random) -> str:
-    "Return a deterministic 4 characer hex id."
+    "Return a deterministic 4 character hex id."
 
     return f"{rng.randint(0, 0xFFFF):04x}"
+
+
+def _hex5(rng: Random) -> str:
+    "Return a deterministic 5 character hex id."
+
+    return f"{rng.randint(0, 0xFFFFF):05x}"
 
 
 def _normalize_whitespace(text: str) -> str:
