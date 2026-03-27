@@ -59,6 +59,7 @@ Exit codes
 """
 
 import argparse
+import signal
 import json
 import sys
 import re
@@ -282,6 +283,16 @@ def _assemble_final_output(
 
 def main(argv: List[str] | None = None) -> int:
     """Parse arguments, read stdin, sort keybinding objects, and write sorted JSONC to stdout."""
+
+    def _signal_handler(signum, frame):
+        raise KeyboardInterrupt
+
+    signal.signal(signal.SIGINT, _signal_handler)
+    try:
+        signal.signal(signal.SIGTERM, _signal_handler)
+    except Exception:
+        # ignore platforms that don't permit SIGTERM handling changes
+        pass
 
     argv = sys.argv[1:] if argv is None else argv
 
@@ -671,4 +682,7 @@ def main(argv: List[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except KeyboardInterrupt:
+        raise SystemExit(1)

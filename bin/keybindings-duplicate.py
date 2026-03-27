@@ -60,6 +60,7 @@ from pathlib import Path
 from vscode_keynav import io as _io
 from vscode_keynav import keybindings as _keybindings
 from vscode_keynav import corpus as _corpus
+import signal
 
 
 ABORTING_EXIT_CODE = 1
@@ -1265,6 +1266,15 @@ def parse_args(argv: list[str], parser: argparse.ArgumentParser) -> argparse.Nam
 def main(argv: List[str] | None = None) -> int:
     """CLI entrypoint."""
 
+    def _signal_handler(signum, frame):
+        raise KeyboardInterrupt
+
+    signal.signal(signal.SIGINT, _signal_handler)
+    try:
+        signal.signal(signal.SIGTERM, _signal_handler)
+    except Exception:
+        pass
+
     argv = sys.argv[1:] if argv is None else argv
 
     default_modifiers = parse_comma_list(DEFAULT_MODIFIERS)
@@ -1437,4 +1447,7 @@ def main(argv: List[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        sys.exit(ABORTING_EXIT_CODE)
