@@ -17,8 +17,6 @@ aborting() {
 }
 
 main() {
-    export VSCODE_KEYBINDINGS_BIN_DIR="$(realpath "${0%/*}")"
-
     if [ -d "${VSCODE_KEYBINDINGS_BIN_DIR}"/../references ]; then
         export VSCODE_KEYBINDINGS_DIR="${VSCODE_KEYBINDINGS_BIN_DIR%/*}"
         export VSCODE_KEYBINDINGS_REFERENCES_DIR="${VSCODE_KEYBINDINGS_DIR}/references"
@@ -27,12 +25,10 @@ main() {
 
     [ "${VSCODE_KEYBINDINGS_DIR}" == "" ] && aborting "could not determine VSCODE_KEYBINDINGS_DIR"
 
-    echo "VSCODE_KEYBINDINGS_DIR=${VSCODE_KEYBINDINGS_DIR}"
-    echo "VSCODE_KEYBINDINGS_BIN_DIR=${VSCODE_KEYBINDINGS_BIN_DIR}"
-    echo "VSCODE_KEYBINDINGS_REFERENCES_DIR=${VSCODE_KEYBINDINGS_REFERENCES_DIR}"
-    echo "VSCODE_KEYBINDINGS_TMP_DIR=${VSCODE_KEYBINDINGS_TMP_DIR}"
-
-    export PATH="${PATH}:${VSCODE_KEYBINDINGS_BIN_DIR}"
+    echo "VSCODE_KEYBINDINGS_DIR=${VSCODE_KEYBINDINGS_DIR}" >&2
+    echo "VSCODE_KEYBINDINGS_BIN_DIR=${VSCODE_KEYBINDINGS_BIN_DIR}" >&2
+    echo "VSCODE_KEYBINDINGS_REFERENCES_DIR=${VSCODE_KEYBINDINGS_REFERENCES_DIR}" >&2
+    echo "VSCODE_KEYBINDINGS_TMP_DIR=${VSCODE_KEYBINDINGS_TMP_DIR}" >&2
 
     if [ "${1}" == "" ]; then
         usage
@@ -62,7 +58,7 @@ main() {
 
 # add the canonical diagnostic surfaces into the references keybindings.json test surface, preserving the original base objects and their placements
 references_test_surface_diagnostics_add() {
-    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/add.$$.jsonc"
 
     local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
 
@@ -76,6 +72,7 @@ references_test_surface_diagnostics_add() {
 
     for diagnostic_surface in "${diagnostic_surfaces[@]}"; do
         echo "----"
+        echo
         echo "diagnostic_surface=${diagnostic_surface}"
         echo
 
@@ -91,24 +88,18 @@ references_test_surface_diagnostics_add() {
     cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
     echo
 
-    echo "Annotating duplicates ..."
-    keybindings-duplicate.py --detect "${test_surface}" > "${tmp_file}"
+    echo "Correcting duplicates ..."
+    keybindings-duplicate.py --detect --correct-duplicate-ids "${test_surface}" > "${tmp_file}"
     cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
 
-    if type -P prettier &> /dev/null; then
-        echo
-        echo "Making ${test_surface} prettier ..."
-        prettier "${test_surface}" > "${tmp_file}"
-        cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
-        rm -f "${tmp_file}" &> /dev/null
-    fi
+    references_test_surface_prettier
 
     rm -f "${tmp_file}" &> /dev/null
     echo
 }
 
 references_test_surface_diagnostics_build() {
-    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/build.$$.jsonc"
 
     local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
 
@@ -126,28 +117,30 @@ references_test_surface_diagnostics_build() {
 }
 
 references_test_surface_diagnostics_clean() {
-    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/clean.$$.jsonc"
 
     local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
 
-    keybindings-pipeline.sh references_test_surface_diagnostics_remove
-    keybindings-pipeline.sh references_test_surface_diagnostics_add
+    keybindings-pipeline.sh references_test_surface_diagnostics_remove 2> /dev/null
+    keybindings-pipeline.sh references_test_surface_diagnostics_add 2> /dev/null
 
-    keybindings-duplicate.sh --detect --correct-duplicate-ids "${test_surface}" > "${tmp_file}"
+    keybindings-duplicate.py --detect --correct-duplicate-ids "${test_surface}" > "${tmp_file}"
     cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
+
+    references_test_surface_prettier
 
     rm -f "${tmp_file}" &> /dev/null
 }
 
 references_test_surface_diagnostics_expand() {
-    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/expand.$$.jsonc"
 
     echo tmp_file=${tmp_file}
 }
 
 # remove all canonical diagnostic command objects from the references keybinding.json test surface, leaving only the valid command objects
 references_test_surface_diagnostics_remove() {
-    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/remove.$$.jsonc"
 
     local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
 
@@ -162,13 +155,13 @@ references_test_surface_diagnostics_remove() {
 
 # ingest (merge) an existing keybindings.json array into the references keybindings.json test surface, overwriting existing objects
 references_test_surface_ingest() {
-    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/ingest.$$.jsonc"
 
     echo tmp_file=${tmp_file}
 }
 
 references_test_surface_foci_get() {
-    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/foci.$$.jsonc"
 
     local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
 
@@ -211,6 +204,26 @@ references_test_surface_foci_get() {
 
 }
 
+references_test_surface_prettier() {
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/keybindings.$$.tmp.jsonc"
+
+    local test_surface
+    if [ -f "${1}" ]; then
+        test_surface="${1}"
+    else
+        test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
+    fi
+
+    if type -P prettier &> /dev/null; then
+        echo
+        echo "Making ${test_surface} prettier ..."
+        prettier "${test_surface}" > "${tmp_file}"
+        cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
+    fi
+
+    rm -f "${tmp_file}" &> /dev/null
+}
+
 usage() {
     printf "\nusage: $(basename "$0") <option>\n\n"
 
@@ -236,5 +249,8 @@ usage() {
 # execute
 
 [ "${1}" == "" ] && usage
+
+export VSCODE_KEYBINDINGS_BIN_DIR="$(realpath "${0%/*}")"
+export PATH="${PATH}:${VSCODE_KEYBINDINGS_BIN_DIR}"
 
 main ${@}
