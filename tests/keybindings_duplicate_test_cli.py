@@ -98,6 +98,44 @@ class KeybindingsDuplicateCliTests(unittest.TestCase):
             self.assertEqual(proc.returncode, 0, msg=rel_path)
             self.assertIn("[", proc.stdout.decode("utf-8"), msg=rel_path)
 
+    def test_automatic_contexts_do_not_infer_terminal_enabled_from_negated_terminal_focus(self) -> None:
+        data = dedent(
+            """
+            [
+              {
+                "key": "alt+h",
+                "command": "workbench.action.navigateLeft",
+                "when": "config.keyboardNavigation.enabled && !terminalFocus && editorFocus"
+              }
+            ]
+            """
+        )
+
+        proc = _run_dup(data, ["-f", "h", "-t", "left", "-m", "alt", "-a"])
+        self.assertEqual(proc.returncode, 0)
+        out = proc.stdout.decode("utf-8")
+        self.assertRegex(out, r'"key":\s*"alt\+left"')
+        self.assertNotIn("config.keyboardNavigation.terminal.enabled", out)
+
+    def test_automatic_contexts_infer_terminal_enabled_from_positive_terminal_focus(self) -> None:
+        data = dedent(
+            """
+            [
+              {
+                "key": "alt+h",
+                "command": "workbench.action.navigateLeft",
+                "when": "config.keyboardNavigation.enabled && terminalFocus && editorFocus"
+              }
+            ]
+            """
+        )
+
+        proc = _run_dup(data, ["-f", "h", "-t", "left", "-m", "alt", "-a"])
+        self.assertEqual(proc.returncode, 0)
+        out = proc.stdout.decode("utf-8")
+        self.assertRegex(out, r'"key":\s*"alt\+left"')
+        self.assertIn("config.keyboardNavigation.terminal.enabled", out)
+
 
 def _run_dup(input_text: str, args: list[str] | None = None) -> subprocess.CompletedProcess[bytes]:
     """Run the duplicate script with optional args and stdin input."""

@@ -127,7 +127,7 @@ references_test_surface_diagnostics_clean() {
     keybindings-duplicate.py --detect --correct-duplicate-ids "${test_surface}" > "${tmp_file}"
     cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
 
-    references_test_surface_prettier
+    references_test_surface_prettier 2> /dev/null
 
     rm -f "${tmp_file}" &> /dev/null
 }
@@ -216,7 +216,7 @@ references_test_surface_prettier() {
 
     if type -P prettier &> /dev/null; then
         echo
-        echo "Making ${test_surface} prettier ..."
+        echo "Making ${test_surface} prettier ..." >&2
         prettier "${test_surface}" > "${tmp_file}"
         cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
     fi

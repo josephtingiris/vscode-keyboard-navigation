@@ -209,6 +209,23 @@ def merge_when_clause(existing: str, extra: str) -> str:
     return f"{extra} && {existing}"
 
 
+def has_non_negated_when_context(expr: str, context_name: str) -> bool:
+    """Return True when a context appears in expr without leading negation."""
+
+    if not expr or not context_name:
+        return False
+
+    for token in _keybindings._split_when_contexts(expr):
+        normalized = token.strip()
+        while normalized.startswith("(") and normalized.endswith(")") and len(normalized) >= 2:
+            normalized = normalized[1:-1].strip()
+        if not normalized or normalized.startswith("!"):
+            continue
+        if normalized == context_name or normalized.startswith(f"{context_name} "):
+            return True
+    return False
+
+
 def insert_comments_inside_object(obj_text: str, comments: list[str]) -> str:
     """Insert comment lines inside an object before its final closing brace.
 
@@ -421,7 +438,7 @@ def build_emitted_objects(
                     auto_ctxs.append("config.keyboardNavigation.juke.enabled")
                 if key_norm in _corpus._SPLIT_GROUP:
                     auto_ctxs.append("config.keyboardNavigation.split.enabled")
-                if "terminal" in (extra_when_clause or "").lower():
+                if has_non_negated_when_context(extra_when_clause or "", "terminalFocus"):
                     auto_ctxs.append("config.keyboardNavigation.terminal.enabled")
                 if auto_ctxs:
                     if combined_extra:
@@ -497,8 +514,10 @@ def build_emitted_objects(
                     auto_ctxs = []
                 if key_norm in _corpus._SPLIT_GROUP and "config.keyboardNavigation.split.enabled" not in per_combined_extra:
                     auto_ctxs.append("config.keyboardNavigation.split.enabled")
-                cmd_val = str(record.parsed_obj.get("command", ""))
-                if ("terminal" in source_when.lower() or "terminalfocus" in source_when.lower() or "terminal" in cmd_val.lower()):
+                if (
+                    has_non_negated_when_context(source_when, "terminalFocus")
+                    or has_non_negated_when_context(per_combined_extra, "terminalFocus")
+                ):
                     if "config.keyboardNavigation.terminal.enabled" not in per_combined_extra:
                         auto_ctxs.append("config.keyboardNavigation.terminal.enabled")
                 if auto_ctxs:
