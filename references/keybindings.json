@@ -99027,7 +99027,8 @@ Notes:
   },
   {
     "key": "ctrl+d",
-    "command": "ctrl+d e8825",
+    "command": "workbench.action.closeActiveEditor",
+    // "command": "ctrl+d e8825",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && !auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && focusedView == '' && !activeEditorIsReadonly"
   },
   {
