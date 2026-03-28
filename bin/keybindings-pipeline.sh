@@ -120,10 +120,23 @@ references_test_surface_diagnostics_build() {
     make maps
     make surfaces
 
+    references_test_surface_diagnostics_clean
+
+    cd "${here}"
+}
+
+references_test_surface_diagnostics_clean() {
+    local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/m1.$$.jsonc"
+
+    local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
+
     keybindings-pipeline.sh references_test_surface_diagnostics_remove
     keybindings-pipeline.sh references_test_surface_diagnostics_add
 
-    cd "${here}"
+    keybindings-duplicate.sh --detect --correct-duplicate-ids "${test_surface}" > "${tmp_file}"
+    cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
+
+    rm -f "${tmp_file}" &> /dev/null
 }
 
 references_test_surface_diagnostics_expand() {
