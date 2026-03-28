@@ -98,36 +98,6 @@ Notes:
     "when": "config.keyboardNavigation.enabled"
   },
   {
-    // [keynav] (corpus) (0) (self) (gold) (X)
-    "key": "alt+h",
-    "command": "(corpus) alt+h baba2",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (0) (self) (gold) (X)
-    "key": "alt+j",
-    "command": "(corpus) alt+j d6dae",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (0) (self) (gold) (X)
-    "key": "alt+k",
-    "command": "(corpus) alt+k a12b8",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (0) (self) (gold) (X)
-    "key": "alt+l",
-    "command": "(corpus) alt+l ec431",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
-    // [keynav] (corpus) (0) (self) (gold) (X)
-    "key": "alt+x",
-    "command": "(corpus) alt+x d0ffe",
-    "when": "config.keyboardNavigation.enabled"
-  },
-  {
     // [keynav] (0) (self) (gold) (X)
     "key": "alt+x escape",
     "command": "keyboardNavigation.resetLayout",
@@ -127540,7 +127510,8 @@ Notes:
   {
     // [keynav] (map) (up) (vi) (move) (1) (red) (A) (editor) (text) (multiple)
     "key": "shift+alt+k",
-    "command": "shift+alt+k 954a8",
+    "command": "-noop",
+    // "command": "shift+alt+k 954a8",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && editorFocus && editorTextFocus && !panelFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && multipleEditorGroups"
   },
   {
