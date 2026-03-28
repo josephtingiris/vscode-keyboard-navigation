@@ -67,7 +67,7 @@ references_test_surface_diagnostics_add() {
     diagnostic_surfaces+=("${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.surface.jsonc")
     diagnostic_surfaces+=("${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.surface.vi.jsonc")
 
-    echo tmp_file=${tmp_file}
+    echo test_surface=${test_surface}, tmp_file=${tmp_file}
     echo
 
     for diagnostic_surface in "${diagnostic_surfaces[@]}"; do
@@ -135,7 +135,10 @@ references_test_surface_diagnostics_clean() {
 references_test_surface_diagnostics_expand() {
     local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/expand.$$.jsonc"
 
-    echo tmp_file=${tmp_file}
+    local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
+
+    echo test_surface=${test_surface}, tmp_file=${tmp_file}
+    echo
 }
 
 # remove all canonical diagnostic command objects from the references keybinding.json test surface, leaving only the valid command objects
@@ -144,7 +147,7 @@ references_test_surface_diagnostics_remove() {
 
     local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
 
-    echo tmp_file=${tmp_file}
+    echo test_surface=${test_surface}, tmp_file=${tmp_file}
     echo
 
     echo "Removing diagnosticts from ${test_surface} ..."
@@ -157,7 +160,10 @@ references_test_surface_diagnostics_remove() {
 references_test_surface_ingest() {
     local tmp_file="${VSCODE_KEYBINDINGS_TMP_DIR}/ingest.$$.jsonc"
 
-    echo tmp_file=${tmp_file}
+    local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
+
+    echo test_surface=${test_surface}, tmp_file=${tmp_file}
+    echo
 }
 
 references_test_surface_foci_get() {
@@ -166,6 +172,7 @@ references_test_surface_foci_get() {
     local test_surface="${VSCODE_KEYBINDINGS_REFERENCES_DIR}/keybindings.json"
 
     echo test_surface=${test_surface}, tmp_file=${tmp_file}
+    echo
 
     grep \"when\": "${test_surface}" |
         sed -E \
@@ -215,7 +222,6 @@ references_test_surface_prettier() {
     fi
 
     if type -P prettier &> /dev/null; then
-        echo
         echo "Making ${test_surface} prettier ..." >&2
         prettier "${test_surface}" > "${tmp_file}"
         cat "${tmp_file}" | keybindings-sort.py -w focal-invariant > "${test_surface}"
@@ -229,15 +235,10 @@ usage() {
 
     echo "options:"
     echo
-    echo " - KEYBINDINGS_MAP_FOCUS"
+    cat "${0}" | grep -E '^[a-zA-Z0-9_-]+\(\)' | sed -E 's/([a-zA-Z0-9_-]+)\(\).*/\1/' | sort -u | grep -Eve '^aborting|^main$|^usage' | while read option; do
+        echo "  ${option}"
+    done
     echo
-
-    #echo "examples:"
-    #echo
-    #echo "KEYBINDINGS_MAP_FOCUS=\"inQuickEdit && editorFocus\" $(basename $0) vi"
-    #echo "KEYBINDINGS_MAP_MODIFIERS=shift+alt KEYBINDINGS_MAP_FOCUS=\"inQuickEdit\" $(basename $0) vi"
-    #echo "WHEN_PREFIX=\"config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi'\" KEYBINDINGS_MAP_MODIFIERS=alt,shift+alt KEYBINDINGS_MAP_FOCUS=\"inQuickEdit\" $(basename $0) vi"
-    #echo
 
     exit 99
 }
