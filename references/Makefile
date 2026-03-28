@@ -56,21 +56,24 @@ clean:
 	# remove any other temporary files in references/
 	-@rm -rf node_modules .cache tmp
 
-corpora:
+corpora: corpora-none corpora-letter-key-groups corpora-all
 	@echo "++ Updating references keybindings corpus files ..."
 	@echo
 
-	# none
-	@keybindings-corpus.py -a | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.jsonc
+corpora-all:
+	# copora-all
+	@keybindings-corpus.py -a -n all | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.all.jsonc
+	@echo
 
-	# letter-key groups
+corpora-letter-key-groups:
+	# copora-letter-key groups
 	@for lkg in $(LETTER_KEY_GROUPS); do \
 		../bin/keybindings-corpus.py -a -n $$lkg | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.$$lkg.jsonc; \
 	done
 
-	# all
-	@keybindings-corpus.py -a -n all | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.all.jsonc
-	@echo
+corpora-none:
+	# copora-none
+	@keybindings-corpus.py -a | keybindings-sort.py $(KEYBINDINGS_SORT_ARGUMENTS) > keybindings.corpus.jsonc
 
 corpus: corpora
 
