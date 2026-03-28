@@ -1,7 +1,7 @@
-!auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && activeEditor != '' && focusedView == '' && activeEditorIsReadonly && editorIsOpen
-!auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && focusedView == '' && !activeEditorIsReadonly && editorIsOpen
-!auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && focusedView == '' && activeEditorIsReadonly && editorIsOpen
-!auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && activeEditor == 'workbench.editors.errorEditor' && editorIsOpen
+!auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && focusedView == '' && !activeEditorIsReadonly
+!auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && !editorFocus && focusedView == '' && activeEditorIsReadonly
+!auxiliaryBarFocus && !terminalFocus && !sideBarFocus && !panelFocus && activeEditor == 'workbench.editors.errorEditor'
+# editorFocus && editorTextFocus && !panelFocus && (auxiliaryBarVisible || panelVisible || sideBarVisible)
 auxiliaryBarFocus
 auxiliaryBarFocus && !panelVisible
 editorFocus
@@ -9,13 +9,11 @@ editorFocus && !panelFocus
 editorFocus && editorTextFocus
 editorFocus && editorTextFocus && !auxiliaryBarVisible && !panelVisible && !sideBarVisible
 editorFocus && editorTextFocus && !panelFocus
-editorFocus && editorTextFocus && !panelFocus && (auxiliaryBarVisible || panelVisible || sideBarVisible)
 editorFocus && editorTextFocus && !panelFocus && multipleEditorGroups
-editorFocus && editorTextFocus && editorHasDocumentFormattingProvider && !editorReadonly && !inCompositeEditor
 editorFocus && panelFocus
 panelFocus
 panelFocus && !editorFocus
-panelFocus && editorFocus && !auxiliaryBarFocus && !terminalFocus && !sideBarFocus && activePanel == 'workbench.panel.output' && editorIsOpen
+panelFocus && editorFocus && !auxiliaryBarFocus && !terminalFocus && !sideBarFocus && activePanel == 'workbench.panel.output'
 panelFocus && sideBarFocus
 panelFocus && terminalFocus
 sideBarFocus && !panelVisible
