@@ -110,6 +110,14 @@ Notes:
     // "0.0.2": "keyboardNavigation.applyVisualHighlights",
   },
   {
+    "key": "ctrl+shift+/",
+    "command": "editor.action.triggerSuggest",
+    // "command": "ctrl+shift+/ 121871",
+    // "command": "focusSuggestion",
+    "when": "config.keyboardNavigation.enabled"
+    // note ceditor.action.triggerSuggest is very handy in the chat input box (and others)
+  },
+  {
     // [keynav] (0) (self) (gold) (X)
     "key": "alt+h",
     "command": "-editor.action.accessibilityHelpOpenHelpLink",
@@ -4339,6 +4347,11 @@ Notes:
     // [note] open and focus the (SECONDARY) CHAT viewlet
   },
   {
+    "key": "alt+a l",
+    "command": "workbench.action.editorDictation.stop",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && editorDictation.inProgress && github.copilot-chat.activated"
+  },
+  {
     // [keynav] (vi) (action) (chord) (editor) (text)
     "key": "ctrl+a",
     "command": "editor.action.selectAll",
@@ -4420,6 +4433,21 @@ Notes:
     // "command": "alt+a i 20294",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && github.copilot-chat.activated"
     // "0.0.3": "github.copilot.chat.completions.toggle",
+  },
+  {
+    "key": "alt+a l",
+    "command": "workbench.action.editorDictation.start",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && github.copilot-chat.activated && !editorDictation.inProgress"
+  },
+  {
+    "key": "alt+a h",
+    "command": "workbench.action.chat.startVoiceChat",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && github.copilot-chat.activated && !voiceChatInProgress"
+  },
+  {
+    "key": "alt+a h",
+    "command": "workbench.action.chat.stopListeningAndSubmit",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && github.copilot-chat.activated && voiceChatInProgress"
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (panel)
@@ -4526,7 +4554,6 @@ Notes:
     // "0.0.3": "workbench.action.reloadWindow",
   },
   {
-    // [keynav] (corpus) (vi) (debug) (chord)
     // [keynav] (corpus) (vi) (debug) (chord) (pass)
     "key": "ctrl+d",
     "command": "-noop",
