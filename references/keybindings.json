@@ -1,4 +1,5 @@
 /*
+vim: ft=jsonc
 // ^.*\"key.*alt+h",
 // ^.*\"key.*+h",
 
@@ -171,6 +172,13 @@ Notes:
     // "command": "ctrl+shift+alt+= 4900d",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.split.enabled"
     // "0.0.3": "workbench.action.zoomIn",
+  },
+  {
+    // [keynav]
+    "key": "ctrl+shift+s",
+    "command": "ctrl+shift+s 0b1871",
+    "when": "config.keyboardNavigation.enabled && editorFocus"
+    // save all open editors
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X)
@@ -3396,13 +3404,34 @@ Notes:
     // note: mimic windows terminal (for tmux)
   },
   {
+    "key": "ctrl+b",
+    "command": "workbench.action.terminal.sendSequence",
+    // "command": "ctrl+b 7c3b5",
+    "args": {
+      "text": "\u0002"
+    },
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus"
+    // vi/emacs back
+  },
+  {
+    "key": "ctrl+f",
+    "command": "workbench.action.terminal.sendSequence",
+    // "command": "ctrl+f 7c3f5",
+    "args": {
+      "text": "\u0006"
+    },
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus"
+    // vi/emacs forward
+  },
+  {
     "key": "ctrl+h",
-    //"command": "workbench.action.terminal.sendSequence",
-    "command": "ctrl+h 7c3e5",
+    "command": "workbench.action.terminal.sendSequence",
+    // "command": "ctrl+h 7c3e5",
     "args": {
       "text": "\u001bh"
     },
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus"
+    // mimic windows terminal alt+h
   },
   {
     "key": "ctrl+j",
@@ -3412,6 +3441,7 @@ Notes:
       "text": "\u001bj"
     },
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus"
+    // mimic windows terminal alt+j
   },
   {
     "key": "ctrl+k",
@@ -3421,6 +3451,7 @@ Notes:
       "text": "\u001bk"
     },
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus"
+    // mimic windows terminal alt+k
   },
   {
     "key": "ctrl+l",
@@ -3430,6 +3461,7 @@ Notes:
       "text": "\u001bl"
     },
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus"
+    // mimic windows terminal alt+l
   },
   {
     "key": "ctrl+shift+[",
@@ -3439,6 +3471,7 @@ Notes:
       "text": "\u001b{"
     },
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus"
+    // note for windows terminal+tmux
   },
   {
     "key": "ctrl+shift+]",
@@ -3448,6 +3481,27 @@ Notes:
       "text": "\u001b]"
     },
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus"
+    // note for windows terminal+tmux
+  },
+  {
+    "key": "ctrl+shift+b",
+    "command": "workbench.action.terminal.sendSequence",
+    // "command": "ctrl+shift+b 8b3e5",
+    "args": {
+      "text": "\u001bB"
+    },
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus"
+    // note for windows terminal+tmux
+  },
+  {
+    "key": "ctrl+shift+f",
+    "command": "workbench.action.terminal.sendSequence",
+    // "command": "ctrl+shift+f 8f3e5",
+    "args": {
+      "text": "\u001bF"
+    },
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && terminalFocus"
+    // note for windows terminal+tmux
   },
   {
     // [keynav] (left) (vi) (juke) (0) (self) (gold) (X) (terminal) (pass)
