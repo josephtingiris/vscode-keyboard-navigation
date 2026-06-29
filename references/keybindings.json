@@ -75,6 +75,7 @@ Notes:
 
   * The keybindings in this reference file use my 'Focal-Invariant Navigation' (FIN) model to determine when contexts.
   * My main editor is [neo]vim, so these keybindings are designed to augment and blend with the traditional vi keyboard grammar (and muscle memory).
+  * with copilot, reject or clear Next Edit Suggestions: editor.action.inlineEdit.hide
 
 */
 [
@@ -4437,8 +4438,9 @@ Notes:
   {
     // [keynav] (vi) (action) (chord) (editor) (text)
     "key": "ctrl+c",
-    //"command": "editor.action.clipboardCopyAction",
-    "command": "ctrl+c de172",
+    "command": "-noop",
+    // "command": "editor.action.clipboardCopyAction",
+    // "command": "ctrl+c de172",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && editorFocus && editorTextFocus"
   },
   {
@@ -4654,6 +4656,12 @@ Notes:
     "command": "-noop",
     // "command": "(corpus) ctrl+d 8975f",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
+  },
+  {
+    "key": "alt+d alt+c",
+    "command": "github.copilot.clearCache",
+    // "command": "alt+d alt+c f1881",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug && editorDictation.inProgress && github.copilot-chat.activated"
   },
   {
     // [keynav] (vi) (debug) (chord) (neovim)
