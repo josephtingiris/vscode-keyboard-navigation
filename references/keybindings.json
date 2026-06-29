@@ -4405,21 +4405,18 @@ Notes:
     // [note] toggle secondary side bar
   },
   {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
+    "key": "alt+a c",
+    "command": "workbench.action.focusAuxiliaryBar",
+    // "command": "alt+a c 38bad",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && chatIsEnabled"
+    // "0.0.3": "workbench.action.focusAuxiliaryBar",
+  },
+  {
     "key": "alt+a c",
     "command": "workbench.action.closeAuxiliaryBar",
     // "command": "alt+a c 49ba1",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && auxiliaryBarFocus && config.workbench.sideBar.location == 'left' && panelPosition == 'bottom' && activeAuxiliary == 'workbench.panel.chat' && chatIsEnabled"
-  },
-  {
-    // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
-    "key": "alt+a c",
-    "command": "workbench.action.chat.focusInput",
-    // "command": "alt+a c 38bad",
-    // "command": "workbench.action.chat.focusAgentSessionsViewer",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && chatIsEnabled"
-    // "0.0.3": "workbench.action.focusAuxiliaryBar",
-    // [note] open and focus the (SECONDARY) CHAT viewlet
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && chatIsEnabled && auxiliaryBarVisible"
+    // "0.0.3.1": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && chatIsEnabled && auxiliaryBarVisible"
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord)
@@ -4427,6 +4424,13 @@ Notes:
     "command": "workbench.action.editorDictation.stop",
     // "command": "alt+a l 19a46",
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && editorDictation.inProgress && github.copilot-chat.activated"
+  },
+  {
+    "key": "alt+a z",
+    "command": "workbench.action.toggleMaximizeEditorGroup",
+    // "command": "alt+a z 8dc9a",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && editorFocus && editorTextFocus"
+    // "0.0.3.1": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.action && editorFocus && editorTextFocus"
   },
   {
     // [keynav] (vi) (action) (chord) (editor) (text)
@@ -4461,8 +4465,9 @@ Notes:
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (editor) (text)
     "key": "alt+a z",
-    "command": "runCommands",
+    "command": "-noop",
     // "command": "alt+a z 8807e",
+    // "command": "runCommands",
     "args": {
       "commands": [
         "workbench.action.toggleSidebarVisibility",
@@ -4476,6 +4481,7 @@ Notes:
     // [note] 'toggle' maximized editor group
     // [note] this is like a pseudo-zen mode; everything closes except the status bar
     // [bug] runCommands and/or togglePanel are still stealing the cursor despite the last command being focusActiveEditorGroup
+    // [note] "0.0.3.1" enabling this drives me nuts; I keep accidentally pressing alt+a z and then losing focus of the editor.  I think this is a bad idea, but I will leave it here for now in case I want to experiment with it later
   },
   {
     // [keynav] (vi) (0) (self) (gold) (X) (action) (chord) (editor) (text)
@@ -4658,10 +4664,16 @@ Notes:
     "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug"
   },
   {
+    "key": "alt+d c",
+    "command": "editor.action.inlineSuggest.hide",
+    // "command": "alt+d c 55b14",
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug && github.copilot-chat.activated"
+  },
+  {
     "key": "alt+d alt+c",
-    "command": "github.copilot.clearCache",
+    "command": "workbench.action.chat.clearHistory", // ui prompts y/n
     // "command": "alt+d alt+c f1881",
-    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug && editorDictation.inProgress && github.copilot-chat.activated"
+    "when": "config.keyboardNavigation.enabled && config.keyboardNavigation.keys.letters == 'vi' && config.keyboardNavigation.chords.debug && github.copilot-chat.activated"
   },
   {
     // [keynav] (vi) (debug) (chord) (neovim)
