@@ -260,4 +260,7 @@ BLUE='\033[34m'
 MAGENTA='\033[35m'
 CYAN='\033[36m'
 
+# ensure ${BASH_SOURCE[0]} directory is in PATH for keybindings-sort.py and keybindings-remove-comments.py
+export PATH="${DIRNAME}:${PATH}"
+
 main "${@}"
